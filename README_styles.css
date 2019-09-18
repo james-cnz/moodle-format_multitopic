@@ -1,0 +1,143 @@
+/* STYLES */
+
+/* To install:
+ * Site administration > Appearance > Additional HTML > Within HEAD: Copy and paste styles (in style tag).
+ * Insert page heading background image URL.
+ * Adjust anchor jump fix for the height of the Moodle page top nav bar.
+ * Set specific category details. */
+
+/* Page */
+body.format-multitopic div#page {
+    max-width: 1680px;
+}
+
+/* Course Header */
+body.format-multitopic div#course-header > div#course-header-banner {
+    max-width: none;  /* Needed on LTD server? */
+    padding: 40px;
+    font-size: xx-large;
+    color: #fff;
+    background-size: cover;
+}
+body.format-multitopic div#course-header > p#course-header-banner_attribution {
+    text-align: right;
+    margin: 0;
+    font-size: xx-small;
+}
+
+/* Tabs */
+/* INCLUDED moodle/course/format/onetopic CHANGED. */
+body.format-multitopic .course-content ul.nav-tabs li a .tab_content {
+    border-top: transparent 2px solid;
+}
+body.format-multitopic .course-content ul.nav-tabs li a .tab_content.marker {
+    border-top: #06c 2px solid;
+}
+body.format-multitopic .course-content ul.nav-tabs li a .tab_content.dimmed {
+    color: #999;
+    background-color: transparent;
+}
+/* END INCLUDED */
+
+/* Generic Section */
+body.format-multitopic ul.sections li.section {
+    width: 100%;
+    height: auto;
+    position: initial;
+    visibility: visible;
+    margin-bottom: 1rem;
+}
+body.format-multitopic ul.sections li.section .content {
+    display: block;
+}
+body.format-multitopic ul.sections li.section .content .sectionname {
+    background: #eee;
+    padding: 10px;
+    margin-bottom: 0;
+    font-size: large;
+}
+body.format-multitopic ul.sections li.section:not(.hidden) .content .sectionname {
+    color: #000;
+}
+body.format-multitopic ul.sections li.section:not(.hidden) .content .sectionname a {
+    color: #000;
+}
+body.format-multitopic ul.sections li.section .content .sectionname .section_subtitle {
+    font-size: small;
+}
+body.format-multitopic ul.sections li.section .summary {
+    padding: 1rem;
+}
+body.format-multitopic ul.sections li.section .summary .section_image_holder {
+    text-align: right;
+}
+body.format-multitopic ul.sections li.section .section_image_holder {
+    float: right;
+    width: 240px;
+    font-size: xx-small;
+}
+body.format-multitopic ul.sections li.section .section_image_holder img {
+    width: 240px;
+    height: 180px;
+    object-fit: cover;
+}
+
+/* Section Anchor Jump Fix */
+body.format-multitopic ul.sections li.section::before {
+    display: block;
+    content: " ";
+    margin-top: -100px;
+    height: 100px;
+    visibility: hidden;
+    pointer-events: none;
+    position: initial;
+}
+body.format-multitopic ul.sections li.section {
+    background: none;
+}
+
+/* Page Section */
+body.format-multitopic ul.sections li.section.section-page .content .sectionname {
+    background: url("[page_heading_background]");
+    padding: 30px;
+    font-size: x-large;
+}
+
+/* Topic Section */
+body.format-multitopic ul.sections li.section.section-topic {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+/* Current Section */
+body.format-multitopic ul.sections li.section.current .content h3 {
+    border-left: #06c 2px solid;
+}
+
+/* Timed Topic Section */
+body.format-multitopic ul.sections li.section.section-topic-timed .content .sectionname {
+    background: linear-gradient(to right, #7ce, #7bb);
+}
+body.format-multitopic ul.sections li.section.section-topic-timed:not(.hidden) .content .sectionname {
+    color: #fff;
+}
+body.format-multitopic ul.sections li.section.section-topic-timed:not(.hidden) .content .sectionname a {
+    color: #fff;
+}
+body.format-multitopic ul.sections li.section.section-topic-timed .content .section_availability {
+    background: #eee;
+}
+body.format-multitopic ul.sections li.section.section-topic-timed .content .summary {
+    background: #eee;
+}
+
+/* Hidden Section */
+body.format-multitopic ul.sections li.section.hidden .content .sectionname {
+    color: #868e96;
+}
+body.format-multitopic ul.sections li.section.hidden .content .sectionname a {
+    color: #868e96;
+}
+
+/* Section Custom Style for Specific Category (example) */
+/*body.category-2.format-multitopic ul.sections li.section.section-topic-timed .content .sectionname { background: #b45341; }*/

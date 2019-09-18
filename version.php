@@ -17,14 +17,14 @@
 /**
  * Version details
  *
- * @package    format
- * @subpackage topics
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
+ * @package    format_multitopic
+ * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com),
+ *             2018 Otago Polytechnic
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019052000;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2019051100;        // Requires this Moodle version.
-$plugin->component = 'format_topics';    // Full name of the plugin (used for diagnostics).
+$plugin->version   = 2019051118;        // The current plugin version (Date: YYYYMMDDXX).
+$plugin->requires  = 2018050800;        // Requires this Moodle version.
+$plugin->component = 'format_multitopic';    // Full name of the plugin (used for diagnostics). // CHANGED: format name.

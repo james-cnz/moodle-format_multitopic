@@ -13,19 +13,21 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Privacy Subsystem implementation for format_topics.
+ * Privacy Subsystem implementation for format_multitopic.
  *
- * @package    format_topics
- * @copyright  2018 Carlos Escobedo <carlos@moodle.com>
+ * @package    format_multitopic
+ * @copyright  2018 Carlos Escobedo <carlos@moodle.com>,
+ *             2018 Otago Polytechnic
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace format_topics\privacy;
+namespace format_multitopic\privacy;
 defined('MOODLE_INTERNAL') || die();
 /**
- * Privacy Subsystem for format_topics implementing null_provider.
+ * Privacy Subsystem for format_multitopic implementing null_provider.
  *
- * @copyright  2018 Carlos Escobedo <carlos@moodle.com>
+ * @copyright  2018 Carlos Escobedo <carlos@moodle.com>, 2018 Otago Polytechnic
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {

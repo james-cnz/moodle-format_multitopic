@@ -15,25 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer for outputting the topics course format.
+ * Renderer for outputting the multitopic course format.
  *
- * @package format_topics
- * @copyright 2012 Dan Poltawski
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @since Moodle 2.3
+ * @package   format_multitopic
+ * @copyright 2012 Dan Poltawski,
+ *            2018 Otago Polytechnic
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @since     Moodle 2.3
  */
 
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot.'/course/format/renderer.php');
+require_once($CFG->dirroot . '/course/format/renderer.php');
+// ADDED.
+require_once(__DIR__ . '/lib.php');
+require_once(__DIR__ . '/locallib.php');
+require_once(__DIR__ . '/classes/core_course_renderer_wrapper.php');
+// END ADDED.
 
 /**
- * Basic renderer for topics format.
+ * Basic renderer for multitopic format.
  *
- * @copyright 2012 Dan Poltawski
+ * @copyright 2012 Dan Poltawski,
+ *            2018 Otago Polytechnic
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_topics_renderer extends format_section_renderer_base {
+class format_multitopic_renderer extends format_section_renderer_base {         // CHANGED.
 
     /**
      * Constructor method, calls the parent constructor
@@ -41,27 +48,39 @@ class format_topics_renderer extends format_section_renderer_base {
      * @param moodle_page $page
      * @param string $target one of rendering target constants
      */
-    public function __construct(moodle_page $page, $target) {
+    public function __construct(moodle_page $page, string $target) {
         parent::__construct($page, $target);
 
-        // Since format_topics_renderer::section_edit_control_items() only displays the 'Highlight' control when editing mode is on
-        // we need to be sure that the link 'Turn editing mode on' is available for a user who does not have any other managing capability.
-        $page->set_other_editing_capability('moodle/course:setcurrentsection');
+        // REMOVED: Marker stuff.
+
+        // ADDED.
+        // If we're on the view page, patch the URL to use the section ID instead of section number.
+        global $PAGE;
+        if ($PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+            && $id = optional_param('id', null, PARAM_INT)) {
+            $params = ['id' => $id];
+            if ($sectionid = optional_param('sectionid', null, PARAM_INT)) {
+                $params['sectionid'] = $sectionid;
+            }
+            $PAGE->set_url('/course/view.php', $params);
+        }
+        // END ADDED.
+
     }
 
     /**
      * Generate the starting container html for a list of sections
      * @return string HTML to output.
      */
-    protected function start_section_list() {
-        return html_writer::start_tag('ul', array('class' => 'topics'));
+    protected function start_section_list() : string {
+        return html_writer::start_tag('ul', array('class' => 'sections'));
     }
 
     /**
      * Generate the closing container html for a list of sections
      * @return string HTML to output.
      */
-    protected function end_section_list() {
+    protected function end_section_list() : string {
         return html_writer::end_tag('ul');
     }
 
@@ -69,19 +88,45 @@ class format_topics_renderer extends format_section_renderer_base {
      * Generate the title for this section page
      * @return string the page title
      */
-    protected function page_title() {
-        return get_string('topicoutline');
+    protected function page_title() : string {
+        return get_string_manager()->string_exists('sectionoutline', 'format_multitopic') ?
+                get_string('sectionoutline', 'format_multitopic') : get_string('topicoutline'); // CHANGED.
     }
 
     /**
-     * Generate the section title, wraps it in a link to the section page if page is to be displayed on a separate page
+     * Generate the section title, wraps it in a link to the section if section is collapsible
      *
      * @param stdClass $section The course_section entry from DB
      * @param stdClass $course The course entry from DB
+     * @param bool $linkifneeded Whether to add link
      * @return string HTML to output.
      */
-    public function section_title($section, $course) {
-        return $this->render(course_get_format($course)->inplace_editable_render_section_name($section));
+    public function section_title($section, $course, bool $linkifneeded = true) : string {
+        // CHANGED LINE ABOVE.
+
+        // ADDED.
+        $section = course_get_format($course)->fmt_get_section($section);
+
+        // Date range for the topic, to be placed under the title.
+        $datestring = '';
+        if ($section->dateend && ($section->datestart < $section->dateend)) {
+
+            $dateformat = get_string('strftimedateshort');
+            $startday = userdate($section->datestart + 12 * 60 * 60, $dateformat);
+            $endday = userdate($section->dateend - 12 * 60 * 60, $dateformat);
+
+            if ($startday == $endday) {
+                $datestring = "({$startday})";
+            } else {
+                $datestring = "({$startday}–{$endday})";
+            }
+
+        }
+        // END ADDED.
+
+        return $this->render(course_get_format($course)->inplace_editable_render_section_name($section, $linkifneeded))
+                . html_writer::empty_tag('br')
+                . html_writer::tag('span', $datestring, ['class' => 'section_subtitle']); // CHANGED.
     }
 
     /**
@@ -91,9 +136,11 @@ class format_topics_renderer extends format_section_renderer_base {
      * @param stdClass $course The course entry from DB
      * @return string HTML to output.
      */
-    public function section_title_without_link($section, $course) {
-        return $this->render(course_get_format($course)->inplace_editable_render_section_name($section, false));
+    public function section_title_without_link($section, $course) : string {
+        return section_title($section, $course, false);                         // CHANGED.
     }
+
+    // NOTE: Additional $section data passes through function section_right_content.
 
     // INCLUDED course/format/renderer.php function section_header .
     /**
@@ -103,52 +150,65 @@ class format_topics_renderer extends format_section_renderer_base {
      * @param stdClass $section The course_section entry from DB
      * @param stdClass $course The course entry from DB
      * @param bool $onsectionpage true if being printed on a single-section page
-     * @param int $sectionreturn The section to return to after an action
+     * @param int $sectionreturn The section to return to after an action, unused
      * @return string HTML to output.
      */
-    protected function section_header($section, $course, $onsectionpage, $sectionreturn=null) {
-        global $PAGE;
+    protected function section_header($section, $course, $onsectionpage, $sectionreturn=null) : string {
+        // REMOVED: unused global $PAGE.
+
+        $section = course_get_format($course)->fmt_get_section($section);
 
         $o = '';
-        $currenttext = '';
+        // REMOVED: unused local $currenttext.
         $sectionstyle = '';
 
         if ($section->section != 0) {
             // Only in the non-general sections.
             if (!$section->visible) {
-                $sectionstyle = ' hidden';
+                $sectionstyle .= ' hidden';
             }
             if (course_get_format($course)->is_section_current($section)) {
-                $sectionstyle = ' current';
+                $sectionstyle .= ' current';
+            }
+            if (!$section->uservisible) {
+                $sectionstyle .= ' section-userhidden';
             }
         }
 
-        $o.= html_writer::start_tag('li', array('id' => 'section-'.$section->section,
-            'class' => 'section main clearfix'.$sectionstyle, 'role'=>'region',
-            'aria-label'=> get_section_name($course, $section)));
+        // ADDED.
+        // Determine the section type.
+        $collapsible = false;
+        if ($section->levelsan < FMT_SECTION_LEVEL_TOPIC) {
+            $sectionstyle .= ' section-page';
+        } else if ($section->periodduration == '0 days') {
+            $sectionstyle .= ' section-topic section-topic-untimed';
+        } else {
+            $sectionstyle .= ' section-topic section-topic-timed';
+            $collapsible = true;
+        }
+
+        $sectionstyle .= " sectionid-{$section->id}";
+        // END ADDED.
+
+        $o .= html_writer::start_tag('li', array('id' => 'section-' . $section->section,
+            'class' => 'section main clearfix' . $sectionstyle, 'role' => 'region',
+            'aria-label' => get_section_name($course, $section)));
 
         // Create a span that contains the section title to be used to create the keyboard section move menu.
         $o .= html_writer::tag('span', get_section_name($course, $section), array('class' => 'hidden sectionname'));
 
         $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
-        $o.= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
+        $o .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
 
         $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
-        $o.= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
-        $o.= html_writer::start_tag('div', array('class' => 'content'));
+        $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
+        $o .= html_writer::start_tag('div', array('class' => 'content'));
 
-        // When not on a section page, we display the section titles except the general section if null
-        $hasnamenotsecpg = (!$onsectionpage && ($section->section != 0 || !is_null($section->name)));
+        // REMOVED: section title display rules.  Always display the section title.
+        $classes = '';                                                          // ADDED.
 
-        // When on a section page, we only display the general section title, if title is not the default one
-        $hasnamesecpg = ($onsectionpage && ($section->section == 0 && !is_null($section->name)));
-
-        $classes = ' accesshide';
-        if ($hasnamenotsecpg || $hasnamesecpg) {
-            $classes = '';
-        }
-        $sectionname = html_writer::tag('span', $this->section_title($section, $course));
-        $o.= $this->output->heading($sectionname, 3, 'sectionname' . $classes);
+        $sectionname = html_writer::tag('span', $this->section_title($section, $course, $collapsible && $section->uservisible)); // CHANGED.
+        $o .= $this->output->heading($sectionname, 3, 'sectionname' . $classes);
 
         $o .= $this->section_availability($section);
 
@@ -165,7 +225,6 @@ class format_topics_renderer extends format_section_renderer_base {
     }
     // END INCLUDED.
 
-    // INCLUDED instead /course/format/renderer.php function section_edit_control_items .
     /**
      * Generate the edit control items of a section
      *
@@ -174,34 +233,38 @@ class format_topics_renderer extends format_section_renderer_base {
      * @param bool $onsectionpage true if being printed on a section page
      * @return array of edit control items
      */
-    protected function section_edit_control_items($course, $section, $onsectionpage = false) {
+    protected function section_edit_control_items($course, $section, $onsectionpage = false) : array {
+        // REMOVED function body.
+        // INCLUDED /course/format/renderer.php function section_edit_control_items body.
         global $PAGE;
 
         if (!$PAGE->user_is_editing()) {
             return array();
         }
 
-        $sectionreturn = $onsectionpage ? $section->section : null;
+        // REMOVED sectionreturn .
+        $section = course_get_format($course)->fmt_get_section($section);       // ADDED.
+        $onsectionpage = $section->levelsan < FMT_SECTION_LEVEL_TOPIC;          // ADDED.
 
         $coursecontext = context_course::instance($course->id);
         $numsections = course_get_format($course)->get_last_section_number();
-        $isstealth = $section->section > $numsections;
+        $isstealth = false;                                                     // CHANGED: Don't use numsections.
 
-        $baseurl = course_get_url($course, $sectionreturn);
+        $baseurl = course_get_url($course, $section, ['fmtedit' => true]);      // CHANGED.
         $baseurl->param('sesskey', sesskey());
 
         $controls = array();
 
         if (!$isstealth && has_capability('moodle/course:update', $coursecontext)) {
             if ($section->section > 0
-                && get_string_manager()->string_exists('editsection', 'format_'.$course->format)) {
-                $streditsection = get_string('editsection', 'format_'.$course->format);
+                && get_string_manager()->string_exists('editsection', 'format_' . $course->format)) {
+                $streditsection = get_string('editsection', 'format_' . $course->format);
             } else {
                 $streditsection = get_string('editsection');
             }
 
             $controls['edit'] = array(
-                'url'   => new moodle_url('/course/editsection.php', array('id' => $section->id, 'sr' => $sectionreturn)),
+                'url'   => new moodle_url('/course/format/multitopic/_course_editsection.php', array('id' => $section->id)), // CHANGED.
                 'icon' => 'i/settings',
                 'name' => $streditsection,
                 'pixattr' => array('class' => ''),
@@ -213,91 +276,154 @@ class format_topics_renderer extends format_section_renderer_base {
             if (!$isstealth) {
                 if (has_capability('moodle/course:sectionvisibility', $coursecontext)) {
                     if ($section->visible) { // Show the hide/show eye.
-                        $strhidefromothers = get_string('hidefromothers', 'format_'.$course->format);
-                        $url->param('hide', $section->section);
+                        $strhidefromothers = get_string_manager()->string_exists('hidefromothers', 'format_' . $course->format) ?
+                                                get_string('hidefromothers', 'format_' . $course->format) : get_string('hide'); // CHANGED.
+                        $url->param('hideid', $section->id);                    // CHANGED.
                         $controls['visiblity'] = array(
                             'url' => $url,
                             'icon' => 'i/hide',
                             'name' => $strhidefromothers,
                             'pixattr' => array('class' => ''),
                             'attr' => array('class' => 'icon editing_showhide',
-                                'data-sectionreturn' => $sectionreturn, 'data-action' => 'hide'));
-                    } else {
-                        $strshowfromothers = get_string('showfromothers', 'format_'.$course->format);
-                        $url->param('show',  $section->section);
+                                ));                                             // REMOVED section return & AJAX action .
+                        // ADDED: AJAX action added back for topic-level sections only.
+                        if (!$onsectionpage) {
+                            $controls['visiblity']['attr']['data-action'] = 'hide';
+                        }
+                        // END ADDED.
+                    } else if ($section->parentvisiblesan) {                    // CHANGED.
+                        $strshowfromothers = get_string_manager()->string_exists('showfromothers', 'format_' . $course->format) ?
+                                                get_string('showfromothers', 'format_' . $course->format) : get_string('show'); // CHANGED.
+                        $url->param('showid',  $section->id);                   // CHANGED.
                         $controls['visiblity'] = array(
                             'url' => $url,
                             'icon' => 'i/show',
                             'name' => $strshowfromothers,
                             'pixattr' => array('class' => ''),
                             'attr' => array('class' => 'icon editing_showhide',
-                                'data-sectionreturn' => $sectionreturn, 'data-action' => 'show'));
+                                )); // REMOVED section return & AJAX action.
+                        // ADDED.
+                        if (!$onsectionpage) {
+                            $controls['visiblity']['attr']['data-action'] = 'show';
+                        }
+                        // END ADDED.
                     }
                 }
 
-                // INCLUDED again if (!$onsectionpage) with repeated content .
-                if (!$onsectionpage) {
-                    if (has_capability('moodle/course:movesections', $coursecontext)) {
+                // INCLUDED /course/format/renderer.php function section_edit_control_items if (!$onsectionpage) .
+                if ($onsectionpage) {                                           // CHANGED.
+                    if (has_capability('moodle/course:movesections', $coursecontext)
+                        && has_capability('moodle/course:sectionvisibility', $coursecontext)
+                        && has_capability('moodle/course:update', $coursecontext)) {
                         $url = clone($baseurl);
-                        if ($section->section > 1) { // Add a arrow to move section up.
-                            $url->param('section', $section->section);
-                            $url->param('move', -1);
-                            $strmoveup = get_string('moveup');
-                            $controls['moveup'] = array(
+                        if ($section->levelsan - 1 > FMT_SECTION_LEVEL_ROOT) { // Raise section. // CHANGED.
+                            // CHANGED.
+                            $url->param('sectionid', $section->id);
+                            $url->param('destprevupid', $section->parentid);
+                            $url->param('destlevel', $section->levelsan - 1);
+                            $strmovelevelup = get_string_manager()->string_exists('move_level_up', 'format_multitopic') ?
+                                                get_string('move_level_up', 'format_multitopic') : get_string('moveup');
+                            // END CHANGED.
+                            $controls['movelevelup'] = array(                   // CHANGED.
                                 'url' => $url,
                                 'icon' => 'i/up',
-                                'name' => $strmoveup,
+                                'name' => $strmovelevelup,
                                 'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon moveup'));
+                                'attr' => array('class' => 'icon fmtmovelevelup')); // CHANGED.
                         }
 
                         $url = clone($baseurl);
-                        if ($section->section < $numsections) { // Add a arrow to move section down.
-                            $url->param('section', $section->section);
-                            $url->param('move', 1);
-                            $strmovedown = get_string('movedown');
-                            $controls['movedown'] = array(
+                        if ($section->pagedepth + 1 <= FMT_SECTION_LEVEL_PAGE_USE) { // Lower section. CHANGED.
+                            // CHANGED.
+                            $url->param('sectionid', $section->id);
+                            $url->param('destparentid', $section->prevupid);
+                            $url->param('destlevel', $section->levelsan + 1);
+                            $strmoveleveldown = get_string_manager()->string_exists('move_level_down', 'format_multitopic') ?
+                                                get_string('move_level_down', 'format_multitopic') : get_string('movedown');
+                            // END CHANGED.
+                            $controls['moveleveldown'] = array(                 // CHANGED.
                                 'url' => $url,
                                 'icon' => 'i/down',
-                                'name' => $strmovedown,
+                                'name' => $strmoveleveldown,
                                 'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon movedown'));
-                        }
-
-                        $url = clone($baseurl);
-                        if ($section->section > 1) { // Add a arrow to move section up.
-                            $url->param('section', $section->section);
-                            $url->param('move', -1);
-                            $strmoveup = get_string('moveup');
-                            $controls['moveup'] = array(
-                                'url' => $url,
-                                'icon' => 'i/up',
-                                'name' => $strmoveup,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon moveup'));
-                        }
-
-                        $url = clone($baseurl);
-                        if ($section->section < $numsections) { // Add a arrow to move section down.
-                            $url->param('section', $section->section);
-                            $url->param('move', 1);
-                            $strmovedown = get_string('movedown');
-                            $controls['movedown'] = array(
-                                'url' => $url,
-                                'icon' => 'i/down',
-                                'name' => $strmovedown,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon movedown'));
+                                'attr' => array('class' => 'icon fmtmoveleveldown')); // CHANGED.
                         }
                     }
-                }
-                // END INCLUDED.
-                if (!$onsectionpage) {
-                    if (has_capability('moodle/course:movesections', $coursecontext)) {
+                    if (has_capability('moodle/course:movesections', $coursecontext)
+                        && has_capability('moodle/course:sectionvisibility', $coursecontext)) {
+                        $url = clone($baseurl);
+                        // CHANGED: Replaced up with previous.
+                        if ($section->prevupid && $section->prevupid != course_get_format($course)->fmtrootsectionid) {
+                                // Add a arrow to move section back.
+                            $url->param('sectionid', $section->id);
+                            $url->param('destnextupid', $section->prevupid);
+                            $strmovepageprev = get_string_manager()->string_exists('move_page_prev', 'format_multitopic') ?
+                                                get_string('move_page_prev', 'format_multitopic') : get_string('moveleft');
+                            $controls['moveprev'] = array(
+                                'url' => $url,
+                                'icon' => 't/left',
+                                'name' => $strmovepageprev,
+                                'pixattr' => array('class' => ''),
+                                'attr' => array('class' => 'icon fmtmovepageprev'));
+                        }
+                        // END CHANGED.
+                        $url = clone($baseurl);
+                        // CHANGED: Replaced down with next.
+                        if ($section->nextupid) { // Add a arrow to move section forward.
+                            $url->param('sectionid', $section->id);
+                            $url->param('destprevupid', $section->nextupid);
+                            $strmovepagenext = get_string_manager()->string_exists('move_page_next', 'format_multitopic') ?
+                                                get_string('move_page_next', 'format_multitopic') : get_string('moveright');
+                            $controls['movenext'] = array(
+                                'url' => $url,
+                                'icon' => 't/right',
+                                'name' => $strmovepagenext,
+                                'pixattr' => array('class' => ''),
+                                'attr' => array('class' => 'icon fmtmovepagenext'));
+                        }
+                        // END CHANGED.
+                    }
+                } else { // END INCLUDED.
+                    // Move sections left and right.
+                    if (has_capability('moodle/course:movesections', $coursecontext)
+                        && has_capability('moodle/course:sectionvisibility', $coursecontext)) {
+                        $url = clone($baseurl);
+                        // CHANGED: Replaced up with to previous page.
+                        if ($section->prevpageid) { // Add a arrow to move section to previous page.
+                            $url->param('sectionid', $section->id);
+                            $url->param('destparentid', $section->prevpageid);
+                            $strmovetoprevpage = get_string_manager()->string_exists('move_to_prev_page', 'format_multitopic') ?
+                                                 get_string('move_to_prev_page', 'format_multitopic') : get_string('moveleft');
+                            $controls['movetoprevpage'] = array(
+                                'url' => $url,
+                                'icon' => 't/left',
+                                'name' => $strmovetoprevpage,
+                                'pixattr' => array('class' => ''),
+                                'attr' => array('class' => 'icon fmtmovetoprevpage'));
+                        }
+                        // END CHANGED.
+                        $url = clone($baseurl);
+                        // CHANGED: Replaced down with to next page.
+                        if ($section->nextpageid) { // Add a arrow to move section to next page.
+                            $url->param('sectionid', $section->id);
+                            $url->param('destparentid', $section->nextpageid);
+                            $strmovetonextpage = get_string_manager()->string_exists('move_to_next_page', 'format_multitopic') ?
+                                                 get_string('move_to_next_page', 'format_multitopic') : get_string('moveright');
+                            $controls['movetonextpage'] = array(
+                                'url' => $url,
+                                'icon' => 't/right',
+                                'name' => $strmovetonextpage,
+                                'pixattr' => array('class' => ''),
+                                'attr' => array('class' => 'icon fmtmovetonextpage'));
+                        }
+                        // END CHANGED.
+                    }
+                    if (has_capability('moodle/course:movesections', $coursecontext)
+                        && has_capability('moodle/course:sectionvisibility', $coursecontext)) {
                         $url = clone($baseurl);
                         if ($section->section > 1) { // Add a arrow to move section up.
-                            $url->param('section', $section->section);
-                            $url->param('move', -1);
+                            $url->param('sectionid', $section->id);
+                            $url->param('destnextupid', $section->prevupid);
                             $strmoveup = get_string('moveup');
                             $controls['moveup'] = array(
                                 'url' => $url,
@@ -309,34 +435,8 @@ class format_topics_renderer extends format_section_renderer_base {
 
                         $url = clone($baseurl);
                         if ($section->section < $numsections) { // Add a arrow to move section down.
-                            $url->param('section', $section->section);
-                            $url->param('move', 1);
-                            $strmovedown = get_string('movedown');
-                            $controls['movedown'] = array(
-                                'url' => $url,
-                                'icon' => 'i/down',
-                                'name' => $strmovedown,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon movedown'));
-                        }
-
-                        $url = clone($baseurl);
-                        if ($section->section > 1) { // Add a arrow to move section up.
-                            $url->param('section', $section->section);
-                            $url->param('move', -1);
-                            $strmoveup = get_string('moveup');
-                            $controls['moveup'] = array(
-                                'url' => $url,
-                                'icon' => 'i/up',
-                                'name' => $strmoveup,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon moveup'));
-                        }
-
-                        $url = clone($baseurl);
-                        if ($section->section < $numsections) { // Add a arrow to move section down.
-                            $url->param('section', $section->section);
-                            $url->param('move', 1);
+                            $url->param('sectionid', $section->id);
+                            $url->param('destprevupid', $section->nextupid);
                             $strmovedown = get_string('movedown');
                             $controls['movedown'] = array(
                                 'url' => $url,
@@ -349,15 +449,15 @@ class format_topics_renderer extends format_section_renderer_base {
                 }
             }
 
-            if (course_can_delete_section($course, $section)) {
-                if (get_string_manager()->string_exists('deletesection', 'format_'.$course->format)) {
-                    $strdelete = get_string('deletesection', 'format_'.$course->format);
+            if (\format_multitopic\format_multitopic_course_can_delete_section($course, $section)) {
+                if (get_string_manager()->string_exists('deletesection', 'format_' . $course->format)) {
+                    $strdelete = get_string('deletesection', 'format_' . $course->format);
                 } else {
                     $strdelete = get_string('deletesection');
                 }
-                $url = new moodle_url('/course/editsection.php', array(
+                $url = new moodle_url('/course/format/multitopic/_course_editsection.php', array(
                     'id' => $section->id,
-                    'sr' => $sectionreturn,
+                    // REMOVED: section return.
                     'delete' => 1,
                     'sesskey' => sesskey()));
                 $controls['delete'] = array(
@@ -370,75 +470,99 @@ class format_topics_renderer extends format_section_renderer_base {
         }
 
         return $controls;
+        // END INCLUDED.
     }
-    // END INCLUDED.
 
     // INCLUDED /course/format/renderer.php function section_availability .
     /**
-     * Displays availability information for the section (hidden, not available unles, etc.)
+     * Displays availability information for the section (hidden, not available unless, etc.)
      *
      * @param section_info $section
      * @return string
      */
-    public function section_availability($section) {
+    public function section_availability($section) : string {
         $context = context_course::instance($section->course);
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
-        return html_writer::div($this->section_availability_message($section, $canviewhidden), 'section_availability');
+
+        return html_writer::div($this->section_availability_message($section, $canviewhidden), 'section_availability'); // CHANGED.
     }
     // END INCLUDED.
 
-    // INCLUDED /course/format/renderer.php function course_activity_clipboard .
     /**
      * Show if something is on on the course clipboard (moving around)
      *
      * @param stdClass $course The course entry from DB
-     * @param int $sectionno The section number in the course which is being displayed
+     * @param section_info $section The section in the course which is being displayed.  Must specify id and section (number).
      * @return string HTML to output.
      */
-    protected function course_activity_clipboard($course, $sectionno = null) {
-        global $USER;
+    protected function fmt_course_activity_clipboard(stdClass $course, section_info $section) : string {
+        global $USER, $PAGE;                                                    // CHANGED: Added $PAGE.
 
+        if (!$PAGE->user_is_editing() && !ismoving($course->id)) {
+            return '';
+        }
+
+        $context = context_course::instance($course->id);
         $o = '';
 
         // INCLUDED /course/format/onetopic/renderer.php function print_single_section_page utilities (parts).
+        // Output the enable / disable button.
+        $disableajax = false;
         if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
 
-            $baseurl = course_get_url($course, $displaysection);
-            $baseurl->param('sesskey', sesskey());
-            $url = clone($baseurl);
-            global $USER, $OUTPUT;
-            if (isset($USER->onetopic_da[$course->id]) && $USER->onetopic_da[$course->id]) {
+            $url = course_get_url($course, $section, ['fmtedit' => true]);
+            $url->param('sesskey', sesskey());
+
+            if ($USER->onetopic_da[$course->id] ?? false) {
+                $disableajax = true;
                 $url->param('onetopic_da', 0);
-                $textbuttondisableajax = get_string('enable', 'format_onetopic');
+                $buttontext = get_string_manager()->string_exists('activityclipboard_disable', 'format_multitopic') ?
+                                get_string('activityclipboard_disable', 'format_multitopic') : get_string('disable');
             } else {
                 $url->param('onetopic_da', 1);
-                $textbuttondisableajax = get_string('disable', 'format_onetopic');
+                $buttontext = get_string_manager()->string_exists('activityclipboard_enable', 'format_multitopic') ?
+                                get_string('activityclipboard_enable', 'format_multitopic') : get_string('enable');
             }
 
+            // ADDED.
+            $button = new single_button($url, $buttontext, 'get');
+            $button->disabled = $disableajax && ismoving($course->id);
+            $o .= html_writer::tag('div', $this->render($button),
+                                    array('class' => 'buttons visibleifjs', 'style' => 'float: right;')); // TODO: Use CSS?
+            // END ADDED.
         }
         // END INCLUDED.
 
-        // If currently moving a file then show the current clipboard.
-        if (ismoving($course->id)) {
-            $url = new moodle_url('/course/mod.php',
-                array('sesskey' => sesskey(),
-                      'cancelcopy' => true,
-                      'sr' => $sectionno,
-                )
-            );
+        // Output the clipboard itself
+        if ($disableajax || ismoving($course->id)) {                            // TODO: Also show when JS disabled?
+            $o .= html_writer::start_tag('div', array('class' => 'clipboard'));
+            $o .= html_writer::tag('i', '', ['class' => 'icon fa fa-clipboard fa-fw']) . ' ';
 
-            $o.= html_writer::start_tag('div', array('class' => 'clipboard'));
-            $o.= strip_tags(get_string('activityclipboard', '', $USER->activitycopyname));
-            $o.= ' ('.html_writer::link($url, get_string('cancel')).')';
-            $o.= html_writer::end_tag('div');
+            // If currently moving a file then show the current clipboard.
+            if (ismoving($course->id)) {
+                $url = new moodle_url('/course/mod.php',
+                    array('sesskey' => sesskey(),
+                        'cancelcopy' => true,
+                        // REMOVED section return.
+                    )
+                );
+
+                $o .= strip_tags(get_string('activityclipboard', '', $USER->activitycopyname));
+                $o .= ' ('.html_writer::link($url, get_string('cancel')).')';
+            } else {
+                $o .= get_string_manager()->string_exists('activityclipboard_placeholder', 'format_' . $course->format) ?
+                        '[' . get_string('activityclipboard_placeholder', 'format_' . $course->format) . ']' : '';
+            }
+
+            $o .= html_writer::end_tag('div');
         }
 
         return $o;
     }
-    // END INCLUDED.
+
 
     // INCLUDED /course/format/renderer.php function print_single_section_page declaration .
-        /**
+    /**
      * Output the html for a single section page .
      *
      * @param stdClass $course The course entry from DB
@@ -446,9 +570,10 @@ class format_topics_renderer extends format_section_renderer_base {
      * @param array $mods (argument not used)
      * @param array $modnames (argument not used)
      * @param array $modnamesused (argument not used)
-     * @param int $displaysection The section number in the course which is being displayed
+     * @param int|section_info $displaysection The section number in the course which is being displayed
      */
-    public function print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection) {
+    public function print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection) : void {
+        $this->print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection); // ADDED.
     }
     // END INCLUDED.
 
@@ -461,18 +586,45 @@ class format_topics_renderer extends format_section_renderer_base {
      * @param array $mods (argument not used)
      * @param array $modnames (argument not used)
      * @param array $modnamesused (argument not used)
+     * @param int|section_info $displaysection
      */
-    public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused) {
-        global $PAGE;
+    public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection = 0) : void {
+        // CHANGED ABOVE from print_single_section_page
+        global $PAGE, $OUTPUT;                                                  // CHANGED: Included output global.
 
-        $modinfo = get_fast_modinfo($course);
+        // REMOVED: Replaced modinfo with fmt_get_sections .
         $course = course_get_format($course)->get_course();
+
+        // ADDED.
+        $sections = course_get_format($course)->fmt_get_sections();
+
+        // Find display section.
+        if (is_object($displaysection && isset($displaysection->id))) {
+            $displaysection = $sections[$displaysection->id] ?? null;
+        } else if (is_numeric($displaysection) || isset($displaysection->section)) {
+            $displaysectionnum = is_numeric($displaysection) ? $displaysection : $displaysection->section;
+            $displaysection = null;
+            foreach ($sections as $section) {
+                if ($section->section == $displaysectionnum) {
+                    $displaysection = $section;
+                    break;
+                }
+            }
+        } else {
+            $displaysection = null;
+        }
+
+        if ($displaysection && $displaysection->levelsan >= FMT_SECTION_LEVEL_TOPIC) {
+            $displaysection = $sections[$displaysection->parentid];
+        }
+        // END ADDED.
 
         $context = context_course::instance($course->id);
 
         // INCLUDED /course/format/renderer.php function print_single_section_page section "Can we view...".
         // Can we view the section in question?
-        if (!($sectioninfo = $modinfo->get_section_info($displaysection)) || !$sectioninfo->uservisible) {
+        $sectioninfo = $displaysection;
+        if (!$sectioninfo || !$sectioninfo->uservisiblesan) { // CHANGED.
             // This section doesn't exist or is not available for the user.
             // We actually already check this in course/view.php but just in case exit from this function as well.
             print_error('unknowncoursesection', 'error', course_get_url($course),
@@ -481,20 +633,26 @@ class format_topics_renderer extends format_section_renderer_base {
         // END INCLUDED.
 
         // Title with completion help icon.
-        $completioninfo = new completion_info($course);
-        echo $completioninfo->display_help_icon();
+        // REMOVED: Move completioninfo as per print_single_section_page.
         echo $this->output->heading($this->page_title(), 2, 'accesshide');
 
         // Copy activity clipboard..
-        echo $this->course_activity_clipboard($course, 0);
+        echo $this->fmt_course_activity_clipboard($course, $displaysection);    // CHANGED from print_single_section_page.
 
-        // INCLUDED list of sections parts and /course/format/onetopic/renderer.php function print_single_section_page tabs parts.
+        // INCLUDED /course/format/onetopic/renderer.php function print_single_section_page tabs parts CHANGED.
 
         // Init custom tabs.
         $tabs = array();
         $inactivetabs = array();
 
-        foreach ($modinfo->get_section_info_all() as $section => $thissection) {
+        $tabln = array_fill(FMT_SECTION_LEVEL_ROOT + 1, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT - 1, null);
+        $sectionatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT, null);
+
+        foreach ($sections as $thissection) {
+
+            for ($level = $thissection->levelsan; $level < FMT_SECTION_LEVEL_TOPIC; $level++) {
+                $sectionatlevel[$level] = $thissection;
+            }
 
             // Show the section if the user is permitted to access it, OR if it's not available
             // but there is some available info text which explains the reason & should display,
@@ -503,181 +661,227 @@ class format_topics_renderer extends format_section_renderer_base {
                     ($thissection->visible && !$thissection->available && !empty($thissection->availableinfo)) ||
                     (!$thissection->visible && !$course->hiddensections);
 
-            if ($showsection) {
+            // Make and add tabs for visible pages.
+            if ($thissection->levelsan <= FMT_SECTION_LEVEL_ROOT
+                || $thissection->levelsan < FMT_SECTION_LEVEL_TOPIC
+                    && $sectionatlevel[$thissection->levelsan - 1]->uservisiblesan && $showsection) {
 
                 $sectionname = get_section_name($course, $thissection);
 
-                $url = course_get_url($course, $section);
+                $url = course_get_url($course, $thissection);
 
-                    $newtab = new tabobject("tab_topic_" . $section, $url,
-                        '<div style="' . $customstyles . '" class="tab_content ' . $specialstyle . '">' .
-                        '<span>' . $sectionname . "</span></div>", $sectionname);
+                // REMOVED: marker.
 
-                    if ($formatoptions['level'] == 0 || count($tabs) == 0) {
-                        $tabs[] = $newtab;
-                        $newtab->level = 1;
-                    } else {
-                        $newtab->level = 2;
-                        $tabs[$parentindex]->subtree[] = $newtab;
+                // Include main tab, and index tabs for pages with sub-pages.
+                for ($level = max(FMT_SECTION_LEVEL_ROOT + 1, $thissection->levelsan);
+                     $level <= $thissection->pagedepthdirect
+                                + ($PAGE->user_is_editing()
+                                    && $thissection->pagedepthdirect < FMT_SECTION_LEVEL_PAGE_USE ? 1 : 0);
+                     $level++) {
+
+                    // Make tab.
+                    $newtab = new tabobject("tab_id_{$thissection->id}_l{$level}", $url,
+                        html_writer::tag('div', $sectionname, ['class' =>
+                            'tab_content'
+                            . ($thissection->currentnestedlevel >= max($thissection->levelsan, $level) ? ' marker' : '')
+                            . (!$thissection->visible || $level > $thissection->pagedepthdirect ? ' dimmed' : '')
+                        ]),
+                        $sectionname);
+                    $newtab->level = $level - FMT_SECTION_LEVEL_ROOT;
+
+                    if ($thissection->id == $displaysection->id) {
+                        $newtab->selected = true;
                     }
+
+                    // Add tab.
+                    if ($level <= FMT_SECTION_LEVEL_ROOT + 1) {
+                        $tabs[] = $newtab;
+                    } else {
+                        $tabln[$level - 1]->subtree[] = $newtab;
+                    }
+
+                    $tabln[$level] = $newtab;
+                }
+
+                // Disable tabs for hidden sections.
+                if (!$thissection->uservisiblesan) {
+                    $inactivetabs[] = "tab_id_{$thissection->id}_l{$thissection->levelsan}";
+                }
 
             }
 
-                    // Increase number of sections.
-                    $straddsection = get_string('increasesections', 'moodle');
-                    $url = new moodle_url('/course/changenumsections.php',
+            // Include "add" sub-tabs if editing.
+            if ($thissection->nextanyid == $thissection->nextpageid
+                && $PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
+
+                // Include "add" sub-tabs for each level of page finished.
+                $nextsectionlevel = $thissection->nextpageid ? $sections[$thissection->nextpageid]->levelsan
+                                                            : FMT_SECTION_LEVEL_ROOT;
+                for ($level = min($sectionatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->pagedepthdirect + 1,
+                                    FMT_SECTION_LEVEL_PAGE_USE);
+                        $level >= $nextsectionlevel + 1;
+                        $level--) {
+
+                    // Make "add" tab.
+                    $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
+                                        get_string('addsectionpage', 'format_' . $course->format) : get_string('addsections');
+                    $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php',
                         array('courseid' => $course->id,
                             'increase' => true,
                             'sesskey' => sesskey(),
-                            'insertsection' => 0));
+                            'insertparentid' => $sectionatlevel[$level - 1]->id,
+                            'insertlevel' => $level,                            // ADDED.
+                        ));
                     $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
-                    $tabs[] = new tabobject("tab_topic_add", $url, $icon, s($straddsection));
+                    $newtab = new tabobject("tab_id_{$sectionatlevel[$level - 1]->id}_l{($level - 1)}_add",
+                        $url,
+                        $icon,
+                        s($straddsection));
+
+                    // Add "add" tab.
+                    if ($level <= FMT_SECTION_LEVEL_ROOT + 1) {
+                        $tabs[] = $newtab;
+                    } else {
+                        $tabln[$level - 1]->subtree[] = $newtab;
+                    }
+
+                }
+
+            }
 
         }
 
-        echo $OUTPUT->tabtree($tabs, "tab_topic_" . $displaysection, $inactivetabs);
+        // Display tabs.
+        echo html_writer::start_tag('div', array('style' => 'clear: both')); // TODO: Use CSS?
+        echo $OUTPUT->tabtree($tabs,
+            "tab_id_{$displaysection->id}_l{$displaysection->pagedepthdirect}",
+            $inactivetabs);
+        echo html_writer::end_tag('div');
+
         // END INCLUDED.
 
         // Now the list of sections..
         echo $this->start_section_list();
-        $numsections = course_get_format($course)->get_last_section_number();
 
-        foreach ($modinfo->get_section_info_all() as $section => $thissection) {
-            if ($section == 0) {
-                // 0-section is displayed a little different then the others
-                if ($thissection->summary or !empty($modinfo->sections[0]) or $PAGE->user_is_editing()) {
-                    echo $this->section_header($thissection, $course, false, 0);
-                    echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
-                    echo $this->courserenderer->course_section_add_cm_control($course, 0, 0);
-                    echo $this->section_footer();
-                }
-                continue;
+        // REMOVED numsections.
+
+        // CHANGED.
+        $sectionatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT, null);
+
+        foreach ($sections as $thissection) {
+
+            for ($level = $thissection->levelsan; $level < FMT_SECTION_LEVEL_TOPIC; $level++) {
+                $sectionatlevel[$level] = $thissection;
             }
-            if ($section > $numsections) {
-                // activities inside this section are 'orphaned', this section will be printed as 'stealth' below
-                continue;
+
+            // ADDED.
+            // If we're at the start of a page-level section, then open a DIV for it.
+            if ($thissection->levelsan < FMT_SECTION_LEVEL_TOPIC) {
+                echo html_writer::start_tag('div',
+                    array('style' => 'display: ' . (($thissection->id == $displaysection->id) ? 'block' : 'none')));
             }
+            // END ADDED.
+
+            // REMOVED: Section 0 differentiation and numsections.
+
             // Show the section if the user is permitted to access it, OR if it's not available
             // but there is some available info text which explains the reason & should display,
             // OR it is hidden but the course has a setting to display hidden sections as unavilable.
             $showsection = $thissection->uservisible ||
                     ($thissection->visible && !$thissection->available && !empty($thissection->availableinfo)) ||
                     (!$thissection->visible && !$course->hiddensections);
-            if (!$showsection) {
-                continue;
-            }
+            // REMOVED: return if section hidden (we may have more to do), and coursedisplay.
 
-            if (!$PAGE->user_is_editing() && $course->coursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-                // Display section summary only.
-                echo $this->section_summary($thissection, $course, null);
-            } else {
-                echo $this->section_header($thissection, $course, false, 0);
-                if ($thissection->uservisible) {
-                    echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
-                    echo $this->courserenderer->course_section_add_cm_control($course, $section, 0);
+            if ($thissection->levelsan <= FMT_SECTION_LEVEL_ROOT
+                || $sectionatlevel[$level - 1]->uservisiblesan && $showsection) {   // ADDED.
+                $pageid  = ($thissection->levelsan < FMT_SECTION_LEVEL_TOPIC) ? $thissection->id : $thissection->parentid;
+                echo $this->section_header($thissection, $course, $thissection->levelsan < FMT_SECTION_LEVEL_TOPIC);
+                if ($thissection->uservisible && $pageid == $displaysection->id) {
+                    // CHANGED LINE ABOVE.
+                    // ADDED moved here as per print_single_section_page.
+                    if ($thissection->levelsan < FMT_SECTION_LEVEL_TOPIC) {
+                        $completioninfo = new completion_info($course);
+                        echo $completioninfo->display_help_icon();
+                    }
+                    // END ADDED.
+                    // TODO: Use section IDs?
+                    echo $this->courserenderer->course_section_cm_list($course, $thissection); // CHANGED removed section return.
+                    echo (new \format_multitopic\format_multitopic_core_course_renderer_wrapper($this->courserenderer)
+                         )->course_section_add_cm_control($course, $thissection); // CHANGED removed section return.
                 }
                 echo $this->section_footer();
             }
-        }
 
-        if ($PAGE->user_is_editing() and has_capability('moodle/course:update', $context)) {
-            // Print stealth sections if present.
-            foreach ($modinfo->get_section_info_all() as $section => $thissection) {
-                if ($section <= $numsections or empty($modinfo->sections[$section])) {
-                    // this is not stealth section or it is empty
-                    continue;
+            // ADDED.
+            // If we're at the end of a page-level section, then close it off.
+            if ($thissection->nextanyid == $thissection->nextpageid) {
+                if ($PAGE->user_is_editing() and has_capability('moodle/course:update', $context)) {
+                    $insertsection = new stdClass();
+                    $insertsection->parentid = $sectionatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->id;
+                    echo $this->change_number_sections($course, null, $insertsection); // CHANGED.
                 }
-                echo $this->stealth_section_header($section);
-                echo $this->courserenderer->course_section_cm_list($course, $thissection, 0);
-                echo $this->stealth_section_footer();
+                echo html_writer::end_tag('div');
             }
+            // END ADDED.
 
-            echo $this->end_section_list();
-
-            echo $this->change_number_sections($course, 0);
-        } else {
-            echo $this->end_section_list();
         }
+
+        // REMOVED: numsections .
+
+        echo $this->end_section_list();                                         // ADDED moved from above.
+        // END CHANGED.
 
     }
     // END INCLUDED.
 
+
     // INCLUDED course/format/renderer.php function change_number_sections .
+    // NOTE: Modified to allow inserting at different positions.
     /**
      * Returns controls in the bottom of the page to increase/decrease number of sections
      *
      * @param stdClass $course
-     * @param int|null $sectionreturn
+     * @param int|null $sectionreturn unused
+     * @param stdClass $insertsection
      * @return string
      */
-    protected function change_number_sections($course, $sectionreturn = null) {
+    protected function change_number_sections($course, $sectionreturn = null, stdClass $insertsection = null) : string {
+        // CHANGED LINE ABOVE.
         $coursecontext = context_course::instance($course->id);
-        if (!has_capability('moodle/course:update', $coursecontext)) {
+        if (!has_capability('moodle/course:update', $coursecontext)
+            || !has_capability('moodle/course:movesections', $coursecontext)) {
             return '';
         }
 
         $format = course_get_format($course);
-        $options = $format->get_format_options();
-        $maxsections = $format->get_max_sections();
+        $maxsections = method_exists($format, "get_max_sections") ? $format->get_max_sections() : 52;
         $lastsection = $format->get_last_section_number();
-        $supportsnumsections = array_key_exists('numsections', $options);
 
-        if ($supportsnumsections) {
-            // Current course format has 'numsections' option, which is very confusing and we suggest course format
-            // developers to get rid of it (see MDL-57769 on how to do it).
-            // Display "Increase section" / "Decrease section" links.
-
-            echo html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
-
-            // Increase number of sections.
-            if ($lastsection < $maxsections) {
-                $straddsection = get_string('increasesections', 'moodle');
-                $url = new moodle_url('/course/changenumsections.php',
-                    array('courseid' => $course->id,
-                          'increase' => true,
-                          'sesskey' => sesskey()));
-                $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
-                echo html_writer::link($url, $icon.get_accesshide($straddsection), array('class' => 'increase-sections'));
-            }
-
-            if ($course->numsections > 0) {
-                // Reduce number of sections sections.
-                $strremovesection = get_string('reducesections', 'moodle');
-                $url = new moodle_url('/course/changenumsections.php',
-                    array('courseid' => $course->id,
-                          'increase' => false,
-                          'sesskey' => sesskey()));
-                $icon = $this->output->pix_icon('t/switch_minus', $strremovesection);
-                echo html_writer::link($url, $icon.get_accesshide($strremovesection), array('class' => 'reduce-sections'));
-            }
-
-            echo html_writer::end_tag('div');
-
-        } else if (course_get_format($course)->uses_sections()) {
+        // REMOVED: numsections .
+        if (course_get_format($course)->uses_sections()) {
             if ($lastsection >= $maxsections) {
                 // Don't allow more sections if we already hit the limit.
-                return;
+                return '';
             }
             // Current course format does not have 'numsections' option but it has multiple sections suppport.
             // Display the "Add section" link that will insert a section in the end.
             // Note to course format developers: inserting sections in the other positions should check both
             // capabilities 'moodle/course:update' and 'moodle/course:movesections'.
-            echo html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
-            if (get_string_manager()->string_exists('addsections', 'format_'.$course->format)) {
-                $straddsections = get_string('addsections', 'format_'.$course->format);
+            $o = '';
+            $o .= html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
+            if (get_string_manager()->string_exists('addsectiontopic', 'format_' . $course->format)) {
+                $straddsections = get_string('addsectiontopic', 'format_' . $course->format);
             } else {
                 $straddsections = get_string('addsections');
             }
-            $url = new moodle_url('/course/changenumsections.php',
-                ['courseid' => $course->id, 'insertsection' => 0, 'sesskey' => sesskey()]);
-            if ($sectionreturn !== null) {
-                $url->param('sectionreturn', $sectionreturn);
-            }
-            $icon = $this->output->pix_icon('t/add', '');
-            $newsections = $maxsections - $lastsection;
-            echo html_writer::link($url, $icon . $straddsections,
-                array('class' => 'add-sections', 'data-add-sections' => $straddsections, 'new-sections' => $newsections));
-            echo html_writer::end_tag('div');
+            $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php',
+                ['courseid' => $course->id, 'insertparentid' => $insertsection->parentid, 'numsections' => 1,
+                'insertlevel' => FMT_SECTION_LEVEL_TOPIC, 'sesskey' => sesskey()]);
+            // REMOVED section return.
+            $icon = $this->output->pix_icon('t/add', $straddsections);
+            $o .= html_writer::link($url, $icon . $straddsections);              // CHANGED: Only add single section.
+            $o .= html_writer::end_tag('div');
+            return $o;
         }
     }
     // END INCLUDED.
@@ -689,9 +893,64 @@ class format_topics_renderer extends format_section_renderer_base {
      * @param stdClass $section The course_section entry from DB
      * @return string HTML to output.
      */
-    protected function format_summary_text($section) {
+    protected function format_summary_text($section) : string {
         $context = context_course::instance($section->course);
-        $summarytext = file_rewrite_pluginfile_urls($section->summary, 'pluginfile.php',
+
+        // ADDED.
+        // Variables for section image details.
+        $imageurl = null;
+        $imagename = null;
+        $authorwithurl = null;
+        $licencecode = null;
+
+        // Find section image details.
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($context->id, 'course', 'section', $section->id);
+        foreach ($files as $file) {
+            $filename = $file->get_filename();
+            $filenameextpos = strrpos($filename, '.');
+            if ((substr($filename, 0, 4) == 'goi_') && $filenameextpos) {
+                $url = moodle_url::make_file_url('/pluginfile.php' ,
+                        "/{$file->get_contextid()}/course/section/{$section->id}{$file->get_filepath()}{$filename}");
+                $imageurl = $url;
+                $imagename = substr($filename, 4, $filenameextpos - 4);
+                $authorwithurl = $file->get_author();
+                $licencecode = $file->get_license();
+            }
+        }
+
+        $o = '';
+
+        // Output section image, if any.
+        if ($imageurl) {
+            $authorwithurlarray = explode('|', $authorwithurl);
+            $authorhtml = $authorwithurlarray[0];
+            if (count($authorwithurlarray) > 1) {
+                $authorurl = $authorwithurlarray[1];
+                $authorhtml = html_writer::tag('a', $authorhtml, array('href' => $authorurl, 'target' => '_blank'));
+            }
+            $licencehtml = get_string($licencecode, 'license');
+            if (substr($licencecode, 0 , 3) == 'cc-') { // TODO: Links to other licences? Make this into a list?
+                $licenceurl = 'https://creativecommons.org/licenses/by-' . substr($licencecode, 3, 5) . '/4.0';
+                $licencehtml = html_writer::tag('a', $licencehtml, array('href' => $licenceurl, 'target' => '_blank'));
+            }
+            $o .= html_writer::start_tag('div', array('class' => 'section_image_holder'));
+                $o .= html_writer::empty_tag('img', array('src' => $imageurl));
+                $o .= html_writer::start_tag('p');
+                    $o .= html_writer::tag('span', get_string('image', 'format_multitopic') . ": {$imagename},",
+                                            array('style' => 'white-space: nowrap;')) . ' ';
+                    $o .= html_writer::tag('span', get_string('image_by', 'format_multitopic') . " {$authorhtml}"
+                                            . (($licencecode == 'unknown') ? '' : ','),
+                                            array('style' => 'white-space: nowrap;')) . ' ';
+                    $o .= (($licencecode == 'unknown') ? '' :
+                                    html_writer::tag('span', get_string('image_licence', 'format_multitopic') . " {$licencehtml}",
+                                                    array('style' => 'white-space: nowrap;')));
+                $o .= html_writer::end_tag('p');
+            $o .= html_writer::end_tag('div');
+        }
+        // END ADDED.
+
+        $summarytext = $o . file_rewrite_pluginfile_urls($section->summary, 'pluginfile.php',
             $context->id, 'course', 'section', $section->id);
 
         $options = new stdClass();
@@ -699,6 +958,210 @@ class format_topics_renderer extends format_section_renderer_base {
         $options->overflowdiv = true;
         return format_text($summarytext, $section->summaryformat, $options);
     }
-    // END INCLUDED
+    // END INCLUDED.
+
+    // ADDED.
+    /**
+     * Generate HTML for course header: A banner with the course title and a slice of the course image.
+     *
+     * @param format_multitopic_courseheader $header header to render
+     * @return string HTML to output.
+     */
+    protected function render_format_multitopic_courseheader(format_multitopic_courseheader $header) : string {
+
+        global $PAGE;
+
+        // Include code to preview the banner (and attribution, to an extent), if we're on the course edit page.
+        if ($PAGE->has_set_url() && $PAGE->url->compare(new moodle_url('/course/edit.php'), URL_MATCH_BASE)) {
+            $PAGE->requires->js('/course/format/multitopic/_course_edit.js');
+        }
+
+        return $header->output();
+    }
+
+    /**
+     * Generate HTML for course content header/footer: Back to course button.
+     *
+     * @param format_multitopic_coursecontentheaderfooter $headerfooter header/footer to render
+     * @return string HTML to output.
+     */
+    protected function render_format_multitopic_coursecontentheaderfooter(
+                            format_multitopic_coursecontentheaderfooter $headerfooter) : string {
+        return $headerfooter->output();
+    }
+    // END ADDED.
 
 }
+
+
+// ADDED.
+/**
+ * Course header: A banner with the course title and a slice of the course image.
+ *
+ * @copyright  2018 Otago Polytechnic
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class format_multitopic_courseheader implements renderable {
+
+    /** @var moodle_url|null course image URL */
+    private $imageurl;
+    /** @var string|null course image name */
+    private $imagename;
+    /** @var string|null course image author's name, optionally followed by vertical bar and URL */
+    private $authorwithurl;
+    /** @var string|null course image licence */
+    private $licencecode;
+    /** @var int how far down the course image (in percent) to take the banner slice from */
+    private $bannerslice;
+    /** @var string course name */
+    private $coursename;
+
+    /**
+     * Construct course header
+     *
+     * @param stdClass $course the course to construct a header for
+     */
+    public function __construct(\stdClass $course) {
+
+        $contextid = context_course::instance($course->id)->id;
+
+        // Set course-related properties.
+        $this->coursename   = $course->fullname;
+        $this->bannerslice  = $course->bannerslice;
+
+        // Clear image-related properties.
+        $this->imageurl   = null;
+        $this->imagename  = null;
+        $this->authorwithurl = null;
+        $this->licencecode  = null;
+
+        // Search for the course image.
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($contextid, 'course', 'overviewfiles');
+        foreach ($files as $file) {
+            $filename = $file->get_filename();
+            $filenameextpos = strrpos($filename, '.');
+            if ($filenameextpos) {
+                $url = moodle_url::make_file_url('/pluginfile.php' ,
+                        '/' . $file->get_contextid() . '/course/overviewfiles' .
+                        $file->get_filepath() . $filename);
+                $this->imageurl   = $url;
+                $this->imagename  = substr($filename, 0, $filenameextpos);
+                $this->authorwithurl = $file->get_author();
+                $this->licencecode  = $file->get_license();
+            }
+        }
+
+    }
+
+    /**
+     * Output the course header
+     *
+     * @return string generated HTML.
+     */
+    public function output(): string {
+
+        // Output the banner.
+        // NOTE: Changes here need to be reflected in _course_edit.js .
+        $o = html_writer::tag('div', $this->coursename, array(
+            'id' => 'course-header-banner',
+            'style' => "background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url('{$this->imageurl}'); "
+                     . "background-position: center, center {$this->bannerslice}%;"
+            ));
+
+        // Output the attribution.
+        $o .= html_writer::start_tag('p', array('id'    => 'course-header-banner_attribution',
+                                                'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';'));
+        $imagename = $this->imagename;
+        $authorwithurlarray = explode('|', $this->authorwithurl);
+        $authorhtml = $authorwithurlarray[0];
+        if (count($authorwithurlarray) > 1) {
+            $authorurl = $authorwithurlarray[1];
+            $authorhtml = html_writer::tag('a', $authorhtml, array('href' => $authorurl, 'target' => '_blank'));
+        }
+        $licencehtml = $this->imageurl ? get_string($this->licencecode, 'license') : '';
+        if ($licencehtml && substr($this->licencecode, 0 , 3) == 'cc-') {
+            $licenceurl = 'https://creativecommons.org/licenses/by-' . substr($this->licencecode, 3, 5) . '/4.0';
+            $licencehtml = html_writer::tag('a', $licencehtml, ['href' => $licenceurl, 'target' => '_blank']);
+        }
+        $o .= get_string('image', 'format_multitopic') . ": {$imagename}, ";
+        $o .= get_string('image_by', 'format_multitopic') . " {$authorhtml}"
+                . (($this->licencecode == 'unknown') ? '' : (', '));
+        $o .= (($this->licencecode == 'unknown') ? ''
+                : (get_string('image_licence', 'format_multitopic') . " {$licencehtml}"));
+        $o .= html_writer::end_tag('p');
+
+        return $o;
+    }
+
+}
+
+/**
+ * Course content header/footer: Back to course button.
+ *
+ * @copyright  2018 Otago Polytechnic
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class format_multitopic_coursecontentheaderfooter implements renderable {
+
+    /** @var int -1 for header, 1 for footer */
+    private $pos;
+    /** @var moodle_url URL for relevant course section */
+    private $sectionurl;
+
+    /**
+     * Construct course content header or footer
+     *
+     * @param moodle_page $page The page the header or footer is for
+     * @param int $pos -1 for header, 1 for footer
+     */
+    public function __construct(\moodle_page $page, int $pos) {
+        // Based on outputrenderers.php function activity_navigation .
+
+        // First we should check if we want to add navigation.
+        if (($page->pagelayout == 'incourse' || $page->pagelayout == 'frametop')
+                && $page->context->contextlevel == CONTEXT_MODULE
+                && !$page->cm->is_stealth()) {
+            $course = $page->cm->get_course();
+            $section = new stdClass();
+            $section->id = $page->cm->section;
+            $this->sectionurl = course_get_url($course->id, $section);
+            $this->pos = $pos;
+        } else {
+            $this->sectionurl = null;
+        }
+    }
+
+    /**
+     * Output course content header or footer
+     *
+     * @return string generated HTML.
+     */
+    public function output(): string {
+
+        global $OUTPUT;
+        $o = '';
+
+        // Back button.
+        if ($this->sectionurl) {
+            $strback = get_string_manager()->string_exists('back_to_course', 'format_multitopic') ?
+                        get_string('back_to_course', 'format_multitopic') : get_string('back');
+            $o .= html_writer::tag('a', $OUTPUT->pix_icon('t/left', '') . ' ' . $strback,
+                                    array('href' => $this->sectionurl));
+        }
+
+        // Horizontal rule to separate header/footer from page content.
+        if ($o) {
+            if ($this->pos < 0) {
+                $o = $o . html_writer::empty_tag('hr');
+            } else if ($this->pos > 0) {
+                $o = html_writer::empty_tag('hr') . $o;
+            }
+        }
+
+        return $o;
+    }
+
+}
+
+// END ADDED.

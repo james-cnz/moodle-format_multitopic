@@ -16,36 +16,50 @@
 
 /**
  * Library of useful functions
- * 
- * INCLUDED /course/lib.php selected functions
  *
- * @copyright 1999 Martin Dougiamas  http://dougiamas.com
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- * @package core_course
+ * INCLUDED from /course/lib.php
+ *
+ * @package   format_multitopic
+ * @copyright 1999 Martin Dougiamas  http://dougiamas.com,
+ *            2018 Otago Polytechnic
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace format_multitopic;
 
 defined('MOODLE_INTERNAL') || die;
 
-
+// REMOVED start - function course_set_marker .
 
 /**
  * For a given course section, marks it visible or hidden,
  * and does the same for every activity in that section
  *
  * @param int $courseid course id
- * @param int $sectionnumber The section number to adjust
- * @param int $visibility The new visibility
+ * @param stdClass $section The section to adjust.  Must specify id
+ * @param int $visibility The new visibility.  0 = hidden, 1 = visible
  * @return array A list of resources which were hidden in the section
  */
-function set_section_visible($courseid, $sectionnumber, $visibility) {
+function format_multitopic_set_section_visible(int $courseid, \stdClass $section, int $visibility) : array {
+    // CHANGED LINE ABOVE: Use sectioninfo, not section number.
     global $DB;
 
     $resourcestotoggle = array();
-    if ($section = $DB->get_record("course_sections", array("course"=>$courseid, "section"=>$sectionnumber))) {
-        course_update_section($courseid, $section, array('visible' => $visibility));
+    // ADDED.
+    // Fetch section info.
+    $sections = course_get_format($courseid)->fmt_get_sections();
+    $section = array_key_exists($section->id, $sections) ? $sections[$section->id] : null;
+    // We will recurse if setting visibility to hidden, because hidden sections should not contain visible sections.
+    $recurse = ($visibility == 0);
+    // END ADDED.
+    for ($subsection = $section;
+        $subsection && ($subsection->id == $section->id || $recurse && $subsection->levelsan > $section->levelsan);
+        $subsection = array_key_exists($subsection->nextanyid, $sections) ? $sections[$subsection->nextanyid] : null) {
+        // CHANGED LINES ABOVE: Recurse, if necessary.
+        course_update_section($courseid, $subsection, array('visible' => $visibility)); // CHANGED: $section -> $subsection .
 
-        // Determine which modules are visible for AJAX update
-        $modules = !empty($section->sequence) ? explode(',', $section->sequence) : array();
+        // Determine which modules are visible for AJAX update.
+        $modules = !empty($subsection->sequence) ? explode(',', $subsection->sequence) : array();
+        // CHANGED LINE ABOVE: $section -> $subsection.
         if (!empty($modules)) {
             list($insql, $params) = $DB->get_in_or_equal($modules);
             $select = 'id ' . $insql . ' AND visible = ?';
@@ -53,36 +67,44 @@ function set_section_visible($courseid, $sectionnumber, $visibility) {
             if (!$visibility) {
                 $select .= ' AND visibleold = 1';
             }
-            $resourcestotoggle = $DB->get_fieldset_select('course_modules', 'id', $select, $params);
+            $resourcestotoggle = array_merge($resourcestotoggle,
+                                            $DB->get_fieldset_select('course_modules', 'id', $select, $params));
+            // CHANGED LINE ABOVE: Merge results.
         }
     }
     return $resourcestotoggle;
 }
 
+// REMOVED function get_module_metadata - function add_course_module .
 
 /**
  * Creates a course section and adds it to the specified position
  *
- * @param int|stdClass $courseorid course id or course object
- * @param int $position position to add to, 0 means to the end. If position is greater than
- *        number of existing secitons, the section is added to the end. This will become sectionnum of the
- *        new section. All existing sections at this or bigger position will be shifted down.
- * @param bool $skipcheck the check has already been made and we know that the section with this position does not exist
- * @return stdClass created section object
+ * @param stdClass $courseorid course id or course object
+ * @param stdClass $section position to insert at.  Must specify parentid.  May specify level.
+ * @return stdClass created section object.  Has database properties plus parentid and levelsan.
  */
-function course_create_section($courseorid, $position = 0, $skipcheck = false) {
+function format_multitopic_course_create_section(\stdClass $courseorid, \stdClass $section) : \stdClass {
+    // CHANGED LINE ABOVE: Use section info, specifying parentid and level, instead of section number.
     global $DB;
     $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
 
+    // ADDED: Require that the parent exists.
+    $parent = $DB->get_record('course_sections', array('id' => $section->parentid, 'course' => $courseid));
+    if (!$parent) {
+        throw new \moodle_exception('sectionnotexist');
+    }
+    // END ADDED.
+
     // Find the last sectionnum among existing sections.
-    if ($skipcheck) {
-        $lastsection = $position - 1;
+    if (false) {                                                                // CHANGED: Don't skip check.
+        $lastsection = $section->section - 1;                                   // CHANGED: Extract from section info.
     } else {
         $lastsection = (int)$DB->get_field_sql('SELECT max(section) from {course_sections} WHERE course = ?', [$courseid]);
     }
 
     // First add section to the end.
-    $cw = new stdClass();
+    $cw = new \stdClass();
     $cw->course   = $courseid;
     $cw->section  = $lastsection + 1;
     $cw->summary  = '';
@@ -95,95 +117,113 @@ function course_create_section($courseorid, $position = 0, $skipcheck = false) {
     $cw->id = $DB->insert_record("course_sections", $cw);
 
     // Now move it to the specified position.
-    if ($position > 0 && $position <= $lastsection) {
+    if (true) {                                                                 // CHANGED.
         $course = is_object($courseorid) ? $courseorid : get_course($courseorid);
-        move_section_to($course, $cw->section, $position, true);
-        $cw->section = $position;
+        rebuild_course_cache($courseid, true);                                  // ADDED.
+        format_multitopic_move_section_to($course, $cw, $section, true);        // CHANGED: Use section info instead of position.
+        // END CHANGED.
+        $cw->section = (int)$DB->get_field_sql('SELECT section from {course_sections} WHERE course = ? AND id = ?',
+                                                [$courseid, $cw->id]);          // CHANGED.
+        $cw->parentid = $section->parentid;                                     // ADDED.
+        $cw->levelsan = $section->level ?? FMT_SECTION_LEVEL_TOPIC;             // ADDED.
     }
 
-    core\event\course_section_created::create_from_section($cw)->trigger();
+    \core\event\course_section_created::create_from_section($cw)->trigger();
 
     rebuild_course_cache($courseid, true);
     return $cw;
 }
 
+// REMOVED function course_create_sections_if_missing - course_module_calendar_event_update_process .
 
 /**
  * Moves a section within a course, from a position to another.
- * Be very careful: $section and $destination refer to section number,
- * not id!.
  *
- * @param object $course
- * @param int $section Section number (not id!!!)
- * @param int $destination
- * @param bool $ignorenumsections
- * @return boolean Result
+ * @param stdClass $course
+ * @param stdClass $section The section to be moved.  Must specify id.
+ * @param stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
  */
-function move_section_to($course, $section, $destination, $ignorenumsections = false) {
-/// Moves a whole course section up and down within the course
-    global $USER, $DB;
+function format_multitopic_move_section_to(\stdClass $course, \stdClass $section, \stdClass $destination) : void {
+    // CHANGED LINE ABOVE: Use section info instead of number.  No return value (use exceptions).
+    // Moves a course section within the course.
+    // CHANGES THROUGHOUT: Use section info instead of number.
+    global $DB;                                                                 // CHANGED: Removed $USER.
 
-    if (!$destination && $destination != 0) {
-        return true;
+    if (!$destination) {                                                        // CHANGED.
+        throw new \moodle_exception('sectionnotexist');                         // CHANGED.
     }
 
-    // compartibility with course formats using field 'numsections'
-    $courseformatoptions = course_get_format($course)->get_format_options();
-    if ((!$ignorenumsections && array_key_exists('numsections', $courseformatoptions) &&
-            ($destination > $courseformatoptions['numsections'])) || ($destination < 1)) {
-        return false;
+    // Compatibility with course formats using field 'numsections'.
+    // REMOVED.
+
+    // Get all sections for this course and re-order them.
+    if (!$sections = course_get_format($course)->fmt_get_sections()) {          // CHANGED.
+        throw new \moodle_exception('cannotcreateorfindstructs');               // CHANGED.
     }
 
-    // Get all sections for this course and re-order them (2 of them should now share the same section number)
-    if (!$sections = $DB->get_records_menu('course_sections', array('course' => $course->id),
-            'section ASC, id ASC', 'id, section')) {
-        return false;
-    }
-
-    $movedsections = reorder_sections($sections, $section, $destination);
+    $movedsections = format_multitopic_reorder_sections($sections, $section, $destination); // CHANGED.
 
     // Update all sections. Do this in 2 steps to avoid breaking database
-    // uniqueness constraint
+    // uniqueness constraint.
     $transaction = $DB->start_delegated_transaction();
-    foreach ($movedsections as $id => $position) {
-        if ($sections[$id] !== $position) {
+    // CHANGED.
+    foreach ($movedsections as $id => $movedsection) {
+        $position = $movedsection->section;
+        if ($sections[$id]->section !== $position) {
             $DB->set_field('course_sections', 'section', -$position, array('id' => $id));
         }
     }
-    foreach ($movedsections as $id => $position) {
-        if ($sections[$id] !== $position) {
+    foreach ($movedsections as $id => $movedsection) {
+        $position = $movedsection->section;
+        if ($sections[$id]->section !== $position) {
             $DB->set_field('course_sections', 'section', $position, array('id' => $id));
         }
     }
+    // END CHANGED.
 
     // If we move the highlighted section itself, then just highlight the destination.
     // Adjust the higlighted section location if we move something over it either direction.
-    if ($section == $course->marker) {
-        course_set_marker($course->id, $destination);
-    } elseif ($section > $course->marker && $course->marker >= $destination) {
-        course_set_marker($course->id, $course->marker+1);
-    } elseif ($section < $course->marker && $course->marker <= $destination) {
-        course_set_marker($course->id, $course->marker-1);
-    }
+    // REMOVED.
 
     $transaction->allow_commit();
     rebuild_course_cache($course->id, true);
-    return true;
+
+    // ADDED.
+    // Set properties for moved sections.
+    foreach ($movedsections as $id => $movedsection) {
+        // Find differences between original section and moved section, and store as updates.
+        $updates = [];
+        if ($sections[$id]->level !== $movedsection->level) {
+            $updates['level'] = $movedsection->level;
+        }
+        if ($sections[$id]->visible !== $movedsection->visible) {
+            $updates['visible'] = $movedsection->visible;
+        }
+        // Apply section updates.
+        if ($updates) {
+            course_update_section($course, $movedsections[$id], $updates);
+        }
+    }
+    // END ADDED.
+
+    return;                                                                     // CHANGED.
 }
 
+// REMOVED function course_delete_section - function course_update_section .
 
 /**
  * Checks if the current user can delete a section (if course format allows it and user has proper permissions).
  *
- * @param int|stdClass $course
- * @param int|stdClass|section_info $section
+ * CHANGED: Pass section info through to corresponding course format function.
+ *
+ * @param stdClass $course
+ * @param section_info $section The section to check.  Must specify section (number).  Should specify calculated properties.
  * @return bool
  */
-function course_can_delete_section($course, $section) {
-    if (is_object($section)) {
-        $section = $section->section;
-    }
-    if (!$section) {
+function format_multitopic_course_can_delete_section(\stdClass $course, \section_info $section) : bool {
+    // CHANGED LINE ABOVE.
+    // REMOVED: extract number from section parameter.
+    if (!$section->section) {                                                   // CHANGED: Check inside section info.
         // Not possible to delete 0-section.
         return false;
     }
@@ -192,15 +232,15 @@ function course_can_delete_section($course, $section) {
         return false;
     }
     // Make sure user has capability to update course and move sections.
-    $context = context_course::instance(is_object($course) ? $course->id : $course);
+    $context = \context_course::instance(is_object($course) ? $course->id : $course);
     if (!has_all_capabilities(array('moodle/course:movesections', 'moodle/course:update'), $context)) {
         return false;
     }
     // Make sure user has capability to delete each activity in this section.
     $modinfo = get_fast_modinfo($course);
-    if (!empty($modinfo->sections[$section])) {
-        foreach ($modinfo->sections[$section] as $cmid) {
-            if (!has_capability('moodle/course:manageactivities', context_module::instance($cmid))) {
+    if (!empty($modinfo->sections[$section->section])) {                        // CHANGED.
+        foreach ($modinfo->sections[$section->section] as $cmid) {              // CHANGED.
+            if (!has_capability('moodle/course:manageactivities', \context_module::instance($cmid))) {
                 return false;
             }
         }
@@ -208,74 +248,139 @@ function course_can_delete_section($course, $section) {
     return true;
 }
 
-
 /**
- * Reordering algorithm for course sections. Given an array of section->section indexed by section->id,
- * an original position number and a target position number, rebuilds the array so that the
- * move is made without any duplication of section positions.
- * Note: The target_position is the position AFTER WHICH the moved section will be inserted. If you want to
- * insert a section before the first one, you must give 0 as the target (section 0 can never be moved).
+ * Reordering algorithm for course sections. Given an array of sections indexed by section->id,
+ * an origin and a target, rebuilds the array.
  *
- * @param array $sections
- * @param int $origin_position
- * @param int $target_position
+ * @param array $sections The list of sections.  Must specify fmt calculated properties.
+ * @param stdClass $origin The section to be moved.  Must specify id.
+ * @param stdClass $target The destination.  Must specify parentid, prevupid, or nextupid.  May specify level.
  * @return array
  */
-function reorder_sections($sections, $origin_position, $target_position) {
+function format_multitopic_reorder_sections(array $sections, \stdClass $origin, \stdClass $target) : array {
+    // CHANGED THROUGHOUT: Section numbers changed to IDs, used exceptions instead of returning false.
+    // Calculated section values (levelsan, visiblesan) are read,
+    // raw section values (level, visible) are written.
     if (!is_array($sections)) {
-        return false;
+        throw new \moodle_exception('cannotcreateorfindstructs');
     }
 
-    // We can't move section position 0
-    if ($origin_position < 1) {
-        echo "We can't move section position 0";
-        return false;
+    // We can't move section position 0.
+    if (isset($origin->section) && $origin->section < 1) {
+        throw new \moodle_exception('cannotcreateorfindstructs');
     }
 
-    // Locate origin section in sections array
-    if (!$origin_key = array_search($origin_position, $sections)) {
-        echo "searched position not in sections array";
-        return false; // searched position not in sections array
+    // Locate origin section in sections array.
+    if (!$origin = array_key_exists($origin->id, $sections) ? $sections[$origin->id] : null) {
+        throw new \moodle_exception('sectionnotexist');
     }
 
-    // Extract origin section
-    $origin_section = $sections[$origin_key];
-    unset($sections[$origin_key]);
+    $target->level = $target->level ?? $origin->levelsan;
+    $levelchange = $target->level - $origin->levelsan;
 
-    // Find offset of target position (stupid PHP's array_splice requires offset instead of key index!)
+    // Extract origin sections.
+    $originarray = [];
+    for ($originsubkey = $origin->id;
+        $originsubkey == $origin->id || $originsubkey && $sections[$originsubkey]->levelsan > $origin->levelsan;
+        $originsubkey = $originarray[$originsubkey]->nextanyid) {
+        $originarray[$originsubkey] = $sections[$originsubkey];
+        unset($sections[$originsubkey]);
+    }
+
+    // Find target position and extract remaining sections.
+    $parent = null;
+    $prev = null;
     $found = false;
-    $append_array = array();
-    foreach ($sections as $id => $position) {
+    $appendarray = array();
+    foreach ($sections as $id => $section) {
         if ($found) {
-            $append_array[$id] = $position;
+            // Target position already found, extract remaining sections.
+            $appendarray[$id] = $section;
             unset($sections[$id]);
-        }
-        if ($position == $target_position) {
-            if ($target_position < $origin_position) {
-                $append_array[$id] = $position;
-                unset($sections[$id]);
+        } else if (isset($target->parentid) && $section->id == $target->parentid) {
+            // Reached the target parent section, remember it.
+            $parent = $section;
+            if ($target->level <= $parent->levelsan) {
+                // The moved section can not be a child of the specified parent.
+                throw new \moodle_exception('cannotcreateorfindstructs');
             }
+        } else if (isset($target->prevupid) && $section->id == $target->prevupid) {
+            // Reached the target previous section, remember it.
+            $prev = $section;
+            if ($target->level < $prev->levelsan) {
+                // The moved section can not have the specified section as its previous.
+                throw new \moodle_exception('cannotcreateorfindstructs');
+            }
+        } else if ($parent && ($section->levelsan < $target->level || $section->levelsan <= $parent->levelsan)
+                    || $prev && ($section->levelsan <= $target->level)
+                    || isset($target->nextupid) && $section->id == $target->nextupid) {
+            // Reached the last position in a specified parent in which the moved section would be a (direct) child,
+            // or the appropriate position after a specified previous section,
+            // or the position before a specified next section.
+            if ($section->levelsan > $target->level) {
+                // If inserted here, the moved section would absorb other sections.
+                throw new \moodle_exception('cannotcreateorfindstructs');
+            }
+            $appendarray[$id] = $section;
+            unset($sections[$id]);
             $found = true;
         }
     }
+    if ($parent || $prev) {
+        // If a specified parent or previous was found, but no position within the section list was appropriate,
+        // the appropriate position must be the end of the section list.
+        $found = true;
+    }
+    if (!$found) {
+        throw new \moodle_exception('sectionnotexist');
+    }
 
-    // Append moved section
-    $sections[$origin_key] = $origin_section;
-
-    // Append rest of array (if applicable)
-    if (!empty($append_array)) {
-        foreach ($append_array as $id => $position) {
-            $sections[$id] = $position;
+    // Clone pre-target sections (to avoid cross-linking),
+    // and check if the target location's parent is visible.
+    $parentvisible = true;
+    if (true) {
+        foreach ($sections as $id => $section) {
+            $sections[$id] = new \stdClass;
+            $sections[$id]->id = $id;
+            $sections[$id]->visible = $section->visiblesan;
+            $sections[$id]->level = $section->levelsan;
+            if ($section->levelsan < $target->level) {
+                $parentvisible = $section->visiblesan;
+            }
         }
     }
 
-    // Renumber positions
+    // Append moved sections.
+    foreach ($originarray as $id => $section) {
+        $sections[$id] = new \stdClass;
+        $sections[$id]->id = $id;
+        $sections[$id]->visible = $section->visible && $parentvisible;
+        $sections[$id]->level = ($id == $origin->id) ? // TODO: Need this special case? Remove?
+                                $target->level
+                                : ($section->levelsan >= FMT_SECTION_LEVEL_TOPIC ?
+                                    FMT_SECTION_LEVEL_TOPIC                     // Don't change topic level.
+                                    : $section->levelsan + $levelchange);
+    }
+
+    // Append rest of array (if applicable).
+    if (true) {
+        foreach ($appendarray as $id => $section) {
+            $sections[$id] = new \stdClass;
+            $sections[$id]->id = $id;
+            $sections[$id]->visible = $section->visiblesan;
+            $sections[$id]->level = $section->levelsan;
+        }
+    }
+
+    // Renumber positions.
     $position = 0;
-    foreach ($sections as $id => $p) {
-        $sections[$id] = $position;
+    foreach ($sections as $section) {
+        $section->section = $position;
         $position++;
     }
 
     return $sections;
 
 }
+
+// REMOVED function moveto_module - end .

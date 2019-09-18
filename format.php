@@ -15,47 +15,40 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Topics course format.  Display the whole course as "topics" made of modules.
+ * Multitopic course format.  Display the course as pages of topics made of modules.
  *
- * @package format_topics
- * @copyright 2006 The Open University
- * @author N.D.Freear@open.ac.uk, and others.
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   format_multitopic
+ * @copyright 2006 The Open University,
+ *            2018 Otago Polytechnic
+ * @author    N.D.Freear@open.ac.uk, James Calder, and others.
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace format_multitopic;                                                    // ADDED.
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir.'/filelib.php');
-require_once($CFG->libdir.'/completionlib.php');
+require_once($CFG->libdir . '/filelib.php');
+require_once($CFG->libdir . '/completionlib.php');
 
 // Horrible backwards compatible parameter aliasing..
-if ($topic = optional_param('topic', 0, PARAM_INT)) {
-    $url = $PAGE->url;
-    $url->param('section', $topic);
-    debugging('Outdated topic param passed to course/view.php', DEBUG_DEVELOPER);
-    redirect($url);
-}
-// End backwards-compatible aliasing..
+// REMOVED.
 
-$context = context_course::instance($course->id);
+$context = \context_course::instance($course->id);
 // Retrieve course format option fields and add them to the $course object.
 $course = course_get_format($course)->get_course();
 
-if (($marker >=0) && has_capability('moodle/course:setcurrentsection', $context) && confirm_sesskey()) {
-    $course->marker = $marker;
-    course_set_marker($course->id, $marker);
-}
+// REMOVED set course marker.
 
 // Make sure section 0 is created.
 course_create_sections_if_missing($course, 0);
 
-$renderer = $PAGE->get_renderer('format_topics');
+$renderer = $PAGE->get_renderer('format_multitopic');
 
-if (!empty($displaysection)) {
+if (false) {                                                                    // CHANGED: Always use multi-section page.
     $renderer->print_single_section_page($course, null, null, null, null, $displaysection);
 } else {
-    $renderer->print_multiple_section_page($course, null, null, null, null);
+    $renderer->print_multiple_section_page($course, null, null, null, null, $displaysection); // CHANGED.
 }
 
-// Include course format js module
-$PAGE->requires->js('/course/format/topics/format.js');
+// Include course format js module.
+$PAGE->requires->js('/course/format/multitopic/format.js');

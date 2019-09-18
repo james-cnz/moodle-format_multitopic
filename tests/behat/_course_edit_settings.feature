@@ -1,5 +1,5 @@
-@core @core_course
-Feature: Edit course settings
+@format @format_multitopic
+Feature: Edit course settings (Multitopic format)
   In order to set the course according to my teaching needs
   As a teacher
   I need to edit the course settings
@@ -11,7 +11,7 @@ Feature: Edit course settings
       | teacher1 | Teacher | 1 | teacher1@example.com |
     And the following "courses" exist:
       | fullname | shortname | summary | format |
-      | Course 1 | C1 | <p>Course summary</p> | topics |
+      | Course 1 | C1 | <p>Course summary</p> | multitopic |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
@@ -40,8 +40,8 @@ Feature: Edit course settings
       | name | category | idnumber |
       | Cat 1 | 0 | CAT1 |
     And the following "courses" exist:
-      | category | fullname | shortname | idnumber |
-      | CAT1 | Course 1 | Course 1 | C1 |
+      | category | fullname | shortname | idnumber | format |
+      | CAT1 | Course 1 | Course 1 | C1 | multitopic |
     And I log in as "admin"
     And I go to the courses management page
     And I should see the "Categories" management page

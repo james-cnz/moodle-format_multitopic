@@ -15,72 +15,305 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains main class for the course format Topic
+ * This file contains main class for the course format Multitopic
  *
  * @since     Moodle 2.0
- * @package   format_topics
- * @copyright 2009 Sam Hemelryk
+ * @package   format_multitopic
+ * @copyright 2009 Sam Hemelryk,
+ *            2018 Otago Polytechnic
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot. '/course/format/lib.php');
+require_once($CFG->dirroot . '/course/format/lib.php');
+require_once(__DIR__ . '/classes/global_navigation_wrapper.php');               // ADDED.
+
+// ADDED.
+/** @var int The level of the General section, which represents the course as a whole.
+ * Set to -1, to be a level above the top-level sections in OneTopic format, which are numbered 0.
+ * NOTE: This isn't properly factored in the code, so can't be changed without breaking stuff.
+ */
+const FMT_SECTION_LEVEL_ROOT    = -1;
+
+/** @var int Deepest level of page to let users create.  Must be between the root level and the topic level. */
+const FMT_SECTION_LEVEL_PAGE_USE = 1;
+
+/** @var int Level of topics, which are displayed within pages.
+ * NOTE: This could have been made higher, to allow more page levels, but more page levels seemed too confusing.
+ */
+const FMT_SECTION_LEVEL_TOPIC   = 2;
+// END ADDED.
 
 /**
- * Main class for the Topics course format
+ * Main class for the Multitopic course format
  *
- * @package    format_topics
- * @copyright  2012 Marina Glancy
+ * @package    format_multitopic
+ * @copyright  2012 Marina Glancy, 2018 Otago Polytechnic
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_topics extends format_base {
+class format_multitopic extends format_base {
+
+    /** @var int ID of section 0 / the General section, treated as the section root by the Multitopic format */
+    public $fmtrootsectionid;
+
+    /**
+     * Creates a new instance of class
+     *
+     * Please use {@link course_get_format($courseorid)} to get an instance of the format class
+     *
+     * @param string $format
+     * @param int $courseid
+     * @return format_base
+     */
+    protected function __construct($format, $courseid) {
+        global $DB;
+        parent::__construct($format, $courseid);
+        if ($courseid) {
+            $this->fmtrootsectionid = $DB->get_field('course_sections', 'id', array('section' => 0, 'course' => $courseid));
+            // TODO: Check if this is set correctly for new courses?
+        }
+    }
 
     /**
      * Returns true if this course format uses sections
      *
      * @return bool
      */
-    public function uses_sections() {
+    public function uses_sections() : bool {
         return true;
     }
 
-    // INCLUDED /course/format/lib function get_sections .
-        /**
-     * Returns a list of sections used in the course
+    // INCLUDED /course/format/lib function get_sections - function get_section .
+    /**
+     * Returns a list of sections used in the course, indexed by ID, with calculated properties
+     * - levelsan:          Sanatised section level
+     * - parentid:          ID of section's parent (previous section at a higher level)
+     * - prevupid:          ID of the previous section at the same or higher level
+     * - prevpageid:        ID of the previous section above topic level
+     * - prevanyid:         ID of the previous section at any level
+     * - nextupid:          ID of the next section at the same or higher level
+     * - nextpageid:        ID of the next section above topic level
+     * - nextanyid:         ID of the next section at any level
+     * - hassubsections:    Whether this section has subsections
+     * - pagedepth:         The lowest level of subpages
+     * - pagedepthdirect:   The lowest level of direct subpages
+     * - parentvisiblesan:  Sanatised parent's visibility
+     * - visiblesan:        Sanatised visibility
+     * - uservisiblesan:    Sanatised uservisibility
+     * - datestart:         Section's start date
+     * - dateend:           Section's end date
+     * - currentnestedlevel: The level down to which this section contains the current section.
+     *                      A page-level section may be represented as multiple levels of tabs,
+     *                      and higher levels may contain the current section, while lower levels don't.
+     * - fmtdata:           Flag to indicate the presence of calculated properties
      *
-     * This is a shortcut to get_fast_modinfo()->get_section_info_all()
-     * @see get_fast_modinfo()
-     * @see course_modinfo::get_section_info_all()
-     *
-     * @return array of section_info objects
+     * @return array of section_info objects with calculated properties
      */
-    public final function get_sections() {
+    public final function fmt_get_sections() : array {
+        // CHANGED LINE ABOVE.
+        // CHANGED: Get info, but don't return it yet.
         if ($course = $this->get_course()) {
             $modinfo = get_fast_modinfo($course);
-            return $modinfo->get_section_info_all();
+            $sections = $modinfo->get_section_info_all();
+        } else {
+            return array();
         }
-        return array();
-    }
-    // END INCLUDED.
+        // END CHANGED.
 
-    // INCLUDED /course/format/lib function get_section .
-        /**
-     * Returns information about section used in course
+        // ADDED.
+
+        $timenow = time();
+
+        $courseperioddays = null;
+        switch($course->periodduration) {
+            case '1 day':
+                $courseperioddays = 1;
+                break;
+            case '1 week':
+                $courseperioddays = 7;
+                break;
+            default:
+                $courseperioddays = null;
+        }
+
+        // Forward pass.
+
+        // Generated list of sections.
+        $fmtsections = [];
+
+        // The previous section at or above, each level.
+        $sectionprevatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, null);
+
+        // The current section at or above, each level.
+        $sectionatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, null);
+
+        foreach ($sections as $thissection) {
+
+            // Add this section the the list.
+            $fmtsections[$thissection->id] = $thissection;
+
+            // Fix the section's level within appropriate bounds.
+            $level = ($sectionatlevel[FMT_SECTION_LEVEL_TOPIC] == null) ?
+                        FMT_SECTION_LEVEL_ROOT
+                        : max(FMT_SECTION_LEVEL_ROOT + 1,
+                            min($thissection->level ?? FMT_SECTION_LEVEL_TOPIC, FMT_SECTION_LEVEL_TOPIC));
+            $thissection->levelsan = $level;
+
+            // Update remembered sections.
+            for ($sublevel = $level; $sublevel <= FMT_SECTION_LEVEL_TOPIC; $sublevel++) {
+                $sectionprevatlevel[$sublevel] = $sectionatlevel[$sublevel];
+                $sectionatlevel[$sublevel] = $thissection;
+            }
+
+            // The previous section at or above this section's level.
+            $thissection->prevupid = $sectionprevatlevel[$level] ? $sectionprevatlevel[$level]->id : null;
+
+            // The previous page.
+            $thissection->prevpageid = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC - 1] ?
+                                            $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->id
+                                            : null;
+
+            // The previous section at any level.
+            $thissection->prevanyid = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC] ?
+                                            $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC]->id
+                                            : null;
+
+            // The section's parent.
+            $thissection->parentid   = ($level >= FMT_SECTION_LEVEL_ROOT + 1) ? $sectionatlevel[$level - 1]->id : null;
+
+            // Initialise tree-related properties to be set in the reverse pass.
+            $thissection->hassubsections = false;   // Does this section have subsections (page or topic)?
+            $thissection->pagedepth = $level;       // How far down does the level go for sub-pages?
+            $thissection->pagedepthdirect = $level; // What is the lowest level of direct sub-pages?
+
+            // Set visibility properties.
+            $thissection->parentvisiblesan   = ($level <= FMT_SECTION_LEVEL_ROOT) ?
+                                                true
+                                                : $sectionatlevel[$level - 1]->visiblesan;
+            $thissection->visiblesan         = ($level <= FMT_SECTION_LEVEL_ROOT) ?
+                                                true
+                                                : ($sectionatlevel[$level - 1]->visiblesan && $thissection->visible);
+            $thissection->uservisiblesan     = (($level <= FMT_SECTION_LEVEL_ROOT) ?
+                                                true
+                                                : $sectionatlevel[$level - 1]->uservisiblesan) && $thissection->uservisible;
+
+            // Set date-start property from previous section.
+            $thissection->datestart = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC] ?
+                                            $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC]->dateend
+                                            : $course->startdate;
+
+            // Set date-end property.
+            if ($level < FMT_SECTION_LEVEL_TOPIC) {
+                $sectionperioddays = 0;
+            } else {
+                switch($thissection->periodduration) {
+                    case '0 days':
+                        $sectionperioddays = 0;
+                        break;
+                    default:
+                        $sectionperioddays = $courseperioddays;
+                }
+            }
+            $thissection->dateend = (is_null($thissection->datestart) || is_null($sectionperioddays)) ?
+                                        null
+                                        : ($thissection->datestart + $sectionperioddays * 24 * 60 * 60);
+
+            // The level down to which this section contains the current section.
+            // Initialise for reverse pass.
+            $iscurrent = $thissection->dateend
+                        && ($thissection->datestart <= $timenow) && ($timenow < $thissection->dateend);
+            $thissection->currentnestedlevel = $iscurrent ? FMT_SECTION_LEVEL_TOPIC : FMT_SECTION_LEVEL_ROOT;
+
+        }
+
+        // Reverse pass.
+
+        // Remembered sections.
+        $sectionnextatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, null);
+
+        for ($thissection = $sectionatlevel[FMT_SECTION_LEVEL_TOPIC];
+                $thissection;
+                $thissection = $thissection->prevanyid ? $fmtsections[$thissection->prevanyid] : null) {
+            $level = $thissection->levelsan;
+
+            // Tree properties from next sections.
+            $thissection->nextupid      = $sectionnextatlevel[$level] ?
+                                            $sectionnextatlevel[$level]->id
+                                            : null;
+            $thissection->nextanyid  = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC] ?
+                                            $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC]->id
+                                            : null;
+            $thissection->nextpageid  = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1] ?
+                                            $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->id
+                                            : null;
+
+            // Flag to indicate the presence of calculated properties.
+            $thissection->fmtdata = true;
+
+            // Parent's tree properties.
+            if ($thissection->parentid) {
+                $parent = $fmtsections[$thissection->parentid];
+                $parent->hassubsections = true;
+                if ($level < FMT_SECTION_LEVEL_TOPIC) {
+                    $parent->pagedepth = max($parent->pagedepth, $thissection->pagedepth);
+                    $parent->pagedepthdirect = max($parent->pagedepthdirect, $level);
+                }
+                if ($thissection->currentnestedlevel > FMT_SECTION_LEVEL_ROOT) {
+                    $parent->currentnestedlevel = max($parent->currentnestedlevel, $level - 1);
+                }
+            }
+
+            // Update remembered next sections.
+            for ($sublevel = $level; $sublevel <= FMT_SECTION_LEVEL_TOPIC; $sublevel++) {
+                $sectionnextatlevel[$sublevel] = $thissection;
+            }
+
+        }
+
+        return $fmtsections;
+
+        // END ADDED.
+
+    }
+
+    /**
+     * Returns information about section used in course.
+     *
+     * If passed section info with calculated properties already in place, they will be returned as is.
+     * @see fmt_get_sections for details of calculated properties.
      *
      * @param int|stdClass $section either section number (field course_section.section) or row from course_section table
      * @param int $strictness
-     * @return section_info
+     * @return section_info section data with calculated properties
      */
-    public final function get_section($section, $strictness = IGNORE_MISSING) {
-        if (is_object($section)) {
-            $sectionnum = $section->section;
-        } else {
+    public final function fmt_get_section($section, int $strictness = IGNORE_MISSING) : section_info {
+        // CHANGED LINE ABOVE.
+        // CHANGED.
+        if (is_numeric($section)) {
             $sectionnum = $section;
+            $section = new stdClass();
+            $section->section = $sectionnum;
         }
-        $sections = $this->get_sections();
-        if (array_key_exists($sectionnum, $sections)) {
-            return $sections[$sectionnum];
+        // END CHANGED.
+        // ADDED.
+        if (isset($section->fmtdata) && $section->fmtdata) {
+            return $section;
         }
+        // END ADDED.
+        // CHANGED.
+        $sections = $this->fmt_get_sections();
+        if (isset($section->id)) {
+            if (array_key_exists($section->id, $sections)) {
+                return $sections[$section->id];
+            }
+        } else if (isset($section->section)) {
+            foreach ($sections as $thissection) {
+                if ($thissection->section == $section->section) {
+                    return $thissection;
+                }
+            }
+        }
+        // END CHANGED.
         if ($strictness == MUST_EXIST) {
             throw new moodle_exception('sectionnotexist');
         }
@@ -88,26 +321,91 @@ class format_topics extends format_base {
     }
     // END INCLUDED.
 
-    // INCLUDED instead /course/format/weeks/lib.php function get_section_name .
+    // INCLUDED /course/format/weeks/lib.php function get_section_name .
     /**
      * Returns the display name of the given section that the course prefers.
      *
-     * @param int|stdClass $section Section object from database or just field section.section
-     * @return string Display name that the course format prefers, e.g. "Topic 2"
+     * Use section name as specified by user. Otherwise use default ("Section #")
+     *
+     * @param int|stdClass $section Section object from database.  Should specify fmt calculated properties.
+     * @return string Display name that the course format prefers, e.g. "Section 2"
      */
-    public function get_section_name($section) {
-        $section = $this->get_section($section);
+    public function get_section_name($section) : string {
+
+        // If we don't have calculated data, don't bother fetching it.
+        if (!is_object($section) || !isset($section->fmtdata)) {
+            $section = $this->get_section($section);
+            if ((string)$section->name !== '') {
+                return format_string($section->name, true,
+                        array('context' => context_course::instance($this->courseid)));
+            } else {
+                return $this->get_default_section_name($section);
+            }
+        }
+
+        $weekword = new lang_string('week');
+        $weeksword = new lang_string('weeks');
+
+        // ADDED.
+        // Figure out the string for the week number.
+        $daystring = '';
+        if ($section->dateend && ($section->datestart < $section->dateend)) {
+            $currentyear = date('o');
+            $datestart = $section->datestart + 12 * 60 * 60;
+            $dateend = $section->dateend - 12 * 60 * 60;
+            if (date('o', $datestart) == date('o', $dateend)) {
+                // Within one year.
+                $yearstring = date('o', $datestart) != $currentyear ? date('o ', $datestart) : '';
+                if (date('o W', $datestart) == date('o W', $dateend)) {
+                    // Within one week.
+                    $weekstring = $yearstring . $weekword . ' ' . date('W', $datestart);
+                    if (date('o W N', $datestart) == date('o W N', $dateend)) {
+                        // One day.
+                        $daystring = $weekstring . ' ' . date('D', $datestart);
+                    } else if ((date('N', $datestart) == '1') && (date('N', $dateend) == '7')) {
+                        // Whole week.
+                        $daystring = $weekstring;
+                    } else {
+                        // Partial week.
+                        $daystring = $weekstring . ' ' . date('D', $datestart) . '–' . date('D', $dateend);
+                    }
+                } else if ((date('N', $datestart) == '1') && (date('N', $dateend) == '7')) {
+                    // Spans whole weeks.
+                    $daystring = $yearstring . $weeksword . ' ' . date('W', $datestart) . '–' . date('W', $dateend);
+                } else {
+                    // Spans partial weeks.
+                    $daystring = $yearstring . $weekword . ' ' . date('W D', $datestart)
+                                . '–' . $weekword . ' ' . date('W D', $dateend);
+                }
+            } else {
+                // Spans years.
+                $yearstartstring = date('o', $datestart) != $currentyear ? date('o ', $datestart) : '';
+                $yearendstring = date('o', $dateend) != $currentyear ? date('o ', $dateend) : '';
+                if ((date('N', $datestart) == '1') && (date('N', $dateend) == '7')) {
+                    // Spans whole weeks.
+                    $daystring = $yearstartstring . $weekword . ' ' . date('W', $datestart)
+                            . '–' . $yearendstring . $weekword . ' ' . date('W', $dateend);
+                } else {
+                    // Spans partial weeks.
+                    $daystring = $yearstartstring . $weekword . ' ' . date('W D', $datestart)
+                            . '–' . $yearendstring . $weekword . ' ' . date('W D', $dateend);
+                }
+            }
+            $daystring = $daystring . ': ';
+        }
+        // END ADDED.
+
         if ((string)$section->name !== '') {
-            // Return the name the user set.
-            return format_string($section->name, true, array('context' => context_course::instance($this->courseid)));
+            return format_string($daystring . $section->name, true,
+                    array('context' => context_course::instance($this->courseid))); // CHANGED.
         } else {
-            return $this->get_default_section_name($section);
+            return $daystring . $this->get_default_section_name($section);
         }
     }
-    // INCLUDED.
+    // END INCLUDED.
 
     /**
-     * Returns the default section name for the topics course format.
+     * Returns the default section name for the multitopic course format.
      *
      * If the section number is 0, it will use the string with key = section0name from the course format's lang file.
      * If the section number is not 0, the base implementation of format_base::get_default_section_name which uses
@@ -116,10 +414,10 @@ class format_topics extends format_base {
      * @param stdClass $section Section object from database or just field course_sections section
      * @return string The default value for the section name.
      */
-    public function get_default_section_name($section) {
+    public function get_default_section_name($section) : string {
         if ($section->section == 0) {
             // Return the general section.
-            return get_string('section0name', 'format_topics');
+            return get_string('section0name', 'format_multitopic');
         } else {
             // Use format_base::get_default_section_name implementation which
             // will display the section name in "Topic n" format.
@@ -131,50 +429,39 @@ class format_topics extends format_base {
      * The URL to use for the specified course (with section)
      *
      * @param int|stdClass $section Section object from database or just field course_sections.section
-     *     if omitted the course view page is returned
+     *                      In the general case, should specify fmt calculated properties,
+     *                      specifically levelsan, and parentid where levelsan is topic level.
+     *                      If option fmtedit is given, only must specify id
      * @param array $options options for view URL. At the moment core uses:
+     *     'fmtedit' (bool)    if true, return URL for edit page rather than view page
      *     'navigation' (bool) if true and section has no separate page, the function returns null
-     *     'sr' (int) used by multipage formats to specify to which section to return
      * @return null|moodle_url
      */
-    public function get_view_url($section, $options = array()) {
+    public function get_view_url($section, $options = array()) : ?moodle_url {
         global $CFG;
         $course = $this->get_course();
-        $url = new moodle_url('/course/view.php', array('id' => $course->id));
-
-        $sr = null;
-        if (array_key_exists('sr', $options)) {
-            $sr = $options['sr'];
-        }
-        if (is_object($section)) {
-            $sectionno = $section->section;
-        } else {
-            $sectionno = $section;
-        }
-        if ($sectionno !== null) {
-            if ($sr !== null) {
-                if ($sr) {
-                    $usercoursedisplay = COURSE_DISPLAY_MULTIPAGE;
-                    $sectionno = $sr;
-                } else {
-                    $usercoursedisplay = COURSE_DISPLAY_SINGLEPAGE;
-                }
-            } else {
-                $usercoursedisplay = $course->coursedisplay;
+        $url = new moodle_url( ($options['fmtedit'] ?? false) ? '/course/format/multitopic/_course_view.php'
+                                : '/course/view.php', array('id' => $course->id)); // CHANGED.
+        // REMOVED section return.
+        // REMOVED convert sectioninfo to number.
+        $section = $this->fmt_get_section($section);                            // ADDED.
+        if ($section !== null) {                                                // CHANGED.
+            // CHANGED.
+            $pageid  = ($section->levelsan < FMT_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
+            if ($pageid != $this->fmtrootsectionid) {
+                $url->param('sectionid', $pageid);
             }
-            if ($sectionno != 0 && $usercoursedisplay == COURSE_DISPLAY_MULTIPAGE) {
-                $url->param('section', $sectionno);
-            } else {
+            if ($section->levelsan >= FMT_SECTION_LEVEL_TOPIC) {
                 if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
                     return null;
                 }
-                $url->set_anchor('section-'.$sectionno);
+                $url->set_anchor('sectionid-' . $section->id);
             }
+            // END CHANGED.
         }
         return $url;
     }
 
-    // INCLUDED instead /course/format/onetopic/lib.php function supports_ajax .
     /**
      * Returns the information about the ajax support in the given source format
      *
@@ -183,24 +470,22 @@ class format_topics extends format_base {
      *
      * @return stdClass
      */
-    public function supports_ajax() {
+    public function supports_ajax() : stdClass {
+        // INCLUDED /course/format/onetopic/lib.php function supports_ajax body .
         global $COURSE, $USER;
-
         if (!isset($USER->onetopic_da)) {
             $USER->onetopic_da = array();
         }
-
         if (empty($COURSE)) {
             $disableajax = false;
         } else {
-            $disableajax = isset($USER->onetopic_da[$COURSE->id]) ? $USER->onetopic_da[$COURSE->id] : false;
+            $disableajax = $USER->onetopic_da[$COURSE->id] ?? false;
         }
-
         $ajaxsupport = new stdClass();
         $ajaxsupport->capable = !$disableajax;
         return $ajaxsupport;
+        // END INCLUDED.
     }
-    // END INCLUDED.
 
     /**
      * Loads all of the course sections into the navigation
@@ -208,40 +493,35 @@ class format_topics extends format_base {
      * @param global_navigation $navigation
      * @param navigation_node $node The course node within the navigation
      */
-    public function extend_course_navigation($navigation, navigation_node $node) {
+    public function extend_course_navigation($navigation, navigation_node $node) : void {
         global $PAGE;
-        // if section is specified in course/view.php, make sure it is expanded in navigation
+
+        $navigationwrapper = new \format_multitopic\format_multitopic_global_navigation_wrapper($navigation); // ADDED.
+
+        // If section is specified in course/view.php, make sure it is expanded in navigation.
         if ($navigation->includesectionnum === false) {
-            $selectedsection = optional_param('section', null, PARAM_INT);
-            if ($selectedsection !== null && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') &&
+            // CHANGED.
+            $selectedsectionid = optional_param('sectionid', null, PARAM_INT);
+            if ($selectedsectionid !== null && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0') &&
                     $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)) {
-                $navigation->includesectionnum = $selectedsection;
+                $navigationwrapper->innerincludesectionid = $selectedsectionid;
             }
+            // END CHANGED.
         }
 
-        // check if there are callbacks to extend course navigation
+        // Check if there are callbacks to extend course navigation.
         // REMOVED function call.
-        // INCLUDED instead /course/format/lib.php function extend_course_navigation body.
+
+        // INCLUDED /course/format/lib.php function extend_course_navigation body.
         if ($course = $this->get_course()) {
-            $navigation->load_generic_course_sections($course, $node);
+            $navigationwrapper->load_generic_course_sections($course, $node);   // CHANGED: Wrapped navigation object.
         }
         // END INCLUDED.
 
         // We want to remove the general section if it is empty.
-        $modinfo = get_fast_modinfo($this->get_course());
-        $sections = $modinfo->get_sections();
-        if (!isset($sections[0])) {
-            // The general section is empty to find the navigation node for it we need to get its ID.
-            $section = $modinfo->get_section_info(0);
-            $generalsection = $node->get($section->id, navigation_node::TYPE_SECTION);
-            if ($generalsection) {
-                // We found the node - now remove it.
-                $generalsection->remove();
-            }
-        }
+        // REMOVED.
     }
 
-    // INCLUDED instead /course/format/weeks/lib.php function ajax_section_move .
     /**
      * Custom action after section has been moved in AJAX mode
      *
@@ -249,24 +529,26 @@ class format_topics extends format_base {
      *
      * @return array This will be passed in ajax respose
      */
-    function ajax_section_move() {
+    public function ajax_section_move() : array {
         global $PAGE;
         $titles = array();
-        $current = -1;
+        $current = -1;                                                          // INCLUDED from /course/format/weeks/lib.php .
         $course = $this->get_course();
-        $modinfo = get_fast_modinfo($course);
+        // REMOVED: Replaced $modinfo with fmt_get_sections.
         $renderer = $this->get_renderer($PAGE);
-        if ($renderer && ($sections = $modinfo->get_section_info_all())) {
-            foreach ($sections as $number => $section) {
-                $titles[$number] = $renderer->section_title($section, $course);
+        if ($renderer && ($sections = $this->fmt_get_sections())) {             // CHANGED: Replaced $modinfo with fmt_get_sections.
+            foreach ($sections as $section) {
+                $titles[$section->section] = $renderer->section_title($section, $course);
+                // INCLUDED /course/format/weeks/lib.php function ajax_section_move if ($this->is_section_current($section)) .
                 if ($this->is_section_current($section)) {
-                    $current = $number;
+                    $current = $section->section;
                 }
+                // END INCLUDED.
             }
         }
         return array('sectiontitles' => $titles, 'current' => $current, 'action' => 'move');
+        // CHANGED LINE ABOVE as per /course/format/weeks/lib.php .
     }
-    // END INCLUDED.
 
     /**
      * Returns the list of blocks to be automatically added for the newly created course
@@ -274,7 +556,7 @@ class format_topics extends format_base {
      * @return array of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
      *     each of values is an array of block names (for left and right side columns)
      */
-    public function get_default_blocks() {
+    public function get_default_blocks() : array {
         return array(
             BLOCK_POS_LEFT => array(),
             BLOCK_POS_RIGHT => array()
@@ -282,23 +564,24 @@ class format_topics extends format_base {
     }
 
     /**
-     * Definitions of the additional options that this course format uses for course
+     * Definitions of the additional options that this course format uses for courses
      *
-     * Topics format uses the following options:
-     * - coursedisplay
-     * - hiddensections
+     * Multitopic format uses the following options:
+     * - periodduration (from Periods format): how long each topic takes.  (Only 1 week or null are currently supported.)
+     * - hiddensections (from the standard Topics format): whether hidden sections are shown collapsed, or not shown at all.
+     * - bannerslice (custom option): how far down the course image to take the banner slice from (0-100).
      *
      * @param bool $foreditform
      * @return array of options
      */
-    public function course_format_options($foreditform = false) {
+    public function course_format_options($foreditform = false) : array {
         static $courseformatoptions = false;
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
             $courseformatoptions = array(
                 // INCLUDED /course/format/periods/lib.php function course_format_options 'periodduration'.
                 'periodduration' => array(
-                    'default' => '1 week', // TODO this does not work.
+                    'default' => null,                                          // ADDED.
                     'type' => PARAM_NOTAGS
                 ),
                 // END INCLUDED.
@@ -306,21 +589,30 @@ class format_topics extends format_base {
                     'default' => $courseconfig->hiddensections,
                     'type' => PARAM_INT,
                 ),
-                'coursedisplay' => array(
-                    'default' => $courseconfig->coursedisplay,
+                // REMOVED: course display.
+                // ADDED.
+                'bannerslice' => array(
+                    'default' => 0,
                     'type' => PARAM_INT,
                 ),
+                // END ADDED.
             );
         }
-        if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
+        if ($foreditform && !isset($courseformatoptions['hiddensections']['label'])) { // CHANGED.
             $courseformatoptionsedit = array(
                 // INCLUDED /course/format/periods/lib.php function course_format_options $foreditform 'periodduration' .
                 'periodduration' => array(
-                    'label' => new lang_string('perioddurationdefault', 'format_periods'),
+                    'label' => new lang_string('perioddurationdefault', 'format_multitopic'), // CHANGED.
                     'help' => 'perioddurationdefault',
-                    'help_component' => 'format_periods',
-                    'element_type' => 'periodduration',
-                    'element_attributes' => array(array('default' => '1 week')),
+                    'help_component' => 'format_multitopic',                    // CHANGED.
+                    'element_type' => 'select',                                 // CHANGED.
+                    // REMOVED: Replaced periodduration type.
+                    // ADDED.
+                    'element_attributes' => array(array(
+                        null => new lang_string('period_undefined', 'format_multitopic'),
+                        '1 week' => new lang_string('numweek', '', 1),
+                    )),
+                    // END ADDED.
                 ),
                 // END INCLUDED.
                 'hiddensections' => array(
@@ -335,18 +627,28 @@ class format_topics extends format_base {
                         )
                     ),
                 ),
-                'coursedisplay' => array(
-                    'label' => new lang_string('coursedisplay'),
+                // REMOVED: coursedisplay .
+                // ADDED.
+                'bannerslice' => array(
+                    'label' => new lang_string('bannerslice', 'format_multitopic'),
+                    'help' => 'bannerslice',
+                    'help_component' => 'format_multitopic',
                     'element_type' => 'select',
                     'element_attributes' => array(
-                        array(
-                            COURSE_DISPLAY_SINGLEPAGE => new lang_string('coursedisplay_single'),
-                            COURSE_DISPLAY_MULTIPAGE => new lang_string('coursedisplay_multi')
-                        )
+                        array(' 0%', ' 1%', ' 2%', ' 3%', ' 4%', ' 5%', ' 6%', ' 7%', ' 8%', ' 9%',
+                              '10%', '11%', '12%', '13%', '14%', '15%', '16%', '17%', '18%', '19%',
+                              '20%', '21%', '22%', '23%', '24%', '25%', '26%', '27%', '28%', '29%',
+                              '30%', '31%', '32%', '33%', '34%', '35%', '36%', '37%', '38%', '39%',
+                              '40%', '41%', '42%', '43%', '44%', '45%', '46%', '47%', '48%', '49%',
+                              '50%', '51%', '52%', '53%', '54%', '55%', '56%', '57%', '58%', '59%',
+                              '60%', '61%', '62%', '63%', '64%', '65%', '66%', '67%', '68%', '69%',
+                              '70%', '71%', '72%', '73%', '74%', '75%', '76%', '77%', '78%', '79%',
+                              '80%', '81%', '82%', '83%', '84%', '85%', '86%', '87%', '88%', '89%',
+                              '90%', '91%', '92%', '93%', '94%', '95%', '96%', '97%', '98%', '99%',
+                              '100%')
                     ),
-                    'help' => 'coursedisplay',
-                    'help_component' => 'moodle',
-                )
+                ),
+                // END ADDED.
             );
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }
@@ -379,58 +681,63 @@ class format_topics extends format_base {
      * @param bool $foreditform
      * @return array
      */
-    public function section_format_options($foreditform = false) {
-        // INCLUDED instead /course/format/topics/lib.php function course_format_options body (excluding array items).
-        static $courseformatoptions = false;
-        if ($courseformatoptions === false) {
-            $courseconfig = get_config('moodlecourse');
-            $courseformatoptions = array(
+    public function section_format_options($foreditform = false) : array {
+        // REMOVAL: Removed empty function body.
+        // INCLUDED /course/format/lib.php function course_format_options body (excluding array items).
+        static $sectionformatoptions = false;
+        if ($sectionformatoptions === false) {
+            $sectionformatoptions = array(
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options 'level'.
                 'level' => array(
-                    'default' => 0,
+                    'default' => FMT_SECTION_LEVEL_TOPIC,                       // CHANGED.
                     'type' => PARAM_INT
                 ),
                 // END INCLUDED.
                 // INCLUDED /course/format/periods/lib.php function section_format_options 'periodduration'.
                 'periodduration' => array(
+                    'default' => null,                                          // CHANGED.
                     'type' => PARAM_NOTAGS
                 ),
                 // END INCLUDED.
             );
         }
-        if ($foreditform && !isset($courseformatoptions['coursedisplay']['label'])) {
-            $courseformatoptionsedit = array(
+        if ($foreditform && !isset($sectionformatoptions['level']['label'])) {
+            $sectionformatoptionsedit = array(
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options $foreditform 'level'.
                 'level' => array(
-                    'default' => 0,
-                    'type' => PARAM_INT,
-                    'label' => get_string('level', 'format_onetopic'),
+                    // REMOVED: 'default' & 'type'.
+                    'label' => get_string('level', 'format_multitopic'),        // CHANGED.
                     'element_type' => 'select',
                     'element_attributes' => array(
                         array(
-                            0 => get_string('asprincipal', 'format_onetopic'),
-                            1 => get_string('aschild', 'format_onetopic')
+                            FMT_SECTION_LEVEL_ROOT + 1 => get_string('asprincipal', 'format_multitopic'), // CHANGED.
+                            FMT_SECTION_LEVEL_ROOT + 2 => get_string('aschild', 'format_multitopic'),     // CHANGED.
+                            FMT_SECTION_LEVEL_TOPIC => get_string('topic') // ADDED.
                         )
                     ),
                     'help' => 'level',
-                    'help_component' => 'format_onetopic',
+                    'help_component' => 'format_multitopic',
                 ),
                 // END INCLUDED.
                 // INCLUDED /course/format/periods/lib.php function section_format_options $foreditform 'periodduration'.
                 'periodduration' => array(
-                    'label' => new lang_string('perioddurationoverride', 'format_periods'),
+                    'label' => new lang_string('perioddurationoverride', 'format_multitopic'), // CHANGED.
                     'help' => 'perioddurationoverride',
-                    'help_component' => 'format_periods',
-                    'element_type' => 'periodduration',
-                    'element_attributes' => array(
-                        array('optional' => true, 'default' => null)
-                    )
+                    'help_component' => 'format_multitopic',                    // CHANGED.
+                    'element_type' => 'select',                                 // CHANGED.
+                    // REMOVED: Changed type.
+                    // ADDED.
+                    'element_attributes' => array(array(
+                        null => new lang_string('default'),
+                        '0 days' => new lang_string('period_0_days', 'format_multitopic'),
+                    )),
+                    // END ADDED.
                 ),
                 // END INCLUDED.
             );
-            $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
+            $sectionformatoptions = array_merge_recursive($sectionformatoptions, $sectionformatoptionsedit); // CHANGED.
         }
-        return $courseformatoptions;
+        return $sectionformatoptions;                                           // CHANGED.
         // END INCLUDED.
     }
     // END INCLUDED.
@@ -444,24 +751,11 @@ class format_topics extends format_base {
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
      * @return array array of references to the added form elements.
      */
-    public function create_edit_form_elements(&$mform, $forsection = false) {
-        global $COURSE;
+    public function create_edit_form_elements(&$mform, $forsection = false) : array {
         $elements = parent::create_edit_form_elements($mform, $forsection);
 
-        if (!$forsection && (empty($COURSE->id) || $COURSE->id == SITEID)) {
-            // Add "numsections" element to the create course form - it will force new course to be prepopulated
-            // with empty sections.
-            // The "Number of sections" option is no longer available when editing course, instead teachers should
-            // delete and add sections when needed.
-            $courseconfig = get_config('moodlecourse');
-            $max = (int)$courseconfig->maxsections;
-            $element = $mform->addElement('select', 'numsections', get_string('numberweeks'), range(0, $max ?: 52));
-            $mform->setType('numsections', PARAM_INT);
-            if (is_null($mform->getElementValue('numsections'))) {
-                $mform->setDefault('numsections', $courseconfig->numsections);
-            }
-            array_unshift($elements, $element);
-        }
+        // REMOVED: numsections .
+        // TODO: Add section image upload box?
 
         return $elements;
     }
@@ -469,15 +763,15 @@ class format_topics extends format_base {
     /**
      * Updates format options for a course
      *
-     * In case if course format was changed to 'topics', we try to copy options
-     * 'coursedisplay' and 'hiddensections' from the previous format.
+     * If the course format was changed to 'multitopic', we try to copy options
+     * 'periodduration', 'hiddensections', and 'bannerslice' from the previous format.
      *
      * @param stdClass|array $data return value from {@link moodleform::get_data()} or array with data
      * @param stdClass $oldcourse if this function is called from {@link update_course()}
      *     this object contains information about the course before update
      * @return bool whether there were any changes to the options values
      */
-    public function update_course_format_options($data, $oldcourse = null) {
+    public function update_course_format_options($data, $oldcourse = null) : bool {
         $data = (array)$data;
         if ($oldcourse !== null) {
             $oldcourse = (array)$oldcourse;
@@ -493,87 +787,90 @@ class format_topics extends format_base {
         return $this->update_format_options($data);
     }
 
+    // TODO: Customise editsection_form?
+
     // INCLUDED /course/format/lib.php function course_header declaration.
     /**
-     * Course-specific information to be output on any course page (usually above navigation bar)
+     * Create course header: A banner showing the course name, with a slice of the course image as the background.
      *
-     * Example of usage:
-     * define
-     * class format_FORMATNAME_XXX implements renderable {}
-     *
-     * create format renderer in course/format/FORMATNAME/renderer.php, define rendering function:
-     * class format_FORMATNAME_renderer extends plugin_renderer_base {
-     *     protected function render_format_FORMATNAME_XXX(format_FORMATNAME_XXX $xxx) {
-     *         return html_writer::tag('div', 'This is my header/footer');
-     *     }
-     * }
-     *
-     * Return instance of format_FORMATNAME_XXX in this function, the appropriate method from
-     * plugin renderer will be called
-     *
-     * @return null|renderable null for no output or object with data for plugin renderer
+     * @return null|renderable
      */
-    public function course_header() {
-        return null;
+    public function course_header() : ?renderable {
+        // REMOVED: Removed empty function body.
+        // ADDED.
+        global $CFG;
+        require_once($CFG->dirroot . '/course/format/multitopic/renderer.php');
+        return new format_multitopic_courseheader($this->get_course());
+        // END ADDED.
     }
     // END INCLUDED.
 
-    // INCLUDED /course/format/lib.php function course_content_header declaration.
     /**
-     * Course-specific information to be output immediately above content on any course page
+     * Create course content header when applicable: A "back to course" button.
      *
-     * See {@link format_base::course_header()} for usage
-     *
-     * @return null|renderable null for no output or object with data for plugin renderer
+     * @return renderable|null
      */
-    public function course_content_header() {
-        return null;
-    }
-    // END INCLUDED.
+    public function course_content_header() : ?renderable {
+        global $PAGE;
+        // Don't show in manage files popup.  TODO: Better way?
+        if (class_exists('format_multitopic_coursecontentheaderfooter')) {
+            return new format_multitopic_coursecontentheaderfooter($PAGE, -1);
+        } else {
+            return null;
+        }
 
-    // INCLUDED /course/format/lib.php function course_content_footer declaration.
-    /**
-     * Course-specific information to be output immediately below content on any course page
-     *
-     * See {@link format_base::course_header()} for usage
-     *
-     * @return null|renderable null for no output or object with data for plugin renderer
-     */
-    public function course_content_footer() {
-        return null;
     }
-    // END INCLUDED.
+
+    /**
+     * Create course content footer when applicable: Another "back to course" button.
+     *
+     * @return renderable|null
+     */
+    public function course_content_footer() : ?renderable {
+        global $PAGE;
+        // Don't show in manage files popup.  TODO: Better way?
+        if (class_exists('format_multitopic_coursecontentheaderfooter')) {
+            return new format_multitopic_coursecontentheaderfooter($PAGE, 1);
+        } else {
+            return null;
+        }
+
+    }
 
     // INCLUDED /course/format/lib.php function is_section_current .
     /**
      * Returns true if the specified section is current
      *
-     * By default we analyze $course->marker
-     *
-     * @param int|stdClass|section_info $section
+     * @param int|stdClass|section_info $section The section to check.  Should specify fmt calculated properties.
      * @return bool
      */
-    public function is_section_current($section) {
-        if (is_object($section)) {
-            $sectionnum = $section->section;
-        } else {
-            $sectionnum = $section;
+    public function is_section_current($section) : bool {
+
+        // If we don't have calculated data, don't bother fetching it.
+        if (!is_object($section) || !isset($section->fmtdata)) {
+            return false;
         }
-        return ($sectionnum && ($course = $this->get_course()) && $course->marker == $sectionnum);
+
+        return ($section->section && $section->currentnestedlevel >= FMT_SECTION_LEVEL_TOPIC); // CHANGED.
     }
     // END INCLUDED.
+
 
     /**
      * Whether this format allows to delete sections
      *
      * Do not call this function directly, instead use {@link course_can_delete_section()}
      *
-     * @param int|stdClass|section_info $section
+     * @param int|stdClass|section_info $section The section to check.
+     *                                  Must specify section number or id.  Should specify fmt calculated properties.
      * @return bool
      */
-    public function can_delete_section($section) {
-        return true;
+    public function can_delete_section($section) : bool {
+        $section = $this->fmt_get_section($section);                            // ADDED.
+        return !$section->hassubsections;                                       // CHANGED.
     }
+
+    // TODO: Customise delete_section?
 
     /**
      * Prepares the templateable object to display section name
@@ -586,30 +883,36 @@ class format_topics extends format_base {
      * @return \core\output\inplace_editable
      */
     public function inplace_editable_render_section_name($section, $linkifneeded = true,
-                                                         $editable = null, $edithint = null, $editlabel = null) {
+                                            $editable = null, $edithint = null, $editlabel = null) : \core\output\inplace_editable {
+        // REMOVED: global OUTPUT.
+        $section = $this->fmt_get_section($section);                            // ADDED.
+        // TODO: Determine here whether a link is needed?
         if (empty($edithint)) {
-            $edithint = new lang_string('editsectionname', 'format_topics');
+            $edithint = new lang_string('editsectionname');
         }
         if (empty($editlabel)) {
             $title = get_section_name($section->course, $section);
-            $editlabel = new lang_string('newsectionname', 'format_topics', $title);
+            $editlabel = new lang_string('newsectionname', '', $title);
         }
+        // REMOVED: Replaced function call with function body.
 
-        return parent::inplace_editable_render_section_name($section, $linkifneeded, $editable, $edithint, $editlabel);
-        // REMOVED function call.
-        // INCLUDED instead /course/format/lib.php function inplace_editable_render_section_name body.
+        // INCLUDED: /course/format/lib.php function inplace_editable_render_section_name body.
         global $USER, $CFG;
-        require_once($CFG->dirroot.'/course/lib.php');
+        require_once($CFG->dirroot . '/course/lib.php');
 
         if ($editable === null) {
             $editable = !empty($USER->editing) && has_capability('moodle/course:update',
                     context_course::instance($section->course));
         }
 
-        $displayvalue = $title = get_section_name($section->course, $section);
+        $displayvalue = $title = html_writer::tag('i', '', ['class' =>
+                                        ($section->levelsan < FMT_SECTION_LEVEL_TOPIC ? 'icon fa fa-folder-o fa-fw'
+                                                                                        : 'icon fa fa-list fa-fw')])
+                                    . ' ' . get_section_name($section->course, $section);
+        // TODO: Fix collapse icon for AJAX rename, somehow?
         if ($linkifneeded) {
-            // Display link under the section name if the course format setting is to display one section per page.
-            $url = course_get_url($section->course, $section->section, array('navigation' => true));
+            // Display link under the section name, for collapsible sections.
+            $url = course_get_url($section->course, $section, array('navigation' => true)); // CHANGED.
             if ($url) {
                 $displayvalue = html_writer::link($url, $title);
             }
@@ -637,7 +940,7 @@ class format_topics extends format_base {
      *
      * @return bool
      */
-    public function supports_news() {
+    public function supports_news() : bool {
         return true;
     }
 
@@ -649,24 +952,32 @@ class format_topics extends format_base {
      * @param stdClass|section_info $section section where this module is located or will be added to
      * @return bool
      */
-    public function allow_stealth_module_visibility($cm, $section) {
+    public function allow_stealth_module_visibility($cm, $section) : bool {
         // Allow the third visibility state inside visible sections or in section 0.
         return !$section->section || $section->visible;
     }
 
-    public function section_action($section, $action, $sr) {
+    /**
+     * Callback used in WS core_course_edit_section when teacher performs an AJAX action on a section (show/hide)
+     *
+     * Access to the course is already validated in the WS but the callback has to make sure
+     * that particular action is allowed by checking capabilities
+     *
+     * Course formats should register
+     *
+     * @param stdClass|section_info $section
+     * @param string $action
+     * @param int $sr unused
+     * @return null|array|stdClass any data for the Javascript post-processor (must be json-encodeable)
+     */
+    public function section_action($section, $action, $sr): array {
         global $PAGE;
 
-        if ($section->section && ($action === 'setmarker' || $action === 'removemarker')) {
-            // Format 'topics' allows to set and remove markers in addition to common section actions.
-            require_capability('moodle/course:setcurrentsection', context_course::instance($this->courseid));
-            course_set_marker($this->courseid, ($action === 'setmarker') ? $section->section : 0);
-            return null;
-        }
+        // REMOVED: marker.
 
         // For show/hide actions call the parent method and return the new content for .section_availability element.
-        $rv = parent::section_action($section, $action, $sr);
-        $renderer = $PAGE->get_renderer('format_topics');
+        $rv = parent::section_action($section, $action, null);                  // CHANGED.
+        $renderer = $PAGE->get_renderer('format_multitopic');                   // CHANGED.
         $rv['section_availability'] = $renderer->section_availability($this->get_section($section));
         return $rv;
     }
@@ -677,7 +988,7 @@ class format_topics extends format_base {
      * @return array the list of configuration settings
      * @since Moodle 3.5
      */
-    public function get_config_for_external() {
+    public function get_config_for_external() : array {
         // Return everything (nothing to hide).
         return $this->get_format_options();
     }
@@ -691,13 +1002,14 @@ class format_topics extends format_base {
  * @param mixed $newvalue
  * @return \core\output\inplace_editable
  */
-function format_topics_inplace_editable($itemtype, $itemid, $newvalue) {
+function format_multitopic_inplace_editable(string $itemtype, int $itemid, $newvalue) : \core\output\inplace_editable {
+    // CHANGED LINE ABOVE.
     global $DB, $CFG;
     require_once($CFG->dirroot . '/course/lib.php');
     if ($itemtype === 'sectionname' || $itemtype === 'sectionnamenl') {
         $section = $DB->get_record_sql(
             'SELECT s.* FROM {course_sections} s JOIN {course} c ON s.course = c.id WHERE s.id = ? AND c.format = ?',
-            array($itemid, 'topics'), MUST_EXIST);
+            array($itemid, 'multitopic'), MUST_EXIST);                          // CHANGED.
         return course_get_format($section->course)->inplace_editable_update_section_name($section, $itemtype, $newvalue);
     }
 }
