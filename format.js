@@ -179,9 +179,7 @@ M.course.format.fmt_collapse_onclick = function (event) {
         return;
     }
     var anchor = event_target.hash.substr(1);
-    var sel_section_dom = anchor ? document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor + ","
-                                                        + "body.format-multitopic .course-content ul.sections li.section.section-topic#" + anchor) : null;
-    // TODO: Remove unused CSS selector?
+    var sel_section_dom = anchor ? document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor) : null;
     if (!sel_section_dom || sel_section_dom.querySelector(".content h3 a") != event_target) {
         return;
     }
@@ -211,9 +209,7 @@ M.course.format.fmt_collapse_onhashchange = function (_event) {
 
     // Find the specified section.
     var anchor = window.location.hash.substr(1);
-    var sel_section_dom = anchor ? document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor + ","
-                                                        + "body.format-multitopic .course-content ul.sections li.section.section-topic#" + anchor) : null;
-    // TODO: Remove unused CSS selector?
+    var sel_section_dom = anchor ? document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor) : null;
     // TODO: Exit when there is an event, but no specified section?
 
     // Set the appropriate collapse state for all collapsible sections.

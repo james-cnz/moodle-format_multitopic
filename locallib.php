@@ -351,7 +351,7 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
         $sections[$id] = new \stdClass;
         $sections[$id]->id = $id;
         $sections[$id]->visible = $section->visible && $parentvisible;
-        $sections[$id]->level = ($id == $origin->id) ? // TODO: Need this special case? Remove?
+        $sections[$id]->level = ($id == $origin->id) ?
                                 $target->level
                                 : ($section->levelsan >= FMT_SECTION_LEVEL_TOPIC ?
                                     FMT_SECTION_LEVEL_TOPIC                     // Don't change topic level.

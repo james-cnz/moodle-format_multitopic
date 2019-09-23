@@ -693,7 +693,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     $newtab = new tabobject("tab_id_{$thissection->id}_l{$level}", $url,
                         html_writer::tag('div', $sectionname, ['class' =>
                             'tab_content'
-                            . ($thissection->currentnestedlevel >= max($thissection->levelsan, $level) ? ' marker' : '') // TODO: Just compare to level?
+                            . ($thissection->currentnestedlevel >= $level ? ' marker' : '')
                             . (!$thissection->visible || $level > $thissection->pagedepthdirect ? ' dimmed' : '')
                         ]),
                         $sectionname);
@@ -814,7 +814,6 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                         echo $completioninfo->display_help_icon();
                     }
                     // END ADDED.
-                    // TODO: Use section IDs?
                     echo $this->courserenderer->course_section_cm_list($course, $thissection); // CHANGED removed section return.
                     echo (new \format_multitopic\format_multitopic_core_course_renderer_wrapper($this->courserenderer)
                          )->course_section_add_cm_control($course, $thissection); // CHANGED removed section return.
@@ -1074,11 +1073,15 @@ class format_multitopic_courseheader implements renderable {
 
         // Output the banner.
         // NOTE: Changes here need to be reflected in _course_edit.js .
-        $o = html_writer::tag('div', $this->coursename, array(
+        $o = html_writer::start_tag('div', array(
             'id' => 'course-header-banner',
-            'style' => "background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)), url('{$this->imageurl}'); "
-                     . "background-position: center, center {$this->bannerslice}%;"
+            'style' => "background-image: url('{$this->imageurl}'); "
+                     . "background-position: center {$this->bannerslice}%;"
+        ));
+        $o .= html_writer::tag('div', $this->coursename, array(
+            'id' => 'course-header-banner-text',
             ));
+        $o .= html_writer:: end_tag('div');
 
         // Output the attribution.
         $o .= html_writer::start_tag('p', array('id'    => 'course-header-banner_attribution',

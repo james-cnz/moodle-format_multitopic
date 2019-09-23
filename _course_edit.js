@@ -27,7 +27,7 @@ M.course.format.fmt_banner_preview_slice = function () {
     // Update banner CSS style for new banner slice.
     var banner_style_old = banner_dom.getAttribute("style");
     // This expression should reflect the style code in renderer.php function render_format_multitopic_courseheader .
-    banner_style        = banner_style_old.replace(/\b(background-position: [a-z0-9% ]*, [a-z0-9%]+ )([0-9]+%)(;?)/, "$1" + bannerslice + "%" + "$3");
+    banner_style        = banner_style_old.replace(/\b(background-position: [a-z0-9%]+ )([0-9]+%)(;?)/, "$1" + bannerslice + "%" + "$3");
     banner_dom.setAttribute("style", banner_style);
 
 };
@@ -57,11 +57,10 @@ M.course.format.fmt_banner_preview_image = function () {
     // Update banner CSS style and attribution for new image.
     var banner_style_old = banner_dom.getAttribute("style");
     // This expression should reflect the style code in renderer.php function render_format_multitopic_courseheader .
-    var banner_style    = banner_style_old.replace(/\b(background-image: [a-z-]+\((?:[a-z- ,]|\([0-9.% ,]+\))+\), )(url\('[^']*'\))(;?)/, "$1" + "url('" + image_url + "')" + "$3");
+    var banner_style    = banner_style_old.replace(/\b(background-image: )(url\('[^']*'\))(;?)/, "$1" + "url('" + image_url + "')" + "$3");
     banner_dom.setAttribute("style", banner_style);
     banner_attribution_dom.textContent = banner_attribution_dom.textContent.replace(/([^:]*: )(.*)/, "$1" + image_name + " ...");
-    banner_attribution_dom.setAttribute("style", "visibility: visible;");
-    // TODO: Hide when no image?
+    banner_attribution_dom.setAttribute("style", "visibility: " + (image_file_dom ? "visible " : "hidden") + ";");
 
 };
 

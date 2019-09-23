@@ -14,10 +14,13 @@ body.format-multitopic div#page {
 /* Course Header */
 body.format-multitopic div#course-header > div#course-header-banner {
     max-width: none;  /* Needed on LTD server? */
+    background-size: cover;
+}
+body.format-multitopic div#course-header > div#course-header-banner > div#course-header-banner-text {
     padding: 40px;
     font-size: xx-large;
     color: #fff;
-    background-size: cover;
+    background: rgba(0, 0, 0, 0.25);
 }
 body.format-multitopic div#course-header > p#course-header-banner_attribution {
     text-align: right;
@@ -44,7 +47,7 @@ body.format-multitopic ul.sections li.section {
     width: 100%;
     height: auto;
     position: initial;
-    visibility: visible;
+    visibility: inherit;
     margin-bottom: 1rem;
 }
 body.format-multitopic ul.sections li.section .content {

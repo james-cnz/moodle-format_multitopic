@@ -158,20 +158,20 @@ class format_multitopic extends format_base {
             $fmtsections[$thissection->id] = $thissection;
 
             // Fix the section's level within appropriate bounds.
-            $level = ($sectionatlevel[FMT_SECTION_LEVEL_ROOT] == null) ? // TODO: Rename to levelsan?
+            $levelsan = ($sectionatlevel[FMT_SECTION_LEVEL_ROOT] == null) ?
                         FMT_SECTION_LEVEL_ROOT
                         : max(FMT_SECTION_LEVEL_ROOT + 1,
                             min($thissection->level ?? FMT_SECTION_LEVEL_TOPIC, FMT_SECTION_LEVEL_TOPIC));
-            $thissection->levelsan = $level;
+            $thissection->levelsan = $levelsan;
 
             // Update remembered sections.
-            for ($sublevel = $level; $sublevel <= FMT_SECTION_LEVEL_TOPIC; $sublevel++) {
+            for ($sublevel = $levelsan; $sublevel <= FMT_SECTION_LEVEL_TOPIC; $sublevel++) {
                 $sectionprevatlevel[$sublevel] = $sectionatlevel[$sublevel];
                 $sectionatlevel[$sublevel] = $thissection;
             }
 
             // The previous section at or above this section's level.
-            $thissection->prevupid = $sectionprevatlevel[$level] ? $sectionprevatlevel[$level]->id : null;
+            $thissection->prevupid = $sectionprevatlevel[$levelsan] ? $sectionprevatlevel[$levelsan]->id : null;
 
             // The previous page.
             $thissection->prevpageid = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC - 1] ?
@@ -184,23 +184,23 @@ class format_multitopic extends format_base {
                                             : null;
 
             // The section's parent.
-            $thissection->parentid   = ($level > FMT_SECTION_LEVEL_ROOT) ? $sectionatlevel[$level - 1]->id : null;
+            $thissection->parentid   = ($levelsan > FMT_SECTION_LEVEL_ROOT) ? $sectionatlevel[$levelsan - 1]->id : null;
 
             // Initialise tree-related properties to be set in the reverse pass.
             $thissection->hassubsections = false;   // Whether this section has any subsections (page or topic).
-            $thissection->pagedepth = $level;       // The lowest level of all sub-pages.
-            $thissection->pagedepthdirect = $level; // The lowest level of direct sub-pages.
+            $thissection->pagedepth     = $levelsan;   // The lowest level of all sub-pages.
+            $thissection->pagedepthdirect = $levelsan; // The lowest level of direct sub-pages.
 
             // Set visibility properties.
-            $thissection->parentvisiblesan   = ($level <= FMT_SECTION_LEVEL_ROOT) ?
+            $thissection->parentvisiblesan  = ($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
                                                 true
-                                                : $sectionatlevel[$level - 1]->visiblesan;
-            $thissection->visiblesan         = ($level <= FMT_SECTION_LEVEL_ROOT) ?
+                                                : $sectionatlevel[$levelsan - 1]->visiblesan;
+            $thissection->visiblesan        = ($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
                                                 true
-                                                : ($sectionatlevel[$level - 1]->visiblesan && $thissection->visible);
-            $thissection->uservisiblesan     = (($level <= FMT_SECTION_LEVEL_ROOT) ?
+                                                : ($sectionatlevel[$levelsan - 1]->visiblesan && $thissection->visible);
+            $thissection->uservisiblesan    = (($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
                                                  true
-                                                 : $sectionatlevel[$level - 1]->uservisiblesan)
+                                                 : $sectionatlevel[$levelsan - 1]->uservisiblesan)
                                                 && $thissection->uservisible;
 
             // Set date-start property from previous section.
@@ -209,7 +209,7 @@ class format_multitopic extends format_base {
                                             : $course->startdate;
 
             // Set date-end property.
-            if ($level < FMT_SECTION_LEVEL_TOPIC) {
+            if ($levelsan < FMT_SECTION_LEVEL_TOPIC) {
                 $sectionperioddays = 0;
             } else {
                 switch($thissection->periodduration) {
@@ -228,7 +228,7 @@ class format_multitopic extends format_base {
             // Initialise for reverse pass.
             $iscurrent = $thissection->dateend
                         && ($thissection->datestart <= $timenow) && ($timenow < $thissection->dateend);
-            $thissection->currentnestedlevel = $iscurrent ? FMT_SECTION_LEVEL_TOPIC : FMT_SECTION_LEVEL_ROOT; // TODO: Subtract 1?
+            $thissection->currentnestedlevel = $iscurrent ? FMT_SECTION_LEVEL_TOPIC : FMT_SECTION_LEVEL_ROOT - 1;
 
         }
 
@@ -240,11 +240,11 @@ class format_multitopic extends format_base {
         for ($thissection = $sectionatlevel[FMT_SECTION_LEVEL_TOPIC];
                 $thissection;
                 $thissection = $thissection->prevanyid ? $fmtsections[$thissection->prevanyid] : null) {
-            $level = $thissection->levelsan; // TODO: Rename to levelsan?
+            $levelsan = $thissection->levelsan;
 
             // Tree properties from next sections.
-            $thissection->nextupid  = $sectionnextatlevel[$level] ?
-                                            $sectionnextatlevel[$level]->id
+            $thissection->nextupid  = $sectionnextatlevel[$levelsan] ?
+                                            $sectionnextatlevel[$levelsan]->id
                                             : null;
             $thissection->nextpageid = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1] ?
                                             $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->id
@@ -260,17 +260,17 @@ class format_multitopic extends format_base {
             if ($thissection->parentid) {
                 $parent = $fmtsections[$thissection->parentid];
                 $parent->hassubsections = true;
-                if ($level < FMT_SECTION_LEVEL_TOPIC) {
+                if ($levelsan < FMT_SECTION_LEVEL_TOPIC) {
                     $parent->pagedepth = max($parent->pagedepth, $thissection->pagedepth);
-                    $parent->pagedepthdirect = max($parent->pagedepthdirect, $level);
+                    $parent->pagedepthdirect = max($parent->pagedepthdirect, $levelsan);
                 }
-                if ($thissection->currentnestedlevel > FMT_SECTION_LEVEL_ROOT) { // TODO: Change to >= ?
-                    $parent->currentnestedlevel = max($parent->currentnestedlevel, $level - 1);
+                if ($thissection->currentnestedlevel >= FMT_SECTION_LEVEL_ROOT) {
+                    $parent->currentnestedlevel = max($parent->currentnestedlevel, $levelsan - 1);
                 }
             }
 
             // Update remembered next sections.
-            for ($sublevel = $level; $sublevel <= FMT_SECTION_LEVEL_TOPIC; $sublevel++) {
+            for ($sublevel = $levelsan; $sublevel <= FMT_SECTION_LEVEL_TOPIC; $sublevel++) {
                 $sectionnextatlevel[$sublevel] = $thissection;
             }
 
