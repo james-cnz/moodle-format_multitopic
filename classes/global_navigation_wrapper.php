@@ -60,7 +60,7 @@ class format_multitopic_global_navigation_wrapper {
     protected $innerpage;
     /** @var bool A switch for whether to show empty sections in the navigation. */
     protected $innershowemptysections = true;
-    
+
     /** @var mixed If set to an int, that section will be included even if it has no activities */
     public $innerincludesectionid = null;
 
@@ -194,7 +194,8 @@ class format_multitopic_global_navigation_wrapper {
                     $parentnode = $nodeln[$level - 1];                          // ADDED.
                     $nodeid = ($level == $firstlevel) ? $sectionid : $extraid--; // ADDED.
                     $sectionnode = $parentnode->add($sectionname, $url, \navigation_node::TYPE_SECTION,
-                        null, $nodeid, new \pix_icon($section->levelsan < FMT_SECTION_LEVEL_TOPIC ? 'i/section' : 'e/bullet_list', ''));
+                        null, $nodeid,
+                        new \pix_icon($section->levelsan < FMT_SECTION_LEVEL_TOPIC ? 'i/section' : 'e/bullet_list', ''));
                     // CHANGED ABOVE: Attach to parentnode with nodeid as defined above, and use a list icon for topic sections.
                     $sectionnode->nodetype = \navigation_node::NODETYPE_BRANCH;
                     $sectionnode->hidden = (!$section->visible || !$section->available);
@@ -210,7 +211,8 @@ class format_multitopic_global_navigation_wrapper {
                 if ($this->inner->includesectionnum !== false && $this->inner->includesectionnum == $section->section
                         || isset($this->innerincludesectionid) && $this->innerincludesectionid == $section->id
                         || $section->hassubsections) {
-                            // CHANGED ABOVE: Use section ID.  Also check for subsections, because activities might not get loaded otherwise.
+                            // CHANGED ABOVE: Use section ID.
+                            // Also check for subsections, because activities might not get loaded otherwise.
                     $this->load_section_activities($sectionnode, $section, $activities);
                 }
 

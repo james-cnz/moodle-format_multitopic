@@ -86,7 +86,7 @@ class format_multitopic extends format_base {
     // INCLUDED /course/format/lib function get_sections .
     /**
      * Returns a list of sections used in the course.
-     * 
+     *
      * CHANGED: Indexed by ID, with calculated properties:
      * - levelsan:          Sanatised section level
      * - parentid:          ID of section's parent (previous section at a higher level)
@@ -198,7 +198,9 @@ class format_multitopic extends format_base {
             $thissection->visiblesan         = ($level <= FMT_SECTION_LEVEL_ROOT) ?
                                                 true
                                                 : ($sectionatlevel[$level - 1]->visiblesan && $thissection->visible);
-            $thissection->uservisiblesan     = (($level <= FMT_SECTION_LEVEL_ROOT) ? true : $sectionatlevel[$level - 1]->uservisiblesan)
+            $thissection->uservisiblesan     = (($level <= FMT_SECTION_LEVEL_ROOT) ?
+                                                 true
+                                                 : $sectionatlevel[$level - 1]->uservisiblesan)
                                                 && $thissection->uservisible;
 
             // Set date-start property from previous section.

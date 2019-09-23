@@ -648,7 +648,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // Copy activity clipboard..
         echo $this->fmt_course_activity_clipboard($course, $displaysection);    // CHANGED from print_single_section_page.
 
-        // INCLUDED list of sections parts and /course/format/onetopic/renderer.php function print_single_section_page tabs parts CHANGED.
+        // INCLUDED list of sections parts
+        // and /course/format/onetopic/renderer.php function print_single_section_page tabs parts CHANGED.
 
         // Init custom tabs.
         $tabs = array();

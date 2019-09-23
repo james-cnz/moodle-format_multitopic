@@ -115,7 +115,7 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
     $cw->id = $DB->insert_record("course_sections", $cw);
 
     // Now move it to the specified position.
-    if (true) {                                                                 // CHANGED: We've already checked that the parent exists.
+    if (true) {                                                                 // CHANGED: We've already checked the parent exists.
         $course = is_object($courseorid) ? $courseorid : get_course($courseorid);
         rebuild_course_cache($courseid, true);                                  // ADDED.
         format_multitopic_move_section_to($course, $cw, $section, true);        // CHANGED: Use section info instead of position.
@@ -359,7 +359,7 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
     }
 
     // Append rest of array.
-    if (true) {                                                                 // CHANGED: Don't really need to check for empty array?
+    if (true) {                                                                 // CHANGED: Don't need to check for empty array?
         foreach ($appendarray as $id => $section) {
             $sections[$id] = new \stdClass;
             $sections[$id]->id = $id;

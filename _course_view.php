@@ -44,7 +44,7 @@ if (true) {                                                                     
     $sectionid   = optional_param('sectionid', 0, PARAM_INT);
     $section     = optional_param('section', 0, PARAM_INT);
     // REMOVED: move parameter.
-    // ADDED instead: Specify destination via relationship to another section (identified by ID), instead of via change to section number.
+    // ADDED instead: Specify destination via relationship to another section (identified by ID).
     $destparentid = optional_param('destparentid', null, PARAM_INT);
     $destprevupid = optional_param('destprevupid', null, PARAM_INT);
     $destnextupid = optional_param('destnextupid', null, PARAM_INT);
@@ -166,11 +166,12 @@ if (true) {                                                                     
     // Must set layout before gettting section info. See MDL-47555.
     $PAGE->set_pagelayout('course');
 
-    if ($section and $section->section > 0) {                                   // CHANGED: section is now an object. Dereference number property.
+    if ($section and $section->section > 0) {
+        // CHANGED LINE ABOVE: section is now an object. Dereference number property.
 
         // Get section details and check it exists.
         $modinfo = get_fast_modinfo($course);
-        $coursesections = $modinfo->get_section_info($section->section, MUST_EXIST); // CHANGED: Dereference section number property.
+        $coursesections = $modinfo->get_section_info($section->section, MUST_EXIST); // CHANGED: Dereference section number.
 
         // Check user is allowed to see it.
         if (!$coursesections->uservisible) {
@@ -276,8 +277,8 @@ if (true) {                                                                     
         if (!empty($section) && !empty($dest) &&
                 has_capability('moodle/course:movesections', $context) &&
                 (has_capability('moodle/course:update', $context) || !isset($dest->level)) &&
-                confirm_sesskey()) {                                            // CHANGED: Check update capability when level is changed.
-            $destsection = $dest;                                               // CHANGED: Use section info with IDs instead of section number.
+                confirm_sesskey()) {                                            // CHANGED: Check update capability on level change.
+            $destsection = $dest;                                               // CHANGED: Use section info with ID instead of num.
             try {                                                               // CHANGED: Use try/catch instead of return false.
                 format_multitopic_move_section_to($course, $section, $destsection, false);
                 if ($course->id == SITEID) {
@@ -318,7 +319,7 @@ if (true) {                                                                     
     }
 
     // If viewing a section, make the title more specific.
-    if ($section and $section->section > 0 and course_format_uses_sections($course->format)) { // CHANGED: Dereference section number property.
+    if ($section and $section->section > 0 and course_format_uses_sections($course->format)) { // CHANGED: Dereference section num.
         $sectionname = get_string('sectionname', "format_$course->format");
         $sectiontitle = get_section_name($course, $section);
         $PAGE->set_title(get_string('coursesectiontitle', 'moodle',

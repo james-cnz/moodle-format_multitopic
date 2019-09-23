@@ -144,7 +144,8 @@ class format_multitopic_core_course_renderer_wrapper {
         }
 
         if (!empty($activities[MOD_CLASS_RESOURCE])) {
-            $select = new \url_select($activities[MOD_CLASS_RESOURCE], '', array('' => $straddresource)); // CHANGED: Removed form ID.
+            $select = new \url_select($activities[MOD_CLASS_RESOURCE], '', array('' => $straddresource));
+            // CHANGED LINE ABOVE: Removed form ID.
             $select->set_help_icon('resources');
             $select->set_label($strresourcelabel, array('class' => 'accesshide'));
             $output .= preg_replace('/\/course\/jumpto.php\b/', "/course/format/multitopic/_course_jumpto.php",
@@ -153,7 +154,8 @@ class format_multitopic_core_course_renderer_wrapper {
         }
 
         if (!empty($activities[MOD_CLASS_ACTIVITY])) {
-            $select = new \url_select($activities[MOD_CLASS_ACTIVITY], '', array('' => $straddactivity)); // CHANGED: Removed form ID.
+            $select = new \url_select($activities[MOD_CLASS_ACTIVITY], '', array('' => $straddactivity));
+            // CHANGED LINE ABOVE: Removed form ID.
             $select->set_help_icon('activities');
             $select->set_label($stractivitylabel, array('class' => 'accesshide'));
             $output .= preg_replace('/\/course\/jumpto.php\b/', "/course/format/multitopic/_course_jumpto.php",

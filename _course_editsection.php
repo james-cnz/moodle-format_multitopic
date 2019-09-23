@@ -36,7 +36,8 @@ $id = required_param('id', PARAM_INT);    // Course_sections.id .
 // REMOVED $sectionreturn .
 $deletesection = optional_param('delete', 0, PARAM_BOOL);
 
-$PAGE->set_url('/course/format/multitopic/_course_editsection.php', array('id' => $id)); // CHANGED: Custum script, and omit $sectionreturn.
+$PAGE->set_url('/course/format/multitopic/_course_editsection.php', array('id' => $id));
+// CHANGED LINE ABOVE: Custum script, and omit $sectionreturn.
 // NOTE: Can't revert this without changing reference to $PAGE->url ?
 
 $section = $DB->get_record('course_sections', array('id' => $id), '*', MUST_EXIST);
@@ -86,7 +87,8 @@ if ($deletesection) {
             echo $OUTPUT->header();
             echo $OUTPUT->box_start('noticebox');
             $optionsyes = array('id' => $id, 'confirm' => 1, 'delete' => 1, 'sesskey' => sesskey());
-            $deleteurl = new \moodle_url('/course/format/multitopic/_course_editsection.php', $optionsyes); // CHANGED: Custom script.
+            $deleteurl = new \moodle_url('/course/format/multitopic/_course_editsection.php', $optionsyes);
+            // CHANGED LINE ABOVE: Custom script.
             $formcontinue = new \single_button($deleteurl, get_string('delete'));
             $formcancel = new \single_button($cancelurl, get_string('cancel'), 'get');
             echo $OUTPUT->confirm(get_string('confirmdeletesection', '',
