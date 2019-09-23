@@ -26,7 +26,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/lib.php');
-require_once(__DIR__ . '/classes/global_navigation_wrapper.php');               // ADDED.
+// ADDED.
+require_once(__DIR__ . '/classes/global_navigation_wrapper.php');
+require_once(__DIR__ . '/classes/courseheader.php');
+require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
+// END ADDED.
 
 // ADDED.
 /** @var int The level of the General section, which represents the course as a whole.
@@ -804,9 +808,7 @@ class format_multitopic extends format_base {
     public function course_header() : ?renderable {
         // REMOVED: Removed empty function body.
         // ADDED.
-        global $CFG;
-        require_once($CFG->dirroot . '/course/format/multitopic/renderer.php');
-        return new format_multitopic_courseheader($this->get_course());
+        return new \format_multitopic\format_multitopic_courseheader($this->get_course());
         // END ADDED.
     }
     // END INCLUDED.
@@ -820,8 +822,8 @@ class format_multitopic extends format_base {
     public function course_content_header() : ?renderable {
         global $PAGE;
         // Don't show in manage files popup.  TODO: Better way?
-        if (class_exists('format_multitopic_coursecontentheaderfooter')) {
-            return new format_multitopic_coursecontentheaderfooter($PAGE, -1);
+        if (class_exists('format_multitopic_renderer')) {
+            return new \format_multitopic\format_multitopic_coursecontentheaderfooter($PAGE, -1);
         } else {
             return null;
         }
@@ -838,8 +840,8 @@ class format_multitopic extends format_base {
     public function course_content_footer() : ?renderable {
         global $PAGE;
         // Don't show in manage files popup.  TODO: Better way?
-        if (class_exists('format_multitopic_coursecontentheaderfooter')) {
-            return new format_multitopic_coursecontentheaderfooter($PAGE, 1);
+        if (class_exists('format_multitopic_renderer')) {
+            return new \format_multitopic\format_multitopic_coursecontentheaderfooter($PAGE, 1);
         } else {
             return null;
         }
