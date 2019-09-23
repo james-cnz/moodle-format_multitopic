@@ -28,7 +28,7 @@
 namespace format_multitopic;
 
     require_once('../../../config.php');                                        // CHANGED.
-    require_once('locallib.php');                                               // CHANGED.
+    require_once('locallib.php');                                               // CHANGED: Use custom code.
     require_once($CFG->libdir . '/completionlib.php');
 
 if (true) {                                                                     // ADDED: To pass indentation style check.
@@ -38,13 +38,13 @@ if (true) {                                                                     
     $edit        = optional_param('edit', -1, PARAM_BOOL);
     $disableajax = optional_param('onetopic_da', -1, PARAM_INT);
     // INCLUDED LINE ABOVE from /course/format/onetopic/format.php $disableajax .
-    $hideid      = optional_param('hideid', null, PARAM_INT);                   // CHANGED.
-    $showid      = optional_param('showid', null, PARAM_INT);                   // CHANGED.
+    $hideid      = optional_param('hideid', null, PARAM_INT);                   // CHANGED: Use ID.
+    $showid      = optional_param('showid', null, PARAM_INT);                   // CHANGED: Use ID.
     $idnumber    = optional_param('idnumber', '', PARAM_RAW);
     $sectionid   = optional_param('sectionid', 0, PARAM_INT);
     $section     = optional_param('section', 0, PARAM_INT);
     // REMOVED: move parameter.
-    // ADDED.
+    // ADDED instead: Specify destination via relationship to another section (identified by ID), instead of via change to section number.
     $destparentid = optional_param('destparentid', null, PARAM_INT);
     $destprevupid = optional_param('destprevupid', null, PARAM_INT);
     $destnextupid = optional_param('destnextupid', null, PARAM_INT);
@@ -56,28 +56,28 @@ if (true) {                                                                     
 
     // ADDED.
     $hide = null;
-    if ($hideid) {
+    if (isset($hideid)) {
         $hide = new \stdClass();
         $hide->id = $hideid;
     }
     $show = null;
-    if ($showid) {
+    if (isset($showid)) {
         $show = new \stdClass();
         $show->id = $showid;
     }
     $dest = null;
-    if ($destparentid || $destprevupid || $destnextupid) {
+    if (isset($destparentid) || isset($destprevupid) || isset($destnextupid)) {
         $dest = new \stdClass();
-        if ($destparentid) {
+        if (isset($destparentid)) {
             $dest->parentid = $destparentid;
         }
-        if ($destprevupid) {
+        if (isset($destprevupid)) {
             $dest->prevupid = $destprevupid;
         }
-        if ($destnextupid) {
+        if (isset($destnextupid)) {
             $dest->nextupid = $destnextupid;
         }
-        if ($destlevel !== null) {
+        if (isset($destlevel)) {
             $dest->level = $destlevel;
         }
     }
@@ -106,7 +106,7 @@ if (true) {                                                                     
         $section = $DB->get_record('course_sections', array('section' => $section, 'course' => $course->id), '*', MUST_EXIST);
     }
     if ($section->section) {
-        // This is changed in renderer.php for view pages, and here for edit pages.
+        // NOTE: This parameter is changed from number to ID, in renderer.php for view pages, and here for edit pages.
         $urlparams['sectionid'] = $section->id;
     }
     // END CHANGED.
@@ -166,11 +166,11 @@ if (true) {                                                                     
     // Must set layout before gettting section info. See MDL-47555.
     $PAGE->set_pagelayout('course');
 
-    if ($section and $section->section > 0) {                                   // CHANGED.
+    if ($section and $section->section > 0) {                                   // CHANGED: section is now an object. Dereference number property.
 
         // Get section details and check it exists.
         $modinfo = get_fast_modinfo($course);
-        $coursesections = $modinfo->get_section_info($section->section, MUST_EXIST); // CHANGED.
+        $coursesections = $modinfo->get_section_info($section->section, MUST_EXIST); // CHANGED: Dereference section number property.
 
         // Check user is allowed to see it.
         if (!$coursesections->uservisible) {
@@ -260,7 +260,7 @@ if (true) {                                                                     
         // END INCLUDED.
 
         if (has_capability('moodle/course:sectionvisibility', $context)) {
-            // CHANGED.
+            // CHANGED: Call custom functions, pass section info.
             if ($hide && confirm_sesskey()) {
                 format_multitopic_set_section_visible($course->id, $hide, 0);
                 redirect($PAGE->url);
@@ -275,17 +275,17 @@ if (true) {                                                                     
 
         if (!empty($section) && !empty($dest) &&
                 has_capability('moodle/course:movesections', $context) &&
-                (has_capability('moodle/course:update', $context) || !isset($destlevel)) &&
-                confirm_sesskey()) {                                            // CHANGED.
-            $destsection = $dest;                                               // CHANGED.
-            try {
+                (has_capability('moodle/course:update', $context) || !isset($dest->level)) &&
+                confirm_sesskey()) {                                            // CHANGED: Check update capability when level is changed.
+            $destsection = $dest;                                               // CHANGED: Use section info with IDs instead of section number.
+            try {                                                               // CHANGED: Use try/catch instead of return false.
                 format_multitopic_move_section_to($course, $section, $destsection, false);
                 if ($course->id == SITEID) {
                     redirect($CFG->wwwroot . '/?redirect=0');
                 } else {
-                    redirect(course_get_url($course, $section));                // CHANGED.
+                    redirect(course_get_url($course, $section));                // CHANGED: Return to the moved section.
                 }
-            } catch (moodle_exception $e) {  // CHANGED.
+            } catch (moodle_exception $e) {                                     // CHANGED: Use returned error message.
                 echo $OUTPUT->notification($e->getMessage());
             }
         }
@@ -318,8 +318,8 @@ if (true) {                                                                     
     }
 
     // If viewing a section, make the title more specific.
-    if ($section and $section->section > 0 and course_format_uses_sections($course->format)) {
-        $sectionname = get_string('sectionname');
+    if ($section and $section->section > 0 and course_format_uses_sections($course->format)) { // CHANGED: Dereference section number property.
+        $sectionname = get_string('sectionname', "format_$course->format");
         $sectiontitle = get_section_name($course, $section);
         $PAGE->set_title(get_string('coursesectiontitle', 'moodle',
             array('course' => $course->fullname, 'sectiontitle' => $sectiontitle, 'sectionname' => $sectionname)));
@@ -329,6 +329,8 @@ if (true) {                                                                     
 
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
+
+    // TODO: Need to include backup stuff here?
 
     if ($completion->is_enabled()) {
         // This value tracks whether there has been a dynamic change to the page.
@@ -373,7 +375,7 @@ if (true) {                                                                     
     // Trigger course viewed event.
     // We don't trust $context here. Course format inclusion above executes in the global space. We can't assume
     // anything after that point.
-    course_view(\context_course::instance($course->id), $section->section);      // CHANGED.
+    course_view(\context_course::instance($course->id), $section->section);      // CHANGED: Dereference section number property.
 
     // Include course AJAX.
     include_course_ajax($course, $modnamesused);

@@ -47,7 +47,7 @@ $renderer = $PAGE->get_renderer('format_multitopic');
 if (false) {                                                                    // CHANGED: Always use multi-section page.
     $renderer->print_single_section_page($course, null, null, null, null, $displaysection);
 } else {
-    $renderer->print_multiple_section_page($course, null, null, null, null, $displaysection); // CHANGED.
+    $renderer->print_multiple_section_page($course, null, null, null, null, $displaysection); // CHANGED: Pass display section.
 }
 
 // Include course format js module.

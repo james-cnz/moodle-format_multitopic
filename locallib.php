@@ -17,7 +17,7 @@
 /**
  * Library of useful functions
  *
- * INCLUDED from /course/lib.php
+ * INCLUDED /course/lib.php selected functions
  *
  * @package   format_multitopic
  * @copyright 1999 Martin Dougiamas  http://dougiamas.com,
@@ -28,7 +28,6 @@ namespace format_multitopic;
 
 defined('MOODLE_INTERNAL') || die;
 
-// REMOVED start - function course_set_marker .
 
 /**
  * For a given course section, marks it visible or hidden,
@@ -75,7 +74,6 @@ function format_multitopic_set_section_visible(int $courseid, \stdClass $section
     return $resourcestotoggle;
 }
 
-// REMOVED function get_module_metadata - function add_course_module .
 
 /**
  * Creates a course section and adds it to the specified position
@@ -117,7 +115,7 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
     $cw->id = $DB->insert_record("course_sections", $cw);
 
     // Now move it to the specified position.
-    if (true) {                                                                 // CHANGED.
+    if (true) {                                                                 // CHANGED: We've already checked that the parent exists.
         $course = is_object($courseorid) ? $courseorid : get_course($courseorid);
         rebuild_course_cache($courseid, true);                                  // ADDED.
         format_multitopic_move_section_to($course, $cw, $section, true);        // CHANGED: Use section info instead of position.
@@ -134,7 +132,6 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
     return $cw;
 }
 
-// REMOVED function course_create_sections_if_missing - course_module_calendar_event_update_process .
 
 /**
  * Moves a section within a course, from a position to another.
@@ -149,7 +146,7 @@ function format_multitopic_move_section_to(\stdClass $course, \stdClass $section
     // CHANGES THROUGHOUT: Use section info instead of number.
     global $DB;                                                                 // CHANGED: Removed $USER.
 
-    if (!$destination) {                                                        // CHANGED.
+    if (!isset($destination)) {                                                 // CHANGED.
         throw new \moodle_exception('sectionnotexist');                         // CHANGED.
     }
 
@@ -201,7 +198,7 @@ function format_multitopic_move_section_to(\stdClass $course, \stdClass $section
         }
         // Apply section updates.
         if ($updates) {
-            course_update_section($course, $movedsections[$id], $updates);
+            course_update_section($course, $movedsection, $updates);
         }
     }
     // END ADDED.
@@ -209,7 +206,6 @@ function format_multitopic_move_section_to(\stdClass $course, \stdClass $section
     return;                                                                     // CHANGED.
 }
 
-// REMOVED function course_delete_section - function course_update_section .
 
 /**
  * Checks if the current user can delete a section (if course format allows it and user has proper permissions).
@@ -248,9 +244,10 @@ function format_multitopic_course_can_delete_section(\stdClass $course, \section
     return true;
 }
 
+
 /**
  * Reordering algorithm for course sections. Given an array of sections indexed by section->id,
- * an origin and a target, rebuilds the array.
+ * an origin, and a target, rebuilds the array.
  *
  * @param array $sections The list of sections.  Must specify fmt calculated properties.
  * @param stdClass $origin The section to be moved.  Must specify id.
@@ -259,8 +256,8 @@ function format_multitopic_course_can_delete_section(\stdClass $course, \section
  */
 function format_multitopic_reorder_sections(array $sections, \stdClass $origin, \stdClass $target) : array {
     // CHANGED THROUGHOUT: Section numbers changed to IDs, used exceptions instead of returning false.
-    // Calculated section values (levelsan, visiblesan) are read,
-    // raw section values (level, visible) are written.
+    // Reads Calculated section values (levelsan, visiblesan).
+    // Writes raw section values (level, visible).
     if (!is_array($sections)) {
         throw new \moodle_exception('cannotcreateorfindstructs');
     }
@@ -271,12 +268,9 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
     }
 
     // Locate origin section in sections array.
-    if (!$origin = array_key_exists($origin->id, $sections) ? $sections[$origin->id] : null) {
+    if (!($origin = array_key_exists($origin->id, $sections) ? $sections[$origin->id] : null)) {
         throw new \moodle_exception('sectionnotexist');
     }
-
-    $target->level = $target->level ?? $origin->levelsan;
-    $levelchange = $target->level - $origin->levelsan;
 
     // Extract origin sections.
     $originarray = [];
@@ -288,6 +282,7 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
     }
 
     // Find target position and extract remaining sections.
+    $target->level = $target->level ?? $origin->levelsan;
     $parent = null;
     $prev = null;
     $found = false;
@@ -311,8 +306,8 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
                 // The moved section can not have the specified section as its previous.
                 throw new \moodle_exception('cannotcreateorfindstructs');
             }
-        } else if ($parent && ($section->levelsan < $target->level || $section->levelsan <= $parent->levelsan)
-                    || $prev && ($section->levelsan <= $target->level)
+        } else if (isset($parent) && ($section->levelsan < $target->level || $section->levelsan <= $parent->levelsan)
+                    || isset($prev) && ($section->levelsan <= $target->level)
                     || isset($target->nextupid) && $section->id == $target->nextupid) {
             // Reached the last position in a specified parent in which the moved section would be a (direct) child,
             // or the appropriate position after a specified previous section,
@@ -326,7 +321,7 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
             $found = true;
         }
     }
-    if ($parent || $prev) {
+    if (isset($parent) || isset($prev)) {
         // If a specified parent or previous was found, but no position within the section list was appropriate,
         // the appropriate position must be the end of the section list.
         $found = true;
@@ -351,6 +346,7 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
     }
 
     // Append moved sections.
+    $levelchange = $target->level - $origin->levelsan;
     foreach ($originarray as $id => $section) {
         $sections[$id] = new \stdClass;
         $sections[$id]->id = $id;
@@ -362,8 +358,8 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
                                     : $section->levelsan + $levelchange);
     }
 
-    // Append rest of array (if applicable).
-    if (true) {
+    // Append rest of array.
+    if (true) {                                                                 // CHANGED: Don't really need to check for empty array?
         foreach ($appendarray as $id => $section) {
             $sections[$id] = new \stdClass;
             $sections[$id]->id = $id;
@@ -382,5 +378,3 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
     return $sections;
 
 }
-
-// REMOVED function moveto_module - end .

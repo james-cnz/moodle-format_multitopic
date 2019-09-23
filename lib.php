@@ -39,7 +39,7 @@ const FMT_SECTION_LEVEL_ROOT    = -1;
 const FMT_SECTION_LEVEL_PAGE_USE = 1;
 
 /** @var int Level of topics, which are displayed within pages.
- * NOTE: This could have been made higher, to allow more page levels, but more page levels seemed too confusing.
+ * NOTE: This could have been made larger, to allow more page levels, but more page levels seemed too confusing.
  */
 const FMT_SECTION_LEVEL_TOPIC   = 2;
 // END ADDED.
@@ -83,9 +83,11 @@ class format_multitopic extends format_base {
         return true;
     }
 
-    // INCLUDED /course/format/lib function get_sections - function get_section .
+    // INCLUDED /course/format/lib function get_sections .
     /**
-     * Returns a list of sections used in the course, indexed by ID, with calculated properties
+     * Returns a list of sections used in the course.
+     * 
+     * CHANGED: Indexed by ID, with calculated properties:
      * - levelsan:          Sanatised section level
      * - parentid:          ID of section's parent (previous section at a higher level)
      * - prevupid:          ID of the previous section at the same or higher level
@@ -107,7 +109,7 @@ class format_multitopic extends format_base {
      *                      and higher levels may contain the current section, while lower levels don't.
      * - fmtdata:           Flag to indicate the presence of calculated properties
      *
-     * @return array of section_info objects with calculated properties
+     * @return array of section_info objects
      */
     public final function fmt_get_sections() : array {
         // CHANGED LINE ABOVE.
@@ -118,6 +120,7 @@ class format_multitopic extends format_base {
         } else {
             return array();
         }
+        // TODO: Call original function, instead of repeating code?
         // END CHANGED.
 
         // ADDED.
@@ -141,19 +144,21 @@ class format_multitopic extends format_base {
         // Generated list of sections.
         $fmtsections = [];
 
-        // The previous section at or above, each level.
+        // The previous section at, or above, each level.
         $sectionprevatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, null);
 
-        // The current section at or above, each level.
+        // The current section at, or above, each level.
         $sectionatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, null);
 
         foreach ($sections as $thissection) {
+
+            // TODO: Skip sections with negative section numbers?  Or throw error?
 
             // Add this section the the list.
             $fmtsections[$thissection->id] = $thissection;
 
             // Fix the section's level within appropriate bounds.
-            $level = ($sectionatlevel[FMT_SECTION_LEVEL_TOPIC] == null) ?
+            $level = ($sectionatlevel[FMT_SECTION_LEVEL_ROOT] == null) ? // TODO: Rename to levelsan?
                         FMT_SECTION_LEVEL_ROOT
                         : max(FMT_SECTION_LEVEL_ROOT + 1,
                             min($thissection->level ?? FMT_SECTION_LEVEL_TOPIC, FMT_SECTION_LEVEL_TOPIC));
@@ -179,12 +184,12 @@ class format_multitopic extends format_base {
                                             : null;
 
             // The section's parent.
-            $thissection->parentid   = ($level >= FMT_SECTION_LEVEL_ROOT + 1) ? $sectionatlevel[$level - 1]->id : null;
+            $thissection->parentid   = ($level > FMT_SECTION_LEVEL_ROOT) ? $sectionatlevel[$level - 1]->id : null;
 
             // Initialise tree-related properties to be set in the reverse pass.
-            $thissection->hassubsections = false;   // Does this section have subsections (page or topic)?
-            $thissection->pagedepth = $level;       // How far down does the level go for sub-pages?
-            $thissection->pagedepthdirect = $level; // What is the lowest level of direct sub-pages?
+            $thissection->hassubsections = false;   // Whether this section has any subsections (page or topic).
+            $thissection->pagedepth = $level;       // The lowest level of all sub-pages.
+            $thissection->pagedepthdirect = $level; // The lowest level of direct sub-pages.
 
             // Set visibility properties.
             $thissection->parentvisiblesan   = ($level <= FMT_SECTION_LEVEL_ROOT) ?
@@ -193,9 +198,8 @@ class format_multitopic extends format_base {
             $thissection->visiblesan         = ($level <= FMT_SECTION_LEVEL_ROOT) ?
                                                 true
                                                 : ($sectionatlevel[$level - 1]->visiblesan && $thissection->visible);
-            $thissection->uservisiblesan     = (($level <= FMT_SECTION_LEVEL_ROOT) ?
-                                                true
-                                                : $sectionatlevel[$level - 1]->uservisiblesan) && $thissection->uservisible;
+            $thissection->uservisiblesan     = (($level <= FMT_SECTION_LEVEL_ROOT) ? true : $sectionatlevel[$level - 1]->uservisiblesan)
+                                                && $thissection->uservisible;
 
             // Set date-start property from previous section.
             $thissection->datestart = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC] ?
@@ -222,7 +226,7 @@ class format_multitopic extends format_base {
             // Initialise for reverse pass.
             $iscurrent = $thissection->dateend
                         && ($thissection->datestart <= $timenow) && ($timenow < $thissection->dateend);
-            $thissection->currentnestedlevel = $iscurrent ? FMT_SECTION_LEVEL_TOPIC : FMT_SECTION_LEVEL_ROOT;
+            $thissection->currentnestedlevel = $iscurrent ? FMT_SECTION_LEVEL_TOPIC : FMT_SECTION_LEVEL_ROOT; // TODO: Subtract 1?
 
         }
 
@@ -234,17 +238,17 @@ class format_multitopic extends format_base {
         for ($thissection = $sectionatlevel[FMT_SECTION_LEVEL_TOPIC];
                 $thissection;
                 $thissection = $thissection->prevanyid ? $fmtsections[$thissection->prevanyid] : null) {
-            $level = $thissection->levelsan;
+            $level = $thissection->levelsan; // TODO: Rename to levelsan?
 
             // Tree properties from next sections.
-            $thissection->nextupid      = $sectionnextatlevel[$level] ?
+            $thissection->nextupid  = $sectionnextatlevel[$level] ?
                                             $sectionnextatlevel[$level]->id
                                             : null;
-            $thissection->nextanyid  = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC] ?
-                                            $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC]->id
-                                            : null;
-            $thissection->nextpageid  = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1] ?
+            $thissection->nextpageid = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1] ?
                                             $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->id
+                                            : null;
+            $thissection->nextanyid = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC] ?
+                                            $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC]->id
                                             : null;
 
             // Flag to indicate the presence of calculated properties.
@@ -258,7 +262,7 @@ class format_multitopic extends format_base {
                     $parent->pagedepth = max($parent->pagedepth, $thissection->pagedepth);
                     $parent->pagedepthdirect = max($parent->pagedepthdirect, $level);
                 }
-                if ($thissection->currentnestedlevel > FMT_SECTION_LEVEL_ROOT) {
+                if ($thissection->currentnestedlevel > FMT_SECTION_LEVEL_ROOT) { // TODO: Change to >= ?
                     $parent->currentnestedlevel = max($parent->currentnestedlevel, $level - 1);
                 }
             }
@@ -279,16 +283,15 @@ class format_multitopic extends format_base {
     /**
      * Returns information about section used in course.
      *
-     * If passed section info with calculated properties already in place, they will be returned as is.
+     * NOTE: If passed section info with calculated properties already in place, they will be returned as is.
      * @see fmt_get_sections for details of calculated properties.
      *
      * @param int|stdClass $section either section number (field course_section.section) or row from course_section table
      * @param int $strictness
-     * @return section_info section data with calculated properties
+     * @return section_info
      */
     public final function fmt_get_section($section, int $strictness = IGNORE_MISSING) : section_info {
-        // CHANGED LINE ABOVE.
-        // CHANGED.
+        // CHANGED: Convert from section number to section info, rather than the other way around.
         if (is_numeric($section)) {
             $sectionnum = $section;
             $section = new stdClass();
@@ -321,19 +324,19 @@ class format_multitopic extends format_base {
     }
     // END INCLUDED.
 
-    // INCLUDED /course/format/weeks/lib.php function get_section_name .
+    // INCLUDED instead /course/format/weeks/lib.php function get_section_name .
     /**
      * Returns the display name of the given section that the course prefers.
-     *
-     * Use section name as specified by user. Otherwise use default ("Section #")
      *
      * @param int|stdClass $section Section object from database.  Should specify fmt calculated properties.
      * @return string Display name that the course format prefers, e.g. "Section 2"
      */
     public function get_section_name($section) : string {
 
+        // ADDED.
         // If we don't have calculated data, don't bother fetching it.
         if (!is_object($section) || !isset($section->fmtdata)) {
+            // INCLUDED: /course/format/topics/lib.php function get_section_name body .
             $section = $this->get_section($section);
             if ((string)$section->name !== '') {
                 return format_string($section->name, true,
@@ -341,12 +344,12 @@ class format_multitopic extends format_base {
             } else {
                 return $this->get_default_section_name($section);
             }
+            // END INCLUDED.
         }
 
         $weekword = new lang_string('week');
         $weeksword = new lang_string('weeks');
 
-        // ADDED.
         // Figure out the string for the week number.
         $daystring = '';
         if ($section->dateend && ($section->datestart < $section->dateend)) {
@@ -396,6 +399,7 @@ class format_multitopic extends format_base {
         // END ADDED.
 
         if ((string)$section->name !== '') {
+            // Return the name the user set.
             return format_string($daystring . $section->name, true,
                     array('context' => context_course::instance($this->courseid))); // CHANGED.
         } else {
@@ -429,9 +433,8 @@ class format_multitopic extends format_base {
      * The URL to use for the specified course (with section)
      *
      * @param int|stdClass $section Section object from database or just field course_sections.section
-     *                      In the general case, should specify fmt calculated properties,
+     *                      Should specify fmt calculated properties,
      *                      specifically levelsan, and parentid where levelsan is topic level.
-     *                      If option fmtedit is given, only must specify id
      * @param array $options options for view URL. At the moment core uses:
      *     'fmtedit' (bool)    if true, return URL for edit page rather than view page
      *     'navigation' (bool) if true and section has no separate page, the function returns null
@@ -462,6 +465,7 @@ class format_multitopic extends format_base {
         return $url;
     }
 
+    // INCLUDED instead /course/format/onetopic/lib.php function supports_ajax .
     /**
      * Returns the information about the ajax support in the given source format
      *
@@ -471,21 +475,23 @@ class format_multitopic extends format_base {
      * @return stdClass
      */
     public function supports_ajax() : stdClass {
-        // INCLUDED /course/format/onetopic/lib.php function supports_ajax body .
         global $COURSE, $USER;
+
         if (!isset($USER->onetopic_da)) {
             $USER->onetopic_da = array();
         }
+
         if (empty($COURSE)) {
             $disableajax = false;
         } else {
             $disableajax = $USER->onetopic_da[$COURSE->id] ?? false;
         }
+
         $ajaxsupport = new stdClass();
         $ajaxsupport->capable = !$disableajax;
         return $ajaxsupport;
-        // END INCLUDED.
     }
+    // END INCLUDED.
 
     /**
      * Loads all of the course sections into the navigation
@@ -511,8 +517,7 @@ class format_multitopic extends format_base {
 
         // Check if there are callbacks to extend course navigation.
         // REMOVED function call.
-
-        // INCLUDED /course/format/lib.php function extend_course_navigation body.
+        // INCLUDED instead /course/format/lib.php function extend_course_navigation body.
         if ($course = $this->get_course()) {
             $navigationwrapper->load_generic_course_sections($course, $node);   // CHANGED: Wrapped navigation object.
         }
@@ -522,6 +527,7 @@ class format_multitopic extends format_base {
         // REMOVED.
     }
 
+    // INCLUDED instead /course/format/weeks/lib.php function ajax_section_move .
     /**
      * Custom action after section has been moved in AJAX mode
      *
@@ -532,23 +538,21 @@ class format_multitopic extends format_base {
     public function ajax_section_move() : array {
         global $PAGE;
         $titles = array();
-        $current = -1;                                                          // INCLUDED from /course/format/weeks/lib.php .
+        $current = -1;
         $course = $this->get_course();
         // REMOVED: Replaced $modinfo with fmt_get_sections.
         $renderer = $this->get_renderer($PAGE);
         if ($renderer && ($sections = $this->fmt_get_sections())) {             // CHANGED: Replaced $modinfo with fmt_get_sections.
             foreach ($sections as $section) {
                 $titles[$section->section] = $renderer->section_title($section, $course);
-                // INCLUDED /course/format/weeks/lib.php function ajax_section_move if ($this->is_section_current($section)) .
                 if ($this->is_section_current($section)) {
                     $current = $section->section;
                 }
-                // END INCLUDED.
             }
         }
         return array('sectiontitles' => $titles, 'current' => $current, 'action' => 'move');
-        // CHANGED LINE ABOVE as per /course/format/weeks/lib.php .
     }
+    // END INCLUDED.
 
     /**
      * Returns the list of blocks to be automatically added for the newly created course
@@ -581,7 +585,7 @@ class format_multitopic extends format_base {
             $courseformatoptions = array(
                 // INCLUDED /course/format/periods/lib.php function course_format_options 'periodduration'.
                 'periodduration' => array(
-                    'default' => null,                                          // ADDED.
+                    'default' => null,                                          // CHANGED.
                     'type' => PARAM_NOTAGS
                 ),
                 // END INCLUDED.
@@ -682,8 +686,7 @@ class format_multitopic extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) : array {
-        // REMOVAL: Removed empty function body.
-        // INCLUDED /course/format/lib.php function course_format_options body (excluding array items).
+        // INCLUDED instead /course/format/lib.php function course_format_options body (excluding array items).
         static $sectionformatoptions = false;
         if ($sectionformatoptions === false) {
             $sectionformatoptions = array(
@@ -695,7 +698,7 @@ class format_multitopic extends format_base {
                 // END INCLUDED.
                 // INCLUDED /course/format/periods/lib.php function section_format_options 'periodduration'.
                 'periodduration' => array(
-                    'default' => null,                                          // CHANGED.
+                    'default' => null,                                          // ADDED.
                     'type' => PARAM_NOTAGS
                 ),
                 // END INCLUDED.
@@ -805,6 +808,7 @@ class format_multitopic extends format_base {
     }
     // END INCLUDED.
 
+    // INCLUDED /course/format/lib.php function course_content_header declaration.
     /**
      * Create course content header when applicable: A "back to course" button.
      *
@@ -820,7 +824,9 @@ class format_multitopic extends format_base {
         }
 
     }
+    // END INCLUDED.
 
+    // INCLUDED /course/format/lib.php function course_content_footer declaration.
     /**
      * Create course content footer when applicable: Another "back to course" button.
      *
@@ -836,6 +842,7 @@ class format_multitopic extends format_base {
         }
 
     }
+    // END INCLUDED.
 
     // INCLUDED /course/format/lib.php function is_section_current .
     /**
@@ -854,7 +861,6 @@ class format_multitopic extends format_base {
         return ($section->section && $section->currentnestedlevel >= FMT_SECTION_LEVEL_TOPIC); // CHANGED.
     }
     // END INCLUDED.
-
 
     /**
      * Whether this format allows to delete sections
@@ -884,7 +890,6 @@ class format_multitopic extends format_base {
      */
     public function inplace_editable_render_section_name($section, $linkifneeded = true,
                                             $editable = null, $edithint = null, $editlabel = null) : \core\output\inplace_editable {
-        // REMOVED: global OUTPUT.
         $section = $this->fmt_get_section($section);                            // ADDED.
         // TODO: Determine here whether a link is needed?
         if (empty($edithint)) {
@@ -894,9 +899,9 @@ class format_multitopic extends format_base {
             $title = get_section_name($section->course, $section);
             $editlabel = new lang_string('newsectionname', '', $title);
         }
-        // REMOVED: Replaced function call with function body.
 
-        // INCLUDED: /course/format/lib.php function inplace_editable_render_section_name body.
+        // REMOVED function call.
+        // INCLUDED instead /course/format/lib.php function inplace_editable_render_section_name body.
         global $USER, $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
 
@@ -976,7 +981,7 @@ class format_multitopic extends format_base {
         // REMOVED: marker.
 
         // For show/hide actions call the parent method and return the new content for .section_availability element.
-        $rv = parent::section_action($section, $action, null);                  // CHANGED.
+        $rv = parent::section_action($section, $action, null);                  // CHANGED: removed section return.
         $renderer = $PAGE->get_renderer('format_multitopic');                   // CHANGED.
         $rv['section_availability'] = $renderer->section_availability($this->get_section($section));
         return $rv;

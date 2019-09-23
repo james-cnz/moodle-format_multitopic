@@ -29,6 +29,10 @@
 $string['addsectionpage'] = 'Add page';
 $string['addsectiontopic'] = 'Add topic';
 $string['currentsection'] = 'This section';
+// REMOVED 'editsection' .
+// REMOVED 'editsectionname' .
+// REMOVED 'deletesection' .
+// REMOVED 'newsectionname' .
 $string['sectionname'] = 'Section';
 $string['pluginname'] = 'Multitopic format';
 $string['section0name'] = 'General';
@@ -39,18 +43,20 @@ $string['showfromothers'] = 'Show section';
 $string['privacy:metadata'] = 'The Multitopic format plugin does not store any personal data.';
 // END CHANGED.
 
-// INCLUDED /lang/en/moodle.php $string['topicoutline'] .
+// INCLUDED /lang/en/moodle.php $string['topicoutline'] CHANGED.
 $string['sectionoutline'] = 'Section outline';
 // END INCLUDED.
 
-// INCLUDED /course/format/onetopic/lang/en/format_onetopic.php $string['level'] - $string['level_help'] .
+// INCLUDED /course/format/onetopic/lang/en/format_onetopic.php $string['level'] - $string['level_help'] CHANGED.
 $string['level'] = 'Level';
+// REMOVED 'index' .
 $string['asprincipal'] = 'First-level page';
+// REMOVED 'asbrother' .
 $string['aschild'] = 'Second-level page';
 $string['level_help'] = 'Change the section level.';
 // END INCLUDED.
 
-// INCLUDED /course/format/periods/lang/en/format_periods.php $string['perioddurationdefault'] - $string['perioddurationoverride_help'] .
+// INCLUDED /course/format/periods/lang/en/format_periods.php $string['perioddurationdefault'] - $string['perioddurationoverride_help'] CHANGED.
 $string['perioddurationdefault'] = 'Topic duration';
 $string['perioddurationoverride'] = 'Override topic duration';
 $string['perioddurationdefault_help'] = 'Set the duration of one topic.  It can be overridden for individual topics.';

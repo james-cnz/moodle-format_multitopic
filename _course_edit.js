@@ -61,6 +61,7 @@ M.course.format.fmt_banner_preview_image = function () {
     banner_dom.setAttribute("style", banner_style);
     banner_attribution_dom.textContent = banner_attribution_dom.textContent.replace(/([^:]*: )(.*)/, "$1" + image_name + " ...");
     banner_attribution_dom.setAttribute("style", "visibility: visible;");
+    // TODO: Hide when no image?
 
 };
 

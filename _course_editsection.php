@@ -36,7 +36,7 @@ $id = required_param('id', PARAM_INT);    // Course_sections.id .
 // REMOVED $sectionreturn .
 $deletesection = optional_param('delete', 0, PARAM_BOOL);
 
-$PAGE->set_url('/course/format/multitopic/_course_editsection.php', array('id' => $id)); // CHANGED: Ignore $sectionreturn.
+$PAGE->set_url('/course/format/multitopic/_course_editsection.php', array('id' => $id)); // CHANGED: Custum script, and omit $sectionreturn.
 // NOTE: Can't revert this without changing reference to $PAGE->url ?
 
 $section = $DB->get_record('course_sections', array('id' => $id), '*', MUST_EXIST);
@@ -70,6 +70,7 @@ if ($deletesection) {
             } else {
                 $sectionreturn->id = $sectioninfo->prevupid;
             }
+            // TODO: Set levelsan and fmtdata to prevent recalculating?
             // END ADDED.
             $courseurl = course_get_url($course, $sectionreturn);               // CHANGED: Use sectionreturn defined above.
             redirect($courseurl);
@@ -85,7 +86,7 @@ if ($deletesection) {
             echo $OUTPUT->header();
             echo $OUTPUT->box_start('noticebox');
             $optionsyes = array('id' => $id, 'confirm' => 1, 'delete' => 1, 'sesskey' => sesskey());
-            $deleteurl = new \moodle_url('/course/format/multitopic/_course_editsection.php', $optionsyes); // CHANGED.
+            $deleteurl = new \moodle_url('/course/format/multitopic/_course_editsection.php', $optionsyes); // CHANGED: Custom script.
             $formcontinue = new \single_button($deleteurl, get_string('delete'));
             $formcancel = new \single_button($cancelurl, get_string('cancel'), 'get');
             echo $OUTPUT->confirm(get_string('confirmdeletesection', '',
@@ -122,7 +123,7 @@ $mform->set_data($initialdata);
 
 if ($mform->is_cancelled()) {
     // Form cancelled, return to course.
-    redirect(course_get_url($course, $sectioninfo));                            // CHANGED: Ignore sectionreturn, pass sectioninfo.
+    redirect(course_get_url($course, $sectioninfo));                            // CHANGED: Omit sectionreturn, pass sectioninfo.
 } else if ($data = $mform->get_data()) {
     // Data submitted and validated, update and return to course.
 

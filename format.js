@@ -41,7 +41,7 @@ M.course.format.swap_sections = function (Y, node1, node2) {
 
     var sectionlist = Y.Node.all('.' + CSS.COURSECONTENT + ' ' + M.course.format.get_section_selector(Y));
     // Swap menus.
-    // REMOVED: Custom section add menus now use section IDs instead of section numbers, so shouldn't be swapped?
+    // REMOVED: Custom section add menus now use section IDs instead of section numbers, so shouldn't be swapped.
 
 };
 
@@ -85,9 +85,11 @@ M.course.format.process_sections = function (Y, sectionlist, response, sectionfr
             ele.setAttribute('alt', newstr);
             ele.setAttribute('title', newstr); // For FireFox as 'alt' is not refreshed.
 
+            // ADDED: Restore collapse icon.
             if (sectionlist.item(i).hasClass("section-topic-timed")) {
                 M.course.format.fmt_collapse_icon_yui(sectionlist.item(i));
             }
+            // END ADDED.
 
             // INCLUDED /course/format/weeks/format.js M.course.format.process_sections part.
             // Remove the current class as section has been moved.
@@ -159,7 +161,7 @@ M.course.format.fmt_collapse_set = function (section_dom, show) {
 };
 
 /**
- * Toggle section expand/collapse state, as and where appropriate, for a given click event.
+ * Toggle section expand/collapse state, where applicable, for a given click event.
  *
  * @param {MouseEvent} event The mouse click
  * @return void
@@ -179,6 +181,7 @@ M.course.format.fmt_collapse_onclick = function (event) {
     var anchor = event_target.hash.substr(1);
     var sel_section_dom = anchor ? document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor + ","
                                                         + "body.format-multitopic .course-content ul.sections li.section.section-topic#" + anchor) : null;
+    // TODO: Remove unused CSS selector?
     if (!sel_section_dom || sel_section_dom.querySelector(".content h3 a") != event_target) {
         return;
     }
@@ -199,7 +202,7 @@ M.course.format.fmt_collapse_onclick = function (event) {
 };
 
 /**
- * Expand and scroll to the section specified in the URL bar, and collapse other sections.
+ * Expand, and scroll to, the section specified in the URL bar, and collapse other sections.
  *
  * @param {HashChangeEvent?} _event The triggering event, if any
  * @return void
@@ -210,6 +213,8 @@ M.course.format.fmt_collapse_onhashchange = function (_event) {
     var anchor = window.location.hash.substr(1);
     var sel_section_dom = anchor ? document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor + ","
                                                         + "body.format-multitopic .course-content ul.sections li.section.section-topic#" + anchor) : null;
+    // TODO: Remove unused CSS selector?
+    // TODO: Exit when there is an event, but no specified section?
 
     // Set the appropriate collapse state for all collapsible sections.
     var sections_dom = document.querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
@@ -237,14 +242,15 @@ M.course.format.fmt_collapse_init = function () {
         return;
     }
 
+    // Set the initial state of collapsible sections.
+    M.course.format.fmt_collapse_onhashchange();
+
     // Capture possible clicks on course section headings.
     document.querySelector("body.format-multitopic .course-content ul.sections").addEventListener("click", M.course.format.fmt_collapse_onclick);
 
     // Capture clicks on any other course section links.
     window.addEventListener("hashchange", M.course.format.fmt_collapse_onhashchange);
 
-    // Set the initial state of collapsible sections.
-    M.course.format.fmt_collapse_onhashchange();
 };
 
 // Run initialisation when the page is loaded, or now, if the page is already loaded.

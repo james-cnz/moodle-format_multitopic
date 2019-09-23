@@ -22,7 +22,6 @@
  *
  * @package   format_multitopic
  * @copyright 2010 Sam Hemelryk,
- *            2012 David Herney Bernal - cirano,
  *            2018 Otago Polytechnic
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -41,10 +40,18 @@ class format_multitopic_core_course_renderer_wrapper {
     // ADDED.
     /** @var core_course_renderer wrapped renderer */
     private $inner;
-    /** @var moodle_page PAGE global, needed by the wrapper, but private to the wrapped object, so we store our own copy instead */
-    private $innerpage;
-    /** @var renderer_base OUTPUT global, as above */
-    private $inneroutput;
+
+    // NOTE: We need access to these private variables, so store our own copy.
+    /**
+     * @var moodle_page The Moodle page the renderer has been created to assist with.
+     */
+    protected $innerpage;
+    /**
+     * @var renderer_base|core_renderer A reference to the current renderer.
+     * The renderer provided here will be determined by the page but will in 90%
+     * of cases by the {@link core_renderer}
+     */
+    protected $inneroutput;
 
     /**
      * Construct wrapper
@@ -75,7 +82,7 @@ class format_multitopic_core_course_renderer_wrapper {
         }
         $modchooser = new \core_course\output\modchooser($course, $modules);
         $modchooser->actionurl = new \moodle_url('/course/format/multitopic/_course_jumpto.php'); // ADDED.
-        // TODO: Use section ID.
+        // TODO: Specify section ID in AJAX, somehow?  Or just remove this function?
         return $this->inner->render($modchooser);
     }
 
@@ -85,13 +92,14 @@ class format_multitopic_core_course_renderer_wrapper {
      * Renders HTML for the menus to add activities and resources to the current course
      *
      * @param stdClass $course
-     * @param section_info $section section
+     * @param section_info $section section info
      * @param int $sectionreturn The section to link back to (unused)
      * @param array $displayoptions additional display options, for example blocks add
      *     option 'inblock' => true, suggesting to display controls vertically
      * @return string
      */
     public function course_section_add_cm_control($course, $section, $sectionreturn = null, $displayoptions = array()) : string {
+        // CHANGED ABOVE: Specify section info instead of number.
         global $CFG;
 
         $vertical = !empty($displayoptions['inblock']);
@@ -105,7 +113,7 @@ class format_multitopic_core_course_renderer_wrapper {
 
         // Retrieve all modules with associated metadata.
         $modules = get_module_metadata($course, $modnames);                     // CHANGED: Removed sectionreturn.
-        $urlparams = array('sectionid' => $section->id);                        // CHANGED: Used section id.
+        $urlparams = array('sectionid' => $section->id);                        // CHANGED: Used section ID.
 
         // We'll sort resources and activities into two lists.
         $activities = array(MOD_CLASS_ACTIVITY => array(), MOD_CLASS_RESOURCE => array());
@@ -129,28 +137,28 @@ class format_multitopic_core_course_renderer_wrapper {
         $stractivitylabel = get_string('addactivitytosection', null, $sectionname);
 
         $output = \html_writer::start_tag('div',
-            array('class' => 'section_add_menus'));                             // CHANGED.
+            array('class' => 'section_add_menus'));                             // CHANGED: Removed HTML ID--not used?
 
         if (!$vertical) {
             $output .= \html_writer::start_tag('div', array('class' => 'horizontal'));
         }
 
         if (!empty($activities[MOD_CLASS_RESOURCE])) {
-            $select = new \url_select($activities[MOD_CLASS_RESOURCE], '', array('' => $straddresource)); // CHANGED.
+            $select = new \url_select($activities[MOD_CLASS_RESOURCE], '', array('' => $straddresource)); // CHANGED: Removed form ID.
             $select->set_help_icon('resources');
             $select->set_label($strresourcelabel, array('class' => 'accesshide'));
             $output .= preg_replace('/\/course\/jumpto.php\b/', "/course/format/multitopic/_course_jumpto.php",
                                     $this->inneroutput->render($select));
-            // CHANGED LINE ABOVE: Convert section ID back to section number later.
+            // CHANGED LINE ABOVE: Use custom script to convert section ID back to section number.
         }
 
         if (!empty($activities[MOD_CLASS_ACTIVITY])) {
-            $select = new \url_select($activities[MOD_CLASS_ACTIVITY], '', array('' => $straddactivity)); // CHANGED.
+            $select = new \url_select($activities[MOD_CLASS_ACTIVITY], '', array('' => $straddactivity)); // CHANGED: Removed form ID.
             $select->set_help_icon('activities');
             $select->set_label($stractivitylabel, array('class' => 'accesshide'));
             $output .= preg_replace('/\/course\/jumpto.php\b/', "/course/format/multitopic/_course_jumpto.php",
                                     $this->inneroutput->render($select));
-            // CHANGED LINE ABOVE: Convert section ID back to section number later.
+            // CHANGED LINE ABOVE: Use custom script to convert section ID back to section number.
         }
 
         if (!$vertical) {

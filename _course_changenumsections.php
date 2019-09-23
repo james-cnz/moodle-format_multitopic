@@ -39,7 +39,7 @@ require_once(__DIR__.'/locallib.php');
 $courseid = required_param('courseid', PARAM_INT);
 $increase = optional_param('increase', null, PARAM_BOOL);
 $insertparentid = optional_param('insertparentid', null, PARAM_INT);            // CHANGED: Insert nested in section with ID.
-$insertlevel = optional_param('insertlevel', null, PARAM_INT);                  // ADDED: Insert with level.
+$insertlevel = optional_param('insertlevel', null, PARAM_INT);                  // ADDED: Level for inserted section.
 $numsections = optional_param('numsections', 1, PARAM_INT);        // Number of sections to insert.
 $returnurl = optional_param('returnurl', null, PARAM_LOCALURL);    // Where to return to after the action.
 // REMOVED: sectionreturn .
@@ -119,7 +119,7 @@ if (false) {                                                                    
     $sections = [];
     for ($i = 0; $i < max($numsections, 1); $i ++) {
         $sections[] = format_multitopic_course_create_section($course, $insertsection);
-        // CHANGED LINE ABOVE: Send section info, not section number.
+        // CHANGED LINE ABOVE: Use custom method, and send section info, not section number.
     }
     if (!$returnurl) {
         $returnurl = course_get_url($course, $sections[0], []);

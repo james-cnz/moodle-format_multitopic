@@ -19,6 +19,7 @@
  *
  * @package   format_multitopic
  * @copyright 2012 Dan Poltawski,
+ *            2012 David Herney Bernal - cirano,
  *            2018 Otago Polytechnic
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since     Moodle 2.3
@@ -57,7 +58,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // If we're on the view page, patch the URL to use the section ID instead of section number.
         global $PAGE;
         if ($PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
-            && $id = optional_param('id', null, PARAM_INT)) {
+            && ($id = optional_param('id', null, PARAM_INT))) {
             $params = ['id' => $id];
             if ($sectionid = optional_param('sectionid', null, PARAM_INT)) {
                 $params['sectionid'] = $sectionid;
@@ -109,12 +110,13 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // Date range for the topic, to be placed under the title.
         $datestring = '';
-        if ($section->dateend && ($section->datestart < $section->dateend)) {
+        if (isset($section->dateend) && ($section->datestart < $section->dateend)) {
 
             $dateformat = get_string('strftimedateshort');
             $startday = userdate($section->datestart + 12 * 60 * 60, $dateformat);
             $endday = userdate($section->dateend - 12 * 60 * 60, $dateformat);
 
+            // TODO: Allow leway in comparison?
             if ($startday == $endday) {
                 $datestring = "({$startday})";
             } else {
@@ -170,9 +172,11 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             if (course_get_format($course)->is_section_current($section)) {
                 $sectionstyle .= ' current';
             }
+            // ADDED.
             if (!$section->uservisible) {
                 $sectionstyle .= ' section-userhidden';
             }
+            // END ADDED.
         }
 
         // ADDED.
@@ -205,7 +209,9 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $o .= html_writer::start_tag('div', array('class' => 'content'));
 
         // REMOVED: section title display rules.  Always display the section title.
-        $classes = '';                                                          // ADDED.
+        if (true) {
+            $classes = '';
+        }
 
         $sectionname = html_writer::tag('span', $this->section_title($section, $course, $collapsible && $section->uservisible)); // CHANGED.
         $o .= $this->output->heading($sectionname, 3, 'sectionname' . $classes);
@@ -225,6 +231,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     }
     // END INCLUDED.
 
+    // INCLUDED instead /course/format/renderer.php function section_edit_control_items .
     /**
      * Generate the edit control items of a section
      *
@@ -234,8 +241,6 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @return array of edit control items
      */
     protected function section_edit_control_items($course, $section, $onsectionpage = false) : array {
-        // REMOVED function body.
-        // INCLUDED /course/format/renderer.php function section_edit_control_items body.
         global $PAGE;
 
         if (!$PAGE->user_is_editing()) {
@@ -291,7 +296,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                             $controls['visiblity']['attr']['data-action'] = 'hide';
                         }
                         // END ADDED.
-                    } else if ($section->parentvisiblesan) {                    // CHANGED.
+                    } else if ($section->parentvisiblesan) {                    // CHANGED: Only allow unhide if parent is visible.
                         $strshowfromothers = get_string_manager()->string_exists('showfromothers', 'format_' . $course->format) ?
                                                 get_string('showfromothers', 'format_' . $course->format) : get_string('show'); // CHANGED.
                         $url->param('showid',  $section->id);                   // CHANGED.
@@ -302,7 +307,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                             'pixattr' => array('class' => ''),
                             'attr' => array('class' => 'icon editing_showhide',
                                 )); // REMOVED section return & AJAX action.
-                        // ADDED.
+                        // ADDED: AJAX action added back for topic-level sections only.
                         if (!$onsectionpage) {
                             $controls['visiblity']['attr']['data-action'] = 'show';
                         }
@@ -353,7 +358,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                         && has_capability('moodle/course:sectionvisibility', $coursecontext)) {
                         $url = clone($baseurl);
                         // CHANGED: Replaced up with previous.
-                        if ($section->prevupid && $section->prevupid != course_get_format($course)->fmtrootsectionid) {
+                        if (isset($section->prevupid) && $section->prevupid != course_get_format($course)->fmtrootsectionid) {
                                 // Add a arrow to move section back.
                             $url->param('sectionid', $section->id);
                             $url->param('destnextupid', $section->prevupid);
@@ -367,9 +372,10 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                                 'attr' => array('class' => 'icon fmtmovepageprev'));
                         }
                         // END CHANGED.
+
                         $url = clone($baseurl);
                         // CHANGED: Replaced down with next.
-                        if ($section->nextupid) { // Add a arrow to move section forward.
+                        if (isset($section->nextupid)) { // Add a arrow to move section forward.
                             $url->param('sectionid', $section->id);
                             $url->param('destprevupid', $section->nextupid);
                             $strmovepagenext = get_string_manager()->string_exists('move_page_next', 'format_multitopic') ?
@@ -402,6 +408,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                                 'attr' => array('class' => 'icon fmtmovetoprevpage'));
                         }
                         // END CHANGED.
+
                         $url = clone($baseurl);
                         // CHANGED: Replaced down with to next page.
                         if ($section->nextpageid) { // Add a arrow to move section to next page.
@@ -417,6 +424,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                                 'attr' => array('class' => 'icon fmtmovetonextpage'));
                         }
                         // END CHANGED.
+
                     }
                     if (has_capability('moodle/course:movesections', $coursecontext)
                         && has_capability('moodle/course:sectionvisibility', $coursecontext)) {
@@ -470,8 +478,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         }
 
         return $controls;
-        // END INCLUDED.
     }
+    // END INCLUDED.
 
     // INCLUDED /course/format/renderer.php function section_availability .
     /**
@@ -488,6 +496,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     }
     // END INCLUDED.
 
+    // INCLUDED /course/format/renderer.php function course_activity_clipboard .
     /**
      * Show if something is on on the course clipboard (moving around)
      *
@@ -559,6 +568,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         return $o;
     }
+    // END INCLUDED.
 
 
     // INCLUDED /course/format/renderer.php function print_single_section_page declaration .
@@ -589,7 +599,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @param int|section_info $displaysection
      */
     public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection = 0) : void {
-        // CHANGED ABOVE from print_single_section_page
+        // CHANGED ABOVE included displaysection from print_single_section_page
         global $PAGE, $OUTPUT;                                                  // CHANGED: Included output global.
 
         // REMOVED: Replaced modinfo with fmt_get_sections .
@@ -623,8 +633,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // INCLUDED /course/format/renderer.php function print_single_section_page section "Can we view...".
         // Can we view the section in question?
-        $sectioninfo = $displaysection;
-        if (!$sectioninfo || !$sectioninfo->uservisiblesan) { // CHANGED.
+        if (!($sectioninfo = $displaysection) || !$sectioninfo->uservisiblesan) { // CHANGED.
             // This section doesn't exist or is not available for the user.
             // We actually already check this in course/view.php but just in case exit from this function as well.
             print_error('unknowncoursesection', 'error', course_get_url($course),
@@ -639,7 +648,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // Copy activity clipboard..
         echo $this->fmt_course_activity_clipboard($course, $displaysection);    // CHANGED from print_single_section_page.
 
-        // INCLUDED /course/format/onetopic/renderer.php function print_single_section_page tabs parts CHANGED.
+        // INCLUDED list of sections parts and /course/format/onetopic/renderer.php function print_single_section_page tabs parts CHANGED.
 
         // Init custom tabs.
         $tabs = array();
@@ -683,7 +692,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     $newtab = new tabobject("tab_id_{$thissection->id}_l{$level}", $url,
                         html_writer::tag('div', $sectionname, ['class' =>
                             'tab_content'
-                            . ($thissection->currentnestedlevel >= max($thissection->levelsan, $level) ? ' marker' : '')
+                            . ($thissection->currentnestedlevel >= max($thissection->levelsan, $level) ? ' marker' : '') // TODO: Just compare to level?
                             . (!$thissection->visible || $level > $thissection->pagedepthdirect ? ' dimmed' : '')
                         ]),
                         $sectionname);
@@ -854,10 +863,11 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         }
 
         $format = course_get_format($course);
-        $maxsections = method_exists($format, "get_max_sections") ? $format->get_max_sections() : 52;
+        $maxsections = method_exists($format, "get_max_sections") ? $format->get_max_sections() : 52; // CHANGED for Moodle 3.5.0 .
         $lastsection = $format->get_last_section_number();
 
         // REMOVED: numsections .
+
         if (course_get_format($course)->uses_sections()) {
             if ($lastsection >= $maxsections) {
                 // Don't allow more sections if we already hit the limit.
@@ -878,7 +888,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 ['courseid' => $course->id, 'insertparentid' => $insertsection->parentid, 'numsections' => 1,
                 'insertlevel' => FMT_SECTION_LEVEL_TOPIC, 'sesskey' => sesskey()]);
             // REMOVED section return.
-            $icon = $this->output->pix_icon('t/add', $straddsections);
+            $icon = $this->output->pix_icon('t/add', '');
             $o .= html_writer::link($url, $icon . $straddsections);              // CHANGED: Only add single section.
             $o .= html_writer::end_tag('div');
             return $o;
@@ -898,35 +908,34 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // ADDED.
         // Variables for section image details.
-        $imageurl = null;
-        $imagename = null;
-        $authorwithurl = null;
-        $licencecode = null;
+        $imageurl       = null;
+        $imagename      = null;
+        $authorwithurl  = null;
+        $licencecode    = null;
 
         // Find section image details.
         $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, 'course', 'section', $section->id);
         foreach ($files as $file) {
-            $filename = $file->get_filename();
+            $filename       = $file->get_filename();
             $filenameextpos = strrpos($filename, '.');
             if ((substr($filename, 0, 4) == 'goi_') && $filenameextpos) {
-                $url = moodle_url::make_file_url('/pluginfile.php' ,
-                        "/{$file->get_contextid()}/course/section/{$section->id}{$file->get_filepath()}{$filename}");
-                $imageurl = $url;
-                $imagename = substr($filename, 4, $filenameextpos - 4);
-                $authorwithurl = $file->get_author();
-                $licencecode = $file->get_license();
+                $imageurl       = moodle_url::make_file_url('/pluginfile.php' ,
+                                    "/{$file->get_contextid()}/course/section/{$section->id}{$file->get_filepath()}{$filename}");
+                $imagename      = substr($filename, 4, $filenameextpos - 4);
+                $authorwithurl  = $file->get_author();
+                $licencecode    = $file->get_license();
             }
         }
 
         $o = '';
 
         // Output section image, if any.
-        if ($imageurl) {
+        if (isset($imageurl)) {
             $authorwithurlarray = explode('|', $authorwithurl);
-            $authorhtml = $authorwithurlarray[0];
+            $authorhtml         = $authorwithurlarray[0];
             if (count($authorwithurlarray) > 1) {
-                $authorurl = $authorwithurlarray[1];
+                $authorurl  = $authorwithurlarray[1];
                 $authorhtml = html_writer::tag('a', $authorhtml, array('href' => $authorurl, 'target' => '_blank'));
             }
             $licencehtml = get_string($licencecode, 'license');
@@ -954,7 +963,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $context->id, 'course', 'section', $section->id);
 
         $options = new stdClass();
-        $options->noclean = true;
+        $options->noclean   = true;
         $options->overflowdiv = true;
         return format_text($summarytext, $section->summaryformat, $options);
     }
@@ -1002,6 +1011,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic_courseheader implements renderable {
+    // TODO: Move to classes folder?
 
     /** @var moodle_url|null course image URL */
     private $imageurl;
@@ -1030,8 +1040,8 @@ class format_multitopic_courseheader implements renderable {
         $this->bannerslice  = $course->bannerslice;
 
         // Clear image-related properties.
-        $this->imageurl   = null;
-        $this->imagename  = null;
+        $this->imageurl     = null;
+        $this->imagename    = null;
         $this->authorwithurl = null;
         $this->licencecode  = null;
 
@@ -1045,8 +1055,8 @@ class format_multitopic_courseheader implements renderable {
                 $url = moodle_url::make_file_url('/pluginfile.php' ,
                         '/' . $file->get_contextid() . '/course/overviewfiles' .
                         $file->get_filepath() . $filename);
-                $this->imageurl   = $url;
-                $this->imagename  = substr($filename, 0, $filenameextpos);
+                $this->imageurl     = $url;
+                $this->imagename    = substr($filename, 0, $filenameextpos);
                 $this->authorwithurl = $file->get_author();
                 $this->licencecode  = $file->get_license();
             }
@@ -1072,11 +1082,11 @@ class format_multitopic_courseheader implements renderable {
         // Output the attribution.
         $o .= html_writer::start_tag('p', array('id'    => 'course-header-banner_attribution',
                                                 'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';'));
-        $imagename = $this->imagename;
+        $imagename          = $this->imagename;
         $authorwithurlarray = explode('|', $this->authorwithurl);
-        $authorhtml = $authorwithurlarray[0];
+        $authorhtml         = $authorwithurlarray[0];
         if (count($authorwithurlarray) > 1) {
-            $authorurl = $authorwithurlarray[1];
+            $authorurl  = $authorwithurlarray[1];
             $authorhtml = html_writer::tag('a', $authorhtml, array('href' => $authorurl, 'target' => '_blank'));
         }
         $licencehtml = $this->imageurl ? get_string($this->licencecode, 'license') : '';
