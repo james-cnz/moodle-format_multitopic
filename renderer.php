@@ -1081,7 +1081,7 @@ class format_multitopic_courseheader implements renderable {
         $o .= html_writer::tag('div', $this->coursename, array(
             'id' => 'course-header-banner-text',
             ));
-        $o .= html_writer:: end_tag('div');
+        $o .= html_writer::end_tag('div');
 
         // Output the attribution.
         $o .= html_writer::start_tag('p', array('id'    => 'course-header-banner_attribution',
