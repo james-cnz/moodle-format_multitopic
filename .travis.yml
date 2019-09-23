@@ -3,7 +3,7 @@ language: php
 branches:
   only:
     - master
-    - devel
+    - develop
 
 sudo: true
 
