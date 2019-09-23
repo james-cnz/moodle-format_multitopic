@@ -71,7 +71,6 @@ if ($deletesection) {
             } else {
                 $sectionreturn->id = $sectioninfo->prevupid;
             }
-            // TODO: Set levelsan and fmtdata to prevent recalculating?
             // END ADDED.
             $courseurl = course_get_url($course, $sectionreturn);               // CHANGED: Use sectionreturn defined above.
             redirect($courseurl);

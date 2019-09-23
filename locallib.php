@@ -196,6 +196,10 @@ function format_multitopic_move_section_to(\stdClass $course, \stdClass $section
         if ($sections[$id]->visible !== $movedsection->visible) {
             $updates['visible'] = $movedsection->visible;
         }
+        // Set page-level sections to untimed.
+        if ($movedsection->level < FMT_SECTION_LEVEL_TOPIC && $sections[$id]->periodduration != '0 days') {
+            $updates['periodduration'] = '0 days';
+        }
         // Apply section updates.
         if ($updates) {
             course_update_section($course, $movedsection, $updates);

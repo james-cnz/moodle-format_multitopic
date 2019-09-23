@@ -202,15 +202,19 @@ M.course.format.fmt_collapse_onclick = function (event) {
 /**
  * Expand, and scroll to, the section specified in the URL bar, and collapse other sections.
  *
- * @param {HashChangeEvent?} _event The triggering event, if any
+ * @param {HashChangeEvent?} event The triggering event, if any
  * @return void
  */
-M.course.format.fmt_collapse_onhashchange = function (_event) {
+M.course.format.fmt_collapse_onhashchange = function (event) {
 
     // Find the specified section.
     var anchor = window.location.hash.substr(1);
     var sel_section_dom = anchor ? document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor) : null;
-    // TODO: Exit when there is an event, but no specified section?
+
+    // Exit if there is an event, but no recognised section.
+    if (event && !sel_section_dom) {
+        return;
+    }
 
     // Set the appropriate collapse state for all collapsible sections.
     var sections_dom = document.querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");

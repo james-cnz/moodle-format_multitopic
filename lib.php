@@ -120,7 +120,6 @@ class format_multitopic extends format_base {
         } else {
             return array();
         }
-        // TODO: Call original function, instead of repeating code?
         // END CHANGED.
 
         // ADDED.
@@ -152,7 +151,10 @@ class format_multitopic extends format_base {
 
         foreach ($sections as $thissection) {
 
-            // TODO: Skip sections with negative section numbers?  Or throw error?
+            // Check section number is not negative.
+            if ($thissection->section < 0) {
+                throw new moodle_exception('cannotcreateorfindstructs');
+            }
 
             // Add this section the the list.
             $fmtsections[$thissection->id] = $thissection;
@@ -760,7 +762,6 @@ class format_multitopic extends format_base {
         $elements = parent::create_edit_form_elements($mform, $forsection);
 
         // REMOVED: numsections .
-        // TODO: Add section image upload box?
 
         return $elements;
     }
@@ -792,7 +793,7 @@ class format_multitopic extends format_base {
         return $this->update_format_options($data);
     }
 
-    // TODO: Customise editsection_form?
+    // TODO: Customise editsection_form to sanitise periodduration?
 
     // INCLUDED /course/format/lib.php function course_header declaration.
     /**
@@ -878,7 +879,7 @@ class format_multitopic extends format_base {
         return !$section->hassubsections;                                       // CHANGED.
     }
 
-    // TODO: Customise delete_section?
+    // TODO: Customise delete_section to be recursive?
 
     /**
      * Prepares the templateable object to display section name

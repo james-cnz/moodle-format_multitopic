@@ -116,7 +116,6 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $startday = userdate($section->datestart + 12 * 60 * 60, $dateformat);
             $endday = userdate($section->dateend - 12 * 60 * 60, $dateformat);
 
-            // TODO: Allow leway in comparison?
             if ($startday == $endday) {
                 $datestring = "({$startday})";
             } else {
