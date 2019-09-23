@@ -191,7 +191,7 @@ class format_multitopic_core_course_renderer_wrapper {
                 $output = \html_writer::tag('div', $output, array('class' => 'show addresourcedropdown'));
                 $modchooser = \html_writer::tag('div', $modchooser, array('class' => 'hide addresourcemodchooser'));
             }
-            $output = $this->course_modchooser($modules, $course) . $modchooser . $output; // CHANGED.
+            $output = $this->inner->course_modchooser($modules, $course) . $modchooser . $output; // CHANGED.
         }
 
         return $output;

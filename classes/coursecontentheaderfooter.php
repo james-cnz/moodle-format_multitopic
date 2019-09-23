@@ -23,6 +23,8 @@
  */
 namespace format_multitopic;
 
+defined('MOODLE_INTERNAL') || die;
+
 /**
  * Course content header/footer: Back to course button.
  *

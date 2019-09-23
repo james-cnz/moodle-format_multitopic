@@ -23,6 +23,8 @@
  */
 namespace format_multitopic;
 
+defined('MOODLE_INTERNAL') || die;
+
 /**
  * Course header: A banner with the course title and a slice of the course image.
  *
@@ -30,7 +32,6 @@ namespace format_multitopic;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic_courseheader implements \renderable {
-    // TODO: Move to classes folder?
 
     /** @var \moodle_url|null course image URL */
     private $imageurl;
