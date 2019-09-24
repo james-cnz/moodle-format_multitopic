@@ -58,7 +58,8 @@ M.course.format.fmt_banner_preview_image = function () {
     var banner_style_old = banner_dom.getAttribute("style");
     // This expression should reflect the style code in renderer.php function render_format_multitopic_courseheader .
     var banner_style    = banner_style_old.replace(/\b(background-image: )(url\('[^']*'\))(;?)/, "$1" + "url('" + image_url + "')" + "$3");
-    // TODO: Need to accept double quotes for Internet Explorer.
+    var banner_style    = banner_style.replace(/\b(background-image: )(url\("[^"]*"\))(;?)/, "$1" + "url('" + image_url + "')" + "$3");
+    // NOTE: Need to accept double quotes for Internet Explorer.
     banner_dom.setAttribute("style", banner_style);
     banner_attribution_dom.textContent = banner_attribution_dom.textContent.replace(/([^:]*: )(.*)/, "$1" + image_name + " ...");
     banner_attribution_dom.setAttribute("style", "visibility: " + (image_file_dom ? "visible " : "hidden") + ";");

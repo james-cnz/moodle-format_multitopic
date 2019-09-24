@@ -331,7 +331,15 @@ if (true) {                                                                     
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
 
-    // TODO: Need to include backup stuff here?
+    if ($USER->editing == 1 && !empty($CFG->enableasyncbackup)) {
+
+        // MDL-65321 The backup libraries are quite heavy, only require the bare minimum.
+        require_once($CFG->dirroot . '/backup/util/helper/async_helper.class.php');
+
+        if (async_helper::is_async_pending($id, 'course', 'backup')) {
+            echo $OUTPUT->notification(get_string('pendingasyncedit', 'backup'), 'warning');
+        }
+    }
 
     if ($completion->is_enabled()) {
         // This value tracks whether there has been a dynamic change to the page.
