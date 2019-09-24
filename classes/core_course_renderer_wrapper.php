@@ -17,7 +17,7 @@
 /**
  * Renderer for use with the course section and all the goodness that falls within it.
  *
- * INCLUDED from /course/renderer.php .
+ * INCLUDED /course/renderer.php selected functions .
  * CHANGED: Use section IDs instead of section numbers.  Delay use of section numbers until later.
  *
  * @package   format_multitopic
@@ -59,27 +59,6 @@ class format_multitopic_core_course_renderer_wrapper {
     }
     // END ADDED.
 
-    // REMOVED start - function render_modchooser .
-
-    /**
-     * Build the HTML for the module chooser javascript popup
-     *
-     * @param array $modules A set of modules as returned from
-     * @see get_module_metadata
-     * @param object $course The course that will be displayed
-     * @return string The composed HTML for the module
-     */
-    public function course_modchooser($modules, $course) : string {
-        if (!$this->innerpage->requires->should_create_one_time_item_now('core_course_modchooser')) {
-            return '';
-        }
-        $modchooser = new \core_course\output\modchooser($course, $modules);
-        $modchooser->actionurl = new \moodle_url('/course/format/multitopic/_course_jumpto.php'); // ADDED.
-        // TODO: Use section ID.
-        return $this->inner->render($modchooser);
-    }
-
-    // REMOVED function course_modchooser_module_types - function course_section_cm_edit_actions .
 
     /**
      * Renders HTML for the menus to add activities and resources to the current course
@@ -181,14 +160,11 @@ class format_multitopic_core_course_renderer_wrapper {
                 $output = \html_writer::tag('div', $output, array('class' => 'show addresourcedropdown'));
                 $modchooser = \html_writer::tag('div', $modchooser, array('class' => 'hide addresourcemodchooser'));
             }
-            $output = $this->course_modchooser($modules, $course) . $modchooser . $output; // CHANGED.
+            $output = $this->inner->course_modchooser($modules, $course) . $modchooser . $output; // CHANGED.
         }
 
         return $output;
     }
 
-    // REMOVED course_search_form - class end .
 
 }
-
-// REMOVED - end .
