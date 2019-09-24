@@ -93,36 +93,43 @@ class format_multitopic_courseheader implements \renderable {
 
         // Output the banner.
         // NOTE: Changes here need to be reflected in _course_edit.js .
-        $o = \html_writer::start_tag('div', array(
+        $o = \html_writer::start_tag('div', [
             'id' => 'course-header-banner',
             'style' => "background-image: url('{$this->imageurl}'); "
                      . "background-position: center {$this->bannerslice}%;"
-        ));
-        $o .= \html_writer::tag('div', $this->coursename, array(
-            'id' => 'course-header-banner-text',
-            ));
+        ]);
+            $o .= \html_writer::tag('div', $this->coursename, [
+                'id' => 'course-header-banner-text',
+            ]);
         $o .= \html_writer::end_tag('div');
 
         // Output the attribution.
-        $o .= \html_writer::start_tag('p', array('id'    => 'course-header-banner_attribution',
-                                                'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';'));
+        $o .= \html_writer::start_tag('p', ['id'    => 'course-header-banner_attribution',
+                                                'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';']);
         $imagename          = $this->imagename;
         $authorwithurlarray = explode('|', $this->authorwithurl);
         $authorhtml         = $authorwithurlarray[0];
         if (count($authorwithurlarray) > 1) {
             $authorurl  = $authorwithurlarray[1];
-            $authorhtml = \html_writer::tag('a', $authorhtml, array('href' => $authorurl, 'target' => '_blank'));
+            $authorhtml = \html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
         }
-        $licencehtml = $this->imageurl ? get_string($this->licencecode, 'license') : '';
+        $licencehtml = ($this->licencecode && $this->licencecode != 'unknown') ? get_string($this->licencecode, 'license') : '';
         if ($licencehtml && substr($this->licencecode, 0 , 3) == 'cc-') {
             $licenceurl = 'https://creativecommons.org/licenses/by-' . substr($this->licencecode, 3, 5) . '/4.0';
             $licencehtml = \html_writer::tag('a', $licencehtml, ['href' => $licenceurl, 'target' => '_blank']);
         }
-        $o .= get_string('image', 'format_multitopic') . ": {$imagename}, ";
-        $o .= get_string('image_by', 'format_multitopic') . " {$authorhtml}"
-                . (($this->licencecode == 'unknown') ? '' : (', '));
-        $o .= (($this->licencecode == 'unknown') ? ''
-                : (get_string('image_licence', 'format_multitopic') . " {$licencehtml}"));
+        $o .= \html_writer::tag('span', get_string('image', 'format_multitopic') . ": {$imagename}"
+                                . (($authorhtml || $licencehtml) ? ',' : ''),
+                                ['style' => 'white-space: nowrap;']) . ' ';
+        if ($authorhtml) {
+            $o .= \html_writer::tag('span', get_string('image_by', 'format_multitopic') . " {$authorhtml}"
+                                    . ($licencehtml ? ',' : ''),
+                                    ['style' => 'white-space: nowrap;']) . ' ';
+        }
+        if ($licencehtml) {
+            $o .= \html_writer::tag('span', get_string('image_licence', 'format_multitopic') . " {$licencehtml}",
+                                    ['style' => 'white-space: nowrap;']);
+        }
         $o .= \html_writer::end_tag('p');
 
         return $o;
