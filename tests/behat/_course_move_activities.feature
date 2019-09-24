@@ -1,5 +1,5 @@
-@core @core_course
-Feature: Activities can be moved between sections (multitopic)
+@format @format_multitopic
+Feature: Activities can be moved between sections (Multitopic format)
   In order to rearrange my course contents
   As a teacher
   I need to move activities between sections
