@@ -382,3 +382,43 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
     return $sections;
 
 }
+
+
+// ADDED.
+
+
+/**
+ * Generate attribution string from info
+ *
+ * @param string $imagename
+ * @param string $authorwithurl
+ * @param string $licencecode
+ * @return string
+ */
+function format_multitopic_image_attribution(string $imagename, string $authorwithurl, string $licencecode) : string {
+    $o = '';
+    $authorwithurlarray = explode('|', $authorwithurl);
+    $authorhtml         = $authorwithurlarray[0];
+    if (count($authorwithurlarray) > 1) {
+        $authorurl  = $authorwithurlarray[1];
+        $authorhtml = \html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
+    }
+    $licencehtml = ($licencecode && $licencecode != 'unknown') ? get_string($licencecode, 'license') : '';
+    if ($licencehtml && substr($licencecode, 0 , 3) == 'cc-') { // TODO: Links to other licences? Make this into a list?
+        $licenceurl = 'https://creativecommons.org/licenses/by-' . substr($licencecode, 3, 5) . '/4.0';
+        $licencehtml = \html_writer::tag('a', $licencehtml, ['href' => $licenceurl, 'target' => '_blank']);
+    }
+    $o .= \html_writer::tag('span', get_string('image', 'format_multitopic') . ": {$imagename}"
+                            . (($authorhtml || $licencehtml) ? ',' : ''),
+                            ['style' => 'white-space: nowrap;']) . ' ';
+    if ($authorhtml) {
+        $o .= \html_writer::tag('span', get_string('image_by', 'format_multitopic') . " {$authorhtml}"
+                                . ($licencehtml ? ',' : ''),
+                                ['style' => 'white-space: nowrap;']) . ' ';
+    }
+    if ($licencehtml) {
+        $o .= \html_writer::tag('span', get_string('image_licence', 'format_multitopic') . " {$licencehtml}",
+                                ['style' => 'white-space: nowrap;']);
+    }
+    return $o;
+}

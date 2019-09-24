@@ -936,29 +936,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $o .= html_writer::start_tag('div', ['class' => 'section_image_holder']);
             $o .= html_writer::empty_tag('img', ['src' => $imageurl]);
             $o .= html_writer::start_tag('p');
-            $authorwithurlarray = explode('|', $authorwithurl);
-            $authorhtml         = $authorwithurlarray[0];
-            if (count($authorwithurlarray) > 1) {
-                $authorurl  = $authorwithurlarray[1];
-                $authorhtml = html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
-            }
-            $licencehtml = ($licencecode && $licencecode != 'unknown') ? get_string($licencecode, 'license') : '';
-            if ($licencehtml && substr($licencecode, 0 , 3) == 'cc-') { // TODO: Links to other licences? Make this into a list?
-                $licenceurl = 'https://creativecommons.org/licenses/by-' . substr($licencecode, 3, 5) . '/4.0';
-                $licencehtml = html_writer::tag('a', $licencehtml, ['href' => $licenceurl, 'target' => '_blank']);
-            }
-            $o .= html_writer::tag('span', get_string('image', 'format_multitopic') . ": {$imagename}"
-                                    . (($authorhtml || $licencehtml) ? ',' : ''),
-                                    ['style' => 'white-space: nowrap;']) . ' ';
-            if ($authorhtml) {
-                $o .= html_writer::tag('span', get_string('image_by', 'format_multitopic') . " {$authorhtml}"
-                                        . ($licencehtml ? ',' : ''),
-                                        ['style' => 'white-space: nowrap;']) . ' ';
-            }
-            if ($licencehtml) {
-                $o .= html_writer::tag('span', get_string('image_licence', 'format_multitopic') . " {$licencehtml}",
-                                                ['style' => 'white-space: nowrap;']);
-            }
+            $o .= \format_multitopic\format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode);
             $o .= html_writer::end_tag('p');
             $o .= html_writer::end_tag('div');
         }

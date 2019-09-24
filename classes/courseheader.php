@@ -106,30 +106,7 @@ class format_multitopic_courseheader implements \renderable {
         // Output the attribution.
         $o .= \html_writer::start_tag('p', ['id'    => 'course-header-banner_attribution',
                                                 'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';']);
-        $imagename          = $this->imagename;
-        $authorwithurlarray = explode('|', $this->authorwithurl);
-        $authorhtml         = $authorwithurlarray[0];
-        if (count($authorwithurlarray) > 1) {
-            $authorurl  = $authorwithurlarray[1];
-            $authorhtml = \html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
-        }
-        $licencehtml = ($this->licencecode && $this->licencecode != 'unknown') ? get_string($this->licencecode, 'license') : '';
-        if ($licencehtml && substr($this->licencecode, 0 , 3) == 'cc-') {
-            $licenceurl = 'https://creativecommons.org/licenses/by-' . substr($this->licencecode, 3, 5) . '/4.0';
-            $licencehtml = \html_writer::tag('a', $licencehtml, ['href' => $licenceurl, 'target' => '_blank']);
-        }
-        $o .= \html_writer::tag('span', get_string('image', 'format_multitopic') . ": {$imagename}"
-                                . (($authorhtml || $licencehtml) ? ',' : ''),
-                                ['style' => 'white-space: nowrap;']) . ' ';
-        if ($authorhtml) {
-            $o .= \html_writer::tag('span', get_string('image_by', 'format_multitopic') . " {$authorhtml}"
-                                    . ($licencehtml ? ',' : ''),
-                                    ['style' => 'white-space: nowrap;']) . ' ';
-        }
-        if ($licencehtml) {
-            $o .= \html_writer::tag('span', get_string('image_licence', 'format_multitopic') . " {$licencehtml}",
-                                    ['style' => 'white-space: nowrap;']);
-        }
+        $o .= format_multitopic_image_attribution($this->imagename, $this->authorwithurl, $this->licencecode);
         $o .= \html_writer::end_tag('p');
 
         return $o;
