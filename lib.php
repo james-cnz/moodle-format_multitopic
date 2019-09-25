@@ -793,6 +793,11 @@ class format_multitopic extends format_base {
                     }
                 }
             }
+            if (!array_key_exists('periodduration', $data) && array_key_exists('layoutstructure', $oldcourse)) {
+                if ($oldcourse['layoutstructure'] == 2 || $oldcourse['layoutstructure'] == 3) {
+                    $data['periodduration'] = '1 week';
+                }
+            }
         }
         return $this->update_format_options($data);
     }
