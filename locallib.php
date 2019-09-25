@@ -391,11 +391,11 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
  * Generate attribution string from info
  *
  * @param string $imagename
- * @param string $authorwithurl
- * @param string $licencecode
+ * @param string|null $authorwithurl
+ * @param string|null $licencecode
  * @return string
  */
-function format_multitopic_image_attribution(string $imagename, string $authorwithurl, string $licencecode) : string {
+function format_multitopic_image_attribution(string $imagename, ?string $authorwithurl, ?string $licencecode) : string {
     $o = '';
     $authorwithurlarray = explode('|', $authorwithurl);
     $authorhtml         = $authorwithurlarray[0];
