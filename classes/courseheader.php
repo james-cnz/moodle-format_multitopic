@@ -79,6 +79,7 @@ class format_multitopic_courseheader implements \renderable {
                 $this->imagename    = substr($filename, 0, $filenameextpos);
                 $this->authorwithurl = $file->get_author();
                 $this->licencecode  = $file->get_license();
+                break;
             }
         }
 

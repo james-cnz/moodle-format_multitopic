@@ -787,6 +787,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 $sectionatlevel[$level] = $thissection;
             }
 
+            // REMOVED: Section 0 differentiation and numsections.
+
             // ADDED.
             // If we're at the start of a page-level section, then open a DIV for it.
             if ($thissection->levelsan < FMT_SECTION_LEVEL_TOPIC) {
@@ -795,14 +797,12 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             }
             // END ADDED.
 
-            // REMOVED: Section 0 differentiation and numsections.
-
             // Show the section if the user is permitted to access it, OR if it's not available
             // but there is some available info text which explains the reason & should display,
             // OR it is hidden but the course has a setting to display hidden sections as unavilable.
             $showsection = $thissection->uservisible ||
-                    ($thissection->visible && !$thissection->available && !empty($thissection->availableinfo)) ||
-                    (!$thissection->visible && !$course->hiddensections);
+                    ($thissection->visible || !$course->hiddensections)
+                    && ($thissection->available || !empty($thissection->availableinfo));
             // REMOVED: return if section hidden (we may have more to do), and coursedisplay.
 
             if ($thissection->levelsan <= FMT_SECTION_LEVEL_ROOT
@@ -928,6 +928,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 $imagename      = substr($filename, 4, $filenameextpos - 4);
                 $authorwithurl  = $file->get_author();
                 $licencecode    = $file->get_license();
+                break;
             }
         }
 
