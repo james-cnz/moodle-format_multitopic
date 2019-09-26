@@ -625,7 +625,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $displaysection = null;
         }
 
-        if ($displaysection && $displaysection->levelsan >= FMT_SECTION_LEVEL_TOPIC) {
+        // If display section is a topic, get the page it is on instead.
+        if (isset($displaysection) && $displaysection->levelsan >= FMT_SECTION_LEVEL_TOPIC) {
             $displaysection = $sections[$displaysection->parentid];
         }
         // END ADDED.
@@ -634,7 +635,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // INCLUDED /course/format/renderer.php function print_single_section_page section "Can we view...".
         // Can we view the section in question?
-        if (!($sectioninfo = $displaysection) || !$sectioninfo->uservisiblesan) { // CHANGED.
+        if (!($sectioninfo = $displaysection) || !$sectioninfo->uservisiblesan) { // CHANGED: Already have section info.
             // This section doesn't exist or is not available for the user.
             // We actually already check this in course/view.php but just in case exit from this function as well.
             print_error('unknowncoursesection', 'error', course_get_url($course),
@@ -669,8 +670,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             // but there is some available info text which explains the reason & should display,
             // OR it is hidden but the course has a setting to display hidden sections as unavilable.
             $showsection = $thissection->uservisible ||
-                    ($thissection->visible && !$thissection->available && !empty($thissection->availableinfo)) ||
-                    (!$thissection->visible && !$course->hiddensections);
+                    ($thissection->visible || !$course->hiddensections)
+                    && ($thissection->available || !empty($thissection->availableinfo));
 
             // Make and add tabs for visible pages.
             if ($thissection->levelsan <= FMT_SECTION_LEVEL_ROOT

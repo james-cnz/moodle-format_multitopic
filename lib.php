@@ -204,10 +204,9 @@ class format_multitopic extends format_base {
             $thissection->visiblesan        = ($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
                                                 true
                                                 : ($sectionatlevel[$levelsan - 1]->visiblesan && $thissection->visible);
-            $thissection->uservisiblesan    = (($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
-                                                 true
-                                                 : $sectionatlevel[$levelsan - 1]->uservisiblesan)
-                                                && $thissection->uservisible;
+            $thissection->uservisiblesan    = ($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
+                                                true
+                                                : ($sectionatlevel[$levelsan - 1]->uservisiblesan && $thissection->uservisible);
 
             // Set date-start property from previous section.
             $thissection->datestart = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC] ?
