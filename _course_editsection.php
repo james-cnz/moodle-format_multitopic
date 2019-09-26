@@ -37,7 +37,7 @@ $id = required_param('id', PARAM_INT);    // Course_sections.id .
 $deletesection = optional_param('delete', 0, PARAM_BOOL);
 
 $PAGE->set_url('/course/format/multitopic/_course_editsection.php', array('id' => $id));
-// CHANGED LINE ABOVE: Custum script, and omit $sectionreturn.
+// CHANGED LINE ABOVE: Custom script, and omit $sectionreturn.
 // NOTE: Can't revert this without changing reference to $PAGE->url ?
 
 $section = $DB->get_record('course_sections', array('id' => $id), '*', MUST_EXIST);

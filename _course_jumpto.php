@@ -49,11 +49,11 @@ if (strpos($jump, '/') === 0 || strpos($jump, $CFG->wwwroot) === 0) {
     // ADDED: Convert sectionid to section.
     $moodlejump = new \moodle_url($jump);
     $courseid = $moodlejump->get_param('id');
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
     $sectionid = $moodlejump->get_param('sectionid');
     $sectionnum = $moodlejump->get_param('section');
     if ($sectionid) {
-        $sectionnum = $DB->get_field('course_sections', 'section', array('id' => $sectionid, 'course' => $courseid), MUST_EXIST);
+        $sectionnum = $DB->get_field('course_sections', 'section', ['id' => $sectionid, 'course' => $courseid], MUST_EXIST);
         $moodlejump->param('section', $sectionnum);
     }
     // END ADDED.

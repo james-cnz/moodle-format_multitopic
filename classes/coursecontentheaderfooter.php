@@ -76,7 +76,7 @@ class format_multitopic_coursecontentheaderfooter implements \renderable {
             $strback = get_string_manager()->string_exists('back_to_course', 'format_multitopic') ?
                         get_string('back_to_course', 'format_multitopic') : get_string('back');
             $o .= \html_writer::tag('a', $OUTPUT->pix_icon('t/left', '') . ' ' . $strback,
-                                    array('href' => $this->sectionurl));
+                                    ['href' => $this->sectionurl]);
         }
 
         // Horizontal rule to separate header/footer from page content.

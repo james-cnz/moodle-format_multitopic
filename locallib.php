@@ -88,7 +88,7 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
     $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
 
     // ADDED: Require that the parent exists.
-    $parent = $DB->get_record('course_sections', array('id' => $section->parentid, 'course' => $courseid));
+    $parent = $DB->get_record('course_sections', ['id' => $section->parentid, 'course' => $courseid]);
     if (!$parent) {
         throw new \moodle_exception('sectionnotexist');
     }

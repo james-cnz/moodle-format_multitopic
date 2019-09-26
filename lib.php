@@ -73,7 +73,7 @@ class format_multitopic extends format_base {
         global $DB;
         parent::__construct($format, $courseid);
         if ($courseid) {
-            $this->fmtrootsectionid = $DB->get_field('course_sections', 'id', array('section' => 0, 'course' => $courseid));
+            $this->fmtrootsectionid = $DB->get_field('course_sections', 'id', ['section' => 0, 'course' => $courseid]);
             // TODO: Check if this is set correctly for new courses?
         }
     }

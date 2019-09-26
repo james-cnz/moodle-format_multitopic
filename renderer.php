@@ -538,7 +538,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $button = new single_button($url, $buttontext, 'get');
             $button->disabled = $disableajax && ismoving($course->id);
             $o .= html_writer::tag('div', $this->render($button),
-                                    array('class' => 'buttons visibleifjs', 'style' => 'float: right;')); // TODO: Use CSS?
+                                    ['class' => 'buttons visibleifjs', 'style' => 'float: right;']); // TODO: Use CSS?
             // END ADDED.
         }
         // END INCLUDED.
@@ -711,8 +711,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     } else {
                         $tabln[$level - 1]->subtree[] = $newtab;
                     }
-
                     $tabln[$level] = $newtab;
+
                 }
 
                 // Disable tabs for hidden sections.
@@ -738,12 +738,12 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
                                         get_string('addsectionpage', 'format_' . $course->format) : get_string('addsections');
                     $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php',
-                        array('courseid' => $course->id,
+                        ['courseid' => $course->id,
                             'increase' => true,
                             'sesskey' => sesskey(),
                             'insertparentid' => $sectionatlevel[$level - 1]->id,
                             'insertlevel' => $level,                            // ADDED.
-                        ));
+                        ]);
                     $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
                     $newtab = new tabobject("tab_id_{$sectionatlevel[$level - 1]->id}_l{($level - 1)}_add",
                         $url,
@@ -756,6 +756,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     } else {
                         $tabln[$level - 1]->subtree[] = $newtab;
                     }
+                    $tabln[$level] = null;
 
                 }
 
@@ -764,7 +765,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         }
 
         // Display tabs.
-        echo html_writer::start_tag('div', array('style' => 'clear: both')); // TODO: Use CSS?
+        echo html_writer::start_tag('div', ['style' => 'clear: both']); // TODO: Use CSS?
         echo $OUTPUT->tabtree($tabs,
             "tab_id_{$displaysection->id}_l{$displaysection->pagedepthdirect}",
             $inactivetabs);
@@ -790,7 +791,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             // If we're at the start of a page-level section, then open a DIV for it.
             if ($thissection->levelsan < FMT_SECTION_LEVEL_TOPIC) {
                 echo html_writer::start_tag('div',
-                    array('style' => 'display: ' . (($thissection->id == $displaysection->id) ? 'block' : 'none')));
+                    ['style' => 'display: ' . (($thissection->id == $displaysection->id) ? 'block' : 'none')]);
             }
             // END ADDED.
 
