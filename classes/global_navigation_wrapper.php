@@ -82,8 +82,6 @@ class format_multitopic_global_navigation_wrapper {
     /**
      * Generates an array of sections and an array of activities for the given course.
      *
-     * This method uses the cache to improve performance and avoid the get_fast_modinfo call
-     *
      * @param stdClass $course
      * @return array Array($sections, $activities)
      */

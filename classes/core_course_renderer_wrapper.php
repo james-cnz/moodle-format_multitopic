@@ -18,7 +18,7 @@
  * Renderer for use with the course section and all the goodness that falls within it.
  *
  * INCLUDED /course/renderer.php selected functions .
- * CHANGED: Use section IDs instead of section numbers.  Delay use of section numbers until later.
+ * CHANGED: Use section IDs instead of section numbers.  Delay use of section numbers until later, using _course_jumpto.php .
  *
  * @package   format_multitopic
  * @copyright 2010 Sam Hemelryk,

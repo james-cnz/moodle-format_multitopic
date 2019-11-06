@@ -35,7 +35,7 @@ require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 // ADDED.
 /** @var int The level of the General section, which represents the course as a whole.
  * Set to -1, to be a level above the top-level sections in OneTopic format, which are numbered 0.
- * NOTE: This isn't properly factored in the code, so can't be changed without breaking stuff.
+ * NOTE: Not sure this can be changed without breaking stuff.
  */
 const FMT_SECTION_LEVEL_ROOT    = -1;
 

@@ -21,7 +21,6 @@
  *  - Use section info instead of section number.
  *  - Specify the insertion location as the new section's parent ID, rather than the new section's section number.
  *  - Specify the new section's level.
- *  (Misc. other.)
  *
  * @package   format_multitopic
  * @copyright 2012 Dan Poltawski,
