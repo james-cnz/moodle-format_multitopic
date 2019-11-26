@@ -1,6 +1,6 @@
 # Moodle Multitopic Format ⭐
 
-> A fusion of features from several Moodle course formats
+> Shows multiple topics per page, with tabbed navigation between pages.
 
 ### 🏠 [Otago Polytechnic](https://op.ac.nz)
 
