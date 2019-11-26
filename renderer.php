@@ -183,7 +183,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // ADDED.
         // Determine the section type.
         $collapsible = false;
-        if ($section->levelsan < FMT_SECTION_LEVEL_TOPIC) {
+        if ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionstyle .= ' section-page';
         } else if ($section->periodduration == '0 days') {
             $sectionstyle .= ' section-topic section-topic-untimed';
@@ -250,7 +250,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // REMOVED sectionreturn .
         $section = course_get_format($course)->fmt_get_section($section);       // ADDED.
-        $onsectionpage = $section->levelsan < FMT_SECTION_LEVEL_TOPIC;          // ADDED.
+        $onsectionpage = $section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; // ADDED.
 
         $coursecontext = context_course::instance($course->id);
         $numsections = course_get_format($course)->get_last_section_number();
@@ -322,7 +322,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                         && has_capability('moodle/course:sectionvisibility', $coursecontext)
                         && has_capability('moodle/course:update', $coursecontext)) {
                         $url = clone($baseurl);
-                        if ($section->levelsan - 1 > FMT_SECTION_LEVEL_ROOT) { // Raise section. // CHANGED.
+                        if ($section->levelsan - 1 > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) { // Raise section. // CHANGED.
                             // CHANGED.
                             $url->param('sectionid', $section->id);
                             $url->param('destprevupid', $section->parentid);
@@ -339,7 +339,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                         }
 
                         $url = clone($baseurl);
-                        if ($section->pagedepth + 1 <= FMT_SECTION_LEVEL_PAGE_USE) { // Lower section. CHANGED.
+                        if ($section->pagedepth + 1 <= FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE) { // Lower section. CHANGED.
                             // CHANGED.
                             $url->param('sectionid', $section->id);
                             $url->param('destparentid', $section->prevupid);
@@ -626,7 +626,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         }
 
         // If display section is a topic, get the page it is on instead.
-        if (isset($displaysection) && $displaysection->levelsan >= FMT_SECTION_LEVEL_TOPIC) {
+        if (isset($displaysection) && $displaysection->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $displaysection = $sections[$displaysection->parentid];
         }
         // END ADDED.
@@ -657,12 +657,14 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $tabs = array();
         $inactivetabs = array();
 
-        $tabln = array_fill(FMT_SECTION_LEVEL_ROOT + 1, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT - 1, null);
-        $sectionatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT, null);
+        $tabln = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1,
+                            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1, null);
+        $sectionatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+                                     FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT, null);
 
         foreach ($sections as $thissection) {
 
-            for ($level = $thissection->levelsan; $level < FMT_SECTION_LEVEL_TOPIC; $level++) {
+            for ($level = $thissection->levelsan; $level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; $level++) {
                 $sectionatlevel[$level] = $thissection;
             }
 
@@ -674,8 +676,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     && ($thissection->available || !empty($thissection->availableinfo));
 
             // Make and add tabs for visible pages.
-            if ($thissection->levelsan <= FMT_SECTION_LEVEL_ROOT
-                || $thissection->levelsan < FMT_SECTION_LEVEL_TOPIC
+            if ($thissection->levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT
+                || $thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
                     && $sectionatlevel[$thissection->levelsan - 1]->uservisiblesan && $showsection) {
 
                 $sectionname = get_section_name($course, $thissection);
@@ -685,10 +687,10 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 // REMOVED: marker.
 
                 // Include main tab, and index tabs for pages with sub-pages.
-                for ($level = max(FMT_SECTION_LEVEL_ROOT + 1, $thissection->levelsan);
+                for ($level = max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $thissection->levelsan);
                      $level <= $thissection->pagedepthdirect
                                 + ($PAGE->user_is_editing()
-                                    && $thissection->pagedepthdirect < FMT_SECTION_LEVEL_PAGE_USE ? 1 : 0);
+                                    && $thissection->pagedepthdirect < FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE ? 1 : 0);
                      $level++) {
 
                     // Make tab.
@@ -699,14 +701,14 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                             . (!$thissection->visible || $level > $thissection->pagedepthdirect ? ' dimmed' : '')
                         ]),
                         $sectionname);
-                    $newtab->level = $level - FMT_SECTION_LEVEL_ROOT;
+                    $newtab->level = $level - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
 
                     if ($thissection->id == $displaysection->id) {
                         $newtab->selected = true;
                     }
 
                     // Add tab.
-                    if ($level <= FMT_SECTION_LEVEL_ROOT + 1) {
+                    if ($level <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1) {
                         $tabs[] = $newtab;
                     } else {
                         $tabln[$level - 1]->subtree[] = $newtab;
@@ -728,9 +730,9 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
                 // Include "add" sub-tabs for each level of page finished.
                 $nextsectionlevel = $thissection->nextpageid ? $sections[$thissection->nextpageid]->levelsan
-                                                            : FMT_SECTION_LEVEL_ROOT;
-                for ($level = min($sectionatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->pagedepthdirect + 1,
-                                    FMT_SECTION_LEVEL_PAGE_USE);
+                                                            : FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
+                for ($level = min($sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->pagedepthdirect + 1,
+                                    FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE);
                         $level >= $nextsectionlevel + 1;
                         $level--) {
 
@@ -751,7 +753,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                         s($straddsection));
 
                     // Add "add" tab.
-                    if ($level <= FMT_SECTION_LEVEL_ROOT + 1) {
+                    if ($level <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1) {
                         $tabs[] = $newtab;
                     } else {
                         $tabln[$level - 1]->subtree[] = $newtab;
@@ -779,11 +781,12 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // REMOVED numsections.
 
         // CHANGED.
-        $sectionatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT, null);
+        $sectionatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+                                     FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT, null);
 
         foreach ($sections as $thissection) {
 
-            for ($level = $thissection->levelsan; $level < FMT_SECTION_LEVEL_TOPIC; $level++) {
+            for ($level = $thissection->levelsan; $level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; $level++) {
                 $sectionatlevel[$level] = $thissection;
             }
 
@@ -791,7 +794,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
             // ADDED.
             // If we're at the start of a page-level section, then open a DIV for it.
-            if ($thissection->levelsan < FMT_SECTION_LEVEL_TOPIC) {
+            if ($thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                 echo html_writer::start_tag('div',
                     ['style' => 'display: ' . (($thissection->id == $displaysection->id) ? 'block' : 'none')]);
             }
@@ -805,14 +808,15 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     && ($thissection->available || !empty($thissection->availableinfo));
             // REMOVED: return if section hidden (we may have more to do), and coursedisplay.
 
-            if ($thissection->levelsan <= FMT_SECTION_LEVEL_ROOT
+            if ($thissection->levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT
                 || $sectionatlevel[$level - 1]->uservisiblesan && $showsection) {   // ADDED.
-                $pageid  = ($thissection->levelsan < FMT_SECTION_LEVEL_TOPIC) ? $thissection->id : $thissection->parentid;
-                echo $this->section_header($thissection, $course, $thissection->levelsan < FMT_SECTION_LEVEL_TOPIC);
+                $pageid = ($thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $thissection->id
+                                                                                           : $thissection->parentid;
+                echo $this->section_header($thissection, $course, $thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC);
                 if ($thissection->uservisible && $pageid == $displaysection->id) {
                     // CHANGED LINE ABOVE.
                     // ADDED moved here as per print_single_section_page.
-                    if ($thissection->levelsan < FMT_SECTION_LEVEL_TOPIC) {
+                    if ($thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                         $completioninfo = new completion_info($course);
                         echo $completioninfo->display_help_icon();
                     }
@@ -829,7 +833,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             if ($thissection->nextanyid == $thissection->nextpageid) {
                 if ($PAGE->user_is_editing() and has_capability('moodle/course:update', $context)) {
                     $insertsection = new stdClass();
-                    $insertsection->parentid = $sectionatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->id;
+                    $insertsection->parentid = $sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id;
                     echo $this->change_number_sections($course, null, $insertsection); // CHANGED.
                 }
                 echo html_writer::end_tag('div');
@@ -889,7 +893,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             }
             $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php',
                 ['courseid' => $course->id, 'insertparentid' => $insertsection->parentid, 'numsections' => 1,
-                'insertlevel' => FMT_SECTION_LEVEL_TOPIC, 'sesskey' => sesskey()]);
+                'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC, 'sesskey' => sesskey()]);
             // REMOVED section return.
             $icon = $this->output->pix_icon('t/add', '');
             $o .= html_writer::link($url, $icon . $straddsections);              // CHANGED: Only add single section.

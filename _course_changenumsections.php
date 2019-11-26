@@ -48,7 +48,7 @@ $insertsection = null;
 if (isset($insertparentid)) {
     $insertsection = new \stdClass();
     $insertsection->parentid = $insertparentid;
-    $insertsection->level = $insertlevel ?? FMT_SECTION_LEVEL_TOPIC;
+    $insertsection->level = $insertlevel ?? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC;
 }
 // END ADDED.
 

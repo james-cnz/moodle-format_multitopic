@@ -66,7 +66,7 @@ if ($deletesection) {
             // ADDED.
             // If section was topic level, return to page, else return to previous section.
             $sectionreturn = new \stdClass();
-            if ($sectioninfo->levelsan >= FMT_SECTION_LEVEL_TOPIC) {
+            if ($sectioninfo->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                 $sectionreturn->id = $sectioninfo->parentid;
             } else {
                 $sectionreturn->id = $sectioninfo->prevupid;
@@ -142,7 +142,8 @@ if ($mform->is_cancelled()) {
     if (isset($data->level) && ($data->level != $sectioninfo->levelsan) && ($sectioninfo->section > 0)) {
         // If the level was changed, update the section info properties relevant to generating the URL.
         // (A hack to avoid recalculating section properties.)
-        if (($sectioninfo->levelsan < FMT_SECTION_LEVEL_TOPIC) && ($data->level >= FMT_SECTION_LEVEL_TOPIC)) {
+        if (($sectioninfo->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
+            && ($data->level >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)) {
             // If the section was changed to Topic level, the former previous page will be the new parent page.
             $sectioninfo->parentid = $sectioninfo->prevpageid;
         }

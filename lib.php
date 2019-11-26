@@ -37,15 +37,15 @@ require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
  * Set to -1, to be a level above the top-level sections in OneTopic format, which are numbered 0.
  * NOTE: Not sure this can be changed without breaking stuff.
  */
-const FMT_SECTION_LEVEL_ROOT    = -1;
+const FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT    = -1;
 
 /** @var int Deepest level of page to let users create.  Must be between the root level and the topic level. */
-const FMT_SECTION_LEVEL_PAGE_USE = 1;
+const FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE = 1;
 
 /** @var int Level of topics, which are displayed within pages.
  * NOTE: This could have been made larger, to allow more page levels, but more page levels seemed too confusing.
  */
-const FMT_SECTION_LEVEL_TOPIC   = 2;
+const FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC   = 2;
 // END ADDED.
 
 /**
@@ -149,10 +149,12 @@ class format_multitopic extends format_base {
         $fmtsections = [];
 
         // The previous section at, or above, each level.
-        $sectionprevatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, null);
+        $sectionprevatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+                                         FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
         // The current section at, or above, each level.
-        $sectionatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, null);
+        $sectionatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+                                     FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
         foreach ($sections as $thissection) {
 
@@ -165,14 +167,14 @@ class format_multitopic extends format_base {
             $fmtsections[$thissection->id] = $thissection;
 
             // Fix the section's level within appropriate bounds.
-            $levelsan = ($sectionatlevel[FMT_SECTION_LEVEL_ROOT] == null) ?
-                        FMT_SECTION_LEVEL_ROOT
-                        : max(FMT_SECTION_LEVEL_ROOT + 1,
-                            min($thissection->level ?? FMT_SECTION_LEVEL_TOPIC, FMT_SECTION_LEVEL_TOPIC));
+            $levelsan = ($sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT] == null) ?
+                        FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT
+                        : max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1,
+                          min($thissection->level ?? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC, FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC));
             $thissection->levelsan = $levelsan;
 
             // Update remembered sections.
-            for ($sublevel = $levelsan; $sublevel <= FMT_SECTION_LEVEL_TOPIC; $sublevel++) {
+            for ($sublevel = $levelsan; $sublevel <= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; $sublevel++) {
                 $sectionprevatlevel[$sublevel] = $sectionatlevel[$sublevel];
                 $sectionatlevel[$sublevel] = $thissection;
             }
@@ -181,17 +183,17 @@ class format_multitopic extends format_base {
             $thissection->prevupid = $sectionprevatlevel[$levelsan] ? $sectionprevatlevel[$levelsan]->id : null;
 
             // The previous page.
-            $thissection->prevpageid = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC - 1] ?
-                                            $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->id
+            $thissection->prevpageid = $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1] ?
+                                            $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id
                                             : null;
 
             // The previous section at any level.
-            $thissection->prevanyid = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC] ?
-                                            $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC]->id
+            $thissection->prevanyid = $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
+                                            $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->id
                                             : null;
 
             // The section's parent.
-            $thissection->parentid   = ($levelsan > FMT_SECTION_LEVEL_ROOT) ? $sectionatlevel[$levelsan - 1]->id : null;
+            $thissection->parentid = ($levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ? $sectionatlevel[$levelsan - 1]->id : null;
 
             // Initialise tree-related properties to be set in the reverse pass.
             $thissection->hassubsections = false;   // Whether this section has any subsections (page or topic).
@@ -199,23 +201,23 @@ class format_multitopic extends format_base {
             $thissection->pagedepthdirect = $levelsan; // The lowest level of direct sub-pages.
 
             // Set visibility properties.
-            $thissection->parentvisiblesan  = ($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
+            $thissection->parentvisiblesan  = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
                                                 true
                                                 : $sectionatlevel[$levelsan - 1]->visiblesan;
-            $thissection->visiblesan        = ($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
+            $thissection->visiblesan        = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
                                                 true
                                                 : ($sectionatlevel[$levelsan - 1]->visiblesan && $thissection->visible);
-            $thissection->uservisiblesan    = ($levelsan <= FMT_SECTION_LEVEL_ROOT) ?
+            $thissection->uservisiblesan    = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
                                                 true
                                                 : ($sectionatlevel[$levelsan - 1]->uservisiblesan && $thissection->uservisible);
 
             // Set date-start property from previous section.
-            $thissection->datestart = $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC] ?
-                                            $sectionprevatlevel[FMT_SECTION_LEVEL_TOPIC]->dateend
+            $thissection->datestart = $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
+                                            $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->dateend
                                             : $course->startdate;
 
             // Set date-end property.
-            if ($levelsan < FMT_SECTION_LEVEL_TOPIC) {
+            if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                 $sectionperioddays = 0;
             } else {
                 switch($thissection->periodduration) {
@@ -234,16 +236,18 @@ class format_multitopic extends format_base {
             // Initialise for reverse pass.
             $iscurrent = $thissection->dateend
                         && ($thissection->datestart <= $timenow) && ($timenow < $thissection->dateend);
-            $thissection->currentnestedlevel = $iscurrent ? FMT_SECTION_LEVEL_TOPIC : FMT_SECTION_LEVEL_ROOT - 1;
+            $thissection->currentnestedlevel = $iscurrent ? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                                                          : FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1;
 
         }
 
         // Reverse pass.
 
         // Remembered sections.
-        $sectionnextatlevel = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, null);
+        $sectionnextatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+                                         FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
-        for ($thissection = $sectionatlevel[FMT_SECTION_LEVEL_TOPIC];
+        for ($thissection = $sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC];
                 $thissection;
                 $thissection = $thissection->prevanyid ? $fmtsections[$thissection->prevanyid] : null) {
             $levelsan = $thissection->levelsan;
@@ -252,11 +256,11 @@ class format_multitopic extends format_base {
             $thissection->nextupid  = $sectionnextatlevel[$levelsan] ?
                                             $sectionnextatlevel[$levelsan]->id
                                             : null;
-            $thissection->nextpageid = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1] ?
-                                            $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC - 1]->id
+            $thissection->nextpageid = $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1] ?
+                                            $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id
                                             : null;
-            $thissection->nextanyid = $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC] ?
-                                            $sectionnextatlevel[FMT_SECTION_LEVEL_TOPIC]->id
+            $thissection->nextanyid = $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
+                                            $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->id
                                             : null;
 
             // Flag to indicate the presence of calculated properties.
@@ -266,17 +270,17 @@ class format_multitopic extends format_base {
             if ($thissection->parentid) {
                 $parent = $fmtsections[$thissection->parentid];
                 $parent->hassubsections = true;
-                if ($levelsan < FMT_SECTION_LEVEL_TOPIC) {
+                if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                     $parent->pagedepth = max($parent->pagedepth, $thissection->pagedepth);
                     $parent->pagedepthdirect = max($parent->pagedepthdirect, $levelsan);
                 }
-                if ($thissection->currentnestedlevel >= FMT_SECTION_LEVEL_ROOT) {
+                if ($thissection->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) {
                     $parent->currentnestedlevel = max($parent->currentnestedlevel, $levelsan - 1);
                 }
             }
 
             // Update remembered next sections.
-            for ($sublevel = $levelsan; $sublevel <= FMT_SECTION_LEVEL_TOPIC; $sublevel++) {
+            for ($sublevel = $levelsan; $sublevel <= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; $sublevel++) {
                 $sectionnextatlevel[$sublevel] = $thissection;
             }
 
@@ -458,11 +462,11 @@ class format_multitopic extends format_base {
         $section = $this->fmt_get_section($section);                            // ADDED.
         if ($section !== null) {                                                // CHANGED.
             // CHANGED.
-            $pageid  = ($section->levelsan < FMT_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
+            $pageid  = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
             if ($pageid != $this->fmtrootsectionid) {
                 $url->param('sectionid', $pageid);
             }
-            if ($section->levelsan >= FMT_SECTION_LEVEL_TOPIC) {
+            if ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                 if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
                     return null;
                 }
@@ -700,7 +704,7 @@ class format_multitopic extends format_base {
             $sectionformatoptions = array(
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options 'level'.
                 'level' => array(
-                    'default' => FMT_SECTION_LEVEL_TOPIC,                       // CHANGED.
+                    'default' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,         // CHANGED.
                     'type' => PARAM_INT
                 ),
                 // END INCLUDED.
@@ -721,9 +725,9 @@ class format_multitopic extends format_base {
                     'element_type' => 'select',
                     'element_attributes' => array(
                         array(
-                            FMT_SECTION_LEVEL_ROOT + 1 => get_string('asprincipal', 'format_multitopic'), // CHANGED.
-                            FMT_SECTION_LEVEL_ROOT + 2 => get_string('aschild', 'format_multitopic'),     // CHANGED.
-                            FMT_SECTION_LEVEL_TOPIC => get_string('topic') // ADDED.
+                            FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1 => get_string('asprincipal', 'format_multitopic'), // CHANGED.
+                            FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 2 => get_string('aschild', 'format_multitopic'),     // CHANGED.
+                            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC => get_string('topic') // ADDED.
                         )
                     ),
                     'help' => 'level',
@@ -868,7 +872,7 @@ class format_multitopic extends format_base {
             return false;
         }
 
-        return ($section->section && $section->currentnestedlevel >= FMT_SECTION_LEVEL_TOPIC); // CHANGED.
+        return ($section->section && $section->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // CHANGED.
     }
     // END INCLUDED.
 
@@ -921,8 +925,8 @@ class format_multitopic extends format_base {
         }
 
         $displayvalue = $title = html_writer::tag('i', '', ['class' =>
-                                        ($section->levelsan < FMT_SECTION_LEVEL_TOPIC ? 'icon fa fa-folder-o fa-fw'
-                                                                                        : 'icon fa fa-list fa-fw')])
+                                        ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'icon fa fa-folder-o fa-fw'
+                                                                                                    : 'icon fa fa-list fa-fw')])
                                     . ' ' . get_section_name($section->course, $section);
         // TODO: Fix collapse icon for AJAX rename, somehow?
         if ($linkifneeded) {

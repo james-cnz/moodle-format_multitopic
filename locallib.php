@@ -123,7 +123,7 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
         $cw->section = (int)$DB->get_field_sql('SELECT section from {course_sections} WHERE course = ? AND id = ?',
                                                 [$courseid, $cw->id]);          // CHANGED.
         $cw->parentid = $section->parentid;                                     // ADDED.
-        $cw->levelsan = $section->level ?? FMT_SECTION_LEVEL_TOPIC;             // ADDED.
+        $cw->levelsan = $section->level ?? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; // ADDED.
     }
 
     \core\event\course_section_created::create_from_section($cw)->trigger();
@@ -197,7 +197,7 @@ function format_multitopic_move_section_to(\stdClass $course, \stdClass $section
             $updates['visible'] = $movedsection->visible;
         }
         // Set page-level sections to untimed.
-        if ($movedsection->level < FMT_SECTION_LEVEL_TOPIC && $sections[$id]->periodduration != '0 days') {
+        if ($movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $sections[$id]->periodduration != '0 days') {
             $updates['periodduration'] = '0 days';
         }
         // Apply section updates.
@@ -357,8 +357,8 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
         $sections[$id]->visible = $section->visible && $parentvisible;
         $sections[$id]->level = ($id == $origin->id) ?
                                 $target->level
-                                : ($section->levelsan >= FMT_SECTION_LEVEL_TOPIC ?
-                                    FMT_SECTION_LEVEL_TOPIC                     // Don't change topic level.
+                                : ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ?
+                                    FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC       // Don't change topic level.
                                     : $section->levelsan + $levelchange);
     }
 

@@ -158,7 +158,8 @@ class format_multitopic_global_navigation_wrapper {
         // Navigation node at level n.
         // This is a list of the navigation nodes currently at each level,
         // from the node for the course, down to the node we're currently working on.
-        $nodeln = array_fill(FMT_SECTION_LEVEL_ROOT, FMT_SECTION_LEVEL_TOPIC - FMT_SECTION_LEVEL_ROOT + 1, $coursenode);
+        $nodeln = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $coursenode);
         // The navigation node we're currently working on.
         $sectionnode = $coursenode;
         // Extra navigation node ID counter.
@@ -188,13 +189,14 @@ class format_multitopic_global_navigation_wrapper {
                 // The course node already exists, so we must start below course level.
                 // And activities don't seem to get removed from the course node in the Boost theme,
                 // so we need at least one section node to attach activities to.
-                $firstlevel = max($section->levelsan, FMT_SECTION_LEVEL_ROOT + 1); // ADDED.
+                $firstlevel = max($section->levelsan, FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1); // ADDED.
                 for ($level = $firstlevel; $level <= max($section->pagedepthdirect, $firstlevel); $level++) {
                     $parentnode = $nodeln[$level - 1];                          // ADDED.
                     $nodeid = ($level == $firstlevel) ? $sectionid : $extraid--; // ADDED.
                     $sectionnode = $parentnode->add($sectionname, $url, \navigation_node::TYPE_SECTION,
                         null, $nodeid,
-                        new \pix_icon($section->levelsan < FMT_SECTION_LEVEL_TOPIC ? 'i/section' : 'e/bullet_list', ''));
+                        new \pix_icon($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'i/section'
+                                                                                                 : 'e/bullet_list', ''));
                     // CHANGED ABOVE: Attach to parentnode with nodeid as defined above, and use a list icon for topic sections.
                     $sectionnode->nodetype = \navigation_node::NODETYPE_BRANCH;
                     $sectionnode->hidden = (!$section->visible || !$section->available);
@@ -203,7 +205,7 @@ class format_multitopic_global_navigation_wrapper {
 
                 // Fill the rest of the list of nodes with the node we're currently working on.
                 // This is so Topic-level sections will find the correct parent.
-                for ($level = $level; $level <= FMT_SECTION_LEVEL_TOPIC; $level++) {
+                for ($level = $level; $level <= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; $level++) {
                     $nodeln[$level] = $sectionnode;
                 }
 
