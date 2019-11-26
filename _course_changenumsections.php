@@ -23,8 +23,8 @@
  *  - Specify the new section's level.
  *
  * @package   format_multitopic
- * @copyright 2012 Dan Poltawski,
- *            2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2012 Dan Poltawski
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since     Moodle 2.3
  */

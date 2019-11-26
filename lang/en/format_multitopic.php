@@ -18,10 +18,10 @@
  * Strings for component 'format_multitopic', language 'en', branch 'MOODLE_20_STABLE'
  *
  * @package   format_multitopic
- * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com},
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 1999 onwards Martin Dougiamas  {@link http://moodle.com},
  *            2012 David Herney Bernal - cirano,
- *            2014 Marina Glancy,
- *            2018 Otago Polytechnic
+ *            2014 Marina Glancy
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -18,7 +18,7 @@
  * Course header
  *
  * @package   format_multitopic
- * @copyright 2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace format_multitopic;
@@ -28,8 +28,8 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Course header: A banner with the course title and a slice of the course image.
  *
- * @copyright  2018 Otago Polytechnic
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic_courseheader implements \renderable {
 

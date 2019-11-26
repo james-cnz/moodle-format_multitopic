@@ -21,8 +21,8 @@
  * CHANGED: Use section IDs instead of section numbers.  Delay use of section numbers until later, using _course_jumpto.php .
  *
  * @package   format_multitopic
- * @copyright 2010 Sam Hemelryk,
- *            2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2010 Sam Hemelryk
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace format_multitopic;
@@ -32,8 +32,8 @@ defined('MOODLE_INTERNAL') || die;                                              
 /**
  * Wrapper for the core course renderer
  *
- * @copyright  2018 Otago Polytechnic
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic_core_course_renderer_wrapper {
 
@@ -41,7 +41,7 @@ class format_multitopic_core_course_renderer_wrapper {
     /** @var core_course_renderer wrapped renderer */
     private $inner;
 
-    // NOTE: We need access to these private variables, so store our own copy.
+    // NOTE: We need access to these protected variables, so store our own copy.
     /**
      * @var moodle_page The Moodle page the renderer has been created to assist with.
      */

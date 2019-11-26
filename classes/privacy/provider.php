@@ -17,18 +17,19 @@
 /**
  * Privacy Subsystem implementation for format_multitopic.
  *
- * @package    format_multitopic
- * @copyright  2018 Carlos Escobedo <carlos@moodle.com>,
- *             2018 Otago Polytechnic
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   format_multitopic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2018 Carlos Escobedo <carlos@moodle.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace format_multitopic\privacy;
 defined('MOODLE_INTERNAL') || die();
 /**
  * Privacy Subsystem for format_multitopic implementing null_provider.
  *
- * @copyright  2018 Carlos Escobedo <carlos@moodle.com>, 2018 Otago Polytechnic
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2018 Carlos Escobedo <carlos@moodle.com>
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
     /**

@@ -18,7 +18,8 @@
  * Course content header/footer
  *
  * @package   format_multitopic
- * @copyright 2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2009 Tim Hunt
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace format_multitopic;
@@ -28,8 +29,9 @@ defined('MOODLE_INTERNAL') || die;
 /**
  * Course content header/footer: Back to course button.
  *
- * @copyright  2018 Otago Polytechnic
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2009 Tim Hunt
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic_coursecontentheaderfooter implements \renderable {
 
@@ -45,7 +47,7 @@ class format_multitopic_coursecontentheaderfooter implements \renderable {
      * @param int $pos -1 for header, 1 for footer
      */
     public function __construct(\moodle_page $page, int $pos) {
-        // Based on outputrenderers.php function activity_navigation .
+        // Based on lib/outputrenderers.php function activity_navigation .
 
         // First we should check if we want to add navigation.
         if (($page->pagelayout == 'incourse' || $page->pagelayout == 'frametop')

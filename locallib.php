@@ -20,8 +20,8 @@
  * INCLUDED /course/lib.php selected functions
  *
  * @package   format_multitopic
- * @copyright 1999 Martin Dougiamas  http://dougiamas.com,
- *            2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 1999 Martin Dougiamas  http://dougiamas.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace format_multitopic;

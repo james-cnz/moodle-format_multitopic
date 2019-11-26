@@ -18,9 +18,9 @@
  * Renderer for outputting the multitopic course format.
  *
  * @package   format_multitopic
- * @copyright 2012 Dan Poltawski,
- *            2012 David Herney Bernal - cirano,
- *            2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2012 Dan Poltawski,
+ *            2012 David Herney Bernal - cirano
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since     Moodle 2.3
  */
@@ -39,8 +39,8 @@ require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 /**
  * Basic renderer for multitopic format.
  *
- * @copyright 2012 Dan Poltawski,
- *            2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2012 Dan Poltawski
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic_renderer extends format_section_renderer_base {         // CHANGED.

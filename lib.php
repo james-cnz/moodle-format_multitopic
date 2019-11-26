@@ -19,8 +19,8 @@
  *
  * @since     Moodle 2.0
  * @package   format_multitopic
- * @copyright 2009 Sam Hemelryk,
- *            2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2009 Sam Hemelryk
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -51,9 +51,10 @@ const FMT_SECTION_LEVEL_TOPIC   = 2;
 /**
  * Main class for the Multitopic course format
  *
- * @package    format_multitopic
- * @copyright  2012 Marina Glancy, 2018 Otago Polytechnic
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   format_multitopic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2012 Marina Glancy
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic extends format_base {
 

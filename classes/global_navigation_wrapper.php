@@ -20,11 +20,11 @@
  * INCLUDED from /lib/navigationlib.php
  * CHANGED: Modified to show sections in a heirarchy, and use section IDs where possible.
  *
- * @since      Moodle 2.0
- * @package    format_multitopic
- * @copyright  2009 Sam Hemelryk,
- *             2018 Otago Polytechnic
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @since     Moodle 2.0
+ * @package   format_multitopic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2009 Sam Hemelryk
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace format_multitopic;
 
@@ -44,7 +44,8 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package   format_multitopic
  * @category  navigation
- * @copyright 2009 Sam Hemelryk, 2018 Otago Polytechnic
+ * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright based on work by 2009 Sam Hemelryk
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic_global_navigation_wrapper {
