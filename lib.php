@@ -459,8 +459,8 @@ class format_multitopic extends format_base {
                                 : '/course/view.php', array('id' => $course->id)); // CHANGED.
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
-        $section = $this->fmt_get_section($section);                            // ADDED.
         if ($section !== null) {                                                // CHANGED.
+            $section = $this->fmt_get_section($section, MUST_EXIST);            // ADDED.
             // CHANGED.
             $pageid  = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
             if ($pageid != $this->fmtrootsectionid) {
