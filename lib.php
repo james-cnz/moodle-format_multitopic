@@ -302,7 +302,7 @@ class format_multitopic extends format_base {
      * @param int $strictness
      * @return section_info
      */
-    public final function fmt_get_section($section, int $strictness = IGNORE_MISSING) : section_info {
+    public final function fmt_get_section($section, int $strictness = IGNORE_MISSING) : ?section_info {
         // CHANGED: Convert from section number to section info, rather than the other way around.
         if (is_numeric($section)) {
             $sectionnum = $section;
