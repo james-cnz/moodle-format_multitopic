@@ -698,7 +698,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                         html_writer::tag('div', $sectionname, ['class' =>
                             'tab_content'
                             . ($thissection->currentnestedlevel >= $level ? ' marker' : '')
-                            . (!$thissection->visible || $level > $thissection->pagedepthdirect ? ' dimmed' : '')
+                            . (!$thissection->visible || !$thissection->available
+                               || $level > $thissection->pagedepthdirect ? ' dimmed' : '')
                         ]),
                         $sectionname);
                     $newtab->level = $level - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
