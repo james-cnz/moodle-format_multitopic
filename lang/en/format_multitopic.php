@@ -63,7 +63,7 @@ $string['perioddurationdefault'] = 'Topic duration';
 $string['perioddurationoverride'] = 'Override topic duration';
 $string['perioddurationdefault_help'] = 'Set to "1 week" to have dates shown for topics, similar to the Weekly course format, '
                                       . 'or "Unspecified" otherwise.';
-$string['perioddurationoverride_help'] = 'Whether this topic is to be completed during time spent on other topics.  '
+$string['perioddurationoverride_help'] = 'Whether this topic has time allocated to it or not.  '
                                        . 'Set to "No time" for, e.g., assignments that students are to complete while working on other topics, '
                                        . 'or "Default" otherwise.  '
                                        . '(Not applicable to pages.)';
