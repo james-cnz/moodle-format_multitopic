@@ -53,14 +53,20 @@ $string['level'] = 'Level';
 $string['asprincipal'] = 'First-level page';
 // REMOVED 'asbrother' .
 $string['aschild'] = 'Second-level page';
-$string['level_help'] = 'Change the section level.';
+$string['level_help'] = 'Set the section level.  '
+                      . 'This is an advanced setting.  '
+                      . 'Where possible, it is recommended to use page "Edit" menu options "Raise page level" and "Lower page level" instead.';
 // END INCLUDED.
 
 // INCLUDED /course/format/periods/lang/en/format_periods.php $string['perioddurationdefault'] - $string['perioddurationoverride_help'] CHANGED.
 $string['perioddurationdefault'] = 'Topic duration';
 $string['perioddurationoverride'] = 'Override topic duration';
-$string['perioddurationdefault_help'] = 'Set the duration of one topic.  It can be overridden for individual topics.';
-$string['perioddurationoverride_help'] = 'Set the duration of this topic.  If not set, the default value for the course will be used.';
+$string['perioddurationdefault_help'] = 'Set to "1 week" to have dates shown for topics, similar to the Weekly course format, '
+                                      . 'or "Unspecified" otherwise.';
+$string['perioddurationoverride_help'] = 'Whether this topic is to be completed during time spent on other topics.  '
+                                       . 'Set to "No time" for, e.g., assignments that students are to complete while working on other topics, '
+                                       . 'or "Default" otherwise.  '
+                                       . '(Not applicable to pages.)';
 // END INCLUDED.
 
 // ADDED.
@@ -68,7 +74,9 @@ $string['period_undefined'] = 'Unspecified';
 $string['period_0_days']    = 'No time';
 
 $string['bannerslice']      = 'Banner slice';
-$string['bannerslice_help'] = 'How far down the summary image the banner slice is taken from';
+$string['bannerslice_help'] = 'The slice of the course summary image to use in the course banner.  '
+                            . 'e.g.  Set to "0%" to use the top of the course summary image in the course banner, '
+                            . '"50%" to use the middle, or "100%" to use the bottom.';
 
 $string['image']            = 'Image';
 $string['image_by']         = 'by';
