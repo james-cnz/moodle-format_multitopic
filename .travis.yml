@@ -1,9 +1,8 @@
 language: php
 
 branches:
-  only:
-    - master
-    - develop
+  except:
+    - moodle_includes
 
 sudo: true
 
