@@ -31,7 +31,7 @@ defined('MOODLE_INTERNAL') || die;
  * @copyright 2019 James Calder and Otago Polytechnic
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_multitopic_courseheader implements \renderable {
+class courseheader implements \renderable {
 
     /** @var \moodle_url|null course image URL */
     private $imageurl;

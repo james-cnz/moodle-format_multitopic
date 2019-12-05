@@ -23,7 +23,6 @@
  * @author    based on work by N.D.Freear@open.ac.uk and others.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace format_multitopic;                                                    // ADDED.
 
 defined('MOODLE_INTERNAL') || die();
 

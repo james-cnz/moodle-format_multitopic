@@ -26,7 +26,6 @@
  * @copyright based on work by 1999 Martin Dougiamas  http://dougiamas.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace format_multitopic;                                                    // ADDED.
 
 require_once("../../../config.php");                                            // CHANGED.
 require_once("../../lib.php");                                                  // CHANGED.

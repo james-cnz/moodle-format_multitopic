@@ -25,7 +25,6 @@
  * @copyright based on work by 1999 Martin Dougiamas  http://dougiamas.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace format_multitopic;
 
     require_once('../../../config.php');                                        // CHANGED.
     require_once('locallib.php');                                               // CHANGED: Use custom code.
@@ -336,7 +335,7 @@ if (true) {                                                                     
         // MDL-65321 The backup libraries are quite heavy, only require the bare minimum.
         require_once($CFG->dirroot . '/backup/util/helper/async_helper.class.php');
 
-        if (async_helper::is_async_pending($id, 'course', 'backup')) {
+        if (\async_helper::is_async_pending($id, 'course', 'backup')) {
             echo $OUTPUT->notification(get_string('pendingasyncedit', 'backup'), 'warning');
         }
     }

@@ -48,7 +48,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright based on work by 2009 Sam Hemelryk
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_multitopic_global_navigation_wrapper {
+class global_navigation_wrapper {
     // CHANGED LINE ABOVE.
 
     // ADDED.
@@ -68,7 +68,7 @@ class format_multitopic_global_navigation_wrapper {
     /**
      * Construct wrapper
      *
-     * @param global_navigation $inner navigation to wrap
+     * @param \global_navigation $inner navigation to wrap
      */
     public function __construct(\global_navigation $inner) {
         global $PAGE;
@@ -83,7 +83,7 @@ class format_multitopic_global_navigation_wrapper {
     /**
      * Generates an array of sections and an array of activities for the given course.
      *
-     * @param stdClass $course
+     * @param \stdClass $course
      * @return array Array($sections, $activities)
      */
     protected function generate_sections_and_activities(\stdClass $course) : array {
@@ -143,8 +143,8 @@ class format_multitopic_global_navigation_wrapper {
     /**
      * Generically loads the course sections into the course's navigation.
      *
-     * @param stdClass $course
-     * @param navigation_node $coursenode
+     * @param \stdClass $course
+     * @param \navigation_node $coursenode
      * @return array An array of course section nodes
      */
     public function load_generic_course_sections(\stdClass $course, \navigation_node $coursenode) : array {
@@ -229,10 +229,10 @@ class format_multitopic_global_navigation_wrapper {
     /**
      * Loads all of the activities for a section into the navigation structure.
      *
-     * @param navigation_node $sectionnode
-     * @param section_info $section
+     * @param \navigation_node $sectionnode
+     * @param \section_info $section
      * @param array $activities An array of activites as returned by {@link global_navigation::generate_sections_and_activities()}
-     * @param stdClass $course The course object the section and activities relate to.
+     * @param \stdClass $course The course object the section and activities relate to.
      * @return array Array of activity nodes
      */
     protected function load_section_activities(\navigation_node $sectionnode, \section_info $section, array $activities,

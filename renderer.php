@@ -458,7 +458,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 }
             }
 
-            if (\format_multitopic\format_multitopic_course_can_delete_section($course, $section)) {
+            if (\format_multitopic_course_can_delete_section($course, $section)) {
                 if (get_string_manager()->string_exists('deletesection', 'format_' . $course->format)) {
                     $strdelete = get_string('deletesection', 'format_' . $course->format);
                 } else {
@@ -823,7 +823,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     }
                     // END ADDED.
                     echo $this->courserenderer->course_section_cm_list($course, $thissection); // CHANGED removed section return.
-                    echo (new \format_multitopic\format_multitopic_core_course_renderer_wrapper($this->courserenderer)
+                    echo (new \format_multitopic\core_course_renderer_wrapper($this->courserenderer)
                          )->course_section_add_cm_control($course, $thissection); // CHANGED removed section return.
                 }
                 echo $this->section_footer();
@@ -944,7 +944,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $o .= html_writer::start_tag('div', ['class' => 'section_image_holder']);
             $o .= html_writer::empty_tag('img', ['src' => $imageurl]);
             $o .= html_writer::start_tag('p');
-            $o .= \format_multitopic\format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode);
+            $o .= \format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode);
             $o .= html_writer::end_tag('p');
             $o .= html_writer::end_tag('div');
         }
@@ -964,10 +964,10 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     /**
      * Generate HTML for course header: A banner with the course title and a slice of the course image.
      *
-     * @param format_multitopic_courseheader $header header to render
+     * @param \format_multitopic\courseheader $header header to render
      * @return string HTML to output.
      */
-    protected function render_format_multitopic_courseheader(\format_multitopic\format_multitopic_courseheader $header) : string {
+    protected function render_courseheader(\format_multitopic\courseheader $header) : string {
 
         global $PAGE;
 
@@ -982,11 +982,11 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     /**
      * Generate HTML for course content header/footer: Back to course button.
      *
-     * @param format_multitopic_coursecontentheaderfooter $headerfooter header/footer to render
+     * @param \format_multitopic\coursecontentheaderfooter $headerfooter header/footer to render
      * @return string HTML to output.
      */
-    protected function render_format_multitopic_coursecontentheaderfooter(
-                            \format_multitopic\format_multitopic_coursecontentheaderfooter $headerfooter) : string {
+    protected function render_coursecontentheaderfooter(
+                            \format_multitopic\coursecontentheaderfooter $headerfooter) : string {
         return $headerfooter->output();
     }
     // END ADDED.
