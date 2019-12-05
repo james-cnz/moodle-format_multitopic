@@ -69,8 +69,11 @@ $string['perioddurationoverride_help'] = 'Whether this topic has time allocated 
 // END INCLUDED.
 
 // ADDED.
-$string['period_undefined'] = 'Unspecified';
-$string['period_0_days']    = 'No time';
+$string['activityclipboard_disable']    = 'Disable activity clipboard';
+$string['activityclipboard_enable']     = 'Enable activity clipboard';
+$string['activityclipboard_placeholder'] = 'Click the up/down arrows next to an activity to move it to the clipboard.';
+
+$string['back_to_course']   = 'Back to course';
 
 $string['bannerslice']      = 'Banner slice';
 $string['bannerslice_help'] = 'The slice of the course summary image to use in the course banner.
@@ -80,16 +83,13 @@ $string['image']            = 'Image';
 $string['image_by']         = 'by';
 $string['image_licence']    = 'licence';
 
-$string['activityclipboard_enable']     = 'Enable activity clipboard';
-$string['activityclipboard_disable']    = 'Disable activity clipboard';
-$string['activityclipboard_placeholder'] = 'Click the up/down arrows next to an activity to move it to the clipboard.';
-
-$string['move_level_up']     = 'Raise page level';
 $string['move_level_down']   = 'Lower page level';
-$string['move_page_prev']    = 'Move page left';
+$string['move_level_up']     = 'Raise page level';
 $string['move_page_next']    = 'Move page right';
-$string['move_to_prev_page'] = 'Move to previous page';
+$string['move_page_prev']    = 'Move page left';
 $string['move_to_next_page'] = 'Move to next page';
+$string['move_to_prev_page'] = 'Move to previous page';
 
-$string['back_to_course']   = 'Back to course';
+$string['period_0_days']    = 'No time';
+$string['period_undefined'] = 'Unspecified';
 // END ADDED.
