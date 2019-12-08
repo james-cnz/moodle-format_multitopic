@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die;                                              
  * @copyright 2019 James Calder and Otago Polytechnic
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class core_course_renderer_wrapper {
+class course_renderer_wrapper {
 
     // ADDED.
     /** @var core_course_renderer wrapped renderer */

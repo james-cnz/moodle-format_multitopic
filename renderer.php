@@ -31,7 +31,7 @@ require_once($CFG->dirroot . '/course/format/renderer.php');
 // ADDED.
 require_once(__DIR__ . '/lib.php');
 require_once(__DIR__ . '/locallib.php');
-require_once(__DIR__ . '/classes/core_course_renderer_wrapper.php');
+require_once(__DIR__ . '/classes/course_renderer_wrapper.php');
 require_once(__DIR__ . '/classes/courseheader.php');
 require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 // END ADDED.
@@ -823,7 +823,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     }
                     // END ADDED.
                     echo $this->courserenderer->course_section_cm_list($course, $thissection); // CHANGED removed section return.
-                    echo (new \format_multitopic\core_course_renderer_wrapper($this->courserenderer)
+                    echo (new \format_multitopic\course_renderer_wrapper($this->courserenderer)
                          )->course_section_add_cm_control($course, $thissection); // CHANGED removed section return.
                 }
                 echo $this->section_footer();
