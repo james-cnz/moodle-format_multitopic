@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die;                                              
  * @copyright 2019 James Calder and Otago Polytechnic
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_multitopic_core_course_renderer_wrapper {
+class course_renderer_wrapper {
 
     // ADDED.
     /** @var core_course_renderer wrapped renderer */
@@ -56,7 +56,7 @@ class format_multitopic_core_course_renderer_wrapper {
     /**
      * Construct wrapper
      *
-     * @param core_course_renderer $inner renderer to be wrapped
+     * @param \core_course_renderer $inner renderer to be wrapped
      */
     public function __construct(\core_course_renderer $inner) {
         global $PAGE, $OUTPUT;
@@ -70,8 +70,8 @@ class format_multitopic_core_course_renderer_wrapper {
     /**
      * Renders HTML for the menus to add activities and resources to the current course
      *
-     * @param stdClass $course
-     * @param section_info $section section info
+     * @param \stdClass $course
+     * @param \section_info $section section info
      * @param int $sectionreturn The section to link back to (unused)
      * @param array $displayoptions additional display options, for example blocks add
      *     option 'inblock' => true, suggesting to display controls vertically

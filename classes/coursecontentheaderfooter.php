@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die;
  * @copyright based on work by 2009 Tim Hunt
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_multitopic_coursecontentheaderfooter implements \renderable {
+class coursecontentheaderfooter implements \renderable {
 
     /** @var int -1 for header, 1 for footer */
     private $pos;

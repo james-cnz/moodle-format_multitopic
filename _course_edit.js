@@ -24,7 +24,7 @@ M.course.format.fmtBannerPreviewSlice = function() {
 
     // Update banner CSS style for new banner slice.
     var bannerStyleOld = bannerDom.getAttribute("style");
-    // This expression should reflect the style code in renderer.php function render_format_multitopic_courseheader .
+    // This expression should reflect the style code in renderer.php function render_courseheader .
     var bannerStyle = bannerStyleOld.replace(/\b(background-position: [a-z0-9%]+ )([0-9]+%)(;?)/, "$1" + bannerslice + "%" + "$3");
     bannerDom.setAttribute("style", bannerStyle);
 
@@ -52,7 +52,7 @@ M.course.format.fmtBannerPreviewImage = function() {
 
     // Update banner CSS style and attribution for new image.
     var bannerStyleOld = bannerDom.getAttribute("style");
-    // This expression should reflect the style code in renderer.php function render_format_multitopic_courseheader .
+    // This expression should reflect the style code in renderer.php function render_courseheader .
     var bannerStyle = bannerStyleOld.replace(/\b(background-image: )(url\('[^']*'\))(;?)/, "$1" + "url('" + imageUrl + "')" + "$3");
     bannerStyle = bannerStyle.replace(/\b(background-image: )(url\("[^"]*"\))(;?)/, "$1" + "url('" + imageUrl + "')" + "$3");
     // NOTE: Need to accept double quotes for Internet Explorer.

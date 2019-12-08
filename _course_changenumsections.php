@@ -28,7 +28,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since     Moodle 2.3
  */
-namespace format_multitopic;                                                    // ADDED.
 
 require_once(__DIR__.'/../../../config.php');                                   // CHANGED.
 require_once($CFG->dirroot.'/course/lib.php');

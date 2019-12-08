@@ -24,7 +24,6 @@
  * @copyright based on work by 1999 Martin Dougiamas  http://dougiamas.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace format_multitopic;
 
 defined('MOODLE_INTERNAL') || die;
 
