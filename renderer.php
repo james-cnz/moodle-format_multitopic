@@ -140,7 +140,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @return string HTML to output.
      */
     public function section_title_without_link($section, $course) : string {
-        return section_title($section, $course, false);                         // CHANGED.
+        return $this->section_title($section, $course, false);                  // CHANGED.
     }
 
     // NOTE: Additional $section data passes through function section_right_content.
