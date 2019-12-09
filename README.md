@@ -1,6 +1,6 @@
 # Moodle Multitopic Format ⭐
 
-> Shows multiple topics per page, with tabbed navigation between pages.
+> Shows multiple topics per page, with tabbed navigation between pages.  Topics are collapsible, and can optionally be timed.
 
 ### 🏠 [Otago Polytechnic](https://op.ac.nz)
 

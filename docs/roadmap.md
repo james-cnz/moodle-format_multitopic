@@ -2,16 +2,16 @@
 
 ### Known issues
 
-* Changing section name isn't immediately reflected in tabs
-* Reorganising sections or moving activities doesn't change activity dates
+* Setting access restrictions on pages does not effectively prevent access to activities in contained subpages or topics.
+* Changing section name isn't immediately reflected in tabs.
+* Reorganising sections or moving activities doesn't change activity dates.
 
 ### Code
 
-* Improve comments
-* Move styles to CSS
-* Write unit tests
-* Prefer IDs over section numbers
+* Improve comments.
+* Write more unit tests.
+* Prefer IDs over section numbers in AJAX.
 
 ### UX/UI
 
-* Improve banner and section image user experience
+* Improve section image user experience.
