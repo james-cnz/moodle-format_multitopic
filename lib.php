@@ -20,7 +20,9 @@
  * @since     Moodle 2.0
  * @package   format_multitopic
  * @copyright 2019 James Calder and Otago Polytechnic
- * @copyright based on work by 2009 Sam Hemelryk
+ * @copyright based on work by 2009 Sam Hemelryk,
+ *            2012 David Herney Bernal - cirano,
+ *            2014 Marina Glancy
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
