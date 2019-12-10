@@ -34,8 +34,9 @@ M.course.format.get_config = function() {
  * @param {string} node1 node to swap to
  * @param {string} node2 node to swap with
  */
-/* eslint-disable-next-line camelcase, no-unused-vars */
+/* eslint-disable camelcase, no-unused-vars */
 M.course.format.swap_sections = function(Y, node1, node2) {
+    /* eslint-enable camelcase, no-unused-vars */
 
     // REMOVED: Custom section add menus now use section IDs instead of section numbers, so shouldn't be swapped.
 
@@ -50,8 +51,9 @@ M.course.format.swap_sections = function(Y, node1, node2) {
  * @param {string} sectionfrom first affected section
  * @param {string} sectionto last affected section
  */
-/* eslint-disable-next-line camelcase */
+/* eslint-disable camelcase */
 M.course.format.process_sections = function(Y, sectionlist, response, sectionfrom, sectionto) {
+    /* eslint-enable camelcase */
     var CSS = {
         SECTIONNAME: 'sectionname'
     },
