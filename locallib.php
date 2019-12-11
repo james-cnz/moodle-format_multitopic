@@ -139,7 +139,7 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
  * @param stdClass $section The section to be moved.  Must specify id.
  * @param stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
  */
-function format_multitopic_move_section_to(\stdClass $course, \stdClass $section, \stdClass $destination) : void {
+function format_multitopic_move_section_to(\stdClass $course, \stdClass $section, \stdClass $destination) {
     // CHANGED LINE ABOVE: Use section info instead of number.  No return value (use exceptions).
     // Moves a course section within the course.
     // CHANGES THROUGHOUT: Use section info instead of number.
@@ -394,7 +394,7 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
  * @param string|null $licencecode
  * @return string
  */
-function format_multitopic_image_attribution(?string $imagename, ?string $authorwithurl, ?string $licencecode) : string {
+function format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode) : string {
     $o = '';
     $authorwithurlarray = explode('|', $authorwithurl);
     $authorhtml         = $authorwithurlarray[0];

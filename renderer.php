@@ -583,7 +583,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @param array $modnamesused (argument not used)
      * @param int|section_info $displaysection The section number in the course which is being displayed
      */
-    public function print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection) : void {
+    public function print_single_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection) {
         $this->print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection); // ADDED.
     }
     // END INCLUDED.
@@ -599,7 +599,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @param array $modnamesused (argument not used)
      * @param int|section_info $displaysection
      */
-    public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection = 0) : void {
+    public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection = 0) {
         // CHANGED ABOVE included displaysection from print_single_section_page
         global $PAGE, $OUTPUT;                                                  // CHANGED: Included output global.
 

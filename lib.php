@@ -304,7 +304,7 @@ class format_multitopic extends format_base {
      * @param int $strictness
      * @return section_info
      */
-    public final function fmt_get_section($section, int $strictness = IGNORE_MISSING) : ?section_info {
+    public final function fmt_get_section($section, int $strictness = IGNORE_MISSING) {
         // CHANGED: Convert from section number to section info, rather than the other way around.
         if (is_numeric($section)) {
             $sectionnum = $section;
@@ -454,7 +454,7 @@ class format_multitopic extends format_base {
      *     'navigation' (bool) if true and section has no separate page, the function returns null
      * @return null|moodle_url
      */
-    public function get_view_url($section, $options = array()) : ?moodle_url {
+    public function get_view_url($section, $options = array()) {
         global $CFG;
         $course = $this->get_course();
         $url = new moodle_url( ($options['fmtedit'] ?? false) ? '/course/format/multitopic/_course_view.php'
@@ -513,7 +513,7 @@ class format_multitopic extends format_base {
      * @param global_navigation $navigation
      * @param navigation_node $node The course node within the navigation
      */
-    public function extend_course_navigation($navigation, navigation_node $node) : void {
+    public function extend_course_navigation($navigation, navigation_node $node) {
         global $PAGE;
 
         $navigationwrapper = new \format_multitopic\global_navigation_wrapper($navigation); // ADDED.
@@ -816,7 +816,7 @@ class format_multitopic extends format_base {
      *
      * @return null|renderable
      */
-    public function course_header() : ?renderable {
+    public function course_header() {
         // REMOVED: Removed empty function body.
         // ADDED.
         return new \format_multitopic\courseheader($this->get_course());
@@ -830,7 +830,7 @@ class format_multitopic extends format_base {
      *
      * @return renderable|null
      */
-    public function course_content_header() : ?renderable {
+    public function course_content_header() {
         global $PAGE;
         // Don't show in manage files popup.  TODO: Better way?
         if (class_exists('format_multitopic_renderer')) {
@@ -848,7 +848,7 @@ class format_multitopic extends format_base {
      *
      * @return renderable|null
      */
-    public function course_content_footer() : ?renderable {
+    public function course_content_footer() {
         global $PAGE;
         // Don't show in manage files popup.  TODO: Better way?
         if (class_exists('format_multitopic_renderer')) {
