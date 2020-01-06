@@ -907,7 +907,6 @@ class format_multitopic extends format_base {
     public function inplace_editable_render_section_name($section, $linkifneeded = true,
                                             $editable = null, $edithint = null, $editlabel = null) : \core\output\inplace_editable {
         $section = $this->fmt_get_section($section);                            // ADDED.
-        // TODO: Determine here whether a link is needed?
         if (empty($edithint)) {
             $edithint = new lang_string('editsectionname');
         }
@@ -933,7 +932,7 @@ class format_multitopic extends format_base {
         // TODO: Fix collapse icon for AJAX rename, somehow?
         if ($linkifneeded) {
             // Display link under the section name, for collapsible sections.
-            $url = course_get_url($section->course, $section, array('navigation' => true)); // CHANGED.
+            $url = course_get_url($section->course, $section, array('navigation' => ($section->periodduration == '0 days'))); // CHANGED.
             if ($url) {
                 $displayvalue = html_writer::link($url, $title);
             }

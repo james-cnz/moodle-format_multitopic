@@ -182,14 +182,12 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // ADDED.
         // Determine the section type.
-        $collapsible = false;
         if ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionstyle .= ' section-page';
         } else if ($section->periodduration == '0 days') {
             $sectionstyle .= ' section-topic section-topic-untimed';
         } else {
             $sectionstyle .= ' section-topic section-topic-timed';
-            $collapsible = true;
         }
 
         $sectionstyle .= " sectionid-{$section->id}";
@@ -214,7 +212,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $classes = '';
         }
 
-        $sectionname = html_writer::tag('span', $this->section_title($section, $course, $collapsible && $section->uservisible)); // CHANGED.
+        $sectionname = html_writer::tag('span', $this->section_title($section, $course, $section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $section->uservisible)); // CHANGED.
         $o .= $this->output->heading($sectionname, 3, 'sectionname' . $classes);
 
         $o .= $this->section_availability($section);
