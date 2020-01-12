@@ -23,7 +23,7 @@ Conditional section availability isn't propagated to subsections, so activities 
 Not sure how to fix this properly,
 but we can at least avoid confusing users by pointing them to activities that shouldn't be available. */
 body.format-multitopic #page #page-content .m-t-2.m-b-1,
-body.format-multitopic #page #page-content .mt-2.mb-1.activity-navigation {
+body.format-multitopic #page #page-content .mt-5.mb-1.activity-navigation {
     display: none;
 }
 
