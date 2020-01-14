@@ -46,7 +46,7 @@ body.format-multitopic .course-content ul.nav-tabs li a .tab_content.dimmed {
 body.format-multitopic ul.sections li.section {
     width: 100%;
     height: auto;
-    position: initial;
+    position: initial !important;
     visibility: inherit;
     margin-bottom: 1rem;
 }
