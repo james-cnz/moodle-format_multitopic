@@ -61,9 +61,10 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         global $PAGE;
         if ($PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
             && ($id = optional_param('id', null, PARAM_INT))) {
-            $params = ['id' => $id];
+            $params = $PAGE->url->params();
             if ($sectionid = optional_param('sectionid', null, PARAM_INT)) {
                 $params['sectionid'] = $sectionid;
+                unset($params['section']);
             }
             $PAGE->set_url('/course/view.php', $params);
         }
@@ -254,7 +255,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $numsections = course_get_format($course)->get_last_section_number();
         $isstealth = false;                                                     // CHANGED: Don't use numsections.
 
-        $baseurl = course_get_url($course, $section, ['fmtedit' => true]);      // CHANGED.
+        $baseurl = course_get_url($course, $section);                           // CHANGED.
         $baseurl->param('sesskey', sesskey());
 
         $controls = array();
@@ -518,7 +519,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $disableajax = false;
         if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
 
-            $url = course_get_url($course, $section, ['fmtedit' => true]);
+            $url = course_get_url($course, $section);
             $url->param('sesskey', sesskey());
 
             if ($USER->onetopic_da[$course->id] ?? false) {
@@ -608,7 +609,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $sections = course_get_format($course)->fmt_get_sections();
 
         // Find display section.
-        if (is_object($displaysection && isset($displaysection->id))) {
+        if (is_object($displaysection) && isset($displaysection->id)) {
             $displaysection = $sections[$displaysection->id] ?? null;
         } else if (is_numeric($displaysection) || isset($displaysection->section)) {
             $displaysectionnum = is_numeric($displaysection) ? $displaysection : $displaysection->section;

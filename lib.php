@@ -450,15 +450,14 @@ class format_multitopic extends format_base {
      *                      Should specify fmt calculated properties,
      *                      specifically levelsan, and parentid where levelsan is topic level.
      * @param array $options options for view URL. At the moment core uses:
-     *     'fmtedit' (bool)    if true, return URL for edit page rather than view page
      *     'navigation' (bool) if true and section has no separate page, the function returns null
      * @return null|moodle_url
      */
     public function get_view_url($section, $options = array()) {
         global $CFG;
         $course = $this->get_course();
-        $url = new moodle_url( ($options['fmtedit'] ?? false) ? '/course/format/multitopic/_course_view.php'
-                                : '/course/view.php', array('id' => $course->id)); // CHANGED.
+        $url = new moodle_url('/course/view.php', array('id' => $course->id));
+
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
         if ($section !== null) {                                                // CHANGED.
