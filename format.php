@@ -101,7 +101,7 @@ if ($PAGE->user_allowed_editing()) {
     }
     if ($disableajax !== -1) {
         $USER->onetopic_da[$course->id] = $disableajax ? true : false;
-        //redirect($PAGE->url);
+        // redirect($PAGE->url);
     }
     // END INCLUDED.
 
@@ -109,12 +109,12 @@ if ($PAGE->user_allowed_editing()) {
         // CHANGED: Call custom functions, pass section info.
         if ($hide && confirm_sesskey()) {
             format_multitopic_set_section_visible($course->id, $hide, 0);
-            //redirect($PAGE->url);
+            // redirect($PAGE->url);
         }
 
         if ($show && confirm_sesskey()) {
             format_multitopic_set_section_visible($course->id, $show, 1);
-            //redirect($PAGE->url);
+            // redirect($PAGE->url);
         }
         // END CHANGED.
     }
@@ -126,11 +126,11 @@ if ($PAGE->user_allowed_editing()) {
         $destsection = $dest;                                               // CHANGED: Use section info with ID instead of num.
         try {                                                               // CHANGED: Use try/catch instead of return false.
             format_multitopic_move_section_to($course, $sectioninfo, $destsection, false);
-            //if ($course->id == SITEID) {
-            //    redirect($CFG->wwwroot . '/?redirect=0');
-            //} else {
-            //    redirect(course_get_url($course, $sectioninfo));                // CHANGED: Return to the moved section.
-            //}
+            // if ($course->id == SITEID) {
+            // redirect($CFG->wwwroot . '/?redirect=0');
+            // } else {
+            // redirect(course_get_url($course, $sectioninfo));                // CHANGED: Return to the moved section.
+            // }
         } catch (moodle_exception $e) {                                     // CHANGED: Use returned error message.
             echo $OUTPUT->notification($e->getMessage());
         }
