@@ -608,7 +608,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $sections = course_get_format($course)->fmt_get_sections();
 
         // Find display section.
-        if (is_object($displaysection && isset($displaysection->id))) {
+        if (is_object($displaysection) && isset($displaysection->id)) {
             $displaysection = $sections[$displaysection->id] ?? null;
         } else if (is_numeric($displaysection) || isset($displaysection->section)) {
             $displaysectionnum = is_numeric($displaysection) ? $displaysection : $displaysection->section;
