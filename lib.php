@@ -716,9 +716,23 @@ class format_multitopic extends format_base {
                     'type' => PARAM_NOTAGS
                 ),
                 // END INCLUDED.
+                // INCLUDED /course/format/tiles/lib.php function section_format_options 'tileicon'.
+                'tileicon' => array(
+                    'default' => '',
+                    'type' => PARAM_TEXT,
+                ),
+                // END INCLUDED.
             );
         }
         if ($foreditform && !isset($sectionformatoptions['level']['label'])) {
+            // INCLUDED /course/format/tiles/lib.php function section_format_options definitions.
+            $course = $this->get_course();
+            $defaulticonarray = array(
+                '' => get_string('default', 'moodle')
+            );
+            $tileicons = (new \format_multitopic\icon_set)->available_tile_icons($course->id);
+            $tileicons = array_merge($defaulticonarray, $tileicons);
+            // END INCLUDED.
             $sectionformatoptionsedit = array(
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options $foreditform 'level'.
                 'level' => array(
@@ -749,6 +763,14 @@ class format_multitopic extends format_base {
                         '0 days' => new lang_string('period_0_days', 'format_multitopic'),
                     )),
                     // END ADDED.
+                ),
+                // END INCLUDED.
+                // INCLUDED /course/format/tiles/lib.php function section_format_options $foreditform 'tileicon'.
+                'tileicon' => array(
+                    'label' => get_string('tileicon', 'format_multitopic'),
+                    'element_type' => 'select',
+                    'element_attributes' => array($tileicons),
+                    'help' => 'tileicon',
                 ),
                 // END INCLUDED.
             );
@@ -926,8 +948,8 @@ class format_multitopic extends format_base {
         }
 
         $displayvalue = $title = html_writer::tag('i', '', ['class' =>
-                                        ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'icon fa fa-folder-o fa-fw'
-                                                                                                    : 'icon fa fa-list fa-fw')])
+                                        'icon fa fa-' . ($section->tileicon ? $section->tileicon : ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'folder-o'
+                                                                                                    : 'list')) . ' fa-fw'])
                                     . ' ' . get_section_name($section->course, $section);
         // TODO: Fix collapse icon for AJAX rename, somehow?
         if ($linkifneeded) {

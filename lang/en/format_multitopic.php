@@ -22,6 +22,7 @@
  * @copyright based on work by 1999 onwards Martin Dougiamas  {@link http://moodle.com},
  *            2012 David Herney Bernal - cirano,
  *            2014 Marina Glancy
+ *            David Watson {@link http://evolutioncode.uk}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -66,6 +67,118 @@ $string['perioddurationdefault_help'] = 'Set to "1 week" to have dates shown for
 $string['perioddurationoverride_help'] = 'Whether this topic has time allocated to it or not.
  Set to "No time" for, e.g., assignments that students are to complete while working on other topics, or "Default" otherwise.
  (Not applicable to pages.)';
+// END INCLUDED.
+
+// INCLUDED /course/format/tiles/lang/en/format_tiles.php $string['icontitle-address-book-o'] - $string['icontitle-wrench'].
+$string['icontitle-address-book-o'] = 'Address book';
+$string['icontitle-assessment_graded'] = 'Assessment A+';
+$string['icontitle-assessment_timer'] = 'Assessment timer';
+$string['icontitle-asterisk'] = 'Asterisk';
+$string['icontitle-award-solid'] = 'Award rosette';
+$string['icontitle-balance-scale'] = 'Balance scales';
+$string['icontitle-bar-chart'] = 'Bar Chart';
+$string['icontitle-bell-o'] = 'Bell';
+$string['icontitle-binoculars'] = 'Binoculars';
+$string['icontitle-bitcoin'] = 'Bitcoin';
+$string['icontitle-book'] = 'Book';
+$string['icontitle-bookmark-o'] = 'Bookmark';
+$string['icontitle-briefcase'] = 'Briefcase';
+$string['icontitle-building'] = 'Building';
+$string['icontitle-bullhorn'] = 'Bullhorn';
+$string['icontitle-bullseye'] = 'Bullseye';
+$string['icontitle-calculator'] = 'Calculator';
+$string['icontitle-calendar'] = 'Calendar';
+$string['icontitle-calendar-check-o'] = 'Calendar with check mark';
+$string['icontitle-check'] = 'Check';
+$string['icontitle-child'] = 'Child';
+$string['icontitle-clock-o'] = 'Clock';
+$string['icontitle-clone'] = 'Clone';
+$string['icontitle-cloud-download'] = 'Cloud (download)';
+$string['icontitle-cloud-upload'] = 'Cloud (upload)';
+$string['icontitle-comment-o'] = 'Comment';
+$string['icontitle-comments-o'] = 'Comments';
+$string['icontitle-compass'] = 'Compass';
+$string['icontitle-diamond'] = 'Diamond';
+$string['icontitle-dollar'] = 'Dollar';
+$string['icontitle-euro'] = 'Euro';
+$string['icontitle-exclamation-triangle'] = 'Exclamation in triangle';
+$string['icontitle-feed'] = 'Feed';
+$string['icontitle-file-text-o'] = 'Text file';
+$string['icontitle-film'] = 'Film';
+$string['icontitle-flag-checkered'] = 'Flag (checkered)';
+$string['icontitle-flag-o'] = 'Flag';
+$string['icontitle-flash'] = 'Flash';
+$string['icontitle-flask'] = 'Flask';
+$string['icontitle-flipchart'] = 'Flip chart';
+$string['icontitle-frown-o'] = 'Frown';
+$string['icontitle-gavel'] = 'Gavel';
+$string['icontitle-gbp'] = 'British pound';
+$string['icontitle-globe'] = 'Globe';
+$string['icontitle-handshake-o'] = 'Handshake';
+$string['icontitle-headphones'] = 'Headphones';
+$string['icontitle-heartbeat'] = 'Heartbeat';
+$string['icontitle-history'] = 'History clock';
+$string['icontitle-home'] = 'Home';
+$string['icontitle-id-card-o'] = 'ID card';
+$string['icontitle-info'] = 'Info';
+$string['icontitle-jigsaw'] = 'Jigsaw';
+$string['icontitle-key'] = 'Key';
+$string['icontitle-laptop'] = 'Laptop';
+$string['icontitle-life-buoy'] = 'Life belt / life buoy';
+$string['icontitle-lightbulb-o'] = 'Light bulb';
+$string['icontitle-line-chart'] = 'Line chart';
+$string['icontitle-list'] = 'List (bullet points)';
+$string['icontitle-list-ol'] = 'List (numbered)';
+$string['icontitle-location-arrow'] = 'Location arrow';
+$string['icontitle-map-marker'] = 'Map marker';
+$string['icontitle-map-o'] = 'Map';
+$string['icontitle-map-signs'] = 'Map signs';
+$string['icontitle-microphone'] = 'Microphone';
+$string['icontitle-mobile-phone'] = 'Mobile phone';
+$string['icontitle-mortar-board'] = 'Mortar board';
+$string['icontitle-music'] = 'Music';
+$string['icontitle-newspaper-o'] = 'Newspaper';
+$string['icontitle-number_1'] = 'Number 1';
+$string['icontitle-number_10'] = 'Number 10';
+$string['icontitle-number_2'] = 'Number 2';
+$string['icontitle-number_3'] = 'Number 3';
+$string['icontitle-number_4'] = 'Number 4';
+$string['icontitle-number_5'] = 'Number 5';
+$string['icontitle-number_6'] = 'Number 6';
+$string['icontitle-number_7'] = 'Number 7';
+$string['icontitle-number_8'] = 'Number 8';
+$string['icontitle-number_9'] = 'Number 9';
+$string['icontitle-pencil-square-o'] = 'Pencil in square';
+$string['icontitle-person'] = 'Person';
+$string['icontitle-pie-chart'] = 'Pie chart';
+$string['icontitle-podcast'] = 'Podcast';
+$string['icontitle-puzzle-piece'] = 'Puzzle piece';
+$string['icontitle-question-circle'] = 'Question mark in circle';
+$string['icontitle-random'] = 'Random';
+$string['icontitle-refresh'] = 'Refresh';
+$string['icontitle-road'] = 'Road';
+$string['icontitle-search'] = 'Magnifying glass';
+$string['icontitle-sliders'] = 'Sliders';
+$string['icontitle-smile-o'] = 'Smile';
+$string['icontitle-star'] = 'Star (shaded)';
+$string['icontitle-star-half-o'] = 'Star (half shaded)';
+$string['icontitle-star-o'] = 'Star (unshaded)';
+$string['icontitle-survey'] = 'Survey';
+$string['icontitle-tags'] = 'Tags';
+$string['icontitle-tasks'] = 'Tasks';
+$string['icontitle-television'] = 'Television';
+$string['icontitle-thinking-person'] = 'Person with light bulb';
+$string['icontitle-thumbs-o-down'] = 'Thumbs down';
+$string['icontitle-thumbs-o-up'] = 'Thumbs up';
+$string['icontitle-trophy'] = 'Trophy';
+$string['icontitle-umbrella'] = 'Umbrella';
+$string['icontitle-university'] = 'University';
+$string['icontitle-user-o'] = 'Person (unshaded)';
+$string['icontitle-users'] = 'People';
+$string['icontitle-volume-up'] = 'Speaker';
+$string['icontitle-wrench'] = 'Wrench';
+$string['tileicon_help'] = 'Item selected here will override, for this tile only, whatever tile icon has been set at the course level.';
+$string['tileicon'] = 'Icon to display on this tile only';
 // END INCLUDED.
 
 // ADDED.
