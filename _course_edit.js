@@ -2,7 +2,6 @@
  * Preview banner slice changes.
  *
  * On the course edit page, when banner details are changed, show a live preview.
- * This script is included in the banner, because I couldn't see a way to include it on the course edit page.
  */
 
 M.course = M.course || {};

@@ -773,6 +773,14 @@ class format_multitopic extends format_base {
 
         // REMOVED: numsections .
 
+        // ADDED.
+        global $PAGE;
+        // Include code to preview the banner (and attribution, to an extent), if we're on the course edit page.
+        if (!$forsection) {
+            $PAGE->requires->js('/course/format/multitopic/_course_edit.js');
+        }
+        // END ADDED.
+
         return $elements;
     }
 

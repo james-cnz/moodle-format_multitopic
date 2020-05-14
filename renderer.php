@@ -966,14 +966,6 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @return string HTML to output.
      */
     protected function render_courseheader(\format_multitopic\courseheader $header) : string {
-
-        global $PAGE;
-
-        // Include code to preview the banner (and attribution, to an extent), if we're on the course edit page.
-        if ($PAGE->has_set_url() && $PAGE->url->compare(new moodle_url('/course/edit.php'), URL_MATCH_BASE)) {
-            $PAGE->requires->js('/course/format/multitopic/_course_edit.js');
-        }
-
         return $header->output();
     }
 
