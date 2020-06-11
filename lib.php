@@ -343,6 +343,7 @@ class format_multitopic extends format_base {
      * Returns the display name of the given section that the course prefers.
      *
      * @param int|stdClass $section Section object from database.  Should specify fmt calculated properties.
+     * @param bool $useshortname Use the section's short name.
      * @return string Display name that the course format prefers, e.g. "Section 2"
      */
     public function get_section_name($section, bool $useshortname = false) : string {
