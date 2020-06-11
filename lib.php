@@ -345,7 +345,7 @@ class format_multitopic extends format_base {
      * @param int|stdClass $section Section object from database.  Should specify fmt calculated properties.
      * @return string Display name that the course format prefers, e.g. "Section 2"
      */
-    public function get_section_name($section) : string {
+    public function get_section_name($section, bool $useshortname = false) : string {
 
         // ADDED.
         // If we don't have calculated data, don't bother fetching it.
@@ -361,8 +361,10 @@ class format_multitopic extends format_base {
             // END INCLUDED.
         }
 
-        $weekword = new lang_string('week');
-        $weeksword = new lang_string('weeks');
+        $weekword = ($useshortname && get_string_manager()->string_exists('week_shortname', 'format_multitopic'))
+                    ? new lang_string('week_shortname', 'format_multitopic') : new lang_string('week');
+        $weeksword = ($useshortname && get_string_manager()->string_exists('weeks_shortname', 'format_multitopic'))
+                    ? new lang_string('weeks_shortname', 'format_multitopic') : new lang_string('weeks');
 
         // Figure out the string for the week number.
         $daystring = '';
@@ -410,11 +412,13 @@ class format_multitopic extends format_base {
             }
             $daystring = $daystring . ': ';
         }
+
+        $sectionname = ($useshortname && $section->shortname) ? $section->shortname : $section->name;
         // END ADDED.
 
-        if ((string)$section->name !== '') {
+        if ((string)$sectionname !== '') {
             // Return the name the user set.
-            return format_string($daystring . $section->name, true,
+            return format_string($daystring . $sectionname, true,
                     array('context' => context_course::instance($this->courseid))); // CHANGED.
         } else {
             return $daystring . $this->get_default_section_name($section);
@@ -704,6 +708,12 @@ class format_multitopic extends format_base {
         static $sectionformatoptions = false;
         if ($sectionformatoptions === false) {
             $sectionformatoptions = array(
+                // ADDED.
+                'shortname' => array(
+                    'default' => "",
+                    'type' => PARAM_NOTAGS
+                ),
+                // END ADDED.
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options 'level'.
                 'level' => array(
                     'default' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,         // CHANGED.
@@ -720,6 +730,19 @@ class format_multitopic extends format_base {
         }
         if ($foreditform && !isset($sectionformatoptions['level']['label'])) {
             $sectionformatoptionsedit = array(
+                // ADDED.
+                'shortname' => array(
+                    'label' => get_string('shortname', 'format_multitopic'),
+                    'element_type' => 'text',
+                    'element_attributes' => array(
+                        array(
+                            'size' => '20'
+                        )
+                    ),
+                    'help' => 'shortname',
+                    'help_component' => 'format_multitopic',
+                ),
+                // END ADDED.
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options $foreditform 'level'.
                 'level' => array(
                     // REMOVED: 'default' & 'type'.

@@ -182,7 +182,7 @@ class global_navigation_wrapper {
                 }
 
                 // CHANGED.
-                $sectionname = get_section_name($course, $section);
+                $sectionname = course_get_format($course)->get_section_name($section, true);
                 $url = course_get_url($course, $section, array('navigation' => true)); // CHANGED: Custom call.
 
                 // Add multiple nodes per section, one per level as required.

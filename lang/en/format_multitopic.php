@@ -92,4 +92,9 @@ $string['move_to_prev_page'] = 'Move to previous page';
 
 $string['period_0_days']    = 'No time';
 $string['period_undefined'] = 'Unspecified';
+
+$string['shortname']        = 'Short name';
+$string['shortname_help']   = 'A short version of the section name for display in the navigation bar, breadcrumbs, and tabs.';
+$string['week_shortname']   = 'Wk';
+$string['weeks_shortname']  = 'Wks';
 // END ADDED.

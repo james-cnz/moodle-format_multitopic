@@ -678,7 +678,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 || $thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
                     && $sectionatlevel[$thissection->levelsan - 1]->uservisiblesan && $showsection) {
 
-                $sectionname = get_section_name($course, $thissection);
+                $sectionname = course_get_format($course)->get_section_name($thissection, true);
 
                 $url = course_get_url($course, $thissection);
 
