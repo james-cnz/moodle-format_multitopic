@@ -791,7 +791,29 @@ class format_multitopic extends format_base {
      * @return array array of references to the added form elements.
      */
     public function create_edit_form_elements(&$mform, $forsection = false) : array {
+        global $COURSE, $PAGE, $DB, $USER;
         $elements = parent::create_edit_form_elements($mform, $forsection);
+
+        // Call the JS edit_form_helper.js, which in turn will call edit_icon_picker.js.
+        if ($forsection) {
+            $sectionid = optional_param('id', 0, PARAM_INT);
+            $section = $DB->get_field('course_sections', 'section', array('id' => $sectionid));
+        } else {
+            // We are on the course setting page so can ignore section.
+            $section = 0;
+            $sectionid = 0;
+        }
+        $jsparams = array(
+            'pageType' => $PAGE->pagetype,
+            'courseDefaultIcon' => 'list',
+            'courseId' => $COURSE->id,
+            'sectionId' => $sectionid,
+            'section' => $section,
+            'userId' => $USER->id,
+            false,
+            'https://docs.moodle.org/38/en/Multitopic_course_format'
+        );
+        $PAGE->requires->js_call_amd('format_multitopic/edit_form_helper', 'init', $jsparams);
 
         // REMOVED: numsections .
 

@@ -153,8 +153,8 @@ class icon_set {
         if ($this->supports_font_awesome()) {
             foreach ($this->fontawesometileicons as $iconname) {
                 $pixname = str_replace('fa-', '', $iconname);
-                if ($stringmanager->string_exists('icontitle-' . $pixname, 'format_tiles')) {
-                    $displayname = \get_string('icontitle-' . $pixname, 'format_tiles');
+                if ($stringmanager->string_exists('icontitle-' . $pixname, 'format_multitopic')) {
+                    $displayname = \get_string('icontitle-' . $pixname, 'format_multitopic');
                 } else {
                     $displayname = ucwords(str_replace('_', ' ', (str_replace('-', ' ', $pixname))));
                 }
@@ -168,13 +168,13 @@ class icon_set {
         // The reason is that those fallback images are never called if the theme is font awesome compatible (as fa is used).
         // However they are left in pix for now as some older themes (e.g. Clean) may need them.
         $iconsindirectory = \get_directory_list($CFG->dirroot
-            . '/course/format/tiles/pix/tileicon', '', false, false, true);
+            . '/course/format/multitopic/pix/tileicon', '', false, false, true);
         foreach ($iconsindirectory as $icon) {
             $filename = explode('.', $icon)[0];
             // If we don't already have it from font awesome (e.g. book, flipchart, assessment_timer), then add it here.
             if (!isset($availableicons[$filename])) {
-                if ($stringmanager->string_exists('icontitle-' . $filename, 'format_tiles')) {
-                    $displayname = \get_string('icontitle-' . $filename, 'format_tiles');
+                if ($stringmanager->string_exists('icontitle-' . $filename, 'format_multitopic')) {
+                    $displayname = \get_string('icontitle-' . $filename, 'format_multitopic');
                 } else {
                     $displayname = ucwords(str_replace('_', ' ', (str_replace('-', ' ', $filename))));
                 }
@@ -189,7 +189,7 @@ class icon_set {
             // Put the default course icon in first place.
             $defaulticon = $DB->get_field('course_format_options', 'value', array(
                 'courseid' => $courseid,
-                'format' => 'tiles',
+                'format' => 'multitopic',
                 'sectionid' => 0,
                 'name' => 'defaulttileicon'
             ));
@@ -245,52 +245,52 @@ class icon_set {
         // First the general icons (not specific to tiles).
         // These are used for example to show nav buttons within tiles.
         $generalicons = [
-            'format_tiles:camera' => 'fa-camera',
-            'format_tiles:check' => 'fa-check',
-            'format_tiles:chevron-left' => 'fa-chevron-left',
-            'format_tiles:chevron-right' => 'fa-chevron-right',
-            'format_tiles:clone' => 'fa-clone',
-            'format_tiles:close' => 'fa-close',
-            'format_tiles:cloud-download' => 'fa-cloud-download',
-            'format_tiles:cloud-upload' => 'fa-cloud-upload',
-            'format_tiles:filter' => 'fa-filter',
-            'format_tiles:eye-slash' => 'fa-eye-slash',
-            'format_tiles:home' => 'fa-home',
-            'format_tiles:lock' => 'fa-lock',
-            'format_tiles:star-o' => 'fa-star-o',
-            'format_tiles:pencil' => 'fa-pencil',
-            'format_tiles:random' => 'fa-random',
-            'format_tiles:star' => 'fa-star',
-            'format_tiles:toggle-off' => 'fa-toggle-off',
-            'format_tiles:toggle-on' => 'fa-toggle-on'
+            'format_multitopic:camera' => 'fa-camera',
+            'format_multitopic:check' => 'fa-check',
+            'format_multitopic:chevron-left' => 'fa-chevron-left',
+            'format_multitopic:chevron-right' => 'fa-chevron-right',
+            'format_multitopic:clone' => 'fa-clone',
+            'format_multitopic:close' => 'fa-close',
+            'format_multitopic:cloud-download' => 'fa-cloud-download',
+            'format_multitopic:cloud-upload' => 'fa-cloud-upload',
+            'format_multitopic:filter' => 'fa-filter',
+            'format_multitopic:eye-slash' => 'fa-eye-slash',
+            'format_multitopic:home' => 'fa-home',
+            'format_multitopic:lock' => 'fa-lock',
+            'format_multitopic:star-o' => 'fa-star-o',
+            'format_multitopic:pencil' => 'fa-pencil',
+            'format_multitopic:random' => 'fa-random',
+            'format_multitopic:star' => 'fa-star',
+            'format_multitopic:toggle-off' => 'fa-toggle-off',
+            'format_multitopic:toggle-on' => 'fa-toggle-on'
         ];
 
          // These are used on sub-tiles (if used) e.g. to show PDF, Excel activities.
         $subtileicons = [
-            'format_tiles:subtile/comments-o' => 'fa-comments-o',
-            'format_tiles:subtile/database' => 'fa-database',
-            'format_tiles:subtile/feedback' => 'fa-bullhorn',
-            'format_tiles:subtile/file-excel' => 'fa-table',
-            'format_tiles:subtile/file-pdf-o' => 'fa-file-pdf-o',
-            'format_tiles:subtile/file-powerpoint-o' => 'fa-file-powerpoint-o',
-            'format_tiles:subtile/file-text-o' => 'fa-file-text-o',
-            'format_tiles:subtile/file-word-o' => 'fa-file-word-o',
-            'format_tiles:subtile/file-zip-o' => 'fa-file-zip-o',
-            'format_tiles:subtile/film' => 'fa-film',
-            'format_tiles:subtile/folder-o' => 'fa-folder-o',
-            'format_tiles:subtile/globe' => 'fa-globe',
-            'format_tiles:subtile/puzzle-piece' => 'fa-puzzle-piece',
-            'format_tiles:subtile/question-circle' => 'fa-question-circle',
-            'format_tiles:subtile/star' => 'fa-star',
-            'format_tiles:subtile/star-o' => 'fa-star-o',
-            'format_tiles:subtile/survey' => 'fa-bar-chart',
-            'format_tiles:subtile/volume-up' => 'fa-volume-up'
+            'format_multitopic:subtile/comments-o' => 'fa-comments-o',
+            'format_multitopic:subtile/database' => 'fa-database',
+            'format_multitopic:subtile/feedback' => 'fa-bullhorn',
+            'format_multitopic:subtile/file-excel' => 'fa-table',
+            'format_multitopic:subtile/file-pdf-o' => 'fa-file-pdf-o',
+            'format_multitopic:subtile/file-powerpoint-o' => 'fa-file-powerpoint-o',
+            'format_multitopic:subtile/file-text-o' => 'fa-file-text-o',
+            'format_multitopic:subtile/file-word-o' => 'fa-file-word-o',
+            'format_multitopic:subtile/file-zip-o' => 'fa-file-zip-o',
+            'format_multitopic:subtile/film' => 'fa-film',
+            'format_multitopic:subtile/folder-o' => 'fa-folder-o',
+            'format_multitopic:subtile/globe' => 'fa-globe',
+            'format_multitopic:subtile/puzzle-piece' => 'fa-puzzle-piece',
+            'format_multitopic:subtile/question-circle' => 'fa-question-circle',
+            'format_multitopic:subtile/star' => 'fa-star',
+            'format_multitopic:subtile/star-o' => 'fa-star-o',
+            'format_multitopic:subtile/survey' => 'fa-bar-chart',
+            'format_multitopic:subtile/volume-up' => 'fa-volume-up'
         ];
 
         $tileicons = [];
         foreach ($this->fontawesometileicons as $icon) {
             $pixname = str_replace('fa-', '', $icon);
-            $tileicons['format_tiles:tileicon/' . $pixname] = $icon;
+            $tileicons['format_multitopic:tileicon/' . $pixname] = $icon;
         }
         return array_merge($tileicons, $generalicons, $subtileicons);
     }

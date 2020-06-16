@@ -179,6 +179,8 @@ $string['icontitle-volume-up'] = 'Speaker';
 $string['icontitle-wrench'] = 'Wrench';
 $string['tileicon_help'] = 'Item selected here will override, for this tile only, whatever tile icon has been set at the course level.';
 $string['tileicon'] = 'Icon to display on this tile only';
+
+$string['picknewicon'] = 'Pick a new icon';
 // END INCLUDED.
 
 // ADDED.
