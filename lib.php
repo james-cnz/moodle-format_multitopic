@@ -66,7 +66,7 @@ class format_multitopic extends format_base {
     /**
      * Creates a new instance of class
      *
-     * Please use @see course_get_format() to get an instance of the format class
+     * Please use see course_get_format() to get an instance of the format class
      *
      * @param string $format
      * @param int $courseid
@@ -677,12 +677,12 @@ class format_multitopic extends format_base {
     /**
      * Definitions of the additional options that this course format uses for section
      *
-     * See @see format_base::course_format_options() for return array definition.
+     * See see format_base::course_format_options() for return array definition.
      *
      * Additionally section format options may have property 'cache' set to true
-     * if this option needs to be cached in @see get_fast_modinfo(). The 'cache' property
-     * is recommended to be set only for fields used in @see format_base::get_section_name(),
-     * @see format_base::extend_course_navigation() and @see format_base::get_view_url()
+     * if this option needs to be cached in see get_fast_modinfo(). The 'cache' property
+     * is recommended to be set only for fields used in see format_base::get_section_name(),
+     * see format_base::extend_course_navigation() and see format_base::get_view_url()
      *
      * For better performance cached options are recommended to have 'cachedefault' property
      * Unlike 'default', 'cachedefault' should be static and not access get_config().
@@ -762,7 +762,7 @@ class format_multitopic extends format_base {
     /**
      * Adds format options elements to the course/section edit form.
      *
-     * This function is called from @see course_edit_form::definition_after_data().
+     * This function is called from see course_edit_form::definition_after_data().
      *
      * @param MoodleQuickForm $mform form the elements are added to.
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
@@ -782,8 +782,8 @@ class format_multitopic extends format_base {
      * If the course format was changed to 'multitopic', we try to copy options
      * 'periodduration', 'hiddensections', and 'bannerslice' from the previous format.
      *
-     * @param stdClass|array $data return value from @see moodleform::get_data() or array with data
-     * @param stdClass $oldcourse if this function is called from @see update_course()
+     * @param stdClass|array $data return value from see moodleform::get_data() or array with data
+     * @param stdClass $oldcourse if this function is called from see update_course()
      *     this object contains information about the course before update
      * @return bool whether there were any changes to the options values
      */
@@ -881,7 +881,7 @@ class format_multitopic extends format_base {
     /**
      * Whether this format allows to delete sections
      *
-     * Do not call this function directly, instead use @see course_can_delete_section()
+     * Do not call this function directly, instead use see course_can_delete_section()
      *
      * @param int|stdClass|section_info $section The section to check.
      *                                  Must specify section number or id.  Should specify fmt calculated properties.
