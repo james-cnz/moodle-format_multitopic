@@ -39,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
  * and is then used by the settings nav and navbar to save on processing and DB calls
  *
  * See
- * lib/pagelib.php {@see \moodle_page::initialise_theme_and_output()}
+ * lib/pagelib.php @see moodle_page::initialise_theme_and_output()
  * lib/ajax/getnavbranch.php Called by ajax
  *
  * @package   format_multitopic
@@ -231,7 +231,7 @@ class global_navigation_wrapper {
      *
      * @param \navigation_node $sectionnode
      * @param \section_info $section
-     * @param array $activities An array of activites as returned by {@see \global_navigation::generate_sections_and_activities()}
+     * @param array $activities An array of activites as returned by @see global_navigation::generate_sections_and_activities()
      * @param \stdClass $course The course object the section and activities relate to.
      * @return array Array of activity nodes
      */
