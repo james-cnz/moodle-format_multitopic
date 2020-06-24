@@ -49,7 +49,7 @@ class course_renderer_wrapper {
     /**
      * @var renderer_base|core_renderer A reference to the current renderer.
      * The renderer provided here will be determined by the page but will in 90%
-     * of cases by the {@link core_renderer}
+     * of cases by the see core_renderer
      */
     protected $inneroutput;
 
