@@ -60,7 +60,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // If we're on the view page, patch the URL to use the section ID instead of section number.
         if ($this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
             && ($id = optional_param('id', null, PARAM_INT))) {
-            $params = $PAGE->url->params();
+            $params = $this->page->url->params();
             if ($sectionid = optional_param('sectionid', null, PARAM_INT)) {
                 $params['sectionid'] = $sectionid;
                 unset($params['section']);
