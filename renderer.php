@@ -818,8 +818,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     }
                     // END ADDED.
                     echo $this->courserenderer->course_section_cm_list($course, $thissection); // CHANGED removed section return.
-                    echo (new \format_multitopic\course_renderer_wrapper($this->courserenderer)
-                         )->course_section_add_cm_control($course, $thissection); // CHANGED removed section return.
+                    echo $this->courserenderer->course_section_add_cm_control($course, $thissection->section);
+                    // Reverted to standard course renderer, rather than wrapper, for cm controls.
                 }
                 echo $this->section_footer();
             }
