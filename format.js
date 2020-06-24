@@ -38,8 +38,8 @@ M.course.format.get_config = function() {
 M.course.format.swap_sections = function(Y, node1, node2) {
     /* eslint-enable camelcase, no-unused-vars */
     var CSS = {
-        COURSECONTENT : 'course-content',
-        SECTIONADDMENUS : 'section_add_menus'
+        COURSECONTENT: 'course-content',
+        SECTIONADDMENUS: 'section_add_menus'
     };
 
     // Reinstated this, since not using course renderer wrapper.
