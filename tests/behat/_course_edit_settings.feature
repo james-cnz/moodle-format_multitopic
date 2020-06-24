@@ -54,3 +54,4 @@ Feature: Edit course settings (Multitopic format)
       | Course summary | Edited course summary |
     And I press "Save and return"
     Then I should see the "Course categories and courses" management page
+    
