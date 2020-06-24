@@ -596,7 +596,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @param int|section_info $displaysection
      */
     public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection = 0) {
-        // CHANGED ABOVE included displaysection from print_single_section_page
+        // CHANGED ABOVE included displaysection from print_single_section_page .
 
         // REMOVED: Replaced modinfo with fmt_get_sections .
         $course = course_get_format($course)->get_course();
