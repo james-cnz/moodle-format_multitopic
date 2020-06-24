@@ -37,9 +37,17 @@ M.course.format.get_config = function() {
 /* eslint-disable camelcase, no-unused-vars */
 M.course.format.swap_sections = function(Y, node1, node2) {
     /* eslint-enable camelcase, no-unused-vars */
+    var CSS = {
+        COURSECONTENT: 'course-content',
+        SECTIONADDMENUS: 'section_add_menus'
+    };
 
-    // REMOVED: Custom section add menus now use section IDs instead of section numbers, so shouldn't be swapped.
-
+    // Reinstated this, since not using course renderer wrapper.
+    var sectionlist = Y.Node.all('.' + CSS.COURSECONTENT + ' ' + M.course.format.get_section_selector(Y));
+    // Swap the non-ajax menus, noting these are not always present (depends on theme and user prefs).
+    if (sectionlist.item(node1).one('.' + CSS.SECTIONADDMENUS)) {
+        sectionlist.item(node1).one('.' + CSS.SECTIONADDMENUS).swap(sectionlist.item(node2).one('.' + CSS.SECTIONADDMENUS));
+    }
 };
 
 /**
