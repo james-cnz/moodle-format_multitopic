@@ -58,14 +58,13 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // ADDED.
         // If we're on the view page, patch the URL to use the section ID instead of section number.
-        global $PAGE;
-        if ($PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+        if ($this->page->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
             && ($id = optional_param('id', null, PARAM_INT))) {
             $params = ['id' => $id];
             if ($sectionid = optional_param('sectionid', null, PARAM_INT)) {
                 $params['sectionid'] = $sectionid;
             }
-            $PAGE->set_url('/course/view.php', $params);
+            $this->page->set_url('/course/view.php', $params);
         }
         // END ADDED.
 
@@ -240,9 +239,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @return array of edit control items
      */
     protected function section_edit_control_items($course, $section, $onsectionpage = false) : array {
-        global $PAGE;
 
-        if (!$PAGE->user_is_editing()) {
+        if (!$this->page->user_is_editing()) {
             return array();
         }
 
@@ -504,9 +502,9 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @return string HTML to output.
      */
     protected function fmt_course_activity_clipboard(stdClass $course, section_info $section) : string {
-        global $USER, $PAGE;                                                    // CHANGED: Added $PAGE.
+        global $USER;
 
-        if (!$PAGE->user_is_editing() && !ismoving($course->id)) {
+        if (!$this->page->user_is_editing() && !ismoving($course->id)) {
             return '';
         }
 
@@ -516,7 +514,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // INCLUDED /course/format/onetopic/renderer.php function print_single_section_page utilities (parts).
         // Output the enable / disable button.
         $disableajax = false;
-        if ($PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
+        if ($this->page->user_is_editing() && has_capability('moodle/course:update', $context)) {
 
             $url = course_get_url($course, $section, ['fmtedit' => true]);
             $url->param('sesskey', sesskey());
@@ -598,8 +596,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @param int|section_info $displaysection
      */
     public function print_multiple_section_page($course, $sections, $mods, $modnames, $modnamesused, $displaysection = 0) {
-        // CHANGED ABOVE included displaysection from print_single_section_page
-        global $PAGE, $OUTPUT;                                                  // CHANGED: Included output global.
+        // CHANGED ABOVE included displaysection from print_single_section_page .
 
         // REMOVED: Replaced modinfo with fmt_get_sections .
         $course = course_get_format($course)->get_course();
@@ -687,7 +684,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 // Include main tab, and index tabs for pages with sub-pages.
                 for ($level = max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $thissection->levelsan);
                      $level <= $thissection->pagedepthdirect
-                                + ($PAGE->user_is_editing()
+                                + ($this->page->user_is_editing()
                                     && $thissection->pagedepthdirect < FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE ? 1 : 0);
                      $level++) {
 
@@ -725,7 +722,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
             // Include "add" sub-tabs if editing.
             if ($thissection->nextanyid == $thissection->nextpageid
-                && $PAGE->user_is_editing() && has_capability('moodle/course:update', $context)) {
+                && $this->page->user_is_editing() && has_capability('moodle/course:update', $context)) {
 
                 // Include "add" sub-tabs for each level of page finished.
                 $nextsectionlevel = $thissection->nextpageid ? $sections[$thissection->nextpageid]->levelsan
@@ -767,7 +764,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // Display tabs.
         echo html_writer::start_tag('div', ['style' => 'clear: both']); // TODO: Use CSS?
-        echo $OUTPUT->tabtree($tabs,
+        echo $this->output->tabtree($tabs,
             "tab_id_{$displaysection->id}_l{$displaysection->pagedepthdirect}",
             $inactivetabs);
         echo html_writer::end_tag('div');
@@ -821,8 +818,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                     }
                     // END ADDED.
                     echo $this->courserenderer->course_section_cm_list($course, $thissection); // CHANGED removed section return.
-                    echo (new \format_multitopic\course_renderer_wrapper($this->courserenderer)
-                         )->course_section_add_cm_control($course, $thissection); // CHANGED removed section return.
+                    echo $this->courserenderer->course_section_add_cm_control($course, $thissection->section);
+                    // Reverted to standard course renderer, rather than wrapper, for cm controls.
                 }
                 echo $this->section_footer();
             }
@@ -830,7 +827,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             // ADDED.
             // If we're at the end of a page-level section, then close it off.
             if ($thissection->nextanyid == $thissection->nextpageid) {
-                if ($PAGE->user_is_editing() and has_capability('moodle/course:update', $context)) {
+                if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
                     $insertsection = new stdClass();
                     $insertsection->parentid = $sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id;
                     echo $this->change_number_sections($course, null, $insertsection); // CHANGED.
@@ -967,11 +964,9 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      */
     protected function render_courseheader(\format_multitopic\courseheader $header) : string {
 
-        global $PAGE;
-
         // Include code to preview the banner (and attribution, to an extent), if we're on the course edit page.
-        if ($PAGE->has_set_url() && $PAGE->url->compare(new moodle_url('/course/edit.php'), URL_MATCH_BASE)) {
-            $PAGE->requires->js('/course/format/multitopic/_course_edit.js');
+        if ($this->page->has_set_url() && $this->page->url->compare(new moodle_url('/course/edit.php'), URL_MATCH_BASE)) {
+            $this->page->requires->js('/course/format/multitopic/_course_edit.js');
         }
 
         return $header->output();
