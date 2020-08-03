@@ -63,7 +63,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             if ($sectionid = optional_param('sectionid', null, PARAM_INT)) {
                 $params['sectionid'] = $sectionid;
             }
-            $this->page->set_url('/course/view.php', $params);                  // TODO: Replace just section parameter, not whole url?
+            $this->page->set_url('/course/view.php', $params);                  // TODO: Replace just section param, not whole url?
         }
         // END ADDED.
 

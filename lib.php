@@ -346,7 +346,7 @@ class format_multitopic extends format_base {
 
     /**
      * Returns the display name of the given section that the course prefers.
-     * 
+     *
      * Use section name is specified by user. Otherwise use default
      *
      * @param int|stdClass $section Section object from database.  Should specify fmt calculated properties.
