@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'format_multitopic', language 'en', branch 'MOODLE_20_STABLE'
+ * Strings for component Multitopic course format.
  *
  * @package   format_multitopic
  * @copyright 2019 James Calder and Otago Polytechnic

@@ -32,6 +32,7 @@ defined('MOODLE_INTERNAL') || die;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class courseheader implements \renderable {
+    // See https://docs.moodle.org/dev/Course_formats#Additional_footer_or_header_on_any_page_inside_the_course .
 
     /** @var \moodle_url|null course image URL */
     private $imageurl;
@@ -52,6 +53,7 @@ class courseheader implements \renderable {
      * @param \stdClass $course the course to construct a header for
      */
     public function __construct(\stdClass $course) {
+        // See https://stackoverflow.com/questions/37537352/showing-course-image-on-custom-page-in-moodle .
 
         $contextid = \context_course::instance($course->id)->id;
 

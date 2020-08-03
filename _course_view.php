@@ -154,7 +154,7 @@ if (true) {                                                                     
         include($CFG->dirroot . '/course/externservercourse.php');
         if (function_exists('extern_server_course')) {
             if ($externurl = extern_server_course($course)) {
-                redirect($externurl);
+                redirect($externurl);                                           // TODO: Check if there are issues with this?
             }
         }
     }
@@ -276,10 +276,11 @@ if (true) {                                                                     
         if (!empty($section) && !empty($dest) &&
                 has_capability('moodle/course:movesections', $context) &&
                 (has_capability('moodle/course:update', $context) || !isset($dest->level)) &&
-                confirm_sesskey()) {                                            // CHANGED: Check update capability on level change.
+                confirm_sesskey()) {                                            // CHANGED: Use $dest, check capability for level.
+                                                                                // TODO: Is this the correct capability?
             $destsection = $dest;                                               // CHANGED: Use section info with ID instead of num.
             try {                                                               // CHANGED: Use try/catch instead of return false.
-                format_multitopic_move_section_to($course, $section, $destsection, false);
+                format_multitopic_move_section_to($course, $section, $destsection);
                 if ($course->id == SITEID) {
                     redirect($CFG->wwwroot . '/?redirect=0');
                 } else {
@@ -330,7 +331,8 @@ if (true) {                                                                     
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
 
-    if ($USER->editing == 1 && !empty($CFG->enableasyncbackup)) {
+    // INCLUDED for Moodle >= 3.7 .
+    if ($CFG->version >= 2019052000 && $USER->editing == 1 && ($CFG->version >= 2020061500 || !empty($CFG->enableasyncbackup))) {
 
         // MDL-65321 The backup libraries are quite heavy, only require the bare minimum.
         require_once($CFG->dirroot . '/backup/util/helper/async_helper.class.php');
@@ -339,6 +341,7 @@ if (true) {                                                                     
             echo $OUTPUT->notification(get_string('pendingasyncedit', 'backup'), 'warning');
         }
     }
+    // END INCLUDED.
 
     if ($completion->is_enabled()) {
         // This value tracks whether there has been a dynamic change to the page.

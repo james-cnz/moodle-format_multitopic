@@ -23,28 +23,28 @@ Feature: Sections can be edited and deleted in Multitopic format
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
 
-  Scenario: View the default name of the general section in topics format
+  Scenario: View the default name of the general section in Multitopic format
     When I edit the section "0"
     Then the field "Custom" matches value "0"
     And the field "New value for Section name" matches value "General"
 
-  Scenario: Edit the default name of the general section in topics format
+  Scenario: Edit the default name of the general section in Multitopic format
     When I edit the section "0" and I fill the form with:
       | Custom | 1                     |
       | New value for Section name      | This is the general section |
     Then I should see "This is the general section" in the "li#section-0" "css_element"
 
-  Scenario: View the default name of the second section in topics format
+  Scenario: View the default name of the second section in Multitopic format
     When I edit the section "2"
     Then the field "Custom" matches value "0"
     And the field "New value for Section name" matches value "Section 2"
 
-  Scenario: Edit section summary in topics format
+  Scenario: Edit section summary in Multitopic format
     When I edit the section "2" and I fill the form with:
       | Summary | Welcome to section 2 |
     Then I should see "Welcome to section 2" in the "li#section-2" "css_element"
 
-  Scenario: Edit section default name in topics format
+  Scenario: Edit section default name in Multitopic format
     When I edit the section "2" and I fill the form with:
       | Custom | 1                      |
       | New value for Section name      | This is the second topic |
@@ -52,7 +52,7 @@ Feature: Sections can be edited and deleted in Multitopic format
     And I should not see "Section 2" in the "li#section-2" "css_element"
 
   @javascript
-  Scenario: Inline edit section name in multitopic format
+  Scenario: Inline edit section name in Multitopic format
     When I click on "Edit section name" "link" in the "li#section-1" "css_element"
     And I set the field "New name for section Section 1" to "Midterm evaluation"
     And I press key "13" in the field "New name for section Section 1"
@@ -63,14 +63,14 @@ Feature: Sections can be edited and deleted in Multitopic format
     And I should not see "Section 1" in the "region-main" "region"
     And I should see "Midterm evaluation" in the "li#section-1" "css_element"
 
-  Scenario: Deleting the last section in multitopic format
+  Scenario: Deleting the last section in Multitopic format
     When I delete section "5"
     Then I should see "Are you absolutely sure you want to completely delete \"Section 5\" and all the activities it contains?"
     And I press "Delete"
     And I should not see "Section 5"
     And I should see "Section 4"
 
-  Scenario: Deleting the middle section in multitopic format
+  Scenario: Deleting the middle section in Multitopic format
     When I delete section "4"
     And I press "Delete"
     Then I should not see "Section 5"
@@ -79,7 +79,7 @@ Feature: Sections can be edited and deleted in Multitopic format
     And I should see "Section 4"
 
   @javascript
-  Scenario: Adding sections in multitopic format
+  Scenario: Adding sections in Multitopic format
     When I follow "Add topic"
     And I should see "Section 6" in the "li#section-6" "css_element"
     And "li#section-7" "css_element" should not exist

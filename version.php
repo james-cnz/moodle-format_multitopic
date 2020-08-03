@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details
+ * Version details.
  *
  * @package   format_multitopic
  * @copyright 2019 James Calder and Otago Polytechnic

@@ -5,7 +5,7 @@ M.course = M.course || {};
 M.course.format = M.course.format || {};
 
 /**
- * Get sections config for this format
+ * Get sections config for this format.
  *
  * The section structure is:
  * <ul class="sections">
@@ -20,7 +20,7 @@ M.course.format = M.course.format || {};
 M.course.format.get_config = function() {
     return {
         container_node: 'ul',
-        container_class: 'sections',
+        container_class: 'sections',                                            // CHANGED.
         section_node: 'li',
         section_class: 'section'
     };
@@ -28,7 +28,7 @@ M.course.format.get_config = function() {
 /* eslint-enable camelcase */
 
 /**
- * Swap section
+ * Swap section.
  *
  * @param {YUI} Y YUI3 instance
  * @param {string} node1 node to swap to
@@ -51,10 +51,10 @@ M.course.format.swap_sections = function(Y, node1, node2) {
 };
 
 /**
- * Process sections after ajax response
+ * Process sections after ajax response.
  *
  * @param {YUI} Y YUI3 instance
- * @param {NodeList} sectionlist
+ * @param {NodeList} sectionlist of sections
  * @param {array} response ajax response
  * @param {string} sectionfrom first affected section
  * @param {string} sectionto last affected section
@@ -84,13 +84,14 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
             // Update section title.
             var content = Y.Node.create('<span>' + response.sectiontitles[i] + '</span>');
             sectionlist.item(i).all('.' + CSS.SECTIONNAME).setHTML(content);
-            // Update move icon.
-            ele = sectionlist.item(i).one(SELECTORS.SECTIONLEFTSIDE);
-            str = ele.getAttribute('alt');
+            // Update the drag handle.
+            ele = sectionlist.item(i).one(SELECTORS.SECTIONLEFTSIDE).ancestor('.section-handle');
+            str = ele.getAttribute('title');
             stridx = str.lastIndexOf(' ');
             newstr = str.substr(0, stridx + 1) + i;
-            ele.setAttribute('alt', newstr);
-            ele.setAttribute('title', newstr); // For FireFox as 'alt' is not refreshed.
+            ele.setAttribute('title', newstr);
+            // Update the aria-label for the section
+            sectionlist.item(i).setAttribute('aria-label', content.get('innerText').trim());
 
             // ADDED: Restore collapse icon.
             if (sectionlist.item(i).hasClass("section-topic-timed")) {

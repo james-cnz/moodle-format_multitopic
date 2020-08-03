@@ -34,6 +34,7 @@ defined('MOODLE_INTERNAL') || die;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class coursecontentheaderfooter implements \renderable {
+    // See https://docs.moodle.org/dev/Course_formats#Additional_footer_or_header_on_any_page_inside_the_course .
 
     /** @var int -1 for header, 1 for footer */
     private $pos;
@@ -79,6 +80,7 @@ class coursecontentheaderfooter implements \renderable {
                         get_string('back_to_course', 'format_multitopic') : get_string('back');
             $o .= \html_writer::tag('a', $OUTPUT->pix_icon('t/left', '') . ' ' . $strback,
                                     ['href' => $this->sectionurl]);
+            // TODO: Use up arrow, to match Book exit link?
         }
 
         // Horizontal rule to separate header/footer from page content.

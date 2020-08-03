@@ -15,23 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for format_multitopic.
+ * Privacy Subsystem implementation for Multitopic course format.
  *
  * @package   format_multitopic
  * @copyright 2019 James Calder and Otago Polytechnic
  * @copyright based on work by 2018 Carlos Escobedo <carlos@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 namespace format_multitopic\privacy;
+
 defined('MOODLE_INTERNAL') || die();
+
+use core_privacy\local\metadata\null_provider;
+
 /**
- * Privacy Subsystem for format_multitopic implementing null_provider.
+ * Privacy Subsystem for Multitopic course format implementing null_provider.
  *
  * @copyright 2019 James Calder and Otago Polytechnic
  * @copyright based on work by 2018 Carlos Escobedo <carlos@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\local\metadata\null_provider {
+class provider implements null_provider {
+
     /**
      * Get the language string identifier with the component's language
      * file to explain why this plugin stores no data.

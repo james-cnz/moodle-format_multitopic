@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Renderer for outputting the multitopic course format.
+ * Renderer for outputting the Multitopic course format.
  *
  * @package   format_multitopic
  * @copyright 2019 James Calder and Otago Polytechnic
@@ -24,7 +24,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since     Moodle 2.3
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/renderer.php');
@@ -37,7 +36,7 @@ require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 // END ADDED.
 
 /**
- * Basic renderer for multitopic format.
+ * Basic renderer for Multitopic format.
  *
  * @copyright 2019 James Calder and Otago Polytechnic
  * @copyright based on work by 2012 Dan Poltawski
@@ -46,7 +45,7 @@ require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 class format_multitopic_renderer extends format_section_renderer_base {         // CHANGED.
 
     /**
-     * Constructor method, calls the parent constructor
+     * Constructor method, calls the parent constructor.
      *
      * @param moodle_page $page
      * @param string $target one of rendering target constants
@@ -64,22 +63,23 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             if ($sectionid = optional_param('sectionid', null, PARAM_INT)) {
                 $params['sectionid'] = $sectionid;
             }
-            $this->page->set_url('/course/view.php', $params);
+            $this->page->set_url('/course/view.php', $params);                  // TODO: Replace just section parameter, not whole url?
         }
         // END ADDED.
 
     }
 
     /**
-     * Generate the starting container html for a list of sections
+     * Generate the starting container html for a list of sections.
+     *
      * @return string HTML to output.
      */
     protected function start_section_list() : string {
-        return html_writer::start_tag('ul', array('class' => 'sections'));
+        return html_writer::start_tag('ul', ['class' => 'sections']);           // CHANGED.
     }
 
     /**
-     * Generate the closing container html for a list of sections
+     * Generate the closing container html for a list of sections.
      * @return string HTML to output.
      */
     protected function end_section_list() : string {
@@ -87,7 +87,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     }
 
     /**
-     * Generate the title for this section page
+     * Generate the title for this section page.
+     *
      * @return string the page title
      */
     protected function page_title() : string {
@@ -96,9 +97,9 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     }
 
     /**
-     * Generate the section title, wraps it in a link to the section if section is collapsible
+     * Generate the section title, wraps it in a link to the section if section is collapsible.
      *
-     * @param stdClass $section The course_section entry from DB
+     * @param section_info|stdClass $section The course_section entry from DB
      * @param stdClass $course The course entry from DB
      * @param bool $linkifneeded Whether to add link
      * @return string HTML to output.
@@ -132,10 +133,10 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     }
 
     /**
-     * Generate the section title to be displayed on the section page, without a link
+     * Generate the section title to be displayed on the section page, without a link.
      *
-     * @param stdClass $section The course_section entry from DB
-     * @param stdClass $course The course entry from DB
+     * @param section_info|stdClass $section The course_section entry from DB
+     * @param int|stdClass $course The course entry from DB
      * @return string HTML to output.
      */
     public function section_title_without_link($section, $course) : string {
@@ -156,9 +157,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @return string HTML to output.
      */
     protected function section_header($section, $course, $onsectionpage, $sectionreturn=null) : string {
-        // REMOVED: unused global $PAGE.
 
-        $section = course_get_format($course)->fmt_get_section($section);
+        $section = course_get_format($course)->fmt_get_section($section);       // ADDED.
 
         $o = '';
         // REMOVED: unused local $currenttext.
@@ -172,7 +172,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             if (course_get_format($course)->is_section_current($section)) {
                 $sectionstyle .= ' current';
             }
-            // ADDED.
+            // ADDED. TODO: Remove this?
             if (!$section->uservisible) {
                 $sectionstyle .= ' section-userhidden';
             }
@@ -192,12 +192,18 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $sectionstyle .= " sectionid-{$section->id}";
         // END ADDED.
 
-        $o .= html_writer::start_tag('li', array('id' => 'section-' . $section->section,
-            'class' => 'section main clearfix' . $sectionstyle, 'role' => 'region',
-            'aria-label' => get_section_name($course, $section)));
+        $o .= html_writer::start_tag('li', [
+            'id' => 'section-' . $section->section,
+            'class' => 'section main clearfix' . $sectionstyle,
+            'role' => 'region',
+            'aria-labelledby' => "sectionid-{$section->id}-title",
+            'data-sectionid' => $section->section,
+            'data-sectionreturnid' => $section->section                         // CHANGED.
+        ]);
 
         // Create a span that contains the section title to be used to create the keyboard section move menu.
         $o .= html_writer::tag('span', get_section_name($course, $section), array('class' => 'hidden sectionname'));
+        // TODO: Remove above line?  MDL-68189.
 
         $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
         $o .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
@@ -212,7 +218,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         }
 
         $sectionname = html_writer::tag('span', $this->section_title($section, $course, $section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $section->uservisible)); // CHANGED.
-        $o .= $this->output->heading($sectionname, 3, 'sectionname' . $classes);
+        $o .= $this->output->heading($sectionname, 3, 'sectionname' . $classes, "sectionid-{$section->id}-title");
 
         $o .= $this->section_availability($section);
 
@@ -239,7 +245,6 @@ class format_multitopic_renderer extends format_section_renderer_base {         
      * @return array of edit control items
      */
     protected function section_edit_control_items($course, $section, $onsectionpage = false) : array {
-
         if (!$this->page->user_is_editing()) {
             return array();
         }
@@ -440,6 +445,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
                         $url = clone($baseurl);
                         if ($section->section < $numsections) { // Add a arrow to move section down.
+                            // TODO: Don't use numsections .
                             $url->param('sectionid', $section->id);
                             $url->param('destprevupid', $section->nextupid);
                             $strmovedown = get_string('movedown');
@@ -479,6 +485,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     // END INCLUDED.
 
     // INCLUDED /course/format/renderer.php function section_availability .
+    // TODO: Remove?
     /**
      * Displays availability information for the section (hidden, not available unless, etc.)
      *
@@ -488,7 +495,6 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     public function section_availability($section) : string {
         $context = context_course::instance($section->course);
         $canviewhidden = has_capability('moodle/course:viewhiddensections', $context);
-
         return html_writer::div($this->section_availability_message($section, $canviewhidden), 'section_availability'); // CHANGED.
     }
     // END INCLUDED.
@@ -875,6 +881,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             if ($lastsection >= $maxsections) {
                 // Don't allow more sections if we already hit the limit.
                 return '';
+                // TODO: Show anyway, to avoid confusion?
             }
             // Current course format does not have 'numsections' option but it has multiple sections suppport.
             // Display the "Add section" link that will insert a section in the end.

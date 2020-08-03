@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains main class for the course format Multitopic
+ * This file contains main class for Multitopic course format.
  *
  * @since     Moodle 2.0
  * @package   format_multitopic
@@ -34,6 +34,8 @@ require_once(__DIR__ . '/classes/courseheader.php');
 require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 // END ADDED.
 
+use core\output\inplace_editable;
+
 // ADDED.
 /** @var int The level of the General section, which represents the course as a whole.
  * Set to -1, to be a level above the top-level sections in OneTopic format, which are numbered 0.
@@ -51,7 +53,7 @@ const FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC   = 2;
 // END ADDED.
 
 /**
- * Main class for the Multitopic course format
+ * Main class for the Multitopic course format.
  *
  * @package   format_multitopic
  * @copyright 2019 James Calder and Otago Polytechnic
@@ -60,9 +62,12 @@ const FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC   = 2;
  */
 class format_multitopic extends format_base {
 
+    // ADDED.
     /** @var int ID of section 0 / the General section, treated as the section root by the Multitopic format */
     public $fmtrootsectionid;
+    // END ADDED.
 
+    // INCLUDED declaration /course/format/lib.php class format_base function __construct.
     /**
      * Creates a new instance of class
      *
@@ -77,12 +82,13 @@ class format_multitopic extends format_base {
         parent::__construct($format, $courseid);
         if ($courseid) {
             $this->fmtrootsectionid = $DB->get_field('course_sections', 'id', ['section' => 0, 'course' => $courseid]);
-            // TODO: Check if this is set correctly for new courses?
+            // TODO: Check if this is set correctly for new courses? Do this in fmt_get_sections instead?
         }
     }
+    // END INCLUDED.
 
     /**
-     * Returns true if this course format uses sections
+     * Returns true if this course format uses sections.
      *
      * @return bool
      */
@@ -90,7 +96,7 @@ class format_multitopic extends format_base {
         return true;
     }
 
-    // INCLUDED /course/format/lib function get_sections .
+    // INCLUDED /course/format/lib functions get_sections and get_section .
     /**
      * Returns a list of sections used in the course.
      *
@@ -338,9 +344,10 @@ class format_multitopic extends format_base {
     }
     // END INCLUDED.
 
-    // INCLUDED instead /course/format/weeks/lib.php function get_section_name .
     /**
      * Returns the display name of the given section that the course prefers.
+     * 
+     * Use section name is specified by user. Otherwise use default
      *
      * @param int|stdClass $section Section object from database.  Should specify fmt calculated properties.
      * @return string Display name that the course format prefers, e.g. "Section 2"
@@ -354,7 +361,7 @@ class format_multitopic extends format_base {
             $section = $this->get_section($section);
             if ((string)$section->name !== '') {
                 return format_string($section->name, true,
-                        array('context' => context_course::instance($this->courseid)));
+                        ['context' => context_course::instance($this->courseid)]);
             } else {
                 return $this->get_default_section_name($section);
             }
@@ -413,17 +420,15 @@ class format_multitopic extends format_base {
         // END ADDED.
 
         if ((string)$section->name !== '') {
-            // Return the name the user set.
             return format_string($daystring . $section->name, true,
-                    array('context' => context_course::instance($this->courseid))); // CHANGED.
+                    ['context' => context_course::instance($this->courseid)]);  // CHANGED.
         } else {
             return $daystring . $this->get_default_section_name($section);
         }
     }
-    // END INCLUDED.
 
     /**
-     * Returns the default section name for the multitopic course format.
+     * Returns the default section name for the Multitopic course format.
      *
      * If the section number is 0, it will use the string with key = section0name from the course format's lang file.
      * If the section number is not 0, the base implementation of format_base::get_default_section_name which uses
@@ -438,13 +443,13 @@ class format_multitopic extends format_base {
             return get_string('section0name', 'format_multitopic');
         } else {
             // Use format_base::get_default_section_name implementation which
-            // will display the section name in "Topic n" format.
+            // will display the section name in "Section n" format.
             return parent::get_default_section_name($section);
         }
     }
 
     /**
-     * The URL to use for the specified course (with section)
+     * The URL to use for the specified course (with section).
      *
      * @param int|stdClass $section Section object from database or just field course_sections.section
      *                      Should specify fmt calculated properties,
@@ -454,11 +459,11 @@ class format_multitopic extends format_base {
      *     'navigation' (bool) if true and section has no separate page, the function returns null
      * @return null|moodle_url
      */
-    public function get_view_url($section, $options = array()) {
+    public function get_view_url($section, $options = []) {
         global $CFG;
         $course = $this->get_course();
         $url = new moodle_url( ($options['fmtedit'] ?? false) ? '/course/format/multitopic/_course_view.php'
-                                : '/course/view.php', array('id' => $course->id)); // CHANGED.
+                                : '/course/view.php', ['id' => $course->id]);   // CHANGED.
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
         if ($section !== null) {                                                // CHANGED.
@@ -481,7 +486,7 @@ class format_multitopic extends format_base {
 
     // INCLUDED instead /course/format/onetopic/lib.php function supports_ajax .
     /**
-     * Returns the information about the ajax support in the given source format
+     * Returns the information about the ajax support in the given source format.
      *
      * The returned object's property (boolean)capable indicates that
      * the course format supports Moodle course ajax features.
@@ -508,10 +513,11 @@ class format_multitopic extends format_base {
     // END INCLUDED.
 
     /**
-     * Loads all of the course sections into the navigation
+     * Loads all of the course sections into the navigation.
      *
      * @param global_navigation $navigation
      * @param navigation_node $node The course node within the navigation
+     * @return void
      */
     public function extend_course_navigation($navigation, navigation_node $node) {
         global $PAGE;
@@ -543,7 +549,7 @@ class format_multitopic extends format_base {
 
     // INCLUDED instead /course/format/weeks/lib.php function ajax_section_move .
     /**
-     * Custom action after section has been moved in AJAX mode
+     * Custom action after section has been moved in AJAX mode.
      *
      * Used in course/rest.php
      *
@@ -551,7 +557,7 @@ class format_multitopic extends format_base {
      */
     public function ajax_section_move() : array {
         global $PAGE;
-        $titles = array();
+        $titles = [];
         $current = -1;
         $course = $this->get_course();
         // REMOVED: Replaced $modinfo with fmt_get_sections.
@@ -564,25 +570,25 @@ class format_multitopic extends format_base {
                 }
             }
         }
-        return array('sectiontitles' => $titles, 'current' => $current, 'action' => 'move');
+        return ['sectiontitles' => $titles, 'current' => $current, 'action' => 'move'];
     }
     // END INCLUDED.
 
     /**
-     * Returns the list of blocks to be automatically added for the newly created course
+     * Returns the list of blocks to be automatically added for the newly created course.
      *
      * @return array of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
      *     each of values is an array of block names (for left and right side columns)
      */
     public function get_default_blocks() : array {
-        return array(
-            BLOCK_POS_LEFT => array(),
-            BLOCK_POS_RIGHT => array()
-        );
+        return [
+            BLOCK_POS_LEFT => [],
+            BLOCK_POS_RIGHT => []
+        ];
     }
 
     /**
-     * Definitions of the additional options that this course format uses for courses
+     * Definitions of the additional options that this course format uses for courses.
      *
      * Multitopic format uses the following options:
      * - periodduration (from Periods format): how long each topic takes.  (Only 1 week or null are currently supported.)
@@ -596,64 +602,64 @@ class format_multitopic extends format_base {
         static $courseformatoptions = false;
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
-            $courseformatoptions = array(
+            $courseformatoptions = [
                 // INCLUDED /course/format/periods/lib.php function course_format_options 'periodduration'.
-                'periodduration' => array(
+                'periodduration' => [
                     'default' => null,                                          // CHANGED.
                     'type' => PARAM_NOTAGS
-                ),
+                ],
                 // END INCLUDED.
-                'hiddensections' => array(
+                'hiddensections' => [
                     'default' => $courseconfig->hiddensections,
                     'type' => PARAM_INT,
-                ),
+                ],
                 // REMOVED: course display.
                 // ADDED.
-                'bannerslice' => array(
+                'bannerslice' => [
                     'default' => 0,
                     'type' => PARAM_INT,
-                ),
+                ],
                 // END ADDED.
-            );
+            ];
         }
         if ($foreditform && !isset($courseformatoptions['hiddensections']['label'])) { // CHANGED.
-            $courseformatoptionsedit = array(
+            $courseformatoptionsedit = [
                 // INCLUDED /course/format/periods/lib.php function course_format_options $foreditform 'periodduration' .
-                'periodduration' => array(
+                'periodduration' => [
                     'label' => new lang_string('perioddurationdefault', 'format_multitopic'), // CHANGED.
                     'help' => 'perioddurationdefault',
                     'help_component' => 'format_multitopic',                    // CHANGED.
                     'element_type' => 'select',                                 // CHANGED.
                     // REMOVED: Replaced periodduration type.
                     // ADDED.
-                    'element_attributes' => array(array(
+                    'element_attributes' => [[
                         null => new lang_string('period_undefined', 'format_multitopic'),
                         '1 week' => new lang_string('numweek', '', 1),
-                    )),
+                    ]],
                     // END ADDED.
-                ),
+                ],
                 // END INCLUDED.
-                'hiddensections' => array(
+                'hiddensections' => [
                     'label' => new lang_string('hiddensections'),
                     'help' => 'hiddensections',
                     'help_component' => 'moodle',
                     'element_type' => 'select',
-                    'element_attributes' => array(
-                        array(
+                    'element_attributes' => [
+                        [
                             0 => new lang_string('hiddensectionscollapsed'),
                             1 => new lang_string('hiddensectionsinvisible')
-                        )
-                    ),
-                ),
+                        ]
+                    ],
+                ],
                 // REMOVED: coursedisplay .
                 // ADDED.
-                'bannerslice' => array(
+                'bannerslice' => [
                     'label' => new lang_string('bannerslice', 'format_multitopic'),
                     'help' => 'bannerslice',
                     'help_component' => 'format_multitopic',
                     'element_type' => 'select',
-                    'element_attributes' => array(
-                        array(' 0%', ' 1%', ' 2%', ' 3%', ' 4%', ' 5%', ' 6%', ' 7%', ' 8%', ' 9%',
+                    'element_attributes' => [
+                            [ ' 0%', ' 1%', ' 2%', ' 3%', ' 4%', ' 5%', ' 6%', ' 7%', ' 8%', ' 9%',
                               '10%', '11%', '12%', '13%', '14%', '15%', '16%', '17%', '18%', '19%',
                               '20%', '21%', '22%', '23%', '24%', '25%', '26%', '27%', '28%', '29%',
                               '30%', '31%', '32%', '33%', '34%', '35%', '36%', '37%', '38%', '39%',
@@ -663,11 +669,11 @@ class format_multitopic extends format_base {
                               '70%', '71%', '72%', '73%', '74%', '75%', '76%', '77%', '78%', '79%',
                               '80%', '81%', '82%', '83%', '84%', '85%', '86%', '87%', '88%', '89%',
                               '90%', '91%', '92%', '93%', '94%', '95%', '96%', '97%', '98%', '99%',
-                              '100%')
-                    ),
-                ),
+                              '100%']
+                    ],
+                ],
                 // END ADDED.
-            );
+            ];
             $courseformatoptions = array_merge_recursive($courseformatoptions, $courseformatoptionsedit);
         }
         return $courseformatoptions;
@@ -700,7 +706,7 @@ class format_multitopic extends format_base {
      * @return array
      */
     public function section_format_options($foreditform = false) : array {
-        // INCLUDED instead /course/format/lib.php function course_format_options body (excluding array items).
+        // INCLUDED instead /course/format/topics/lib.php function course_format_options body (excluding array items).
         static $sectionformatoptions = false;
         if ($sectionformatoptions === false) {
             $sectionformatoptions = array(
@@ -785,7 +791,7 @@ class format_multitopic extends format_base {
     }
 
     /**
-     * Updates format options for a course
+     * Updates format options for a course.
      *
      * If the course format was changed to 'multitopic', we try to copy options
      * 'periodduration', 'hiddensections', and 'bannerslice' from the previous format.
@@ -887,7 +893,7 @@ class format_multitopic extends format_base {
     // END INCLUDED.
 
     /**
-     * Whether this format allows to delete sections
+     * Whether this format allows to delete sections.
      *
      * Do not call this function directly, instead use see course_can_delete_section()
      *
@@ -903,24 +909,24 @@ class format_multitopic extends format_base {
     // TODO: Customise delete_section to be recursive?
 
     /**
-     * Prepares the templateable object to display section name
+     * Prepares the templateable object to display section name.
      *
      * @param section_info|stdClass $section
      * @param bool $linkifneeded
      * @param bool $editable
      * @param null|lang_string|string $edithint
      * @param null|lang_string|string $editlabel
-     * @return \core\output\inplace_editable
+     * @return inplace_editable
      */
     public function inplace_editable_render_section_name($section, $linkifneeded = true,
-                                            $editable = null, $edithint = null, $editlabel = null) : \core\output\inplace_editable {
+            $editable = null, $edithint = null, $editlabel = null) : \core\output\inplace_editable {
         $section = $this->fmt_get_section($section);                            // ADDED.
         if (empty($edithint)) {
-            $edithint = new lang_string('editsectionname');
+            $edithint = new lang_string('editsectionname');                     // CHANGED.
         }
         if (empty($editlabel)) {
             $title = get_section_name($section->course, $section);
-            $editlabel = new lang_string('newsectionname', '', $title);
+            $editlabel = new lang_string('newsectionname', '', $title);         // CHANGED.
         }
 
         // REMOVED function call.
@@ -936,7 +942,7 @@ class format_multitopic extends format_base {
         $displayvalue = $title = html_writer::tag('i', '', ['class' =>
                                         ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'icon fa fa-folder-o fa-fw'
                                                                                                     : 'icon fa fa-list fa-fw')])
-                                    . ' ' . get_section_name($section->course, $section);
+                                    . ' ' . get_section_name($section->course, $section);  // CHANGED.
         // TODO: Fix collapse icon for AJAX rename, somehow?
         if ($linkifneeded) {
             // Display link under the section name, for collapsible sections.
@@ -986,17 +992,17 @@ class format_multitopic extends format_base {
     }
 
     /**
-     * Callback used in WS core_course_edit_section when teacher performs an AJAX action on a section (show/hide)
+     * Callback used in WS core_course_edit_section when teacher performs an AJAX action on a section (show/hide).
      *
      * Access to the course is already validated in the WS but the callback has to make sure
      * that particular action is allowed by checking capabilities
      *
-     * Course formats should register
+     * Course formats should register.
      *
-     * @param stdClass|section_info $section
+     * @param section_info|stdClass $section
      * @param string $action
      * @param int $sr unused
-     * @return null|array|stdClass any data for the Javascript post-processor (must be json-encodeable)
+     * @return null|array any data for the Javascript post-processor (must be json-encodeable)
      */
     public function section_action($section, $action, $sr): array {
         global $PAGE;
@@ -1023,12 +1029,12 @@ class format_multitopic extends format_base {
 }
 
 /**
- * Implements callback inplace_editable() allowing to edit values in-place
+ * Implements callback inplace_editable() allowing to edit values in-place.
  *
  * @param string $itemtype
  * @param int $itemid
  * @param mixed $newvalue
- * @return \core\output\inplace_editable
+ * @return inplace_editable
  */
 function format_multitopic_inplace_editable(string $itemtype, int $itemid, $newvalue) : \core\output\inplace_editable {
     // CHANGED LINE ABOVE.
@@ -1037,7 +1043,7 @@ function format_multitopic_inplace_editable(string $itemtype, int $itemid, $newv
     if ($itemtype === 'sectionname' || $itemtype === 'sectionnamenl') {
         $section = $DB->get_record_sql(
             'SELECT s.* FROM {course_sections} s JOIN {course} c ON s.course = c.id WHERE s.id = ? AND c.format = ?',
-            array($itemid, 'multitopic'), MUST_EXIST);                          // CHANGED.
+            [$itemid, 'multitopic'], MUST_EXIST);                               // CHANGED.
         return course_get_format($section->course)->inplace_editable_update_section_name($section, $itemtype, $newvalue);
     }
 }
