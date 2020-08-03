@@ -5,7 +5,7 @@ branches:
     - moodle_includes
 
 addons:
-  postgresql: "9.5" # Moodle 3.9 requires PostgreSQL 9.5
+  postgresql: "9.3" # Moodle 3.9 requires PostgreSQL 9.5
 
 services:
   - mysql
@@ -20,38 +20,38 @@ cache:
 matrix:
  include:
   # Moodle 3.3 (old) version.php $plugin -> requires = 2017051509
-  #- php: 7.0 # 5.6.5-7.1
-  #  env: MOODLE_BRANCH=MOODLE_33_STABLE NODE_VERSION=8.9 DB=mysqli
+  - php: 7.0 # 5.6.5-7.1
+    env: MOODLE_BRANCH=MOODLE_33_STABLE NODE_VERSION=8.9 DB=mysqli
   # Moodle 3.3 (old), PostgreSQL
-  #- php: 7.0 # 5.6.5-7.1
-  #  env: MOODLE_BRANCH=MOODLE_33_STABLE NODE_VERSION=8.9 DB=pgsql
+  - php: 7.0 # 5.6.5-7.1
+    env: MOODLE_BRANCH=MOODLE_33_STABLE NODE_VERSION=8.9 DB=pgsql
   # Moodle 3.4 (old)
-  #- php: 7.0 # 7.0-7.2
-  #  env: MOODLE_BRANCH=MOODLE_34_STABLE NODE_VERSION=8.10 DB=mysqli
+  - php: 7.0 # 7.0-7.2
+    env: MOODLE_BRANCH=MOODLE_34_STABLE NODE_VERSION=8.10 DB=mysqli
   # Moodle 3.5
-  - php: 7.0 # 7.0-7.2
-    env: MOODLE_BRANCH=MOODLE_35_STABLE NODE_VERSION=14.0 DB=mysqli
+  #- php: 7.0 # 7.0-7.2
+  #  env: MOODLE_BRANCH=MOODLE_35_STABLE NODE_VERSION=14.0 DB=mysqli
   # Moodle 3.5, PostgreSQL
-  - php: 7.0 # 7.0-7.2
-    env: MOODLE_BRANCH=MOODLE_35_STABLE NODE_VERSION=14.0 DB=pgsql
+  #- php: 7.0 # 7.0-7.2
+  #  env: MOODLE_BRANCH=MOODLE_35_STABLE NODE_VERSION=14.0 DB=pgsql
   # Moodle 3.6
-  - php: 7.0 # 7.0-7.3
-    env: MOODLE_BRANCH=MOODLE_36_STABLE NODE_VERSION=8.17 DB=mysqli
+  #- php: 7.0 # 7.0-7.3
+  #  env: MOODLE_BRANCH=MOODLE_36_STABLE NODE_VERSION=8.17 DB=mysqli
   # Moodle 3.7
-  - php: 7.1 # 7.1-7.3
-    env: MOODLE_BRANCH=MOODLE_37_STABLE NODE_VERSION=14.1 DB=mysqli
+  #- php: 7.1 # 7.1-7.3
+  #  env: MOODLE_BRANCH=MOODLE_37_STABLE NODE_VERSION=14.1 DB=mysqli
   # Moodle 3.8
-  - php: 7.2 # 7.1-7.4
-    env: MOODLE_BRANCH=MOODLE_38_STABLE NODE_VERSION=14.2 DB=mysqli
+  #- php: 7.2 # 7.1-7.4
+  #  env: MOODLE_BRANCH=MOODLE_38_STABLE NODE_VERSION=14.2 DB=mysqli
   # Moodle 3.9
-  - php: 7.3 # 7.2-7.4
-    env: MOODLE_BRANCH=MOODLE_39_STABLE NODE_VERSION=14.3 DB=mysqli
+  #- php: 7.3 # 7.2-7.4
+  #  env: MOODLE_BRANCH=MOODLE_39_STABLE NODE_VERSION=14.3 DB=mysqli
   # Moodle Master
-  - php: 7.4 # 7.2-7.4
-    env: MOODLE_BRANCH=master NODE_VERSION=14.4 DB=mysqli
+  #- php: 7.4 # 7.2-7.4
+  #  env: MOODLE_BRANCH=master NODE_VERSION=14.4 DB=mysqli
   # Moodle Master, PostgreSQL
-  - php: 7.4 # 7.2-7.4
-    env: MOODLE_BRANCH=master NODE_VERSION=14.4 DB=pgsql
+  #- php: 7.4 # 7.2-7.4
+  #  env: MOODLE_BRANCH=master NODE_VERSION=14.4 DB=pgsql
 
 before_install:
   - phpenv config-rm xdebug.ini
