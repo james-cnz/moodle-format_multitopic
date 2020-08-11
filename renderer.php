@@ -186,7 +186,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         } else if ($section->periodduration == '0 days') {
             $sectionstyle .= ' section-topic section-topic-untimed';
         } else {
-            $sectionstyle .= ' section-topic section-topic-timed';
+            $sectionstyle .= ' section-topic section-topic-timed section-collapsed';
         }
 
         $sectionstyle .= " sectionid-{$section->id}";

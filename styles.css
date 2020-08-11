@@ -14,7 +14,7 @@ body.format-multitopic #course-header {
 }
 
 /* Hide collapsed sections */
-body.format-multitopic ul.sections li.section.section-collapsed .content .section_availability ~ * {
+body.format-multitopic.jsenabled ul.sections li.section.section-collapsed .content .section_availability ~ * {
     display: none;
 }
 

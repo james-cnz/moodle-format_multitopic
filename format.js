@@ -250,11 +250,6 @@ M.course.format.fmtCollapseOnHashChange = function(event) {
  */
 M.course.format.fmtCollapseInit = function() {
 
-    // Don't run unless the document is loaded.
-    if (document.readyState != "complete") {
-        return;
-    }
-
     // Set the initial state of collapsible sections.
     M.course.format.fmtCollapseOnHashChange();
 
@@ -268,5 +263,8 @@ M.course.format.fmtCollapseInit = function() {
 };
 
 // Run initialisation when the page is loaded, or now, if the page is already loaded.
-document.addEventListener("readystatechange", M.course.format.fmtCollapseInit);
-M.course.format.fmtCollapseInit();
+if (document.readyState == "loading") {
+    document.addEventListener("DOMContentLoaded", M.course.format.fmtCollapseInit);
+} else {
+    M.course.format.fmtCollapseInit();
+}
