@@ -17,7 +17,7 @@
 /**
  * This file contains classes used to manage the navigation structures within Moodle.
  *
- * INCLUDED from /lib/navigationlib.php
+ * INCLUDED from /lib/navigationlib.php class global_navigation
  * CHANGED: Modified to show sections in a heirarchy, and use section IDs where possible.
  *
  * @since     Moodle 2.0
@@ -52,9 +52,9 @@ class global_navigation_wrapper {
     // CHANGED LINE ABOVE.
 
     // ADDED.
-
     /** @var global_navigation wrapped renderer */
     private $inner;
+    // END ADDED.
 
     // NOTE: We need access to these private variables, so store our own copy.
     /** @var moodle_page The Moodle page this navigation object belongs to. */
@@ -62,9 +62,12 @@ class global_navigation_wrapper {
     /** @var bool A switch for whether to show empty sections in the navigation. */
     protected $innershowemptysections = true;
 
+    // INCLUDED /lib/navigationlib.php class navigation_node $includesectionnum .
     /** @var mixed If set to an int, that section will be included even if it has no activities */
     public $innerincludesectionid = null;
+    // END INCLUDED.
 
+    // ADDED.
     /**
      * Construct wrapper
      *
@@ -175,7 +178,7 @@ class global_navigation_wrapper {
             } else {
                 if (!$section->uservisiblesan || (!$this->innershowemptysections &&
                         !$section->hasactivites && !$section->hassubsections
-                        && $this->inner->includesectionnum !== $section->section
+                        && $this->inner->includesectionnum !== $section->section    // TODO: Remove?
                         && $this->innerincludesectionid !== $section->id)) {
                             // CHANGED ABOVE: Use sanitised visibility, check for subsections, and use section ID.
                     continue;

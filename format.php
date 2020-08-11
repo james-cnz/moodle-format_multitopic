@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Multitopic course format.  Display the course as pages of topics made of modules.
+ * Multitopic course format. Display the course as pages of topics made of modules.
  *
  * @package   format_multitopic
  * @copyright 2019 James Calder and Otago Polytechnic
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->libdir . '/completionlib.php');
 
-// Horrible backwards compatible parameter aliasing..
+// Horrible backwards compatible parameter aliasing.
 // REMOVED.
 
 $context = \context_course::instance($course->id);

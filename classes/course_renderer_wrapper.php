@@ -17,7 +17,7 @@
 /**
  * Renderer for use with the course section and all the goodness that falls within it.
  *
- * INCLUDED /course/renderer.php selected functions .
+ * INCLUDED /course/renderer.php class core_course_renderer function course_section_add_cm_control .
  * CHANGED: Use section IDs instead of section numbers.  Delay use of section numbers until later, using _course_jumpto.php .
  *
  * @package   format_multitopic
@@ -40,26 +40,32 @@ class course_renderer_wrapper {
     // ADDED.
     /** @var core_course_renderer wrapped renderer */
     private $inner;
+    // END ADDED.
 
     // NOTE: We need access to these protected variables, so store our own copy.
+    // INCLUDED /lib/outputrenderers.php class renderer_base $page .
     /**
      * @var moodle_page The Moodle page the renderer has been created to assist with.
      */
     protected $innerpage;
+    // END INCLUDED.
+    // INCLUDED /lib/outputrenderers.php class plugin_renderer_base $output .
     /**
      * @var renderer_base|core_renderer A reference to the current renderer.
      * The renderer provided here will be determined by the page but will in 90%
      * of cases by the see core_renderer
      */
     protected $inneroutput;
+    // END INCLUDED.
 
+    // ADDED.
     /**
      * Construct wrapper
      *
      * @param \core_course_renderer $inner renderer to be wrapped
      */
     public function __construct(\core_course_renderer $inner) {
-        global $PAGE, $OUTPUT;
+        global $PAGE, $OUTPUT;                                                  // TODO: Avoid globals?
         $this->inner = $inner;
         $this->innerpage = $PAGE;
         $this->inneroutput = $OUTPUT;
@@ -79,6 +85,17 @@ class course_renderer_wrapper {
      */
     public function course_section_add_cm_control($course, $section, $sectionreturn = null, $displayoptions = array()) : string {
         // CHANGED ABOVE: Specify section info instead of number.
+        // TODO:
+        // 2020-02-10 MDL-67264 core_course: Begin set up for Activity chooser
+        // https://github.com/moodle/moodle/commit/cd2efd12cac1cb41ac39369cf0db3c4789ee527c#diff-1bf8230118157f6e3a179b45b7f75ab0
+        // 2020-02-12 MDL-67264 core_course: Activity chooser new feature
+        // https://github.com/moodle/moodle/commit/05b27f211840b2ce54c140d53f0f3f53e318aae7#diff-1bf8230118157f6e3a179b45b7f75ab0
+        // 2020-02-20 MDL-67585 core_course: Use the content_item_service to build the picker
+        // https://github.com/moodle/moodle/commit/2f040002eeeaad63834836e6a414a37589d08382#diff-1bf8230118157f6e3a179b45b7f75ab0
+        // 2020-02-20 MDL-67585 core_course: Service factory for course content items.
+        // https://github.com/moodle/moodle/commit/5c78541f80157abc224ccc661ff1199a29966ac8#diff-1bf8230118157f6e3a179b45b7f75ab0
+        // 2020-02-26 MDL-68056 core_course: improve render performance when editing
+        // https://github.com/moodle/moodle/commit/aa4d7e1391c1d63856b75f35440b41f6bba7fcf3#diff-1bf8230118157f6e3a179b45b7f75ab0 .
         global $CFG;
 
         $vertical = !empty($displayoptions['inblock']);
@@ -127,7 +144,7 @@ class course_renderer_wrapper {
             // CHANGED LINE ABOVE: Removed form ID.
             $select->set_help_icon('resources');
             $select->set_label($strresourcelabel, array('class' => 'accesshide'));
-            $output .= preg_replace('/\/course\/jumpto.php\b/', "/course/format/multitopic/_course_jumpto.php",
+            $output .= preg_replace('/\/course\/jumpto.php\b/', '/course/format/multitopic/_course_jumpto.php',
                                     $this->inneroutput->render($select));
             // CHANGED LINE ABOVE: Use custom script to convert section ID back to section number.
         }
@@ -137,7 +154,7 @@ class course_renderer_wrapper {
             // CHANGED LINE ABOVE: Removed form ID.
             $select->set_help_icon('activities');
             $select->set_label($stractivitylabel, array('class' => 'accesshide'));
-            $output .= preg_replace('/\/course\/jumpto.php\b/', "/course/format/multitopic/_course_jumpto.php",
+            $output .= preg_replace('/\/course\/jumpto.php\b/', '/course/format/multitopic/_course_jumpto.php',
                                     $this->inneroutput->render($select));
             // CHANGED LINE ABOVE: Use custom script to convert section ID back to section number.
         }

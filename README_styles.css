@@ -13,7 +13,7 @@ body.format-multitopic div#page {
 
 /* Course Header */
 body.format-multitopic div#course-header > div#course-header-banner {
-    max-width: none;  /* Needed on LTD server? */
+    max-width: none;  /* Needed on OP LTD server? */
     background-size: cover;
 }
 body.format-multitopic div#course-header > div#course-header-banner > div#course-header-banner-text {

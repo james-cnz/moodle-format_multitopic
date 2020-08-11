@@ -140,7 +140,7 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
  * @param stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
  */
 function format_multitopic_move_section_to(\stdClass $course, \stdClass $section, \stdClass $destination) {
-    // CHANGED LINE ABOVE: Use section info instead of number.  No return value (use exceptions).
+    // CHANGED LINE ABOVE: Use section info instead of number.  Removed $ignorenumsections param.  No return value (use exceptions).
     // Moves a course section within the course.
     // CHANGES THROUGHOUT: Use section info instead of number.
     global $DB;                                                                 // CHANGED: Removed $USER.
