@@ -61,10 +61,11 @@ $string['level_help'] = 'Set the section level.
 // INCLUDED /course/format/periods/lang/en/format_periods.php $string['perioddurationdefault'] - $string['perioddurationoverride_help'] CHANGED.
 $string['perioddurationdefault'] = 'Topic duration';
 $string['perioddurationoverride'] = 'Topic duration override';
-$string['perioddurationdefault_help'] = 'Set to "1 week" to have dates shown for topics, similar to the Weekly course format,
- or "Unspecified" otherwise.';
-$string['perioddurationoverride_help'] = 'Whether this topic has time allocated to it or not.
- Set to "No time" for, e.g., assignments that students are to complete while working on other topics, or "Default" otherwise.
+$string['perioddurationdefault_help'] = 'Set the default duration for topics to have dates shown.
+ e.g. A setting of "1 week" would be like the Weekly course format.
+ Set to "Unspecified" to not have dates shown, like the Topics course format.';
+$string['perioddurationoverride_help'] = 'The duration of this topic.
+ Set to "No time" for, e.g., assignments that students are to complete while working on other topics.
  (Not applicable to pages.)';
 // END INCLUDED.
 
@@ -92,4 +93,5 @@ $string['move_to_prev_page'] = 'Move to previous page';
 
 $string['period_0_days']    = 'No time';
 $string['period_undefined'] = 'Unspecified';
+$string['weeks_capitalised'] = 'Weeks';
 // END ADDED.

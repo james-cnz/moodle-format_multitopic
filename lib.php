@@ -29,6 +29,7 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/lib.php');
 // ADDED.
+require_once(__DIR__ . '/locallib.php');
 require_once(__DIR__ . '/classes/global_navigation_wrapper.php');
 require_once(__DIR__ . '/classes/courseheader.php');
 require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
@@ -139,17 +140,7 @@ class format_multitopic extends format_base {
 
         $timenow = time();
 
-        $courseperioddays = null;
-        switch($course->periodduration) {
-            case '1 day':
-                $courseperioddays = 1;
-                break;
-            case '1 week':
-                $courseperioddays = 7;
-                break;
-            default:
-                $courseperioddays = null;
-        }
+        $courseperioddays = format_multitopic_duration_as_days($course->periodduration);
 
         // Forward pass.
 
@@ -222,18 +213,15 @@ class format_multitopic extends format_base {
             // Set date-start property from previous section.
             $thissection->datestart = $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
                                             $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->dateend
-                                            : $course->startdate;
+                                            : (is_null($courseperioddays) ? null : $course->startdate);
 
             // Set date-end property.
             if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                 $sectionperioddays = 0;
             } else {
-                switch($thissection->periodduration) {
-                    case '0 days':
-                        $sectionperioddays = 0;
-                        break;
-                    default:
-                        $sectionperioddays = $courseperioddays;
+                $sectionperioddays = format_multitopic_duration_as_days($thissection->periodduration);
+                if ($sectionperioddays === null) {
+                    $sectionperioddays = $courseperioddays;
                 }
             }
             $thissection->dateend = (is_null($thissection->datestart) || is_null($sectionperioddays)) ?
@@ -369,8 +357,8 @@ class format_multitopic extends format_base {
         }
 
         $weekword = new lang_string('week');
-        $weeksword = new lang_string('weeks');
-
+        $weeksword = get_string_manager()->string_exists('weeks_capitalised', 'format_multitopic') ?
+            get_string('weeks_capitalised', 'format_multitopic') : get_string('weeks');
         // Figure out the string for the week number.
         $daystring = '';
         if ($section->dateend && ($section->datestart < $section->dateend)) {
@@ -634,6 +622,7 @@ class format_multitopic extends format_base {
                     // ADDED.
                     'element_attributes' => [[
                         null => new lang_string('period_undefined', 'format_multitopic'),
+                        '1 day' => new lang_string('numday', '', 1),
                         '1 week' => new lang_string('numweek', '', 1),
                     ]],
                     // END ADDED.
@@ -752,7 +741,17 @@ class format_multitopic extends format_base {
                     // ADDED.
                     'element_attributes' => array(array(
                         null => new lang_string('default'),
-                        '0 days' => new lang_string('period_0_days', 'format_multitopic'),
+                        '0 day' => new lang_string('period_0_days', 'format_multitopic'),
+                        '1 day' => new lang_string('numday', '', 1),
+                        '2 day' => new lang_string('numdays', '', 2),
+                        '3 day' => new lang_string('numdays', '', 3),
+                        '4 day' => new lang_string('numdays', '', 4),
+                        '5 day' => new lang_string('numdays', '', 5),
+                        '6 day' => new lang_string('numdays', '', 6),
+                        '1 week' => new lang_string('numweek', '', 1),
+                        '2 week' => new lang_string('numweeks', '', 2),
+                        '3 week' => new lang_string('numweeks', '', 3),
+                        '4 week' => new lang_string('numweeks', '', 4),
                     )),
                     // END ADDED.
                 ),
@@ -814,7 +813,11 @@ class format_multitopic extends format_base {
                 }
             }
             if (!array_key_exists('periodduration', $data) && array_key_exists('layoutstructure', $oldcourse)) {
-                if ($oldcourse['layoutstructure'] == 2 || $oldcourse['layoutstructure'] == 3) {
+                if ($oldcourse['layoutstructure'] == 1 || $oldcourse['layoutstructure'] == 4) {
+                    $data['periodduration'] = null;
+                } else if ($oldcourse['layoutstructure'] == 5) {
+                    $data['periodduration'] = '1 day';
+                } else if ($oldcourse['layoutstructure'] == 2 || $oldcourse['layoutstructure'] == 3) {
                     $data['periodduration'] = '1 week';
                 }
             }
@@ -946,7 +949,7 @@ class format_multitopic extends format_base {
         // TODO: Fix collapse icon for AJAX rename, somehow?
         if ($linkifneeded) {
             // Display link under the section name, for collapsible sections.
-            $url = course_get_url($section->course, $section, array('navigation' => ($section->periodduration == '0 days'))); // CHANGED.
+            $url = course_get_url($section->course, $section, array('navigation' => (format_multitopic_duration_as_days($section->periodduration) === 0))); // CHANGED.
             if ($url) {
                 $displayvalue = html_writer::link($url, $title);
             }

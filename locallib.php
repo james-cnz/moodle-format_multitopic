@@ -196,8 +196,8 @@ function format_multitopic_move_section_to(\stdClass $course, \stdClass $section
             $updates['visible'] = $movedsection->visible;
         }
         // Set page-level sections to untimed.
-        if ($movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $sections[$id]->periodduration != '0 days') {
-            $updates['periodduration'] = '0 days';
+        if ($movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $sections[$id]->periodduration != '0 day') {
+            $updates['periodduration'] = '0 day';
         }
         // Apply section updates.
         if ($updates) {
@@ -420,4 +420,38 @@ function format_multitopic_image_attribution($imagename, $authorwithurl, $licenc
                                 ['style' => 'white-space: nowrap;']);
     }
     return $o;
+}
+
+
+/**
+ * Convert duration string to days.
+ * Note: Doesn't handle months or years correctly.
+ *
+ * @param string|null $duration
+ * @return int|null
+ */
+function format_multitopic_duration_as_days($duration) {
+    $days = null;
+    $matchok = preg_match('/^([0-9]+) (day|week|month|year)(s)?$/', $duration, $matches);
+    if ($matchok) {
+        switch($matches[2]) {
+            case 'day':
+                $days = $matches[1] * 1;
+                break;
+            case 'week':
+                $days = $matches[1] * 7;
+                break;
+            case 'month':
+                $days = $matches[1] * 30;
+                break;
+            case 'year':
+                $days = $matches[1] * 365;
+                break;
+            default:
+                $days = null;
+        }
+    } else {
+        $days = null;
+    }
+    return $days;
 }

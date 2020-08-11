@@ -183,7 +183,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // Determine the section type.
         if ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionstyle .= ' section-page';
-        } else if ($section->periodduration == '0 days') {
+        } else if (format_multitopic_duration_as_days($section->periodduration) === 0) {
             $sectionstyle .= ' section-topic section-topic-untimed';
         } else {
             $sectionstyle .= ' section-topic section-topic-timed section-collapsed';
