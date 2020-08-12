@@ -63,7 +63,7 @@ Feature: Show/hide course sections in Multitopic format
     And section "4" should be visible
     And I click on "Section A" "link" in the ".course-content .nav" "css_element"
     And I should see "Section A" in the "#section-1" "css_element"
-    And I show section "1"
+    And I click on "Show section" "link" in the "#section-1" "css_element"
     And section "1" should be visible
 
   Scenario: Hide and show topic
@@ -75,5 +75,5 @@ Feature: Show/hide course sections in Multitopic format
     And I hide section "3"
     And section "3" should be hidden
     And section "2" should be visible
-    And I show section "3"
+    And I click on "Show section" "link" in the "#section-3" "css_element"
     And section "3" should be visible
