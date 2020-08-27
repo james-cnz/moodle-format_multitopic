@@ -1,5 +1,5 @@
 @format @format_multitopic @_cross_browser
-Feature: Show/hide course sections (Multitopic)
+Feature: Show/hide course sections (Multitopic format)
   In order to delay sections availability
   As a teacher
   I need to show or hide sections

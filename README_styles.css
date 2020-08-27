@@ -44,7 +44,6 @@ body.format-multitopic .course-content ul.nav-tabs li a .tab_content.dimmed {
 
 /* Generic Section */
 body.format-multitopic ul.sections li.section {
-    width: 100%;
     height: auto;
     position: initial !important; /* stylelint-disable-line declaration-no-important */
     visibility: inherit;
