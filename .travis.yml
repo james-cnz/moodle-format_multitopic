@@ -5,7 +5,7 @@ branches:
     - moodle_includes
 
 addons:
-  postgresql: "9.5" # Moodle 3.9 requires PostgreSQL 9.5
+  postgresql: "9.6" # Moodle Master requires PostgreSQL 9.6
 
 services:
   - mysql
