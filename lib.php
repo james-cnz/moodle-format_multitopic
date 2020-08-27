@@ -162,7 +162,7 @@ class format_multitopic extends format_base {
                 throw new moodle_exception('cannotcreateorfindstructs');
             }
 
-            // Add this section the the list.
+            // Add this section to the list.
             $fmtsections[$thissection->id] = $thissection;
 
             // Fix the section's level within appropriate bounds.
