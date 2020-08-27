@@ -68,7 +68,7 @@ body.format-multitopic ul.sections li.section .content .sectionname a:focus {
     background-color: inherit;
     box-shadow: inherit;
     -webkit-box-shadow: inherit;
-  }
+}
 body.format-multitopic ul.sections li.section .content .sectionname .section_subtitle {
     font-size: small;
 }
