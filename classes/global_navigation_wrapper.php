@@ -192,10 +192,13 @@ class global_navigation_wrapper {
                 // The course node already exists, so we must start below course level.
                 // And activities don't seem to get removed from the course node in the Boost theme,
                 // so we need at least one section node to attach activities to.
-                $firstlevel = max($section->levelsan, FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1); // ADDED.
-                for ($level = $firstlevel; $level <= max($section->pagedepthdirect, $firstlevel); $level++) {
+                // ADDED.
+                $firstlevel = max($section->levelsan, FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1);
+                $lastlevel = max($section->pagedepthdirect, $firstlevel);
+                // END ADDED.
+                for ($level = $firstlevel; $level <= $lastlevel; $level++) {
                     $parentnode = $nodeln[$level - 1];                          // ADDED.
-                    $nodeid = ($level == $firstlevel) ? $sectionid : $extraid--; // ADDED.
+                    $nodeid = ($level == $lastlevel) ? $sectionid : $extraid--; // ADDED.
                     $sectionnode = $parentnode->add($sectionname, $url, \navigation_node::TYPE_SECTION,
                         null, $nodeid,
                         new \pix_icon($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'i/section'
