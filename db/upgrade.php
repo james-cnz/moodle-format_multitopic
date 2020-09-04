@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 function xmldb_format_multitopic_upgrade($oldversion) {
     global $DB;
 
-    if ($oldversion < 2020062404) {                                             // TODO: Correct date.
+    if ($oldversion < 2020090400) {
 
         // Change periodduration "0 days" to "0 day".
         $DB->execute(
@@ -43,7 +43,7 @@ function xmldb_format_multitopic_upgrade($oldversion) {
             ['multitopic']
         );
 
-        upgrade_plugin_savepoint(true, 2020062404, 'format', 'multitopic');     // TODO: Correct date.
+        upgrade_plugin_savepoint(true, 2020090400, 'format', 'multitopic');
     }
 
     return true;
