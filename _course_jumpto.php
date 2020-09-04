@@ -16,11 +16,11 @@
 
 /**
  * Jumps to a given relative or Moodle absolute URL.
- * Unused code.
  *
  * CHANGES:
  *  - Only used in the modchooser (classes/course_renderer_wrapper.php), for redirecting to appropriate module creation page.
  *  - Converts from section ID, used by custom code, to section number, used by original code.
+ * Unused code.
  *
  * @package   format_multitopic
  * @copyright 2019 James Calder and Otago Polytechnic
