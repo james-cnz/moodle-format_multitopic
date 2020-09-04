@@ -30,7 +30,7 @@ require_once($CFG->dirroot . '/course/format/renderer.php');
 // ADDED.
 require_once(__DIR__ . '/lib.php');
 require_once(__DIR__ . '/locallib.php');
-require_once(__DIR__ . '/classes/course_renderer_wrapper.php');
+require_once(__DIR__ . '/classes/course_renderer_wrapper.php'); // Unused code.
 require_once(__DIR__ . '/classes/courseheader.php');
 require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 // END ADDED.

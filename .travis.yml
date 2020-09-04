@@ -1,8 +1,6 @@
+# Based on https://github.com/open-lms-open-source/moodle-plugin-ci/blob/master/.travis.dist.yml
+# Plus matrix from https://github.com/catalyst/moodle-auth_saml2/blob/master/.travis.yml
 language: php
-
-branches:
-  except:
-    - moodle_includes
 
 addons:
   postgresql: "9.6" # Moodle Master requires PostgreSQL 9.6
@@ -46,6 +44,9 @@ matrix:
   # Moodle 3.9
   - php: 7.3 # 7.2-7.4
     env: MOODLE_BRANCH=MOODLE_39_STABLE NODE_VERSION=14.3 DB=mysqli
+  # Moodle 3.10
+  - php: 7.4 # 7.2-7.4
+    env: MOODLE_BRANCH=MOODLE_310_STABLE NODE_VERSION=14.4 DB=mysqli
   # Moodle Master
   - php: 7.4 # 7.2-7.4
     env: MOODLE_BRANCH=master NODE_VERSION=14.4 DB=mysqli

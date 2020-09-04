@@ -16,6 +16,7 @@
 
 /**
  * Jumps to a given relative or Moodle absolute URL.
+ * Unused code.
  *
  * CHANGES:
  *  - Only used in the modchooser (classes/course_renderer_wrapper.php), for redirecting to appropriate module creation page.

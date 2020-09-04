@@ -16,6 +16,7 @@
 
 /**
  * Renderer for use with the course section and all the goodness that falls within it.
+ * Unused code.
  *
  * INCLUDED /course/renderer.php class core_course_renderer function course_section_add_cm_control .
  * CHANGED: Use section IDs instead of section numbers.  Delay use of section numbers until later, using _course_jumpto.php .
