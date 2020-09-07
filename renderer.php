@@ -197,6 +197,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             'class' => 'section main clearfix' . $sectionstyle,
             'role' => 'region',
             'aria-labelledby' => "sectionid-{$section->id}-title",
+            'aria-label' => get_section_name($course, $section),                // TODO: Remove when Sharing Cart no longer needs.
             'data-sectionid' => $section->section,
             'data-sectionreturnid' => $section->section                         // CHANGED.
         ]);
@@ -217,7 +218,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $classes = '';
         }
 
-        $sectionname = html_writer::tag('span', $this->section_title($section, $course, $section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $section->uservisible)); // CHANGED.
+        $sectionname = html_writer::tag('span', $this->section_title($section, $course));
         $o .= $this->output->heading($sectionname, 3, 'sectionname' . $classes, "sectionid-{$section->id}-title");
 
         $o .= $this->section_availability($section);
