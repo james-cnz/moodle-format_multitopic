@@ -285,7 +285,7 @@ M.course.format.fmtCollapseAllControlsUpdate = function() {
     var sectionsDom = document.querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
-        if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0) {
+        if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0 && !sectionDom.classList.contains("section-userhidden")) {
             if (sectionDom.classList.contains('section-collapsed')) {
                 collapsedNum++;
             } else {
@@ -293,7 +293,6 @@ M.course.format.fmtCollapseAllControlsUpdate = function() {
             }
         }
     }
-    document.querySelector("body.format-multitopic .collapsible-actions").setAttribute("style", (collapsedNum + expandedNum) ? "" : "display: none;");
     document.querySelector("body.format-multitopic .collapsible-actions .expand-all").setAttribute("style", (collapsedNum) ? "" : "display: none;");
     document.querySelector("body.format-multitopic .collapsible-actions .collapse-all").setAttribute("style", (!collapsedNum) ? "" : "display: none;");
 }
