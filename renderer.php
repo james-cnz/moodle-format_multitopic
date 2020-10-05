@@ -778,6 +778,24 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // END INCLUDED.
 
+        // ADDED: Expand/collapse all sections.
+        $collapsiblenum = 0;
+        $thissection = $displaysection->nextanyid ? $sections[$displaysection->nextanyid] : null;
+        while ($thissection && ($thissection->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)) {
+            if ((format_multitopic_duration_as_days($thissection->periodduration) !== 0) && $thissection->uservisiblesan) {
+                $collapsiblenum++;
+            }
+            $thissection = $thissection->nextanyid ? $sections[$thissection->nextanyid] : null;
+        }
+        echo html_writer::start_tag('div',
+                array('class' => 'collapsible-actions', 'style' => $collapsiblenum ? '' : 'display: none;'));
+        echo html_writer::tag('a', get_string('expandall'),
+                array('href' => '#', 'class' => 'collapseexpand expand-all', 'role' => 'button'));
+        echo html_writer::tag('a', get_string('collapseall'),
+                array('href' => '#', 'class' => 'collapseexpand collapse-all', 'role' => 'button', 'style' => 'display: none;'));
+        echo html_writer::end_tag('div');
+        // END ADDED.
+
         // Now the list of sections..
         echo $this->start_section_list();
 

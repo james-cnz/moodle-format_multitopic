@@ -215,6 +215,8 @@ M.course.format.fmtCollapseOnClick = function(event) {
                           window.location.href.substr(0, window.location.href.length - window.location.hash.length));
     }
 
+    M.course.format.fmtCollapseAllControlsUpdate();
+
     // Override normal event handling.
     event.preventDefault();
 
@@ -247,12 +249,62 @@ M.course.format.fmtCollapseOnHashChange = function(event) {
                                        sectionDom == selSectionDom && !sectionDom.classList.contains("section-userhidden"));
     }
 
+    M.course.format.fmtCollapseAllControlsUpdate();
+
     // Scroll to the specified section.
     if (selSectionDom) {
         selSectionDom.scrollIntoView();
     }
 
 };
+
+/**
+ * Expand/collapse all sections.
+ *
+ * @param {MouseEvent} event The mouse click
+ */
+M.course.format.fmtCollapseAllOnClick = function(event) {
+
+    // Find the clicked link anchor element.
+    var eventTarget = event.target;
+
+    // Is it expand or collapse?
+    var expand = !eventTarget.classList.contains('collapse-all');
+
+    // Set the appropriate collapse state for all collapsible sections.
+    var sectionsDom = document
+                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+    for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
+        var sectionDom = sectionsDom[sectionCount];
+        M.course.format.fmtCollapseSet(sectionDom, expand && !sectionDom.classList.contains("section-userhidden"));
+    }
+
+    M.course.format.fmtCollapseAllControlsUpdate();
+
+    // Override normal event handling.
+    event.preventDefault();
+
+};
+
+/**
+ * Update expand/collapse all controls.
+ */
+M.course.format.fmtCollapseAllControlsUpdate = function() {
+    var collapsedNum = 0, expandedNum = 0;
+    var sectionsDom = document.querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+    for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
+        var sectionDom = sectionsDom[sectionCount];
+        if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0 && !sectionDom.classList.contains("section-userhidden")) {
+            if (sectionDom.classList.contains('section-collapsed')) {
+                collapsedNum++;
+            } else {
+                expandedNum++;
+            }
+        }
+    }
+    document.querySelector("body.format-multitopic .collapsible-actions .expand-all").setAttribute("style", (collapsedNum) ? "" : "display: none;");
+    document.querySelector("body.format-multitopic .collapsible-actions .collapse-all").setAttribute("style", (!collapsedNum) ? "" : "display: none;");
+}
 
 /**
  * Initialise: Set the initial state of collapsible sections, and watch for user input.
@@ -268,6 +320,10 @@ M.course.format.fmtCollapseInit = function() {
 
     // Capture clicks on any other course section links.
     window.addEventListener("hashchange", M.course.format.fmtCollapseOnHashChange);
+
+    // Capture clicks on expand/collapse all sections.
+    document.querySelector("body.format-multitopic .collapsible-actions")
+        .addEventListener("click", M.course.format.fmtCollapseAllOnClick);
 
 };
 
