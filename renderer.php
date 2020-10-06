@@ -197,6 +197,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             'class' => 'section main clearfix' . $sectionstyle,
             'role' => 'region',
             'aria-labelledby' => "sectionid-{$section->id}-title",
+            'aria-label' => get_section_name($course, $section),                // For Sharing Cart.
             'data-sectionid' => $section->section,
             'data-sectionreturnid' => $section->section                         // CHANGED.
         ]);
@@ -217,7 +218,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             $classes = '';
         }
 
-        $sectionname = html_writer::tag('span', $this->section_title($section, $course, $section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $section->uservisible)); // CHANGED.
+        $sectionname = html_writer::tag('span', $this->section_title($section, $course));
         $o .= $this->output->heading($sectionname, 3, 'sectionname' . $classes, "sectionid-{$section->id}-title");
 
         $o .= $this->section_availability($section);
@@ -776,6 +777,24 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         echo html_writer::end_tag('div');
 
         // END INCLUDED.
+
+        // ADDED: Expand/collapse all sections.
+        $collapsiblenum = 0;
+        $thissection = $displaysection->nextanyid ? $sections[$displaysection->nextanyid] : null;
+        while ($thissection && ($thissection->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)) {
+            if ((format_multitopic_duration_as_days($thissection->periodduration) !== 0) && $thissection->uservisiblesan) {
+                $collapsiblenum++;
+            }
+            $thissection = $thissection->nextanyid ? $sections[$thissection->nextanyid] : null;
+        }
+        echo html_writer::start_tag('div',
+                array('class' => 'collapsible-actions', 'style' => $collapsiblenum ? '' : 'display: none;'));
+        echo html_writer::tag('a', get_string('expandall'),
+                array('href' => '#', 'class' => 'collapseexpand expand-all', 'role' => 'button'));
+        echo html_writer::tag('a', get_string('collapseall'),
+                array('href' => '#', 'class' => 'collapseexpand collapse-all', 'role' => 'button', 'style' => 'display: none;'));
+        echo html_writer::end_tag('div');
+        // END ADDED.
 
         // Now the list of sections..
         echo $this->start_section_list();

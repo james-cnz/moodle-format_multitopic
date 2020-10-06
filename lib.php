@@ -949,8 +949,11 @@ class format_multitopic extends format_base {
         // TODO: Fix collapse icon for AJAX rename, somehow?
         if ($linkifneeded) {
             // Display link under the section name, for collapsible sections.
-            $url = course_get_url($section->course, $section, array('navigation' => (format_multitopic_duration_as_days($section->periodduration) === 0))); // CHANGED.
-            if ($url) {
+            $navigation = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
+                        || (format_multitopic_duration_as_days($section->periodduration) === 0)
+                        || !$section->uservisible;                              // ADDED.
+            $url = course_get_url($section->course, $section, array('navigation' => $navigation)); // CHANGED.
+            if ($url && !(empty($CFG->linkcoursesections) && $navigation)) {   // CHANGED.
                 $displayvalue = html_writer::link($url, $title);
             }
             $itemtype = 'sectionname';

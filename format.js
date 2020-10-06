@@ -91,7 +91,7 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
             newstr = str.substr(0, stridx + 1) + i;
             ele.setAttribute('title', newstr);
             // Update the aria-label for the section.
-            sectionlist.item(i).setAttribute('aria-label', content.get('innerText').trim());
+            sectionlist.item(i).setAttribute('aria-label', content.get('innerText').trim()); // For Sharing Cart.
 
             // ADDED: Restore collapse icon.
             if (sectionlist.item(i).hasClass("section-topic-timed")) {
@@ -184,12 +184,22 @@ M.course.format.fmtCollapseOnClick = function(event) {
 
     // Find the linked section, and check that the link is the one on the section's heading,
     // otherwise return to normal event handling.
-    if (!eventTarget.hash) {
+    var sectionId;
+    if (eventTarget.hash) {
+        sectionId = eventTarget.hash.substr(1);
+    } else if (eventTarget.search && (eventTarget.search.indexOf("&sectionid=") >= 0)) {
+        var sectionIdStart = eventTarget.search.indexOf("&sectionid=") + 11;
+        var sectionIdEnd = eventTarget.search.indexOf("&", sectionIdStart);
+        if (sectionIdEnd < 0) {
+            sectionIdEnd = eventTarget.search.length;
+        }
+        sectionId = (sectionIdEnd > sectionIdStart) ?
+                    "sectionid-" + eventTarget.search.substring(sectionIdStart, sectionIdEnd) : "";
+    } else {
         return;
     }
-    var anchor = eventTarget.hash.substr(1);
-    var selSectionDom = anchor ?
-                    document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor)
+    var selSectionDom = sectionId ?
+                    document.querySelector("body.format-multitopic .course-content ul.sections li.section." + sectionId)
                     : null;
     if (!selSectionDom || selSectionDom.querySelector(".content h3 a") != eventTarget) {
         return;
@@ -205,6 +215,8 @@ M.course.format.fmtCollapseOnClick = function(event) {
         history.pushState(null, document.title,
                           window.location.href.substr(0, window.location.href.length - window.location.hash.length));
     }
+
+    M.course.format.fmtCollapseAllControlsUpdate();
 
     // Override normal event handling.
     event.preventDefault();
@@ -238,11 +250,62 @@ M.course.format.fmtCollapseOnHashChange = function(event) {
                                        sectionDom == selSectionDom && !sectionDom.classList.contains("section-userhidden"));
     }
 
+    M.course.format.fmtCollapseAllControlsUpdate();
+
     // Scroll to the specified section.
     if (selSectionDom) {
         selSectionDom.scrollIntoView();
     }
 
+};
+
+/**
+ * Expand/collapse all sections.
+ *
+ * @param {MouseEvent} event The mouse click
+ */
+M.course.format.fmtCollapseAllOnClick = function(event) {
+
+    // Find the clicked link anchor element.
+    var eventTarget = event.target;
+
+    // Is it expand or collapse?
+    var expand = !eventTarget.classList.contains('collapse-all');
+
+    // Set the appropriate collapse state for all collapsible sections.
+    var sectionsDom = document
+                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+    for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
+        var sectionDom = sectionsDom[sectionCount];
+        M.course.format.fmtCollapseSet(sectionDom, expand && !sectionDom.classList.contains("section-userhidden"));
+    }
+
+    M.course.format.fmtCollapseAllControlsUpdate();
+
+    // Override normal event handling.
+    event.preventDefault();
+
+};
+
+/**
+ * Update expand/collapse all controls.
+ */
+M.course.format.fmtCollapseAllControlsUpdate = function() {
+    var collapsedNum = 0;
+    var sectionsDom = document
+                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+    for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
+        var sectionDom = sectionsDom[sectionCount];
+        if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0 && !sectionDom.classList.contains("section-userhidden")) {
+            if (sectionDom.classList.contains('section-collapsed')) {
+                collapsedNum++;
+            }
+        }
+    }
+    document.querySelector("body.format-multitopic .collapsible-actions .expand-all")
+        .setAttribute("style", (collapsedNum) ? "" : "display: none;");
+    document.querySelector("body.format-multitopic .collapsible-actions .collapse-all")
+        .setAttribute("style", (!collapsedNum) ? "" : "display: none;");
 };
 
 /**
@@ -259,6 +322,10 @@ M.course.format.fmtCollapseInit = function() {
 
     // Capture clicks on any other course section links.
     window.addEventListener("hashchange", M.course.format.fmtCollapseOnHashChange);
+
+    // Capture clicks on expand/collapse all sections.
+    document.querySelector("body.format-multitopic .collapsible-actions")
+        .addEventListener("click", M.course.format.fmtCollapseAllOnClick);
 
 };
 
