@@ -197,7 +197,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             'class' => 'section main clearfix' . $sectionstyle,
             'role' => 'region',
             'aria-labelledby' => "sectionid-{$section->id}-title",
-            'aria-label' => get_section_name($course, $section),                // TODO: Remove when Sharing Cart no longer needs.
+            'aria-label' => get_section_name($course, $section),                // For Sharing Cart.
             'data-sectionid' => $section->section,
             'data-sectionreturnid' => $section->section                         // CHANGED.
         ]);

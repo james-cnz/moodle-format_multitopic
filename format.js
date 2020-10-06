@@ -91,7 +91,7 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
             newstr = str.substr(0, stridx + 1) + i;
             ele.setAttribute('title', newstr);
             // Update the aria-label for the section.
-            sectionlist.item(i).setAttribute('aria-label', content.get('innerText').trim()); // TODO: Remove when Sharing Cart no longer needs.
+            sectionlist.item(i).setAttribute('aria-label', content.get('innerText').trim()); // For Sharing Cart.
 
             // ADDED: Restore collapse icon.
             if (sectionlist.item(i).hasClass("section-topic-timed")) {
@@ -193,7 +193,8 @@ M.course.format.fmtCollapseOnClick = function(event) {
         if (sectionIdEnd < 0) {
             sectionIdEnd = eventTarget.search.length;
         }
-        sectionId = (sectionIdEnd > sectionIdStart) ? "sectionid-" + eventTarget.search.substring(sectionIdStart, sectionIdEnd) : "";
+        sectionId = (sectionIdEnd > sectionIdStart) ?
+                    "sectionid-" + eventTarget.search.substring(sectionIdStart, sectionIdEnd) : "";
     } else {
         return;
     }
@@ -290,21 +291,22 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
  * Update expand/collapse all controls.
  */
 M.course.format.fmtCollapseAllControlsUpdate = function() {
-    var collapsedNum = 0, expandedNum = 0;
-    var sectionsDom = document.querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+    var collapsedNum = 0;
+    var sectionsDom = document
+                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0 && !sectionDom.classList.contains("section-userhidden")) {
             if (sectionDom.classList.contains('section-collapsed')) {
                 collapsedNum++;
-            } else {
-                expandedNum++;
             }
         }
     }
-    document.querySelector("body.format-multitopic .collapsible-actions .expand-all").setAttribute("style", (collapsedNum) ? "" : "display: none;");
-    document.querySelector("body.format-multitopic .collapsible-actions .collapse-all").setAttribute("style", (!collapsedNum) ? "" : "display: none;");
-}
+    document.querySelector("body.format-multitopic .collapsible-actions .expand-all")
+        .setAttribute("style", (collapsedNum) ? "" : "display: none;");
+    document.querySelector("body.format-multitopic .collapsible-actions .collapse-all")
+        .setAttribute("style", (!collapsedNum) ? "" : "display: none;");
+};
 
 /**
  * Initialise: Set the initial state of collapsible sections, and watch for user input.
