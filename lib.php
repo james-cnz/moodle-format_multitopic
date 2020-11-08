@@ -335,7 +335,7 @@ class format_multitopic extends format_base {
     /**
      * Returns the display name of the given section that the course prefers.
      *
-     * Use section name is specified by user. Otherwise use default
+     * Use section name is specified by user. Otherwise use default.
      *
      * @param int|stdClass $section Section object from database.  Should specify fmt calculated properties.
      * @return string Display name that the course format prefers, e.g. "Section 2"
@@ -698,48 +698,48 @@ class format_multitopic extends format_base {
         // INCLUDED instead /course/format/topics/lib.php function course_format_options body (excluding array items).
         static $sectionformatoptions = false;
         if ($sectionformatoptions === false) {
-            $sectionformatoptions = array(
+            $sectionformatoptions = [
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options 'level'.
-                'level' => array(
+                'level' => [
                     'default' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,         // CHANGED.
                     'type' => PARAM_INT
-                ),
+                ],
                 // END INCLUDED.
                 // INCLUDED /course/format/periods/lib.php function section_format_options 'periodduration'.
-                'periodduration' => array(
+                'periodduration' => [
                     'default' => null,                                          // ADDED.
                     'type' => PARAM_NOTAGS
-                ),
+                ],
                 // END INCLUDED.
-            );
+            ];
         }
         if ($foreditform && !isset($sectionformatoptions['level']['label'])) {
-            $sectionformatoptionsedit = array(
+            $sectionformatoptionsedit = [
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options $foreditform 'level'.
-                'level' => array(
+                'level' => [
                     // REMOVED: 'default' & 'type'.
                     'label' => get_string('level', 'format_multitopic'),        // CHANGED.
                     'element_type' => 'select',
-                    'element_attributes' => array(
-                        array(
+                    'element_attributes' => [
+                        [
                             FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1 => get_string('asprincipal', 'format_multitopic'), // CHANGED.
                             FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 2 => get_string('aschild', 'format_multitopic'),     // CHANGED.
                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC => get_string('topic') // ADDED.
-                        )
-                    ),
+                        ]
+                    ],
                     'help' => 'level',
                     'help_component' => 'format_multitopic',
-                ),
+                ],
                 // END INCLUDED.
                 // INCLUDED /course/format/periods/lib.php function section_format_options $foreditform 'periodduration'.
-                'periodduration' => array(
+                'periodduration' => [
                     'label' => new lang_string('perioddurationoverride', 'format_multitopic'), // CHANGED.
                     'help' => 'perioddurationoverride',
                     'help_component' => 'format_multitopic',                    // CHANGED.
                     'element_type' => 'select',                                 // CHANGED.
                     // REMOVED: Changed type.
                     // ADDED.
-                    'element_attributes' => array(array(
+                    'element_attributes' => [[
                         null => new lang_string('default'),
                         '0 day' => new lang_string('period_0_days', 'format_multitopic'),
                         '1 day' => new lang_string('numday', '', 1),
@@ -752,11 +752,11 @@ class format_multitopic extends format_base {
                         '2 week' => new lang_string('numweeks', '', 2),
                         '3 week' => new lang_string('numweeks', '', 3),
                         '4 week' => new lang_string('numweeks', '', 4),
-                    )),
+                    ]],
                     // END ADDED.
-                ),
+                ],
                 // END INCLUDED.
-            );
+            ];
             $sectionformatoptions = array_merge_recursive($sectionformatoptions, $sectionformatoptionsedit); // CHANGED.
         }
         return $sectionformatoptions;                                           // CHANGED.
@@ -879,7 +879,7 @@ class format_multitopic extends format_base {
 
     // INCLUDED /course/format/lib.php function is_section_current .
     /**
-     * Returns true if the specified section is current
+     * Returns true if the specified section is current.
      *
      * @param int|stdClass|section_info $section The section to check.  Should specify fmt calculated properties.
      * @return bool
@@ -898,7 +898,7 @@ class format_multitopic extends format_base {
     /**
      * Whether this format allows to delete sections.
      *
-     * Do not call this function directly, instead use see course_can_delete_section()
+     * Do not call this function directly, instead use see course_can_delete_section().
      *
      * @param int|stdClass|section_info $section The section to check.
      *                                  Must specify section number or id.  Should specify fmt calculated properties.
@@ -1001,7 +1001,7 @@ class format_multitopic extends format_base {
      * Callback used in WS core_course_edit_section when teacher performs an AJAX action on a section (show/hide).
      *
      * Access to the course is already validated in the WS but the callback has to make sure
-     * that particular action is allowed by checking capabilities
+     * that particular action is allowed by checking capabilities.
      *
      * Course formats should register.
      *

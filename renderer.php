@@ -148,7 +148,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
     // INCLUDED course/format/renderer.php function section_header .
     /**
      * Generate the display of the header part of a section before
-     * course modules are included
+     * course modules are included.
      *
      * @param stdClass $section The course_section entry from DB
      * @param stdClass $course The course entry from DB
@@ -238,10 +238,10 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
     // INCLUDED instead /course/format/renderer.php function section_edit_control_items .
     /**
-     * Generate the edit control items of a section
+     * Generate the edit control items of a section.
      *
-     * @param stdClass $course The course entry from DB
-     * @param stdClass $section The course_section entry from DB
+     * @param int|stdClass $course The course entry from DB
+     * @param section_info|stdClass $section The course_section entry from DB
      * @param bool $onsectionpage true if being printed on a section page
      * @return array of edit control items
      */
