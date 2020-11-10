@@ -1,5 +1,6 @@
-# Based on https://github.com/open-lms-open-source/moodle-plugin-ci/blob/master/.travis.dist.yml
+# Based on https://github.com/moodlehq/moodle-plugin-ci/blob/master/.travis.dist.yml
 # Plus matrix from https://github.com/catalyst/moodle-auth_saml2/blob/master/.travis.yml
+
 language: php
 
 addons:
@@ -56,12 +57,11 @@ matrix:
 
 before_install:
   - phpenv config-rm xdebug.ini
+  - cd ../..
   - nvm install $NODE_VERSION
   - nvm use $NODE_VERSION
-  - cd ../..
   - composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  - docker run -d -p 127.0.0.1:4444:4444 --net=host -v /dev/shm:/dev/shm selenium/standalone-firefox:2.53.1
 
 install:
   - moodle-plugin-ci install
