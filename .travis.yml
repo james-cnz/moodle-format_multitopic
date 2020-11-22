@@ -4,7 +4,7 @@
 language: php
 
 addons:
-  postgresql: "9.6" # Moodle Master requires PostgreSQL 9.6
+  postgresql: "9.6" # Moodle 3.10 requires PostgreSQL 9.6
 
 services:
   - mysql
@@ -40,14 +40,17 @@ matrix:
   - php: 7.1 # 7.1-7.3
     env: MOODLE_BRANCH=MOODLE_37_STABLE NODE_VERSION=14.15 DB=mysqli
   # Moodle 3.8
-  - php: 7.2 # 7.1-7.4
+  - php: 7.1 # 7.1-7.4
     env: MOODLE_BRANCH=MOODLE_38_STABLE NODE_VERSION=14.15 DB=mysqli
   # Moodle 3.9
-  - php: 7.3 # 7.2-7.4
+  - php: 7.2 # 7.2-7.4
     env: MOODLE_BRANCH=MOODLE_39_STABLE NODE_VERSION=14.15 DB=mysqli
   # Moodle 3.10
-  - php: 7.4 # 7.2-7.4
+  - php: 7.2 # 7.2-7.4
     env: MOODLE_BRANCH=MOODLE_310_STABLE NODE_VERSION=14.15 DB=mysqli
+  # Moodle 3.11
+  - php: 7.3 # 7.2-7.4
+    env: MOODLE_BRANCH=MOODLE_311_STABLE NODE_VERSION=14.15 DB=mysqli
   # Moodle Master
   - php: 7.4 # 7.2-7.4
     env: MOODLE_BRANCH=master NODE_VERSION=14.15 DB=mysqli
