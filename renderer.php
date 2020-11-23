@@ -272,7 +272,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             }
 
             $controls['edit'] = array(
-                'url'   => new moodle_url('/course/format/multitopic/_course_editsection.php', array('id' => $section->id)), // CHANGED.
+                'url'   => new moodle_url('/course/format/multitopic/_course_editsection.php',
+                                         array('id' => $section->id)),          // CHANGED.
                 'icon' => 'i/settings',
                 'name' => $streditsection,
                 'pixattr' => array('class' => ''),
@@ -285,7 +286,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 if (has_capability('moodle/course:sectionvisibility', $coursecontext)) {
                     if ($section->visible) { // Show the hide/show eye.
                         $strhidefromothers = get_string_manager()->string_exists('hidefromothers', 'format_' . $course->format) ?
-                                                get_string('hidefromothers', 'format_' . $course->format) : get_string('hide'); // CHANGED.
+                                                get_string('hidefromothers', 'format_' . $course->format)
+                                                : get_string('hide');           // CHANGED.
                         $url->param('hideid', $section->id);                    // CHANGED.
                         $controls['visiblity'] = array(
                             'url' => $url,
@@ -301,7 +303,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                         // END ADDED.
                     } else if ($section->parentvisiblesan) {                    // CHANGED: Only allow unhide if parent is visible.
                         $strshowfromothers = get_string_manager()->string_exists('showfromothers', 'format_' . $course->format) ?
-                                                get_string('showfromothers', 'format_' . $course->format) : get_string('show'); // CHANGED.
+                                                get_string('showfromothers', 'format_' . $course->format)
+                                                : get_string('show');           // CHANGED.
                         $url->param('showid',  $section->id);                   // CHANGED.
                         $controls['visiblity'] = array(
                             'url' => $url,
@@ -546,7 +549,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         }
         // END INCLUDED.
 
-        // Output the clipboard itself
+        // Output the clipboard itself.
         if ($disableajax || ismoving($course->id)) {                            // TODO: Also show when JS disabled?
             $o .= html_writer::start_tag('div', array('class' => 'clipboard'));
             $o .= html_writer::tag('i', '', ['class' => 'icon fa fa-clipboard fa-fw']) . ' ';
@@ -689,10 +692,10 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 // REMOVED: marker.
 
                 // Include main tab, and index tabs for pages with sub-pages.
-                for ($level = max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $thissection->levelsan);
+                for ($level = max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $thissection->levelsan); /* ... */
                      $level <= $thissection->pagedepthdirect
                                 + ($this->page->user_is_editing()
-                                    && $thissection->pagedepthdirect < FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE ? 1 : 0);
+                                    && $thissection->pagedepthdirect < FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE ? 1 : 0); /* ... */
                      $level++) {
 
                     // Make tab.
@@ -735,8 +738,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 $nextsectionlevel = $thissection->nextpageid ? $sections[$thissection->nextpageid]->levelsan
                                                             : FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
                 for ($level = min($sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->pagedepthdirect + 1,
-                                    FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE);
-                        $level >= $nextsectionlevel + 1;
+                                    FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE); /* ... */
+                        $level >= $nextsectionlevel + 1; /* ... */
                         $level--) {
 
                     // Make "add" tab.

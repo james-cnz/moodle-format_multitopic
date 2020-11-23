@@ -49,8 +49,8 @@ function format_multitopic_set_section_visible(int $courseid, \stdClass $section
     // We will recurse if setting visibility to hidden, because hidden sections should not contain visible sections.
     $recurse = ($visibility == 0);
     // END ADDED.
-    for ($subsection = $section;
-        $subsection && ($subsection->id == $section->id || $recurse && $subsection->levelsan > $section->levelsan);
+    for ($subsection = $section; /* ... */
+        $subsection && ($subsection->id == $section->id || $recurse && $subsection->levelsan > $section->levelsan); /* ... */
         $subsection = array_key_exists($subsection->nextanyid, $sections) ? $sections[$subsection->nextanyid] : null) {
         // CHANGED LINES ABOVE: Recurse, if necessary.
         course_update_section($courseid, $subsection, array('visible' => $visibility)); // CHANGED: $section -> $subsection .
@@ -277,8 +277,8 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
 
     // Extract origin sections.
     $originarray = [];
-    for ($originsubkey = $origin->id;
-        $originsubkey == $origin->id || $originsubkey && $sections[$originsubkey]->levelsan > $origin->levelsan;
+    for ($originsubkey = $origin->id; /* ... */
+        $originsubkey == $origin->id || $originsubkey && $sections[$originsubkey]->levelsan > $origin->levelsan; /* ... */
         $originsubkey = $originarray[$originsubkey]->nextanyid) {
         $originarray[$originsubkey] = $sections[$originsubkey];
         unset($sections[$originsubkey]);

@@ -243,8 +243,8 @@ class format_multitopic extends format_base {
         $sectionnextatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
                                          FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
-        for ($thissection = $sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC];
-                $thissection;
+        for ($thissection = $sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]; /* ... */
+                $thissection; /* ... */
                 $thissection = $thissection->prevanyid ? $fmtsections[$thissection->prevanyid] : null) {
             $levelsan = $thissection->levelsan;
 
