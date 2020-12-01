@@ -115,6 +115,36 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
     }
 };
 
+// INCLUDED from /course/format/collapsibletopics/amd/src/collapsibletopics.js (modified).
+
+/**
+ * Update toggles state of current course in browser storage.
+ * 
+ * @param {Object.<number, boolean>} toggles Array of expanded sections in the current course
+ */
+M.course.format.fmtSetState = function(toggles) {
+    var course = document.querySelector("body").getAttribute("class").match(/(?:^|\s)course-(\d+)(?:\s|$)/)[1];
+    window.localStorage.setItem('fmt-sectionsid-toggle-' + course, JSON.stringify(toggles));
+};
+
+/**
+ * Fetch toggles state of current course from browser storage.
+ * 
+ * @return {Object.<number, boolean>} Array of expanded sections in the current course
+ */
+M.course.format.fmtGetState = function() {
+    var course = document.querySelector("body").getAttribute("class").match(/(?:^|\s)course-(\d+)(?:\s|$)/)[1];
+    var toggles;
+    toggles = window.localStorage.getItem('fmt-sectionsid-toggle-' + course);
+    if (toggles === null) {
+        return {};
+    } else {
+        return JSON.parse(toggles);
+    }
+};
+
+// END INCLUDED.
+
 // REMAINDER ADDED.
 
 /**
@@ -149,20 +179,27 @@ M.course.format.fmtCollapseIconYui = function(sectionYui) {
  * Set or toggle the expand/collapse state for a specified collapsible section
  *
  * @param {HTMLLIElement} sectionDom The collapsible section
+ * @param {Object.<number, boolean>?} toggles Array of expanded sections in the current course
  * @param {boolean?} show Whether the section should be shown, or undefined to toggle
  */
-M.course.format.fmtCollapseSet = function(sectionDom, show) {
+M.course.format.fmtCollapseSet = function(sectionDom, toggles, show) {
 
     if (show === undefined) {
         show = sectionDom.classList.contains("section-collapsed");
     }
 
+    var sectionid = sectionDom.getAttribute("class").match(/(?:^|\s)sectionid-(\d+)(?:\s|$)/)[1];
+
     if (show) {
         sectionDom.classList.remove("section-collapsed");
         sectionDom.classList.add("section-expanded");
+        toggles[sectionid] = true;
     } else {
         sectionDom.classList.remove("section-expanded");
         sectionDom.classList.add("section-collapsed");
+        if (toggles.hasOwnProperty(sectionid)) {
+            delete toggles[sectionid];
+        }
     }
 
     M.course.format.fmtCollapseIcon(sectionDom);
@@ -207,7 +244,9 @@ M.course.format.fmtCollapseOnClick = function(event) {
 
     // If this is a collapsible section, toggle its collapse state.
     if (selSectionDom.classList.contains("section-topic-timed") && !selSectionDom.classList.contains("section-userhidden")) {
-        M.course.format.fmtCollapseSet(selSectionDom);
+        var toggles = M.course.format.fmtGetState();
+        M.course.format.fmtCollapseSet(selSectionDom, toggles);
+        M.course.format.fmtSetState(toggles);
     }
 
     // If a section anchor is specified in the URL bar, clear it, since it may no longer be relevant.
@@ -244,11 +283,19 @@ M.course.format.fmtCollapseOnHashChange = function(event) {
     // Set the appropriate collapse state for all collapsible sections.
     var sectionsDom = document
                         .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+    var toggles = M.course.format.fmtGetState();
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
-        M.course.format.fmtCollapseSet(sectionDom,
-                                       sectionDom == selSectionDom && !sectionDom.classList.contains("section-userhidden"));
+        if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0) {
+            var sectionid = sectionDom.getAttribute("class").match(/(?:^|\s)sectionid-(\d+)(?:\s|$)/)[1];
+            M.course.format.fmtCollapseSet(sectionDom,
+                                        toggles,
+                                        (sectionDom == selSectionDom || !anchor && toggles.hasOwnProperty(sectionid))
+                                        && !sectionDom.classList.contains("section-userhidden")
+                                        );
+        }
     }
+    M.course.format.fmtSetState(toggles);
 
     M.course.format.fmtCollapseAllControlsUpdate();
 
@@ -275,10 +322,14 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
     // Set the appropriate collapse state for all collapsible sections.
     var sectionsDom = document
                         .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+    var toggles = M.course.format.fmtGetState();
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
-        M.course.format.fmtCollapseSet(sectionDom, expand && !sectionDom.classList.contains("section-userhidden"));
+        if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0) {
+            M.course.format.fmtCollapseSet(sectionDom, toggles, expand && !sectionDom.classList.contains("section-userhidden"));
+        }
     }
+    M.course.format.fmtSetState(toggles);
 
     M.course.format.fmtCollapseAllControlsUpdate();
 
