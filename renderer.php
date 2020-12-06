@@ -143,7 +143,55 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         return $this->section_title($section, $course, false);                  // CHANGED.
     }
 
-    // NOTE: Additional $section data passes through function section_right_content.
+    // INCLUDED course/format/renderer.php function section_right_content .
+    /**
+     * Generate the content to displayed on the right part of a section
+     * before course modules are included
+     *
+     * @param stdClass $section The course_section entry from DB
+     * @param stdClass $course The course entry from DB
+     * @param bool $onsectionpage true if being printed on a section page
+     * @return string HTML to output.
+     */
+    protected function section_right_content($section, $course, $onsectionpage) {
+        $o = $this->output->spacer();
+
+        $controls = $this->section_edit_control_items($course, $section, $onsectionpage);
+        $o .= $this->section_edit_control_menu($controls, $course, $section);
+
+        // ADDED.
+        // Completion info.
+        if ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+            && $section->completiontrackdepth >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+            if ($this->page->user_is_editing()) {
+                $completionicon = 'auto-enabled';
+            } else if ($section->completiontickheight <= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+                // if ($section->completionpassdepth >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+                //    $completionicon = 'auto-pass';
+                // } else {
+                    $completionicon = 'auto-y';
+                // }
+            } else {
+            $completionicon = 'auto-n';
+            }
+        } else {
+            $completionicon = '';
+        }
+        if ($completionicon) {
+            $imgalt = '';
+            $completionpixicon = new pix_icon('i/completion-'.$completionicon, $imgalt, '',
+                                array('title' => $imgalt));
+            $completionoutput = html_writer::tag('span', $this->output->render($completionpixicon),
+                                array('class' => 'autocompletion'));
+        } else {
+            $completionoutput = '';
+        }
+        $o .= ' ' . $completionoutput;
+        // END ADDED.
+
+        return $o;
+    }
+    // END INCLUDED.
 
     // INCLUDED course/format/renderer.php function section_header .
     /**
@@ -698,9 +746,35 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                                     && $thissection->pagedepthdirect < FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE ? 1 : 0); /* ... */
                      $level++) {
 
+                    // Completion info.
+                    if ($thissection->completiontrackdepth >= $level) {
+                        if ($this->page->user_is_editing()) {
+                            $completionicon = 'auto-enabled';
+                        } else if ($thissection->completiontickheight <= $level) {
+                            // if ($thissection->completionpassdepth >= $level) {
+                            //    $completionicon = 'auto-pass';
+                            // } else {
+                                $completionicon = 'auto-y';
+                            // }
+                        } else {
+                        $completionicon = 'auto-n';
+                        }
+                    } else {
+                        $completionicon = '';
+                    }
+                    if ($completionicon) {
+                        $imgalt = '';
+                        $completionpixicon = new pix_icon('i/completion-'.$completionicon, $imgalt, '',
+                                            array('title' => $imgalt));
+                        $completionoutput = html_writer::tag('span', $this->output->render($completionpixicon),
+                                            array('class' => 'autocompletion'));
+                    } else {
+                        $completionoutput = '';
+                    }
+                    
                     // Make tab.
                     $newtab = new tabobject("tab_id_{$thissection->id}_l{$level}", $url,
-                        html_writer::tag('div', $sectionname, ['class' =>
+                        html_writer::tag('div', $sectionname . ' ' . $completionoutput, ['class' =>
                             'tab_content'
                             . ($thissection->currentnestedlevel >= $level ? ' marker' : '')
                             . (!$thissection->visible || !$thissection->available

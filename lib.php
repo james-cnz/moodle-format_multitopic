@@ -142,6 +142,8 @@ class format_multitopic extends format_base {
 
         $courseperioddays = format_multitopic_duration_as_days($course->periodduration);
 
+        $completioninfo = new completion_info($course);
+
         // Forward pass.
 
         // Generated list of sections.
@@ -235,6 +237,30 @@ class format_multitopic extends format_base {
             $thissection->currentnestedlevel = $iscurrent ? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
                                                           : FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1;
 
+            // Initialise completion properties for reverse pass.
+            $thissection->completiontrackdepth  = FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1;
+            // $thissection->completionpassdepth   = FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1;
+            $thissection->completiontickheight  = FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
+            $cancomplete = isloggedin() && !isguestuser();
+            if (!empty($modinfo->sections[$thissection->section]) && $cancomplete) {
+                foreach ($modinfo->sections[$thissection->section] as $cmid) {
+                    $thismod = $modinfo->cms[$cmid];
+                    if ($thismod->modname == 'label') {
+                        continue;
+                    }
+                    if ($completioninfo->is_enabled($thismod) != COMPLETION_TRACKING_NONE) {
+                        $thissection->completiontrackdepth = FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC;
+                        $completiondata = $completioninfo->get_data($thismod, true);
+                        if ($completiondata->completionstate == COMPLETION_COMPLETE_PASS) {
+                            // $thissection->completionpassdepth = FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC;
+                        } else if ($completiondata->completionstate == COMPLETION_INCOMPLETE
+                                || $completiondata->completionstate == COMPLETION_COMPLETE_FAIL) {
+                            $thissection->completiontickheight = FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC + 1;
+                        }
+                    }
+                }
+            }
+
         }
 
         // Reverse pass.
@@ -262,9 +288,10 @@ class format_multitopic extends format_base {
             // Flag to indicate the presence of calculated properties.
             $thissection->fmtdata = true;
 
-            // Parent's tree properties.
+            // Parent's properties.
             if ($thissection->parentid) {
                 $parent = $fmtsections[$thissection->parentid];
+                // Parent's tree properties.
                 $parent->hassubsections = true;
                 if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                     $parent->pagedepth = max($parent->pagedepth, $thissection->pagedepth);
@@ -272,6 +299,16 @@ class format_multitopic extends format_base {
                 }
                 if ($thissection->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) {
                     $parent->currentnestedlevel = max($parent->currentnestedlevel, $levelsan - 1);
+                }
+                // Parent's completion properties.
+                if ($thissection->completiontrackdepth >= $levelsan) {
+                    $parent->completiontrackdepth = max($parent->completiontrackdepth, $levelsan -1);
+                }
+                // if ($thissection->completionpassdepth >= $levelsan) {
+                //    $parent->completionpassdepth = max($parent->completionpassdepth, $levelsan -1);
+                // }
+                if ($thissection->completiontickheight > $levelsan) {
+                    $parent->completiontickheight = max($parent->completiontickheight, $levelsan);
                 }
             }
 
