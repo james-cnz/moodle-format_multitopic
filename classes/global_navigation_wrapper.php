@@ -275,7 +275,7 @@ class global_navigation_wrapper {
             $activityname = format_string($activity->name, true, array('context' => \context_module::instance($activity->id)));
             $action = new \moodle_url($activity->url);
 
-            // Check if the onclick property is set (puke!)
+            // Check if the onclick property is set (puke!).
             if (!empty($activity->onclick)) {
                 // Increment the counter so that we have a unique number.
                 $legacyonclickcounter++;

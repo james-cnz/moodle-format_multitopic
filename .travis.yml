@@ -1,9 +1,10 @@
-# Based on https://github.com/open-lms-open-source/moodle-plugin-ci/blob/master/.travis.dist.yml
+# Based on https://github.com/moodlehq/moodle-plugin-ci/blob/master/.travis.dist.yml
 # Plus matrix from https://github.com/catalyst/moodle-auth_saml2/blob/master/.travis.yml
+
 language: php
 
 addons:
-  postgresql: "9.4" # Moodle 3.9 requires PostgreSQL 9.5
+  postgresql: "9.3" # Moodle 3.3 requires PostgreSQL 9.3
 
 services:
   - mysql
@@ -18,14 +19,17 @@ cache:
 matrix:
  include:
   # Moodle 3.3 (old) version.php $plugin -> requires = 2017051509
-  - php: 7.0 # 5.6.5-7.1
-    env: MOODLE_BRANCH=MOODLE_33_STABLE NODE_VERSION=8.9 DB=mysqli
+  #- php: 7.0 # 5.6.5-7.1
+  #  env: MOODLE_BRANCH=MOODLE_33_STABLE NODE_VERSION=8.9 DB=mysqli
   # Moodle 3.3 (old), PostgreSQL
-  - php: 7.0 # 5.6.5-7.1
-    env: MOODLE_BRANCH=MOODLE_33_STABLE NODE_VERSION=8.9 DB=pgsql
+  #- php: 7.0 # 5.6.5-7.1
+  #  env: MOODLE_BRANCH=MOODLE_33_STABLE NODE_VERSION=8.9 DB=pgsql
   # Moodle 3.4 (old)
   - php: 7.0 # 7.0-7.2
-    env: MOODLE_BRANCH=MOODLE_34_STABLE NODE_VERSION=8.10 DB=mysqli
+    env: MOODLE_BRANCH=MOODLE_34_STABLE NODE_VERSION=8.9 DB=mysqli
+  # Moodle 3.4 (old), PostgreSQL
+  - php: 7.0 # 7.0-7.2
+    env: MOODLE_BRANCH=MOODLE_34_STABLE NODE_VERSION=8.9 DB=pgsql
   # Moodle 3.5
   #- php: 7.0 # 7.0-7.2
   #  env: MOODLE_BRANCH=MOODLE_35_STABLE NODE_VERSION=14.0 DB=mysqli
@@ -56,12 +60,11 @@ matrix:
 
 before_install:
   - phpenv config-rm xdebug.ini
+  - cd ../..
   - nvm install $NODE_VERSION
   - nvm use $NODE_VERSION
-  - cd ../..
-  - composer create-project -n --no-dev --prefer-dist blackboard-open-source/moodle-plugin-ci ci ^2
+  - composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
   - export PATH="$(cd ci/bin; pwd):$(cd ci/vendor/bin; pwd):$PATH"
-  - docker run -d -p 127.0.0.1:4444:4444 --net=host -v /dev/shm:/dev/shm selenium/standalone-firefox:2.53.1
 
 install:
   - moodle-plugin-ci install
@@ -77,4 +80,4 @@ script:
   - moodle-plugin-ci grunt
   - moodle-plugin-ci phpdoc
   - moodle-plugin-ci phpunit
-  - moodle-plugin-ci behat
+  #- moodle-plugin-ci behat
