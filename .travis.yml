@@ -4,7 +4,7 @@
 language: php
 
 addons:
-  postgresql: "9.3" # Moodle 3.3 requires PostgreSQL 9.3
+  postgresql: "9.4" # Moodle 3.3 requires PostgreSQL 9.3
 
 services:
   - mysql
