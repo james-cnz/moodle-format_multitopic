@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Specialised restore for format_multitopic
+ * Specialised restore for Multitopic course format.
  *
  * @package   format_multitopic
  * @category  backup
@@ -27,7 +27,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Specialised restore for format_multitopic
+ * Specialised restore for Multitopic course format.
  *
  * Change periodduration "0 days" to "0 day".
  *
@@ -39,7 +39,7 @@ defined('MOODLE_INTERNAL') || die();
 class restore_format_multitopic_plugin extends restore_format_plugin {
 
     /**
-     * Creates a dummy path element in order to be able to execute code after restore
+     * Creates a dummy path element in order to be able to execute code after restore.
      *
      * @return restore_path_element[]
      */
@@ -50,16 +50,19 @@ class restore_format_multitopic_plugin extends restore_format_plugin {
     }
 
     /**
-     * Dummy process method
+     * Dummy process method.
+     *
+     * @return void
      */
     public function process_dummy_course() {
 
     }
 
     /**
-     * Executed after course restore is complete
+     * Executed after course restore is complete.
      *
-     * This method is only executed if course configuration was overridden
+     * This method is only executed if course configuration was overridden.
+     * @return void
      */
     public function after_restore_course() {
         global $DB;

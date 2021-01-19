@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Upgrade scripts for course format "Multitopic"
+ * Upgrade scripts for Multitopic course format.
  *
  * @package    format_multitopic
  * @copyright  2020 James Calder and Otago Polytechnic
@@ -26,9 +26,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Upgrade script for format_multitopic
+ * Upgrade script for Multitopic course format.
  *
- * @param int $oldversion the version we are upgrading from
+ * @param int|float $oldversion the version we are upgrading from
  * @return bool result
  */
 function xmldb_format_multitopic_upgrade($oldversion) {

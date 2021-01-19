@@ -150,7 +150,7 @@ if ($mform->is_cancelled()) {
     // ADDED: Update section info for return URL.
     if (isset($data->level) && ($data->level != $sectioninfo->levelsan) && ($sectioninfo->section > 0)) {
         // If the level was changed, update the section info properties relevant to generating the URL.
-        // (A hack to avoid recalculating section properties.)
+        // This is a hack to avoid recalculating section properties.
         if (($sectioninfo->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
             && ($data->level >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)) {
             // If the section was changed to Topic level, the former previous page will be the new parent page.
