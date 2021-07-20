@@ -125,7 +125,7 @@ class format_multitopic extends format_base {
      *
      * @return array of section_info objects
      */
-    public final function fmt_get_sections() : array {
+    final public function fmt_get_sections() : array {
         // CHANGED LINE ABOVE.
         // CHANGED: Get info, but don't return it yet.
         if ($course = $this->get_course()) {
@@ -298,7 +298,7 @@ class format_multitopic extends format_base {
      * @param int $strictness
      * @return section_info
      */
-    public final function fmt_get_section($section, int $strictness = IGNORE_MISSING) {
+    final public function fmt_get_section($section, int $strictness = IGNORE_MISSING) {
         // CHANGED: Convert from section number to section info, rather than the other way around.
         if (is_numeric($section)) {
             $sectionnum = $section;
