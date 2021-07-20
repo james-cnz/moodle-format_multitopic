@@ -42,7 +42,7 @@ $PAGE->set_url('/course/jumpto.php');
 // TODO: Change?
 
 if (!confirm_sesskey()) {
-    print_error('confirmsesskeybad');
+    throw new moodle_exception('confirmsesskeybad', 'error');
 }
 
 if (strpos($jump, '/') === 0 || strpos($jump, $CFG->wwwroot) === 0) {
@@ -57,5 +57,5 @@ if (strpos($jump, '/') === 0 || strpos($jump, $CFG->wwwroot) === 0) {
     // END ADDED.
     redirect($moodlejump);                                                      // CHANGED.
 } else {
-    print_error('error');
+    throw new moodle_exception('error', 'error');
 }

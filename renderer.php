@@ -643,7 +643,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         if (!($sectioninfo = $displaysection) || !$sectioninfo->uservisiblesan) { // CHANGED: Already have section info.
             // This section doesn't exist or is not available for the user.
             // We actually already check this in course/view.php but just in case exit from this function as well.
-            print_error('unknowncoursesection', 'error', course_get_url($course),
+            throw new moodle_exception('unknowncoursesection', 'error', course_get_url($course),
                 format_string($course->fullname));
         }
         // END INCLUDED.
