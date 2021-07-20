@@ -55,7 +55,7 @@ Feature: Sections can be edited and deleted in Multitopic format
   Scenario: Inline edit section name in Multitopic format
     When I click on "Edit section name" "link" in the "li#section-1" "css_element"
     And I set the field "New name for section Section 1" to "Midterm evaluation"
-    And I press key "13" in the field "New name for section Section 1"
+    And I press the enter key
     Then I should not see "Section 1" in the "region-main" "region"
     And "New name for section" "field" should not exist
     And I should see "Midterm evaluation" in the "li#section-1" "css_element"

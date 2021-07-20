@@ -18,9 +18,10 @@ Feature: Sections can be moved (Multitopic format)
     And I am on "Course 1" course homepage with editing mode on
 
   Scenario: Move up and down a section with Javascript disabled in a single page course
-    Given I add a "Forum" to section "1" and I fill the form with:
-      | Forum name | Test forum name |
-      | Description | Test forum description |
+    Given the following "activities" exist:
+      | activity | name            | intro                        | course | idnumber | section |
+      | forum    | Test forum name | Test forum name description  | C1     | forum1   | 1       |
+    And I am on "Course 1" course homepage
     When I move down section "1"
     Then I should see "Test forum name" in the "Topic 2" "section"
     And I move up section "2"
