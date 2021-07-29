@@ -10,7 +10,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:10 # Moodle 3.4-3.5: >=9.3 / Moodle 3.6-3.8: >=9.4 / Moodle 3.9: >=9.5 / Moodle 3.10-3.11: >=9.6
+        image: postgres:10 # Moodle 3.4-3.5: 9.3-11.x / Moodle 3.6-3.8: 9.4-11.x / Moodle 3.9: >=9.5 / Moodle 3.10-3.11: >=9.6
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -18,7 +18,7 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
       mariadb:
-        image: mariadb:10.5 # Moodle 3.4-3.8: >= 5.5.31 / Moodle 3.9-3.11 >=10.2.29 / 10.6 breaks Moodle, see MDL-72131
+        image: mariadb:10.5 # Moodle 3.4-3.8: >=5.5.31 / Moodle 3.9-3.11 >=10.2.29 / 10.6 breaks Moodle, see MDL-72131
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -63,15 +63,15 @@ jobs:
             moodle-branch: 'MOODLE_310_STABLE'
             database: mariadb
           # Moodle 3.11
-          - php: '7.4' # 7.2-7.4
+          - php: '7.4' # 7.3-7.4
             moodle-branch: 'MOODLE_311_STABLE'
             database: mariadb
           # Moodle 3.11, PostgreSQL
-          - php: '7.4' # 7.2-7.4
+          - php: '7.4' # 7.3-7.4
             moodle-branch: 'MOODLE_311_STABLE'
             database: pgsql
-          # Moodle 3.11, PHP 8.0 (not ready for production)
-          - php: '8.0' # 7.2-7.4
+          # Moodle 3.11, PHP 8.0 (not ready for production, see MDL-70745)
+          - php: '8.0' # 7.3-7.4
             moodle-branch: 'MOODLE_311_STABLE'
             database: mariadb
 
