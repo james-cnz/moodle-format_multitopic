@@ -58,7 +58,7 @@ class courseheader implements \renderable {
         $contextid = \context_course::instance($course->id)->id;
 
         // Set course-related properties.
-        $this->coursename   = $course->fullname;
+        $this->coursename   = format_string($course->fullname, true, ['context' => $contextid]);
         $this->bannerslice  = $course->bannerslice;
 
         // Clear image-related properties.
