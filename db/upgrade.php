@@ -46,5 +46,23 @@ function xmldb_format_multitopic_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020090400, 'format', 'multitopic');
     }
 
+    if ($oldversion < 2021092301) {
+
+        // Add collapsible.
+        $DB->execute(
+            "INSERT IGNORE INTO {course_format_options} (courseid, format, sectionid, name, value)
+             SELECT course AS courseid, 'multitopic' AS format, cs.id AS sectionid, 'collapsible' AS name,
+             (CASE WHEN cfo.value LIKE '0 %' THEN '0' ELSE '1' END) AS value
+             FROM {course_sections} cs
+             JOIN {course} c ON c.id = cs.course
+             LEFT JOIN {course_format_options} cfo
+             ON cfo.courseid = cs.course AND cfo.sectionid = cs.id AND cfo.name = 'periodduration'
+             WHERE c.format = ? AND cfo.value LIKE '0 %'",
+            ['multitopic']
+        );
+
+        upgrade_plugin_savepoint(true, 2021092301, 'format', 'multitopic');
+    }
+
     return true;
 }

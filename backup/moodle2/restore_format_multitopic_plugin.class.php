@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Specialised restore for Multitopic course format.
  *
- * Change periodduration "0 days" to "0 day".
+ * Change periodduration "0 days" to "0 day", and add collapsible.
  *
  * @package   format_multitopic
  * @category  backup
@@ -75,6 +75,16 @@ class restore_format_multitopic_plugin extends restore_format_plugin {
         $DB->execute(
             "UPDATE {course_format_options} SET value = '0 day'
              WHERE courseid = ? AND format = 'multitopic' AND name = 'periodduration' AND value = '0 days'",
+            [$this->step->get_task()->get_courseid()]
+        );
+        $DB->execute(
+            "INSERT IGNORE INTO {course_format_options} (courseid, format, sectionid, name, value)
+             SELECT course AS courseid, 'multitopic' AS format, cs.id AS sectionid, 'collapsible' AS name,
+             (CASE WHEN cfo.value LIKE '0 %' THEN '0' ELSE '1' END) AS value
+             FROM {course_sections} cs
+             LEFT JOIN {course_format_options} cfo
+             ON cfo.courseid = cs.course AND cfo.sectionid = cs.id AND cfo.name = 'periodduration'
+             WHERE course = ? AND cfo.value LIKE '0 %'",
             [$this->step->get_task()->get_courseid()]
         );
 

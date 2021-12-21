@@ -80,6 +80,12 @@ $string['bannerslice']      = 'Banner slice';
 $string['bannerslice_help'] = 'The slice of the course summary image to use in the course banner.
  e.g.  Set to "0%" to use the top of the course summary image in the course banner, "50%" to use the middle, or "100%" to use the bottom.';
 
+$string['collapsibledefault']      = 'Collapsible topics';
+$string['collapsibledefault_help'] = 'Whether topics are collapsible by default.';
+$string['collapsibleoverride']      = 'Collapsible topic override';
+$string['collapsibleoverride_help'] = 'Whether this topic is collapsible.
+ (Not applicable to pages.)';
+
 $string['image']            = 'Image';
 $string['image_by']         = 'by';
 $string['image_licence']    = 'licence';

@@ -628,6 +628,12 @@ class format_multitopic extends format_base {
                     'type' => PARAM_NOTAGS
                 ],
                 // END INCLUDED.
+                // ADDED.
+                'collapsible' => [
+                    'default' => '1',
+                    'type' => PARAM_ALPHANUM
+                ],
+                // END ADDED.
                 'hiddensections' => [
                     'default' => $courseconfig->hiddensections,
                     'type' => PARAM_INT,
@@ -659,6 +665,20 @@ class format_multitopic extends format_base {
                     // END ADDED.
                 ],
                 // END INCLUDED.
+                // ADDED.
+                'collapsible' => [
+                    'label' => get_string('collapsibledefault', 'format_multitopic'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        [
+                            '0' => get_string('no'),
+                            '1' => get_string('yes'),
+                        ]
+                    ],
+                    'help' => 'collapsibledefault',
+                    'help_component' => 'format_multitopic',
+                ],
+                // END ADDED.
                 'hiddensections' => [
                     'label' => new lang_string('hiddensections'),
                     'help' => 'hiddensections',
@@ -742,6 +762,12 @@ class format_multitopic extends format_base {
                     'type' => PARAM_NOTAGS
                 ],
                 // END INCLUDED.
+                // ADDED.
+                'collapsible' => [
+                    'default' => null,
+                    'type' => PARAM_ALPHANUM
+                ],
+                // END ADDED.
             ];
         }
         if ($foreditform && !isset($sectionformatoptions['level']['label'])) {
@@ -787,6 +813,21 @@ class format_multitopic extends format_base {
                     // END ADDED.
                 ],
                 // END INCLUDED.
+                // ADDED.
+                'collapsible' => [
+                    'label' => get_string('collapsibleoverride', 'format_multitopic'),
+                    'element_type' => 'select',
+                    'element_attributes' => [
+                        [
+                            null => new lang_string('default'),
+                            '0' => get_string('no'),
+                            '1' => get_string('yes'),
+                        ]
+                    ],
+                    'help' => 'collapsibleoverride',
+                    'help_component' => 'format_multitopic',
+                ],
+                // END ADDED.
             ];
             $sectionformatoptions = array_merge_recursive($sectionformatoptions, $sectionformatoptionsedit); // CHANGED.
         }
@@ -976,6 +1017,7 @@ class format_multitopic extends format_base {
     public function inplace_editable_render_section_name($section, $linkifneeded = true,
             $editable = null, $edithint = null, $editlabel = null) : \core\output\inplace_editable {
         $section = $this->fmt_get_section($section);                            // ADDED.
+        $course = course_get_format($section->course)->get_course();            // ADDED.
         if (empty($edithint)) {
             $edithint = new lang_string('editsectionname');                     // CHANGED.
         }
@@ -1002,8 +1044,8 @@ class format_multitopic extends format_base {
         if ($linkifneeded) {
             // Display link under the section name, for collapsible sections.
             $navigation = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
-                        || (format_multitopic_duration_as_days($section->periodduration) === 0)
-                        || (!$section->uservisible && $section->section != 0);  // ADDED.
+                        || ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) == '0')
+                        || !$section->uservisible;                              // ADDED.
             $url = course_get_url($section->course, $section, array('navigation' => $navigation)); // CHANGED.
             if ($url && !(empty($CFG->linkcoursesections) && $navigation)) {   // CHANGED.
                 $displayvalue = html_writer::link($url, $title);

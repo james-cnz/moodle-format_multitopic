@@ -183,10 +183,18 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         // Determine the section type.
         if ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionstyle .= ' section-page';
-        } else if (format_multitopic_duration_as_days($section->periodduration) === 0) {
-            $sectionstyle .= ' section-topic section-topic-untimed';
         } else {
-            $sectionstyle .= ' section-topic section-topic-timed section-collapsed';
+            $sectionstyle .= ' section-topic';
+            if (format_multitopic_duration_as_days($section->periodduration) === 0) {
+                $sectionstyle .= ' section-topic-untimed';
+            } else {
+                $sectionstyle .= ' section-topic-timed';
+            }
+            if ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0') {
+                $sectionstyle .= ' section-topic-collapsible section-collapsed';
+            } else {
+                $sectionstyle .= ' section-topic-noncollapsible';
+            }
         }
 
         $sectionstyle .= " sectionid-{$section->id}";
@@ -782,7 +790,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $collapsiblenum = 0;
         $thissection = $displaysection->nextanyid ? $sections[$displaysection->nextanyid] : null;
         while ($thissection && ($thissection->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)) {
-            if ((format_multitopic_duration_as_days($thissection->periodduration) !== 0) && $thissection->uservisible) {
+            if ( ((($thissection->collapsible != '') ? $thissection->collapsible : $course->collapsible) != '0')
+                    && $thissection->uservisible) {
                 $collapsiblenum++;
             }
             $thissection = $thissection->nextanyid ? $sections[$thissection->nextanyid] : null;

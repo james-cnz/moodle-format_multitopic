@@ -94,7 +94,7 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
             sectionlist.item(i).setAttribute('aria-label', content.get('innerText').trim()); // For Sharing Cart.
 
             // ADDED: Restore collapse icon.
-            if (sectionlist.item(i).hasClass("section-topic-timed")) {
+            if (sectionlist.item(i).hasClass("section-topic-collapsible")) {
                 M.course.format.fmtCollapseIconYui(sectionlist.item(i));
             }
             // END ADDED.
@@ -206,7 +206,7 @@ M.course.format.fmtCollapseOnClick = function(event) {
     }
 
     // If this is a collapsible section, toggle its collapse state.
-    if (selSectionDom.classList.contains("section-topic-timed") && !selSectionDom.classList.contains("section-userhidden")) {
+    if (selSectionDom.classList.contains("section-topic-collapsible") && !selSectionDom.classList.contains("section-userhidden")) {
         M.course.format.fmtCollapseSet(selSectionDom);
     }
 
@@ -243,7 +243,7 @@ M.course.format.fmtCollapseOnHashChange = function(event) {
 
     // Set the appropriate collapse state for all collapsible sections.
     var sectionsDom = document
-                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         M.course.format.fmtCollapseSet(sectionDom,
@@ -274,7 +274,7 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
 
     // Set the appropriate collapse state for all collapsible sections.
     var sectionsDom = document
-                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         M.course.format.fmtCollapseSet(sectionDom, expand && !sectionDom.classList.contains("section-userhidden"));
@@ -293,7 +293,7 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
 M.course.format.fmtCollapseAllControlsUpdate = function() {
     var collapsedNum = 0;
     var sectionsDom = document
-                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-timed");
+                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0 && !sectionDom.classList.contains("section-userhidden")) {
