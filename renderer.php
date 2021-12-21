@@ -224,10 +224,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $o .= $this->section_availability($section);
 
         $o .= html_writer::start_tag('div', array('class' => 'summary'));
-        if ($section->uservisible || $section->visible) {
-            // Show summary if section is available or has availability restriction information.
-            // Do not show summary if section is hidden but we still display it because of course setting
-            // "Hidden sections are shown in collapsed form".
+        if ($section->uservisible || ($section->section == 0)) {
+            // Do not show summary if section is hidden.
             $o .= $this->format_summary_text($section);
         }
         $o .= html_writer::end_tag('div');
@@ -640,7 +638,8 @@ class format_multitopic_renderer extends format_section_renderer_base {         
 
         // INCLUDED /course/format/renderer.php function print_single_section_page section "Can we view...".
         // Can we view the section in question?
-        if (!($sectioninfo = $displaysection) || !$sectioninfo->uservisiblesan) { // CHANGED: Already have section info.
+        if (!($sectioninfo = $displaysection)
+            || (!$sectioninfo->uservisible && $section->section != 0)) {  // CHANGED: Already have section info.
             // This section doesn't exist or is not available for the user.
             // We actually already check this in course/view.php but just in case exit from this function as well.
             throw new moodle_exception('unknowncoursesection', 'error', course_get_url($course),
@@ -676,14 +675,12 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             // Show the section if the user is permitted to access it, OR if it's not available
             // but there is some available info text which explains the reason & should display,
             // OR it is hidden but the course has a setting to display hidden sections as unavilable.
-            $showsection = $thissection->uservisible ||
+            $showsection = $thissection->uservisible || ($thissection->section == 0) ||
                     ($thissection->visible || !$course->hiddensections)
                     && ($thissection->available || !empty($thissection->availableinfo));
 
             // Make and add tabs for visible pages.
-            if ($thissection->levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT
-                || $thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
-                    && $sectionatlevel[$thissection->levelsan - 1]->uservisiblesan && $showsection) {
+            if ($thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $showsection) {
 
                 $sectionname = get_section_name($course, $thissection);
 
@@ -703,7 +700,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                         html_writer::tag('div', $sectionname, ['class' =>
                             'tab_content'
                             . ($thissection->currentnestedlevel >= $level ? ' marker' : '')
-                            . (!$thissection->visible || !$thissection->available
+                            . ((!$thissection->visible || !$thissection->available) && ($thissection->section != 0)
                                || $level > $thissection->pagedepthdirect ? ' dimmed' : '')
                         ]),
                         $sectionname);
@@ -724,7 +721,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
                 }
 
                 // Disable tabs for hidden sections.
-                if (!$thissection->uservisiblesan) {
+                if (!$thissection->uservisible && ($thissection->section != 0)) {
                     $inactivetabs[] = "tab_id_{$thissection->id}_l{$thissection->levelsan}";
                 }
 
@@ -785,7 +782,7 @@ class format_multitopic_renderer extends format_section_renderer_base {         
         $collapsiblenum = 0;
         $thissection = $displaysection->nextanyid ? $sections[$displaysection->nextanyid] : null;
         while ($thissection && ($thissection->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)) {
-            if ((format_multitopic_duration_as_days($thissection->periodduration) !== 0) && $thissection->uservisiblesan) {
+            if ((format_multitopic_duration_as_days($thissection->periodduration) !== 0) && $thissection->uservisible) {
                 $collapsiblenum++;
             }
             $thissection = $thissection->nextanyid ? $sections[$thissection->nextanyid] : null;
@@ -827,17 +824,16 @@ class format_multitopic_renderer extends format_section_renderer_base {         
             // Show the section if the user is permitted to access it, OR if it's not available
             // but there is some available info text which explains the reason & should display,
             // OR it is hidden but the course has a setting to display hidden sections as unavilable.
-            $showsection = $thissection->uservisible ||
+            $showsection = $thissection->uservisible || ($thissection->section == 0) ||
                     ($thissection->visible || !$course->hiddensections)
                     && ($thissection->available || !empty($thissection->availableinfo));
             // REMOVED: return if section hidden (we may have more to do), and coursedisplay.
 
-            if ($thissection->levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT
-                || $sectionatlevel[$level - 1]->uservisiblesan && $showsection) {   // ADDED.
+            if ($showsection) {  // ADDED.
                 $pageid = ($thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $thissection->id
                                                                                            : $thissection->parentid;
                 echo $this->section_header($thissection, $course, $thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC);
-                if ($thissection->uservisible && $pageid == $displaysection->id) {
+                if (($thissection->uservisible || $thissection->section == 0) && $pageid == $displaysection->id) {
                     // CHANGED LINE ABOVE.
                     // ADDED moved here as per print_single_section_page.
                     if ($thissection->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {

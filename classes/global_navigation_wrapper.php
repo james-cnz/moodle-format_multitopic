@@ -176,7 +176,7 @@ class global_navigation_wrapper {
             if ($course->id == $SITE->id) {
                 $this->load_section_activities($coursenode, $section, $activities); // CHANGED: Pass section info rather than num.
             } else {
-                if (!$section->uservisiblesan || (!$this->innershowemptysections &&
+                if ((!$section->uservisible && $section->section != 0) || (!$this->innershowemptysections &&
                         !$section->hasactivites && !$section->hassubsections
                         && $this->inner->includesectionnum !== $section->section    // TODO: Remove?
                         && $this->innerincludesectionid !== $section->id)) {
@@ -205,7 +205,7 @@ class global_navigation_wrapper {
                                                                                                  : 'e/bullet_list', ''));
                     // CHANGED ABOVE: Attach to parentnode with nodeid as defined above, and use a list icon for topic sections.
                     $sectionnode->nodetype = \navigation_node::NODETYPE_BRANCH;
-                    $sectionnode->hidden = (!$section->visible || !$section->available);
+                    $sectionnode->hidden = (!$section->visible || !$section->available) && ($section->section != 0);
                     $nodeln[$level] = $sectionnode;                             // ADDED.
                 }
 
