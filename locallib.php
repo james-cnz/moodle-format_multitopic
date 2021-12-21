@@ -455,3 +455,50 @@ function format_multitopic_duration_as_days($duration) {
     }
     return $days;
 }
+
+
+/**
+ * Get week date.
+ *
+ * @param int $date Unix timestamp for date.
+ * @return stdClass Week date.
+ */
+function format_multitopic_week_date($date) {
+
+    $config = get_config('format_multitopic');
+
+    $mstartwday     = $config->startwday;       // Starting week day, 0 = Sunday.
+    $wmd            = $config->weeks_mindays;   // First week of year contains a minimum of how many days of that year, 1-7.
+    $weekspartial   = $config->weeks_partial;   // Partial weeks.
+
+    $dow    = (date('w', $date) - $mstartwday + 7) % 7 + 1;                 // Day of week, 1 = starting week day.
+    $down   = new lang_string(strtolower(date('D', $date)), 'calendar');    // Day of week name.
+
+    $y      = date('Y', $date);                     // Year.
+    $doy    = date('z', $date) + 1;                 // Day of year, 1 = Jan 1.
+    $woy    = intdiv(14 - $wmd + $doy - $dow, 7);   // Week of year, 1 = first.
+
+    if (!$weekspartial) {
+        if ($woy < 1) { // Last week of previous year.
+            $y = date('Y', $date - 7 * 24 * 60 * 60);
+            $doy = date('z', $date - 7 * 24 * 60 * 60) + 7 + 1;
+            $woy = intdiv(14 - $wmd + $doy - $dow, 7);
+        } else if (($ny = date('Y', $date + 7 * 24 * 60 * 60)) > $y) {    // Maybe first week of next year.
+            $dony = date('z', $date + 7 * 24 * 60 * 60) - 7 + 1;
+            $wony = intdiv(14 - $wmd + $dony - $dow, 7);
+            if ($wony >= 1) {
+                $y = $ny;
+                $doy = $dony;
+                $woy = $wony;
+            }
+        }
+    }
+
+    $result = new \stdClass();
+    $result->o = $y;                                    // Year.
+    $result->W = str_pad($woy, 2, "0", STR_PAD_LEFT);   // Week of year.
+    $result->N = $dow;                                  // Day of week (number).
+    $result->D = $down;                                 // Day of week (name).
+    return $result;
+
+}

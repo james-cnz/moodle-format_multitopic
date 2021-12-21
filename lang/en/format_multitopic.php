@@ -100,4 +100,8 @@ $string['move_to_prev_page'] = 'Move to previous page';
 $string['period_0_days']    = 'No time';
 $string['period_undefined'] = 'Unspecified';
 $string['weeks_capitalised'] = 'Weeks';
+$string['weeks_mindays']    = 'First week minimum days of year';
+$string['weeks_mindays_desc'] = 'The first week of the year contains a minimum of how many days of the year?';
+$string['weeks_partial']    = 'Partial weeks';
+$string['weeks_partial_desc'] = 'Whether there are partial weeks at the start and end of the year.';
 // END ADDED.

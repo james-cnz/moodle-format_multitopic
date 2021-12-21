@@ -393,45 +393,45 @@ class format_multitopic extends format_base {
         // Figure out the string for the week number.
         $daystring = '';
         if ($section->dateend && ($section->datestart < $section->dateend)) {
-            $currentyear = date('o');
-            $datestart = $section->datestart + 12 * 60 * 60;
-            $dateend = $section->dateend - 12 * 60 * 60;
-            if (date('o', $datestart) == date('o', $dateend)) {
+            $currentyear = format_multitopic_week_date(time())->o;
+            $datestart = format_multitopic_week_date($section->datestart + 12 * 60 * 60);
+            $dateend = format_multitopic_week_date($section->dateend - 12 * 60 * 60);
+            if ($datestart->o == $dateend->o) {
                 // Within one year.
-                $yearstring = date('o', $datestart) != $currentyear ? date('o ', $datestart) : '';
-                if (date('o W', $datestart) == date('o W', $dateend)) {
+                $yearstring = $datestart->o != $currentyear ? ($datestart->o . ' ') : '';
+                if ($datestart->W == $dateend->W) {
                     // Within one week.
-                    $weekstring = $yearstring . $weekword . ' ' . date('W', $datestart);
-                    if (date('o W N', $datestart) == date('o W N', $dateend)) {
+                    $weekstring = $yearstring . $weekword . ' ' . $datestart->W;
+                    if ($datestart->N == $dateend->N) {
                         // One day.
-                        $daystring = $weekstring . ' ' . date('D', $datestart);
-                    } else if ((date('N', $datestart) == '1') && (date('N', $dateend) == '7')) {
+                        $daystring = $weekstring . ' ' . $datestart->D;
+                    } else if (($datestart->N == 1) && ($dateend->N == 7)) {
                         // Whole week.
                         $daystring = $weekstring;
                     } else {
                         // Partial week.
-                        $daystring = $weekstring . ' ' . date('D', $datestart) . '–' . date('D', $dateend);
+                        $daystring = $weekstring . ' ' . $datestart->D . '–' . $dateend->D;
                     }
-                } else if ((date('N', $datestart) == '1') && (date('N', $dateend) == '7')) {
+                } else if (($datestart->N == 1) && ($dateend->N == 7)) {
                     // Spans whole weeks.
-                    $daystring = $yearstring . $weeksword . ' ' . date('W', $datestart) . '–' . date('W', $dateend);
+                    $daystring = $yearstring . $weeksword . ' ' . $datestart->W . '–' . $dateend->W;
                 } else {
                     // Spans partial weeks.
-                    $daystring = $yearstring . $weekword . ' ' . date('W D', $datestart)
-                                . '–' . $weekword . ' ' . date('W D', $dateend);
+                    $daystring = $yearstring . $weekword . ' ' . $datestart->W . ' ' . $datestart->D
+                                . '–' . $weekword . ' ' . $dateend->W . ' ' . $dateend->D;
                 }
             } else {
                 // Spans years.
-                $yearstartstring = date('o', $datestart) != $currentyear ? date('o ', $datestart) : '';
-                $yearendstring = date('o', $dateend) != $currentyear ? date('o ', $dateend) : '';
-                if ((date('N', $datestart) == '1') && (date('N', $dateend) == '7')) {
+                $yearstartstring = $datestart->o != $currentyear ? ($datestart->o . ' ') : '';
+                $yearendstring = $dateend->o != $currentyear ? ($dateend->o . ' ') : '';
+                if (($datestart->N == 1) && ($dateend->N == 7)) {
                     // Spans whole weeks.
-                    $daystring = $yearstartstring . $weekword . ' ' . date('W', $datestart)
-                            . '–' . $yearendstring . $weekword . ' ' . date('W', $dateend);
+                    $daystring = $yearstartstring . $weekword . ' ' . $datestart->W
+                            . '–' . $yearendstring . $weekword . ' ' . $dateend->W;
                 } else {
                     // Spans partial weeks.
-                    $daystring = $yearstartstring . $weekword . ' ' . date('W D', $datestart)
-                            . '–' . $yearendstring . $weekword . ' ' . date('W D', $dateend);
+                    $daystring = $yearstartstring . $weekword . ' ' . $datestart->W . ' ' . $datestart->D
+                            . '–' . $yearendstring . $weekword . ' ' . $dateend->W . ' ' . $dateend->D;
                 }
             }
             $daystring = $daystring . ': ';
