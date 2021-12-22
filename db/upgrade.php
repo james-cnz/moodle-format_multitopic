@@ -50,10 +50,14 @@ function xmldb_format_multitopic_upgrade($oldversion) {
 
         // Add collapsible.
         $DB->execute(
-            "INSERT IGNORE INTO {course_format_options} (courseid, format, sectionid, name, value)
-             SELECT courseid AS courseid, 'multitopic' AS format, sectionid AS sectionid, 'collapsible' AS name, '0' AS value
-             FROM {course_format_options}
-             WHERE format = ? AND name = 'periodduration' AND value LIKE '0 %'",
+            "INSERT INTO {course_format_options} (courseid, format, sectionid, name, value)
+             SELECT courseid AS courseid, format AS format, sectionid AS sectionid, 'collapsible' AS name, '0' AS value
+             FROM {course_format_options} cfo_pd
+             WHERE format = ? AND name = 'periodduration' AND value LIKE '0 %' AND NOT EXISTS (
+                SELECT id
+                FROM {course_format_options} cfo_c
+                WHERE courseid = cfo_pd.courseid AND format = cfo_pd.format AND sectionid = cfo_pd.sectionid AND name='collapsible'
+             )",
             ['multitopic']
         );
 
