@@ -23,8 +23,6 @@
  */
 namespace format_multitopic;
 
-defined('MOODLE_INTERNAL') || die;
-
 /**
  * Course header: A banner with the course title and a slice of the course image.
  *

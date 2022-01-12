@@ -28,8 +28,6 @@
  */
 namespace format_multitopic;
 
-defined('MOODLE_INTERNAL') || die;                                              // ADDED.
-
 /**
  * Wrapper for the core course renderer
  *

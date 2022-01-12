@@ -42,7 +42,8 @@ require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
  * @copyright based on work by 2012 Dan Poltawski
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class format_multitopic_renderer extends format_section_renderer_base {         // CHANGED.
+class format_multitopic_renderer extends format_section_renderer_base {
+    // CHANGED LINE ABOVE.
 
     /**
      * Constructor method, calls the parent constructor.

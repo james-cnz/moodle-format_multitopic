@@ -28,8 +28,6 @@
  */
 namespace format_multitopic;
 
-defined('MOODLE_INTERNAL') || die();
-
 // REMOVED start - class navigation_node_collection .
 
 /**
