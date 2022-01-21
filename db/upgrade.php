@@ -44,7 +44,7 @@ function xmldb_format_multitopic_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020090400, 'format', 'multitopic');
     }
 
-    if ($oldversion < 2021092301) {
+    if ($oldversion < 2022012100) {
 
         // Add collapsible.
         $DB->execute(
@@ -59,7 +59,7 @@ function xmldb_format_multitopic_upgrade($oldversion) {
             ['multitopic']
         );
 
-        upgrade_plugin_savepoint(true, 2021092301, 'format', 'multitopic');
+        upgrade_plugin_savepoint(true, 2022012100, 'format', 'multitopic');
     }
 
     return true;
