@@ -243,7 +243,7 @@ M.course.format.fmtCollapseOnHashChange = function(event) {
 
     // Set the appropriate collapse state for all collapsible sections.
     var sectionsDom = document
-                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
+                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         M.course.format.fmtCollapseSet(sectionDom,
@@ -274,7 +274,7 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
 
     // Set the appropriate collapse state for all collapsible sections.
     var sectionsDom = document
-                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
+                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         M.course.format.fmtCollapseSet(sectionDom, expand && !sectionDom.classList.contains("section-userhidden"));
@@ -293,7 +293,7 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
 M.course.format.fmtCollapseAllControlsUpdate = function() {
     var collapsedNum = 0;
     var sectionsDom = document
-                        .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
+                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0 && !sectionDom.classList.contains("section-userhidden")) {
