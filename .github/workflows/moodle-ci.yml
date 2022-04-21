@@ -10,7 +10,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:10 # Moodle 3.4-3.5: 9.3-11.x / Moodle 3.6-3.8: 9.4-11.x / Moodle 3.9: >=9.5 / Moodle 3.10-3.11: >=9.6
+        image: postgres:10 #  Moodle 3.9: >=9.5 / Moodle 3.10-3.11: >=9.6
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -18,7 +18,7 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
       mariadb:
-        image: mariadb:10.5 # Moodle 3.4-3.8: >=5.5.31 / Moodle 3.9-3.11 >=10.2.29 / 10.6 breaks Moodle, see MDL-72131
+        image: mariadb:10.5 # Moodle 3.9-3.11 >=10.2.29 / 10.6 breaks Moodle, see MDL-72131
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -30,26 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Moodle 3.4 (old) version.php $plugin -> requires = 2017111300
-          #- php: '7.0' # 7.0-7.2
-          #  moodle-branch: 'MOODLE_34_STABLE'
           #  database: mariadb
-          # Moodle 3.5
-          - php: '7.0' # 7.0-7.2
-            moodle-branch: 'MOODLE_35_STABLE'
-            database: mariadb
-          # Moodle 3.6
-          - php: '7.0' # 7.0-7.3
-            moodle-branch: 'MOODLE_36_STABLE'
-            database: mariadb
-          # Moodle 3.7
-          - php: '7.1' # 7.1-7.3
-            moodle-branch: 'MOODLE_37_STABLE'
-            database: mariadb
-          # Moodle 3.8
-          - php: '7.1' # 7.1-7.4
-            moodle-branch: 'MOODLE_38_STABLE'
-            database: mariadb
           # Moodle 3.9
           - php: '7.2' # 7.2-7.4
             moodle-branch: 'MOODLE_39_STABLE'
