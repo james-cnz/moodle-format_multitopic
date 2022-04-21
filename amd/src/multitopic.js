@@ -26,7 +26,9 @@ import jQuery from 'jquery';
 
 /**
  * Set up the Multitopic course page with eventlistener
- *  for updating section names.
+ *  for updating tabs when section name is changed.
+ *
+ * @return {boolean}
  */
 export const init = () => {
     let tabcontent = jQuery(".course-content");
