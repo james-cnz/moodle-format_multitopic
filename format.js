@@ -327,6 +327,11 @@ M.course.format.fmtCollapseInit = function() {
     document.querySelector("body.format-multitopic .collapsible-actions")
         .addEventListener("click", M.course.format.fmtCollapseAllOnClick);
 
+    // Add listener for section name inplace edited.
+    require(['jquery'], function($) {
+        let tabcontent = document.querySelector(".course-content ul.sections");
+        $(tabcontent).on('updated', changeName);
+    });
 };
 
 // Run initialisation when the page is loaded, or now, if the page is already loaded.
@@ -334,4 +339,19 @@ if (document.readyState == "loading") {
     document.addEventListener("DOMContentLoaded", M.course.format.fmtCollapseInit);
 } else {
     M.course.format.fmtCollapseInit();
+}
+
+/**
+ * Update the First and Second level tabs
+ * @param {event} e
+ */
+function changeName(e) {
+    if (e.target.dataset.itemtype === 'sectionname') {
+        let sectionid = e.target.dataset.itemid;
+        let newname = e.target.dataset.value;
+        let tabs = document.querySelectorAll(".nav-tabs .tab_content[data-itemid='" + sectionid + "']");
+        for (let ti = 0; ti < tabs.length; ti++) {
+            tabs[ti].innerHTML = newname;
+        }
+    }
 }

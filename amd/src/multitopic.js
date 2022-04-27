@@ -31,11 +31,22 @@ import jQuery from 'jquery';
  * @return {boolean}
  */
 export const init = () => {
-    let tabcontent = jQuery(".course-content");
-    tabcontent.on('updated', function(e) {
+    let tabcontent = document.querySelector(".course-content ul.sections");
+    jQuery(tabcontent).on('updated', changeName);
+    return true;
+};
+
+/**
+ * Update the First and Second level tabs when the inplace editable section name is changed.
+ * @param {event} e
+ */
+export const changeName = (e) => {
+    if (e.target.dataset.itemtype === 'sectionname') {
         let sectionid = e.target.dataset.itemid;
         let newname = e.target.dataset.value;
-        jQuery(".nav-link .tab_content[data-itemid=" + sectionid + "]").html(newname);
-    });
-    return true;
+        let tabs = document.querySelectorAll(".nav-tabs .tab_content[data-itemid='" + sectionid + "']");
+        for (let ti = 0; ti < tabs.length; ti++) {
+            tabs[ti].innerHTML = newname;
+        }
+    }
 };
