@@ -51,4 +51,3 @@ if (false) {                                                                    
 
 // Include course format js module.
 $PAGE->requires->js('/course/format/multitopic/format.js');
-//$PAGE->requires->js_call_amd('format_multitopic/multitopic', 'init');
