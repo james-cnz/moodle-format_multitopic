@@ -14,13 +14,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Javascript functions for Multitopic course format.
- *
- * @module     format/multitopic
+ * @file       Javascript functions for Multitopic course format.
  * @copyright  2019 James Calder and Otago Polytechnic
- * @copyright  based on work by 2006 The Open University
  * @author     James Calder
- * @author     Other authors
+ * @author     Jeremy FitzPatrick
+ * @author     Kuslan Kabalin and others.
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
