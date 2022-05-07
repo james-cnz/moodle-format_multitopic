@@ -56,7 +56,9 @@ M.course.format.get_config = function() {
  * @param {string} node1 node to swap to
  * @param {string} node2 node to swap with
  */
+/* eslint-disable camelcase */
 M.course.format.swap_sections = function(Y, node1, node2) {
+    /* eslint-enable camelcase */
     var CSS = {
         COURSECONTENT: 'course-content',
         SECTIONADDMENUS: 'section_add_menus'
