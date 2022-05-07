@@ -31,7 +31,8 @@
  *
  * @package   format_multitopic
  * @category  backup
- * @copyright 2017 Marina Glancy
+ * @copyright 2020 James Calder and Otago Polytechnic
+ * @copyright based on work by 2017 Marina Glancy
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_format_multitopic_plugin extends restore_format_plugin {
@@ -60,6 +61,7 @@ class restore_format_multitopic_plugin extends restore_format_plugin {
      * Executed after course restore is complete.
      *
      * This method is only executed if course configuration was overridden.
+     *
      * @return void
      */
     public function after_restore_course() {
@@ -70,6 +72,7 @@ class restore_format_multitopic_plugin extends restore_format_plugin {
             // Backup from another course format.
             return;
         }
+
         $DB->execute(
             "UPDATE {course_format_options} SET value = '0 day'
              WHERE courseid = ? AND format = 'multitopic' AND name = 'periodduration' AND value = '0 days'",

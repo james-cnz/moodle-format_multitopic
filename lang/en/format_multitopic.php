@@ -18,10 +18,10 @@
  * Strings for component Multitopic course format.
  *
  * @package   format_multitopic
- * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright 2019 onwards James Calder and Otago Polytechnic
  * @copyright based on work by 1999 onwards Martin Dougiamas  {@link http://moodle.com},
- *            2012 David Herney Bernal - cirano,
- *            2014 Marina Glancy
+ * @copyright based on work by 2012 David Herney Bernal - cirano,
+ * @copyright based on work by 2014 Marina Glancy
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

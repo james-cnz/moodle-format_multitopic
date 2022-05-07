@@ -3,8 +3,6 @@
 
 ### Known issues
 
-* Setting access restrictions on pages does not effectively prevent access to activities in contained subpages or topics.
-* Changing section name isn't immediately reflected in tabs.
 * Reorganising sections or moving activities doesn't change activity dates.
 * Sections don't drag and drop immediately after non-AJAX move.
 * When max sections is reached, add page tabs are still shown, but add topic links aren't (inconsistency).
@@ -20,7 +18,7 @@
   classes/course_renderer_wrapper.php (plus include in renderer.php), _course_jumpto.php .
 * Check use of section_info type annotations.
 * Banner display vs banner preview, ensure consistent handling of non-image files.
-* Update copyright notices (add "onward").
+* Update copyright notices (add "onwards").
 
 
 ### UX/UI

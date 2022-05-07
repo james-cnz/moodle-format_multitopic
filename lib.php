@@ -19,10 +19,10 @@
  *
  * @since     Moodle 2.0
  * @package   format_multitopic
- * @copyright 2019 James Calder and Otago Polytechnic
- * @copyright based on work by 2009 Sam Hemelryk,
- *            2012 David Herney Bernal - cirano,
- *            2014 Marina Glancy
+ * @copyright 2019 onwards James Calder and Otago Polytechnic
+ * @copyright based on work by 2009 Sam Hemelryk
+ * @copyright based on work by 2012 onwards Marina Glancy
+ * @copyright based on work by 2012 David Herney Bernal - cirano
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -57,8 +57,10 @@ const FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC   = 2;
  * Main class for the Multitopic course format.
  *
  * @package   format_multitopic
- * @copyright 2019 James Calder and Otago Polytechnic
- * @copyright based on work by 2012 Marina Glancy
+ * @copyright 2019 onwards James Calder and Otago Polytechnic
+ * @copyright based on work by 2009 Sam Hemelryk
+ * @copyright based on work by 2012 onwards Marina Glancy
+ * @copyright based on work by 2012 David Herney Bernal - cirano
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_multitopic extends format_base {
@@ -78,7 +80,7 @@ class format_multitopic extends format_base {
     /**
      * Creates a new instance of class
      *
-     * Please use see course_get_format() to get an instance of the format class
+     * Please use course_get_format($courseorid) to get an instance of the format class
      *
      * @param string $format
      * @param int $courseid
@@ -610,7 +612,7 @@ class format_multitopic extends format_base {
      * Definitions of the additional options that this course format uses for courses.
      *
      * Multitopic format uses the following options:
-     * - periodduration (from Periods format): how long each topic takes.  (Only 1 week or null are currently supported.)
+     * - periodduration (from Periods format): how long each topic takes.  (Only 1 day, 1 week, or null are currently supported.)
      * - hiddensections (from the standard Topics format): whether hidden sections are shown collapsed, or not shown at all.
      * - bannerslice (custom option): how far down the course image to take the banner slice from (0-100).
      *
@@ -839,7 +841,7 @@ class format_multitopic extends format_base {
     /**
      * Adds format options elements to the course/section edit form.
      *
-     * This function is called from see course_edit_form::definition_after_data().
+     * This function is called from {@see course_edit_form::definition_after_data()}.
      *
      * @param MoodleQuickForm $mform form the elements are added to.
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
@@ -867,8 +869,8 @@ class format_multitopic extends format_base {
      * If the course format was changed to 'multitopic', we try to copy options
      * 'periodduration', 'hiddensections', and 'bannerslice' from the previous format.
      *
-     * @param stdClass|array $data return value from see moodleform::get_data() or array with data
-     * @param stdClass $oldcourse if this function is called from see update_course()
+     * @param stdClass|array $data return value from {@see moodleform::get_data()} or array with data
+     * @param stdClass $oldcourse if this function is called from {@see update_course()}
      *     this object contains information about the course before update
      * @return bool whether there were any changes to the options values
      */
@@ -1012,7 +1014,7 @@ class format_multitopic extends format_base {
      * @param bool $editable
      * @param null|lang_string|string $edithint
      * @param null|lang_string|string $editlabel
-     * @return inplace_editable
+     * @return \core\output\inplace_editable
      */
     public function inplace_editable_render_section_name($section, $linkifneeded = true,
             $editable = null, $edithint = null, $editlabel = null) : \core\output\inplace_editable {

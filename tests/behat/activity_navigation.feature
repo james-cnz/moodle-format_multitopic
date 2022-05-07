@@ -24,36 +24,26 @@ Feature: Activity navigation in Multitopic format
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I click on "Edit section" "link" in the "#section-1" "css_element"
-    And I set the following fields to these values:
-      | name[customize] | 1 |
-      | name[value] | Section A |
-      | level | 0 |
-    And I press "Save changes"
-    And I click on "Edit section" "link" in the "#section-2" "css_element"
-    And I set the following fields to these values:
-      | name[customize] | 1 |
-      | name[value] | Section B |
-      | level | 1 |
-    And I press "Save changes"
-    And I click on "Edit section" "link" in the "#section-3" "css_element"
-    And I set the following fields to these values:
-      | name[customize] | 1 |
-      | name[value] | Section C |
-      | level | 2 |
-    And I press "Save changes"
-    And I click on "Edit section" "link" in the "#section-4" "css_element"
-    And I set the following fields to these values:
-      | name[customize] | 1 |
-      | name[value] | Section D |
-      | level | 0 |
-    And I press "Save changes"
-    And I click on "Edit section" "link" in the "#section-5" "css_element"
-    And I set the following fields to these values:
-      | name[customize] | 1 |
-      | name[value] | Section E |
-      | level | 2 |
-    And I press "Save changes"
+    And I edit the section "1" and I fill the form with:
+      | Custom                     | 1         |
+      | New value for Section name | Section A |
+      | Level                      | 0         |
+    And I edit the section "2" and I fill the form with:
+      | Custom                     | 1         |
+      | New value for Section name | Section B |
+      | Level                      | 1         |
+    And I edit the section "3" and I fill the form with:
+      | Custom                     | 1         |
+      | New value for Section name | Section C |
+      | Level                      | 2         |
+    And I edit the section "4" and I fill the form with:
+      | Custom                     | 1         |
+      | New value for Section name | Section D |
+      | Level                      | 0         |
+    And I edit the section "5" and I fill the form with:
+      | Custom                     | 1         |
+      | New value for Section name | Section E |
+      | Level                      | 2         |
     And I click on "Hide" "link" in the "Page 1" activity
     And I click on "Make available" "link" in the "Page 1" activity
     And I click on "General" "link" in the ".course-content .nav" "css_element"

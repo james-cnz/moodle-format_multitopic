@@ -18,7 +18,7 @@
  * Version details.
  *
  * @package   format_multitopic
- * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright 2019 onwards James Calder and Otago Polytechnic
  * @copyright based on work by 1999 onwards Martin Dougiamas (http://dougiamas.com)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

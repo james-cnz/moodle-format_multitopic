@@ -18,7 +18,7 @@
  * Multitopic course format. Display the course as pages of topics made of modules.
  *
  * @package   format_multitopic
- * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright 2019 onwards James Calder and Otago Polytechnic
  * @copyright based on work by 2006 The Open University
  * @author    based on work by N.D.Freear@open.ac.uk and others.
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

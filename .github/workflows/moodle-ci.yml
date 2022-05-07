@@ -1,4 +1,5 @@
-# Copied from https://github.com/moodlehq/moodle-plugin-ci/blob/master/gha.dist.yml
+# Based on <https://github.com/moodlehq/moodle-plugin-ci/blob/master/gha.dist.yml>
+# and <https://moodlehq.github.io/moodle-plugin-ci/GHAFileExplained.html>
 
 name: Moodle Plugin CI
 
@@ -22,6 +23,9 @@ jobs:
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+          MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
+          MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
+
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
