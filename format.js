@@ -1,4 +1,26 @@
-// Javascript functions for Multitopic course format.
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @file       Javascript functions for Multitopic course format.
+ * @copyright  2019 James Calder and Otago Polytechnic
+ * @author     James Calder
+ * @author     Jeremy FitzPatrick
+ * @author     Kuslan Kabalin and others.
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 M.course = M.course || {};
 
@@ -309,9 +331,24 @@ M.course.format.fmtCollapseAllControlsUpdate = function() {
 };
 
 /**
+ * Update the First and Second level tabs.
+ * @param {event} e
+ */
+M.course.format.fmtChangeName = function(e) {
+    if (e.target.dataset.itemtype === 'sectionname') {
+        var sectionid = e.target.dataset.itemid;
+        var newname = e.target.dataset.value;
+        var tabs = document.querySelectorAll(".nav-tabs .tab_content[data-itemid='" + sectionid + "']");
+        for (var ti = 0; ti < tabs.length; ti++) {
+            tabs[ti].innerHTML = newname;
+        }
+    }
+};
+
+/**
  * Initialise: Set the initial state of collapsible sections, and watch for user input.
  */
-M.course.format.fmtCollapseInit = function() {
+M.course.format.fmtInit = function() {
 
     // Set the initial state of collapsible sections.
     M.course.format.fmtCollapseOnHashChange();
@@ -327,11 +364,16 @@ M.course.format.fmtCollapseInit = function() {
     document.querySelector("body.format-multitopic .collapsible-actions")
         .addEventListener("click", M.course.format.fmtCollapseAllOnClick);
 
+    // Add listener for section name inplace edited.
+    require(['jquery'], function($) {
+        var tabcontent = document.querySelector(".course-content ul.sections");
+        $(tabcontent).on('updated', M.course.format.fmtChangeName);
+    });
 };
 
 // Run initialisation when the page is loaded, or now, if the page is already loaded.
 if (document.readyState == "loading") {
-    document.addEventListener("DOMContentLoaded", M.course.format.fmtCollapseInit);
+    document.addEventListener("DOMContentLoaded", M.course.format.fmtInit);
 } else {
-    M.course.format.fmtCollapseInit();
+    M.course.format.fmtInit();
 }

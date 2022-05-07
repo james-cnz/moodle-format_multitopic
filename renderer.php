@@ -709,7 +709,8 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             'tab_content'
                             . ($thissection->currentnestedlevel >= $level ? ' marker' : '')
                             . ((!$thissection->visible || !$thissection->available) && ($thissection->section != 0)
-                               || $level > $thissection->pagedepthdirect ? ' dimmed' : '')
+                               || $level > $thissection->pagedepthdirect ? ' dimmed' : ''),
+                            'data-itemid' => $thissection->id
                         ]),
                         $sectionname);
                     $newtab->level = $level - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
