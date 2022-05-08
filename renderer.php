@@ -619,6 +619,8 @@ class format_multitopic_renderer extends format_section_renderer_base {
 
         // ADDED.
         $sections = course_get_format($course)->fmt_get_sections();
+        $format = course_get_format($course);
+        $canaddmore = $format->get_max_sections() > $format->get_last_section_number();
 
         // Find display section.
         if (is_object($displaysection) && isset($displaysection->id)) {
@@ -758,7 +760,8 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             'insertparentid' => $sectionatlevel[$level - 1]->id,
                             'insertlevel' => $level,                            // ADDED.
                         ]);
-                    $icon = $this->output->pix_icon('t/switch_plus', $straddsection);
+                    $attrs = !$canaddmore ? ['class' => 'dimmed cantadd'] : null;
+                    $icon = $this->output->pix_icon('t/switch_plus', $straddsection, 'moodle', $attrs);
                     $newtab = new tabobject("tab_id_{$sectionatlevel[$level - 1]->id}_l{($level - 1)}_add",
                         $url,
                         $icon,
@@ -906,11 +909,6 @@ class format_multitopic_renderer extends format_section_renderer_base {
         // REMOVED: numsections .
 
         if (course_get_format($course)->uses_sections()) {
-            if ($lastsection >= $maxsections) {
-                // Don't allow more sections if we already hit the limit.
-                return '';
-                // TODO: Show anyway, to avoid confusion?
-            }
             // Current course format does not have 'numsections' option but it has multiple sections suppport.
             // Display the "Add section" link that will insert a section in the end.
             // Note to course format developers: inserting sections in the other positions should check both
@@ -926,8 +924,11 @@ class format_multitopic_renderer extends format_section_renderer_base {
                 ['courseid' => $course->id, 'insertparentid' => $insertsection->parentid, 'numsections' => 1,
                 'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC, 'sesskey' => sesskey()]);
             // REMOVED section return.
-            $icon = $this->output->pix_icon('t/add', '');
-            $o .= html_writer::link($url, $icon . $straddsections);              // CHANGED: Only add single section.
+            $attrs = $lastsection >= $maxsections ? ['class' => 'cantadd'] : null;
+            $icon = $this->output->pix_icon('t/add', '',    'moodle', $attrs);
+            $attrs = $lastsection >= $maxsections ? ['class' => 'dimmed'] : null;
+            $o .= html_writer::link($url, $icon . $straddsections, $attrs);              // CHANGED: Only add single section.
+
             $o .= html_writer::end_tag('div');
             return $o;
         }
