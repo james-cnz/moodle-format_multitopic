@@ -50,7 +50,8 @@ if (false) {                                                                    
 }
 
 // Include course format js module.
-$format = course_get_format($course);
-$maxsections = $format->get_max_sections();
+$courseformat = course_get_format($course);
+$maxsections = method_exists($courseformat, "get_max_sections") ? $courseformat->get_max_sections() : 52;
+$maxsections = get_string('maxsectionslimit', 'core', $maxsections);
 $PAGE->requires->js('/course/format/multitopic/format.js');
-$PAGE->requires->js_init_call('M.course.format.fmtCollapseInit', ['max' => $maxsections], true);
+$PAGE->requires->js_init_call('M.course.format.fmtInit', ['max' => $maxsections], true);

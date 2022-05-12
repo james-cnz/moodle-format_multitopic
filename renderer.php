@@ -619,8 +619,9 @@ class format_multitopic_renderer extends format_section_renderer_base {
 
         // ADDED.
         $sections = course_get_format($course)->fmt_get_sections();
-        $format = course_get_format($course);
-        $canaddmore = $format->get_max_sections() > $format->get_last_section_number();
+        $courseformat = course_get_format($course);
+        $maxsections = method_exists($courseformat, "get_max_sections") ? $courseformat->get_max_sections() : 52;
+        $canaddmore = $maxsections > $courseformat->get_last_section_number();
 
         // Find display section.
         if (is_object($displaysection) && isset($displaysection->id)) {
@@ -753,14 +754,17 @@ class format_multitopic_renderer extends format_section_renderer_base {
                     // Make "add" tab.
                     $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
                                         get_string('addsectionpage', 'format_' . $course->format) : get_string('addsections');
-                    $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php',
-                        ['courseid' => $course->id,
-                            'increase' => true,
-                            'sesskey' => sesskey(),
-                            'insertparentid' => $sectionatlevel[$level - 1]->id,
-                            'insertlevel' => $level,                            // ADDED.
-                        ]);
-                    $attrs = !$canaddmore ? ['class' => 'dimmed cantadd'] : null;
+
+                    $params = [
+                        'courseid' => $course->id,
+                        'increase' => true,
+                        'sesskey' => sesskey(),
+                        'insertparentid' => $sectionatlevel[$level - 1]->id,
+                        'insertlevel' => $level,
+                    ];
+                    $params['returnurl'] = !$canaddmore ? $this->page->url : null;
+                    $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
+                    $attrs = !$canaddmore ? ['class' => 'dimmed_text cantadd'] : null;
                     $icon = $this->output->pix_icon('t/switch_plus', $straddsection, 'moodle', $attrs);
                     $newtab = new tabobject("tab_id_{$sectionatlevel[$level - 1]->id}_l{($level - 1)}_add",
                         $url,
@@ -920,9 +924,16 @@ class format_multitopic_renderer extends format_section_renderer_base {
             } else {
                 $straddsections = get_string('addsections');
             }
-            $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php',
-                ['courseid' => $course->id, 'insertparentid' => $insertsection->parentid, 'numsections' => 1,
-                'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC, 'sesskey' => sesskey()]);
+
+            $params = [
+                'courseid' => $course->id,
+                'insertparentid' => $insertsection->parentid,
+                'numsections' => 1,
+                'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
+                'sesskey' => sesskey(),
+            ];
+            $params['returnurl'] = $lastsection >= $maxsections ? $this->page->url : null;
+            $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
             // REMOVED section return.
             $attrs = $lastsection >= $maxsections ? ['class' => 'cantadd'] : null;
             $icon = $this->output->pix_icon('t/add', '',    'moodle', $attrs);

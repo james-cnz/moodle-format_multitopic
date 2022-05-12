@@ -359,17 +359,16 @@ M.course.format.fmtWarnMaxsections = function(e) {
     }
     if (cantaddlink) {
         e.preventDefault();
-        require(['core/modal_factory', 'core/str'], function(modals, Str) {
-        return modals.create({
-            type: modals.types.ALERT,
-            body: Str.get_string('maxsectionslimit', 'core', M.course.format.fmtMaxsections),
-            title: Str.get_string('notice'),
-            removeOnClose: false,
-        })
-            .then(modal => {
-                modal.show();
-                return modal;
+        require(['core/notification'], function(notification) {
+            return notification.addNotification({
+                message: M.course.format.fmtMaxsections,
+                type: 'warning'
             });
+        });
+        window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
         });
     }
 
@@ -379,7 +378,7 @@ M.course.format.fmtWarnMaxsections = function(e) {
 /**
  * Initialise: Set the initial state of collapsible sections, and watch for user input.
  */
-M.course.format.fmtCollapseInit = function(Y,max) {
+M.course.format.fmtInit = function(Y, max) {
     M.course.format.fmtMaxsections = max;
     // Set the initial state of collapsible sections.
     M.course.format.fmtCollapseOnHashChange();
@@ -400,7 +399,6 @@ M.course.format.fmtCollapseInit = function(Y,max) {
         var tabcontent = document.querySelector(".course-content ul.sections");
         $(tabcontent).on('updated', M.course.format.fmtChangeName);
     });
-
     // Capture clicks on add section links.
     document.querySelector(".course-content")
         .addEventListener('click', M.course.format.fmtWarnMaxsections);
