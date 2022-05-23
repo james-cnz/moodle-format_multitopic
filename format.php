@@ -52,6 +52,11 @@ if (false) {                                                                    
 // Include course format js module.
 $courseformat = course_get_format($course);
 $maxsections = method_exists($courseformat, "get_max_sections") ? $courseformat->get_max_sections() : 52;
-$maxsections = get_string('maxsectionslimit', 'core', $maxsections);
+if (get_string_manager()->string_exists('maxsectionslimit', 'core')) {
+    $maxsections = get_string('maxsectionslimit', 'core', $maxsections);
+} else {
+    $maxsections = "Cannot create new section as it would exceed the maximum"
+                 . " number of sections allowed for this course ({$maxsections}).";
+}
 $PAGE->requires->js('/course/format/multitopic/format.js');
 $PAGE->requires->js_init_call('M.course.format.fmtInit', ['max' => $maxsections], true);

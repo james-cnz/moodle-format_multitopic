@@ -761,8 +761,8 @@ class format_multitopic_renderer extends format_section_renderer_base {
                         'sesskey' => sesskey(),
                         'insertparentid' => $sectionatlevel[$level - 1]->id,
                         'insertlevel' => $level,
+                        'returnurl' => $this->page->url,
                     ];
-                    $params['returnurl'] = !$canaddmore ? $this->page->url : null;
                     $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
                     $attrs = !$canaddmore ? ['class' => 'dimmed_text cantadd'] : null;
                     $icon = $this->output->pix_icon('t/switch_plus', $straddsection, 'moodle', $attrs);
@@ -931,8 +931,8 @@ class format_multitopic_renderer extends format_section_renderer_base {
                 'numsections' => 1,
                 'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
                 'sesskey' => sesskey(),
+                'returnurl' => $this->page->url,
             ];
-            $params['returnurl'] = $lastsection >= $maxsections ? $this->page->url : null;
             $url = new moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
             // REMOVED section return.
             $attrs = $lastsection >= $maxsections ? ['class' => 'cantadd'] : null;

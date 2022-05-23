@@ -360,7 +360,7 @@ M.course.format.fmtWarnMaxsections = function(e) {
     if (cantaddlink) {
         e.preventDefault();
         require(['core/notification'], function(notification) {
-            return notification.addNotification({
+             notification.addNotification({
                 message: M.course.format.fmtMaxsections,
                 type: 'warning'
             });
