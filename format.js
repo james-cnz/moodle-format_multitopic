@@ -346,10 +346,40 @@ M.course.format.fmtChangeName = function(e) {
 };
 
 /**
+ * Show notice dialog when trying to add sections and maximum has been reached.
+ * @param e
+ * @return {boolean}
+ */
+M.course.format.fmtWarnMaxsections = function(e) {
+    var cantaddlink = e.target.matches('.cantadd');
+
+    if (cantaddlink === false && e.target.firstElementChild !== null) {
+        // Maybe we clicked on the parent <a>.
+        cantaddlink = e.target.firstElementChild.matches('.cantadd');
+    }
+    if (cantaddlink) {
+        e.preventDefault();
+        require(['core/notification'], function(notification) {
+             notification.addNotification({
+                message: M.course.format.fmtMaxsections,
+                type: 'warning'
+            });
+        });
+        window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+        });
+    }
+
+    return true;
+};
+
+/**
  * Initialise: Set the initial state of collapsible sections, and watch for user input.
  */
-M.course.format.fmtInit = function() {
-
+M.course.format.fmtInit = function(Y, max) {
+    M.course.format.fmtMaxsections = max;
     // Set the initial state of collapsible sections.
     M.course.format.fmtCollapseOnHashChange();
 
@@ -369,11 +399,7 @@ M.course.format.fmtInit = function() {
         var tabcontent = document.querySelector(".course-content ul.sections");
         $(tabcontent).on('updated', M.course.format.fmtChangeName);
     });
+    // Capture clicks on add section links.
+    document.querySelector(".course-content")
+        .addEventListener('click', M.course.format.fmtWarnMaxsections);
 };
-
-// Run initialisation when the page is loaded, or now, if the page is already loaded.
-if (document.readyState == "loading") {
-    document.addEventListener("DOMContentLoaded", M.course.format.fmtInit);
-} else {
-    M.course.format.fmtInit();
-}
