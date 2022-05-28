@@ -77,7 +77,13 @@ if (false) {                                                                    
 
 if ($desirednumsections > $maxsections) {
     // Increase in number of sections is not allowed.
-    \core\notification::warning(get_string('maxsectionslimit', 'moodle', $maxsections));
+    if (get_string_manager()->string_exists('maxsectionslimit', 'moodle')) {
+        $maxsectionslimit = get_string('maxsectionslimit', 'moodle', $maxsections);
+    } else {
+        $maxsectionslimit = "Cannot create new section as it would exceed the maximum"
+                            . " number of sections allowed for this course ({$maxsections}).";
+    }
+    \core\notification::warning($maxsectionslimit);
     $increase = null;
     $insertsection = null;
     $numsections = 0;

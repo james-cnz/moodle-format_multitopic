@@ -76,7 +76,7 @@ class format_multitopic extends format_base {
     private $fmtsectionscomplete = false;
     // END ADDED.
 
-    // INCLUDED declaration /course/format/lib.php class format_base function __construct.
+    // INCLUDED declarations /course/format/lib.php class format_base functions __construct and get_max_sections.
     /**
      * Creates a new instance of class
      *
@@ -93,6 +93,19 @@ class format_multitopic extends format_base {
             $this->fmtrootsectionid = $DB->get_field('course_sections', 'id', ['section' => 0, 'course' => $courseid]);
             // TODO: Check if this is set correctly for new courses? Do this in fmt_get_sections instead?
         }
+    }
+
+    /**
+     * Method used to get the maximum number of sections for this course format.
+     * @return int
+     */
+    public function get_max_sections() {
+        if (method_exists(get_parent_class($this), 'get_max_sections')) {
+            $result = parent::get_max_sections();
+        } else {
+            $result = 52;
+        }
+        return $result;
     }
     // END INCLUDED.
 
