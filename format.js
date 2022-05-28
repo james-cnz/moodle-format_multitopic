@@ -347,7 +347,7 @@ M.course.format.fmtChangeName = function(e) {
 
 /**
  * Show notice dialog when trying to add sections and maximum has been reached.
- * @param e
+ * @param {event} e
  * @return {boolean}
  */
 M.course.format.fmtWarnMaxsections = function(e) {
@@ -377,6 +377,8 @@ M.course.format.fmtWarnMaxsections = function(e) {
 
 /**
  * Initialise: Set the initial state of collapsible sections, and watch for user input.
+ * @param {YUI} Y
+ * @param {string} max
  */
 M.course.format.fmtInit = function(Y, max) {
     M.course.format.fmtMaxsections = max;
