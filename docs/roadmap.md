@@ -5,7 +5,6 @@
 
 * Reorganising sections or moving activities doesn't change activity dates.
 * Sections don't drag and drop immediately after non-AJAX move.
-* When max sections is reached, add page tabs are still shown, but add topic links aren't (inconsistency).
 
 
 ### Code
