@@ -2,6 +2,11 @@ body.format-multitopic ul.sections {
     list-style: none;
 }
 
+/* INCLUDED from theme/boost/style/moodle.css */
+body.format-multitopic ul.sections li.section .content.collapse:not(.show) {
+    display: none;
+}
+/* END INCLUDED */
 
 /* ADDED */
 
@@ -13,13 +18,11 @@ body.format-multitopic #course-header {
     width: 100%;
 }
 
-/* Hide collapsed sections */
-body.format-multitopic.jsenabled ul.sections li.section.section-collapsed .content .section_availability ~ * {
-    display: none;
+body.format-multitopic ul.sections li.section .sectionname .inplaceeditable {
+    display: inline;
 }
 
 /* Hide activity navigation. */
-body.format-multitopic.path-mod.pagelayout-incourse #page #page-content [role='main'] + .m-t-2.m-b-1,
 body.format-multitopic.path-mod.pagelayout-incourse #page #page-content .activity-navigation {
     display: none;
 }

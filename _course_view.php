@@ -164,6 +164,7 @@ if (true) {                                                                     
 
     // Must set layout before gettting section info. See MDL-47555.
     $PAGE->set_pagelayout('course');
+    $PAGE->add_body_class('limitedwidth');
 
     if ($section and $section->section > 0) {
         // CHANGED LINE ABOVE: section is now an object. Dereference number property.
@@ -190,7 +191,8 @@ if (true) {                                                                     
     }
 
     // Fix course format if it is no longer installed.
-    $course->format = course_get_format($course)->get_format();
+    $format = course_get_format($course);
+    $course->format = $format->get_format();
 
     $PAGE->set_pagetype('course-view-' . $course->format);
     $PAGE->set_other_editing_capability('moodle/course:update');
@@ -204,14 +206,7 @@ if (true) {                                                                     
     // Preload course format renderer before output starts.
     // This is a little hacky but necessary since
     // format.php is not included until after output starts.
-    if (file_exists($CFG->dirroot . '/course/format/' . $course->format . '/renderer.php')) {
-        require_once($CFG->dirroot . '/course/format/' . $course->format . '/renderer.php');
-        if (class_exists('format_' . $course->format . '_renderer')) {
-            // Call get_renderer only if renderer is defined in format plugin
-            // otherwise an exception would be thrown.
-            $PAGE->get_renderer('format_' . $course->format);
-        }
-    }
+    $format->get_renderer($PAGE);
 
     if ($resetuserallowedediting) {
         // Ugly hack.
@@ -302,13 +297,8 @@ if (true) {                                                                     
         redirect($CFG->wwwroot . '/');
     }
 
-    $completion = new \completion_info($course);
-    if ($completion->is_enabled()) {
-        $PAGE->requires->string_for_js('completion-alt-manual-y', 'completion');
-        $PAGE->requires->string_for_js('completion-alt-manual-n', 'completion');
-
-        $PAGE->requires->js_init_call('M.core_completion.init');
-    }
+    // Determine whether the user has permission to download course content.
+    $candownloadcourse = \core\content::can_export_context($context, $USER);
 
     // We are currently keeping the button here from 1.x to help new teachers figure out
     // what to do, even though the link also appears in the course admin block.  It also
@@ -331,8 +321,7 @@ if (true) {                                                                     
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
 
-    // INCLUDED for Moodle >= 3.7 .
-    if ($CFG->version >= 2019052000 && $USER->editing == 1 && ($CFG->version >= 2020061500 || !empty($CFG->enableasyncbackup))) {
+    if ($USER->editing == 1) {
 
         // MDL-65321 The backup libraries are quite heavy, only require the bare minimum.
         require_once($CFG->dirroot . '/backup/util/helper/async_helper.class.php');
@@ -340,21 +329,6 @@ if (true) {                                                                     
         if (\async_helper::is_async_pending($id, 'course', 'backup')) {
             echo $OUTPUT->notification(get_string('pendingasyncedit', 'backup'), 'warning');
         }
-    }
-    // END INCLUDED.
-
-    if ($completion->is_enabled()) {
-        // This value tracks whether there has been a dynamic change to the page.
-        // It is used so that if a user does this - (a) set some tickmarks, (b)
-        // go to another page, (c) clicks Back button - the page will
-        // automatically reload. Otherwise it would start with the wrong tick
-        // values.
-        echo \html_writer::start_tag('form', array('action' => '.', 'method' => 'get'));
-        echo \html_writer::start_tag('div');
-        echo \html_writer::empty_tag('input',
-            array('type' => 'hidden', 'id' => 'completion_dynamic_change', 'name' => 'completion_dynamic_change', 'value' => '0'));
-        echo \html_writer::end_tag('div');
-        echo \html_writer::end_tag('form');
     }
 
     // Course wrapper start.
@@ -377,6 +351,9 @@ if (true) {                                                                     
     // inclusion we pass parameters around this way..
     $displaysection = $section;
 
+    // Include course AJAX.
+    include_course_ajax($course, $modnamesused);
+
     // Include the actual course format.
     require($CFG->dirroot . '/course/format/' . $course->format . '/format.php');
     // Content wrapper end.
@@ -388,8 +365,16 @@ if (true) {                                                                     
     // anything after that point.
     course_view(\context_course::instance($course->id), $section->section);      // CHANGED: Dereference section number property.
 
-    // Include course AJAX.
-    include_course_ajax($course, $modnamesused);
+    // If available, include the JS to prepare the download course content modal.
+    if ($candownloadcourse) {
+        $PAGE->requires->js_call_amd('core_course/downloadcontent', 'init');
+    }
+
+    // Load the view JS module if completion tracking is enabled for this course.
+    $completion = new \completion_info($course);
+    if ($completion->is_enabled()) {
+        $PAGE->requires->js_call_amd('core_course/view', 'init');
+    }
 
     echo $OUTPUT->footer();
 

@@ -105,13 +105,9 @@ $editoroptions = array(
     'maxfiles'  => EDITOR_UNLIMITED_FILES,
     'maxbytes'  => $CFG->maxbytes,
     'trusttext' => false,
-    'noclean'   => true
+    'noclean'   => true,
+    'subdirs'   => true
 );
-// INCLUDED for Moodle >= 3.6.
-if ($CFG->version >= 2018120300) {
-    $editoroptions['subdirs'] = true;
-}
-// END INCLUDED.
 
 $courseformat = course_get_format($course);
 $defaultsectionname = $courseformat->get_default_section_name($sectioninfo);    // CHANGED: Use custom section info.

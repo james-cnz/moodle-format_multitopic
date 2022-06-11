@@ -65,8 +65,7 @@ require_sesskey();
 $desirednumsections = 0;
 $courseformat = course_get_format($course);
 $lastsectionnumber = $courseformat->get_last_section_number();
-$maxsections = method_exists($courseformat, "get_max_sections") ? $courseformat->get_max_sections() : 52;
-// CHANGED LINE ABOVE: For Moodle 3.5.0.
+$maxsections = $courseformat->get_max_sections();
 
 if (false) {                                                                    // CHANGED: Don't use numsections.
     $desirednumsections = $courseformatoptions['numsections'] + 1;
@@ -77,13 +76,7 @@ if (false) {                                                                    
 
 if ($desirednumsections > $maxsections) {
     // Increase in number of sections is not allowed.
-    if (get_string_manager()->string_exists('maxsectionslimit', 'moodle')) {
-        $maxsectionslimit = get_string('maxsectionslimit', 'moodle', $maxsections);
-    } else {
-        $maxsectionslimit = "Cannot create new section as it would exceed the maximum"
-                            . " number of sections allowed for this course ({$maxsections}).";
-    }
-    \core\notification::warning($maxsectionslimit);
+    \core\notification::warning(get_string('maxsectionslimit', 'moodle', $maxsections));
     $increase = null;
     $insertsection = null;
     $numsections = 0;

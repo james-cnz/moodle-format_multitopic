@@ -32,9 +32,10 @@ require_once($CFG->libdir . '/completionlib.php');
 // Horrible backwards compatible parameter aliasing.
 // REMOVED.
 
-$context = \context_course::instance($course->id);
 // Retrieve course format option fields and add them to the $course object.
-$course = course_get_format($course)->get_course();
+$format = course_get_format($course);
+$course = $format->get_course();
+$context = \context_course::instance($course->id);
 
 // REMOVED set course marker.
 
@@ -43,20 +44,22 @@ course_create_sections_if_missing($course, 0);
 
 $renderer = $PAGE->get_renderer('format_multitopic');
 
-if (false) {                                                                    // CHANGED: Always use multi-section page.
-    $renderer->print_single_section_page($course, null, null, null, null, $displaysection);
-} else {
-    $renderer->print_multiple_section_page($course, null, null, null, null, $displaysection); // CHANGED: Pass display section.
+// ADDED.
+if ($sectionid) {
+    $displaysection = $DB->get_record('course_sections',
+                            array('id' => $sectionid, 'course' => $course->id), '*', MUST_EXIST);
 }
+// END ADDED.
+if (isset($displaysection)) {
+    $format->set_section_number($displaysection);
+}
+$outputclass = $format->get_output_classname('content');
+$widget = new $outputclass($format);
+echo $renderer->render($widget);
 
 // Include course format js module.
 $courseformat = course_get_format($course);
-$maxsections = method_exists($courseformat, "get_max_sections") ? $courseformat->get_max_sections() : 52;
-if (get_string_manager()->string_exists('maxsectionslimit', 'core')) {
-    $maxsections = get_string('maxsectionslimit', 'core', $maxsections);
-} else {
-    $maxsections = "Cannot create new section as it would exceed the maximum"
-                 . " number of sections allowed for this course ({$maxsections}).";
-}
+$maxsections = $courseformat->get_max_sections();
+$maxsections = get_string('maxsectionslimit', 'core', $maxsections);
 $PAGE->requires->js('/course/format/multitopic/format.js');
 $PAGE->requires->js_init_call('M.course.format.fmtInit', ['max' => $maxsections], true);

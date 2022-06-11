@@ -4,15 +4,14 @@ Feature: Show/hide course sections (Multitopic format)
   As a teacher
   I need to show or hide sections
 
-  @javascript
-  Scenario: Show / hide section icon functions correctly
+  Background:
     Given the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
       | student1 | Student | 1 | student1@example.com |
     And the following "courses" exist:
-      | fullname | shortname | format | collapsible |
-      | Course 1 | C1 | multitopic | 0 |
+      | fullname | shortname | format | hiddensections | collapsible |
+      | Course 1 | C1 | multitopic | 0 | 0 |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
@@ -43,7 +42,10 @@ Feature: Show/hide course sections (Multitopic format)
       | Forum name | Test hidden forum 32 name |
       | Description | Test hidden forum 32 description |
       | Availability | Show on course page |
-    And I am on "Course 1" course homepage
+
+  @javascript
+  Scenario: Show / hide section icon functions correctly
+    Given I am on "Course 1" course homepage
     When I hide section "1"
     Then section "1" should be hidden
     And section "2" should be visible

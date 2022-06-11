@@ -49,27 +49,24 @@ body.format-multitopic ul.sections li.section {
     visibility: inherit;
     margin-bottom: 1rem;
 }
-body.format-multitopic ul.sections li.section .content {
-    display: block;
-}
-body.format-multitopic ul.sections li.section .content .sectionname {
+/* Removed display: block; */
+body.format-multitopic ul.sections li.section .course-section-header {
     background: #eee;
     padding: 10px;
     margin-bottom: 0;
-    font-size: large;
 }
-body.format-multitopic ul.sections li.section:not(.hidden) .content .sectionname {
+body.format-multitopic ul.sections li.section:not(.hidden) .course-section-header .sectionname {
     color: #000;
 }
-body.format-multitopic ul.sections li.section:not(.hidden) .content .sectionname a {
+body.format-multitopic ul.sections li.section:not(.hidden) .course-section-header .sectionname a {
     color: #000;
 }
-body.format-multitopic ul.sections li.section .content .sectionname a:focus {
+body.format-multitopic ul.sections li.section .course-section-header .sectionname a:focus {
     background-color: inherit;
     box-shadow: inherit;
     -webkit-box-shadow: inherit;
 }
-body.format-multitopic ul.sections li.section .content .sectionname .section_subtitle {
+body.format-multitopic ul.sections li.section .course-section-header .section_subtitle {
     font-size: small;
 }
 body.format-multitopic ul.sections li.section .summary {
@@ -104,10 +101,9 @@ body.format-multitopic ul.sections li.section {
 }
 
 /* Page Section */
-body.format-multitopic ul.sections li.section.section-page .content .sectionname {
+body.format-multitopic ul.sections li.section.section-page .course-section-header {
     background: url("[page_heading_background]");
     padding: 30px;
-    font-size: x-large;
 }
 
 /* Topic Section */
@@ -117,18 +113,18 @@ body.format-multitopic ul.sections li.section.section-topic {
 }
 
 /* Current Section */
-body.format-multitopic ul.sections li.section.current .content h3 {
+body.format-multitopic ul.sections li.section.current .course-section-header {
     border-left: #06c 2px solid;
 }
 
 /* Collapsible Topic Section */
-body.format-multitopic ul.sections li.section.section-topic-collapsible .content .sectionname {
+body.format-multitopic ul.sections li.section.section-topic-collapsible .course-section-header {
     background: linear-gradient(to right, #7ce, #7bb);
 }
-body.format-multitopic ul.sections li.section.section-topic-collapsible:not(.hidden) .content .sectionname {
+body.format-multitopic ul.sections li.section.section-topic-collapsible:not(.hidden) .course-section-header .sectionname {
     color: #fff;
 }
-body.format-multitopic ul.sections li.section.section-topic-collapsible:not(.hidden) .content .sectionname a {
+body.format-multitopic ul.sections li.section.section-topic-collapsible:not(.hidden) .course-section-header .sectionname a {
     color: #fff;
 }
 body.format-multitopic ul.sections li.section.section-topic-collapsible .content .section_availability {
@@ -139,14 +135,14 @@ body.format-multitopic ul.sections li.section.section-topic-collapsible .content
 }
 
 /* Hidden Section */
-body.format-multitopic ul.sections li.section.hidden .content .sectionname {
+body.format-multitopic ul.sections li.section.hidden .course-section-header .sectionname {
     color: #868e96;
 }
-body.format-multitopic ul.sections li.section.hidden .content .sectionname a {
+body.format-multitopic ul.sections li.section.hidden .course-section-header .sectionname a {
     color: #868e96;
 }
 
 /* Section Custom Style for Specific Category (example) */
 /*
-body.category-2.format-multitopic ul.sections li.section.section-topic-collapsible .content .sectionname { background: #b45341; }
+body.category-2.format-multitopic ul.sections li.section.section-topic-collapsible .course-section-header { background: #b45341; }
 */

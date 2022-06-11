@@ -64,7 +64,6 @@ M.course.format.swap_sections = function(Y, node1, node2) {
         SECTIONADDMENUS: 'section_add_menus'
     };
 
-    // Reinstated this, since not using course renderer wrapper.
     var sectionlist = Y.Node.all('.' + CSS.COURSECONTENT + ' ' + M.course.format.get_section_selector(Y));
     // Swap the non-ajax menus, noting these are not always present (depends on theme and user prefs).
     if (sectionlist.item(node1).one('.' + CSS.SECTIONADDMENUS)) {
@@ -113,13 +112,7 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
             newstr = str.substr(0, stridx + 1) + i;
             ele.setAttribute('title', newstr);
             // Update the aria-label for the section.
-            sectionlist.item(i).setAttribute('aria-label', content.get('innerText').trim()); // For Sharing Cart.
-
-            // ADDED: Restore collapse icon.
-            if (sectionlist.item(i).hasClass("section-topic-collapsible")) {
-                M.course.format.fmtCollapseIconYui(sectionlist.item(i));
-            }
-            // END ADDED.
+            // REMOVED.
 
             // INCLUDED /course/format/weeks/format.js M.course.format.process_sections part.
             // Remove the current class as section has been moved.
@@ -140,34 +133,6 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
 // REMAINDER ADDED.
 
 /**
- * Set the appropriate expand/collapse icon for a specified collapsible section
- *
- * @param {HTMLLIElement} sectionDom The collapsible section
- */
-M.course.format.fmtCollapseIcon = function(sectionDom) {
-    var show = !sectionDom.classList.contains("section-collapsed");
-    var iconDom = sectionDom.querySelector("h3.sectionname i.icon");
-    if (!iconDom) {
-        return;
-    }
-    iconDom.setAttribute("class", show ? "icon fa fa-caret-down fa-fw" : "icon fa fa-caret-right fa-fw");
-};
-
-/**
- * Set the appropriate expand/collapse icon for a collapsible section specified as a YUI node
- *
- * @param {YUI} sectionYui The collapsible section
- */
-M.course.format.fmtCollapseIconYui = function(sectionYui) {
-    var show = !sectionYui.hasClass("section-collapsed");
-    var iconYui = sectionYui.one("h3.sectionname i.icon");
-    if (!iconYui) {
-        return;
-    }
-    iconYui.setAttribute("class", show ? "icon fa fa-caret-down fa-fw" : "icon fa fa-caret-right fa-fw");
-};
-
-/**
  * Set or toggle the expand/collapse state for a specified collapsible section
  *
  * @param {HTMLLIElement} sectionDom The collapsible section
@@ -175,78 +140,25 @@ M.course.format.fmtCollapseIconYui = function(sectionYui) {
  */
 M.course.format.fmtCollapseSet = function(sectionDom, show) {
 
+    var sectionIconDom = sectionDom.querySelector(".course-section-header .icons-collapse-expand");
+    var sectionContentDom = sectionDom.querySelector(".content.course-content-item-content");
+
     if (show === undefined) {
-        show = sectionDom.classList.contains("section-collapsed");
+        show = sectionIconDom.classList.contains("collapsed");
     }
 
     if (show) {
-        sectionDom.classList.remove("section-collapsed");
-        sectionDom.classList.add("section-expanded");
+        sectionIconDom.classList.remove("collapsed");
+        sectionContentDom.classList.add("show");
     } else {
-        sectionDom.classList.remove("section-expanded");
-        sectionDom.classList.add("section-collapsed");
+        sectionIconDom.classList.add("collapsed");
+        sectionContentDom.classList.remove("show");
     }
-
-    M.course.format.fmtCollapseIcon(sectionDom);
 
 };
 
 /**
- * Toggle section expand/collapse state, where applicable, for a given click event.
- *
- * @param {MouseEvent} event The mouse click
- */
-M.course.format.fmtCollapseOnClick = function(event) {
-
-    // Find the clicked link anchor element (we may instead have been given the section's icon, from inside the anchor element).
-    var eventTarget = event.target;
-    if (eventTarget && eventTarget.tagName && eventTarget.tagName != "A") {
-        eventTarget = eventTarget.parentElement;
-    }
-
-    // Find the linked section, and check that the link is the one on the section's heading,
-    // otherwise return to normal event handling.
-    var sectionId;
-    if (eventTarget.hash) {
-        sectionId = eventTarget.hash.substr(1);
-    } else if (eventTarget.search && (eventTarget.search.indexOf("&sectionid=") >= 0)) {
-        var sectionIdStart = eventTarget.search.indexOf("&sectionid=") + 11;
-        var sectionIdEnd = eventTarget.search.indexOf("&", sectionIdStart);
-        if (sectionIdEnd < 0) {
-            sectionIdEnd = eventTarget.search.length;
-        }
-        sectionId = (sectionIdEnd > sectionIdStart) ?
-                    "sectionid-" + eventTarget.search.substring(sectionIdStart, sectionIdEnd) : "";
-    } else {
-        return;
-    }
-    var selSectionDom = sectionId ?
-                    document.querySelector("body.format-multitopic .course-content ul.sections li.section." + sectionId)
-                    : null;
-    if (!selSectionDom || selSectionDom.querySelector(".content h3 a") != eventTarget) {
-        return;
-    }
-
-    // If this is a collapsible section, toggle its collapse state.
-    if (selSectionDom.classList.contains("section-topic-collapsible") && !selSectionDom.classList.contains("section-userhidden")) {
-        M.course.format.fmtCollapseSet(selSectionDom);
-    }
-
-    // If a section anchor is specified in the URL bar, clear it, since it may no longer be relevant.
-    if (window.location.hash && window.location.hash != "#") {
-        history.pushState(null, document.title,
-                          window.location.href.substr(0, window.location.href.length - window.location.hash.length));
-    }
-
-    M.course.format.fmtCollapseAllControlsUpdate();
-
-    // Override normal event handling.
-    event.preventDefault();
-
-};
-
-/**
- * Expand, and scroll to, the section specified in the URL bar, and collapse other sections.
+ * Expand, and scroll to, the section specified in the URL bar.
  *
  * @param {HashChangeEvent?} event The triggering event, if any
  */
@@ -263,13 +175,9 @@ M.course.format.fmtCollapseOnHashChange = function(event) {
         return;
     }
 
-    // Set the appropriate collapse state for all collapsible sections.
-    var sectionsDom = document
-                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
-    for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
-        var sectionDom = sectionsDom[sectionCount];
-        M.course.format.fmtCollapseSet(sectionDom,
-                                       sectionDom == selSectionDom && !sectionDom.classList.contains("section-userhidden"));
+    // Expand, if appropriate.
+    if (selSectionDom && selSectionDom.classList.contains("section-topic-collapsible")) {
+        M.course.format.fmtCollapseSet(selSectionDom, !selSectionDom.classList.contains("section-userhidden"));
     }
 
     M.course.format.fmtCollapseAllControlsUpdate();
@@ -290,13 +198,16 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
 
     // Find the clicked link anchor element.
     var eventTarget = event.target;
+    if (eventTarget && eventTarget.tagName && eventTarget.tagName.toUpperCase() != "A") {
+        eventTarget = eventTarget.parentElement;
+    }
 
     // Is it expand or collapse?
-    var expand = !eventTarget.classList.contains('collapse-all');
+    var expand = eventTarget.classList.contains("collapsed");
 
     // Set the appropriate collapse state for all collapsible sections.
     var sectionsDom = document
-                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
+                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible:not([style*='display: none'])");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         M.course.format.fmtCollapseSet(sectionDom, expand && !sectionDom.classList.contains("section-userhidden"));
@@ -313,21 +224,27 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
  * Update expand/collapse all controls.
  */
 M.course.format.fmtCollapseAllControlsUpdate = function() {
-    var collapsedNum = 0;
+    var collapsedNum = 0, expandedNum = 0;
     var sectionsDom = document
-                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible");
+                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible:not([style*='display: none'])");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
-        if (sectionDom.offsetWidth > 0 && sectionDom.offsetHeight > 0 && !sectionDom.classList.contains("section-userhidden")) {
-            if (sectionDom.classList.contains('section-collapsed')) {
+        if (!sectionDom.classList.contains("section-userhidden")) {
+            var sectionIconDom = sectionDom.querySelector(".course-section-header .icons-collapse-expand");
+            if (sectionIconDom.classList.contains('collapsed')) {
                 collapsedNum++;
+            } else {
+                expandedNum++;
             }
         }
     }
-    document.querySelector("body.format-multitopic .collapsible-actions .expand-all")
-        .setAttribute("style", (collapsedNum) ? "" : "display: none;");
-    document.querySelector("body.format-multitopic .collapsible-actions .collapse-all")
-        .setAttribute("style", (!collapsedNum) ? "" : "display: none;");
+    var collapseAllControls = document.querySelector("body.format-multitopic .course-content ul.sections li.section:not([style*='display: none']) #collapsesections");
+    collapseAllControls.setAttribute("style", (collapsedNum<=0 && expandedNum<=0) ? "display: none;" : "");
+    if (expandedNum<=0) {
+        collapseAllControls.classList.add("collapsed");
+    } else if (collapsedNum<=0) {
+        collapseAllControls.classList.remove("collapsed");
+    }
 };
 
 /**
@@ -335,7 +252,7 @@ M.course.format.fmtCollapseAllControlsUpdate = function() {
  * @param {event} e
  */
 M.course.format.fmtChangeName = function(e) {
-    if (e.target.dataset.itemtype === 'sectionname') {
+    if (e.target.dataset.itemtype === 'sectionname' || e.target.dataset.itemtype === 'sectionnamenl') {
         var sectionid = e.target.dataset.itemid;
         var newname = e.target.dataset.value;
         var tabs = document.querySelectorAll(".nav-tabs .tab_content[data-itemid='" + sectionid + "']");
@@ -365,11 +282,7 @@ M.course.format.fmtWarnMaxsections = function(e) {
                 type: 'warning'
             });
         });
-        window.scroll({
-            top: 0,
-            left: 0,
-            behavior: 'smooth'
-        });
+        document.querySelector("#user-notifications").scrollIntoView();
     }
 
     return true;
@@ -385,16 +298,19 @@ M.course.format.fmtInit = function(Y, max) {
     // Set the initial state of collapsible sections.
     M.course.format.fmtCollapseOnHashChange();
 
-    // Capture possible clicks on course section headings.
-    document.querySelector("body.format-multitopic .course-content ul.sections")
-        .addEventListener("click", M.course.format.fmtCollapseOnClick);
-
-    // Capture clicks on any other course section links.
+    // Capture clicks on course section links.
     window.addEventListener("hashchange", M.course.format.fmtCollapseOnHashChange);
 
     // Capture clicks on expand/collapse all sections.
-    document.querySelector("body.format-multitopic .collapsible-actions")
+    document.querySelector("body.format-multitopic .course-content ul.sections li.section:not([style*='display: none']) #collapsesections")
         .addEventListener("click", M.course.format.fmtCollapseAllOnClick);
+
+    // Add listener on sections expanded or collapsed.
+    require(['jquery'], function($) {
+        var sectionList = document.querySelector(".course-content ul.sections");
+        $(sectionList).on('shown.bs.collapse', M.course.format.fmtCollapseAllControlsUpdate);
+        $(sectionList).on('hidden.bs.collapse', M.course.format.fmtCollapseAllControlsUpdate);
+    });
 
     // Add listener for section name inplace edited.
     require(['jquery'], function($) {
