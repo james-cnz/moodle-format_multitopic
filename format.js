@@ -206,8 +206,8 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
     var expand = eventTarget.classList.contains("collapsed");
 
     // Set the appropriate collapse state for all collapsible sections.
-    var sectionsDom = document
-                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible:not([style*='display: none'])");
+    var sectionsDom = document.querySelectorAll(
+        "body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible:not([style*='display: none'])");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         M.course.format.fmtCollapseSet(sectionDom, expand && !sectionDom.classList.contains("section-userhidden"));
@@ -224,9 +224,10 @@ M.course.format.fmtCollapseAllOnClick = function(event) {
  * Update expand/collapse all controls.
  */
 M.course.format.fmtCollapseAllControlsUpdate = function() {
-    var collapsedNum = 0, expandedNum = 0;
-    var sectionsDom = document
-                    .querySelectorAll("body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible:not([style*='display: none'])");
+    var collapsedNum = 0;
+    var expandedNum = 0;
+    var sectionsDom = document.querySelectorAll(
+        "body.format-multitopic .course-content ul.sections li.section.section-topic-collapsible:not([style*='display: none'])");
     for (var sectionCount = 0; sectionCount < sectionsDom.length; sectionCount++) {
         var sectionDom = sectionsDom[sectionCount];
         if (!sectionDom.classList.contains("section-userhidden")) {
@@ -238,11 +239,12 @@ M.course.format.fmtCollapseAllControlsUpdate = function() {
             }
         }
     }
-    var collapseAllControls = document.querySelector("body.format-multitopic .course-content ul.sections li.section:not([style*='display: none']) #collapsesections");
-    collapseAllControls.setAttribute("style", (collapsedNum<=0 && expandedNum<=0) ? "display: none;" : "");
-    if (expandedNum<=0) {
+    var collapseAllControls = document.querySelector(
+        "body.format-multitopic .course-content ul.sections li.section:not([style*='display: none']) #collapsesections");
+    collapseAllControls.setAttribute("style", (collapsedNum <= 0 && expandedNum <= 0) ? "display: none;" : "");
+    if (expandedNum <= 0) {
         collapseAllControls.classList.add("collapsed");
-    } else if (collapsedNum<=0) {
+    } else if (collapsedNum <= 0) {
         collapseAllControls.classList.remove("collapsed");
     }
 };
@@ -302,7 +304,8 @@ M.course.format.fmtInit = function(Y, max) {
     window.addEventListener("hashchange", M.course.format.fmtCollapseOnHashChange);
 
     // Capture clicks on expand/collapse all sections.
-    document.querySelector("body.format-multitopic .course-content ul.sections li.section:not([style*='display: none']) #collapsesections")
+    document.querySelector(
+        "body.format-multitopic .course-content ul.sections li.section:not([style*='display: none']) #collapsesections")
         .addEventListener("click", M.course.format.fmtCollapseAllOnClick);
 
     // Add listener on sections expanded or collapsed.
