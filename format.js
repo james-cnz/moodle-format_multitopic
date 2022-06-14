@@ -282,7 +282,7 @@ M.course.format.fmtWarnMaxsections = function(e) {
                 type: 'warning'
             });
         });
-        document.querySelector("#user-notifications").scrollIntoView();
+        document.querySelector("#user-notifications").scrollIntoView({behavior: "smooth", block: "center"});
     }
 
     return true;
