@@ -46,11 +46,27 @@ class sectionnavigation extends sectionnavigation_base {
     /** @var course_format the course format class */
     protected $format;
 
-    /** @var int the course displayed section */
+    /** @var int the course displayed section number */
     protected $sectionno;
+
+    /** @var stdClass the course displayed section */
+    protected $section;
 
     /** @var stdClass the calculated data to prevent calculations when rendered several times */
     private $data = null;
+
+    /**
+     * Constructor.
+     *
+     * @param course_format $format the course format
+     * @param stdClass $section section info
+     */
+    public function __construct(course_format $format, $section) {
+        $this->format = $format;
+        $section = $format->fmt_get_section($section);
+        $this->section = $section;
+        $this->sectionno = $section->section;
+    }
 
     /**
      * Export this data so it can be used as the context for a mustache template.
@@ -67,14 +83,8 @@ class sectionnavigation extends sectionnavigation_base {
 
         $format = $this->format;
         $course = $format->get_course();
-        $context = context_course::instance($course->id);
 
-        $sections = $format->fmt_get_sections(false);
-        $me = $format->fmt_get_section($this->sectionno);
-
-        // FIXME: Parent class advises using the navigation API.
-        // No guidance given however. And I don't think navigation API would work here anyway.
-        $canviewhidden = has_capability('moodle/course:viewhiddensections', $context, $USER);
+        $sections = $format->fmt_get_sections();
 
         $data = (object)[
             'previousurl' => '',
@@ -84,23 +94,23 @@ class sectionnavigation extends sectionnavigation_base {
             'currentsection' => $this->sectionno,
         ];
 
-        $back = $me;
+        $back = $this->section;
         while (isset($back->prevpageid)) {
             $back = $sections[$back->prevpageid];
-            if ($back->uservisible || $canviewhidden) {
+            if ($back->uservisible) {
                 $data->previousname = get_section_name($course, $back);
-                $data->previousurl = course_get_url($course, $back->section);
+                $data->previousurl = course_get_url($course, $back);
                 $data->hasprevious = true;
                 break;
             }
         }
 
-        $next = $me;
+        $next = $this->section;
         while (isset($next->nextpageid)) {
             $next = $sections[$next->nextpageid];
-            if ($next->uservisible || $canviewhidden) {
+            if ($next->uservisible) {
                 $data->nextname = get_section_name($course, $next);
-                $data->nexturl = course_get_url($course, $next->section);
+                $data->nexturl = course_get_url($course, $next);
                 $data->hasnext = true;
                 break;
             }
