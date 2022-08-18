@@ -201,18 +201,6 @@
         {{/ core_courseformat/local/content/addsection}}
     {{/numsections}}
 </div>
-
-{{#sectionnavigation}}
-    <div class="section-navigation row">
-        <span class="col-md-6 text-left">
-            {{#previousurl}}<a href="{{{previousurl}}}"><i class="fa fa-arrow-circle-left"></i> {{previousname}}</a>{{/previousurl}}
-        </span>
-        <span class="col-md-6 text-right">
-            {{#nexturl}}<a href="{{{nexturl}}}">{{nextname}} <i class="fa fa-arrow-circle-right"></i></a>{{/nexturl}}
-        </span>
-    </div>
-{{/sectionnavigation}}
-
 {{#js}}
 require(['core_courseformat/local/content'], function(component) {
     component.init('{{uniqid}}-course-format');
