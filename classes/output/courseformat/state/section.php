@@ -44,7 +44,8 @@ class section extends base_section {
     public function export_for_template(\renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
         $section = $this->section;
-        $data->indent = ($section->section == 0) ? 0 : $section->level;
+        $data->levelsan = $section->levelsan;
+        $data->indent = ($section->section == 0) ? 0 : $section->levelsan;
         return $data;
     }
 }

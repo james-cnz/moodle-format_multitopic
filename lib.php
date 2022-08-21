@@ -616,7 +616,7 @@ class format_multitopic extends core_courseformat\base {
      * @return bool if the format is compatible with components.
      */
     public function supports_components() : bool {
-        return false;                                                           // TODO: Enable when supported.
+        return true;
     }
 
     /**
