@@ -24,8 +24,27 @@
  */
 
 import BaseComponent from 'core_courseformat/local/courseindex/courseindex';
+import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
+import Mutations from 'format_multitopic/courseformat/courseeditor/mutations';
 
 export default class Component extends BaseComponent {
+
+    /**
+     * Static method to create a component instance form the mustache template.
+     *
+     * @param {element|string} target the DOM main element or its ID
+     * @param {object} selectors optional css selector overrides
+     * @return {Component}
+     */
+     static init(target, selectors) {
+        const reactive = getCurrentCourseEditor();
+        reactive.setMutations(new Mutations());
+        return new Component({
+            element: document.getElementById(target),
+            reactive: reactive,
+            selectors,
+        });
+    }
 
     /**
      * Create a new section instance.
