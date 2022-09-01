@@ -44,4 +44,23 @@ export default class extends SectionBase {
         return super.validateDropData(dropdata);
     }
 
+    /**
+     * Update a course index section using the state information.
+     *
+     * @param {object} param
+     * @param {Object} param.element details the update details.
+     */
+    _refreshSection({element}) {
+        super._refreshSection({element});
+        const pageSectionHTML = document.querySelector(".course-section[data-id='" + element.pageid + "']");
+        const pageSectionDisplay = pageSectionHTML.dataset.fmtonpage;
+        if (this.element.dataset.fmtonpage != pageSectionDisplay) {
+            this.element.dataset.fmtonpage = pageSectionDisplay;
+            this.element.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+            if (pageSectionDisplay == "1" && this.section.cmlist.length > 0) {
+                // TODO: Refresh cm list.
+            }
+        }
+    }
+
 }
