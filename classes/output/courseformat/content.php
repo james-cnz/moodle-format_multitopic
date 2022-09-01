@@ -271,6 +271,10 @@ class content extends content_base {
         $addsection = new $this->addsectionclass($format);
         $data->numsections = $addsection->export_for_template($output);
 
+        // Allow next and back navigation between pages.
+        $sectionnav = new \format_multitopic\output\courseformat\content\sectionnavigation($format, $displaysection);
+        $data->sectionnavigation = $sectionnav->export_for_template($output);
+
         return $data;
     }
 
