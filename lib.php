@@ -425,18 +425,7 @@ class format_multitopic extends core_courseformat\base {
     public function get_section_name($section) : string {
 
         // ADDED.
-        // If we don't have calculated data, don't bother fetching it.
-        if (!is_object($section) || !isset($section->fmtdata)) {
-            // INCLUDED: /course/format/topics/lib.php function get_section_name body .
-            $section = $this->get_section($section);
-            if ((string)$section->name !== '') {
-                return format_string($section->name, true,
-                        ['context' => context_course::instance($this->courseid)]);
-            } else {
-                return $this->get_default_section_name($section);
-            }
-            // END INCLUDED.
-        }
+        $section = $this->fmt_get_section($section);
 
         $weekword = new lang_string('week');
         $weeksword = get_string_manager()->string_exists('weeks_capitalised', 'format_multitopic') ?

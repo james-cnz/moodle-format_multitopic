@@ -25,6 +25,7 @@
 
 import BaseComponent from 'core_courseformat/local/content';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
+import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
 import CmItem from 'core_courseformat/local/content/section/cmitem';
 
@@ -45,6 +46,53 @@ export default class Component extends BaseComponent {
             selectors,
             sectionReturn,
         });
+    }
+
+    /**
+     * Update a course section when the section number changes.
+     *
+     * The courseActions module used for most course section tools still depends on css classes and
+     * section numbers (not id). To prevent inconsistencies when a section is moved, we need to refresh
+     * the
+     *
+     * Course formats can override the section title rendering so the frontend depends heavily on backend
+     * rendering. Luckily in edit mode we can trigger a title update using the inplace_editable module.
+     *
+     * @param {Object} param
+     * @param {Object} param.element details the update details.
+     */
+     _refreshSectionNumber({element}) {
+        // Find the element.
+        const target = this.getElement(this.selectors.SECTION, element.id);
+        if (!target) {
+            // Job done. Nothing to refresh.
+            return;
+        }
+        // Update section numbers in all data, css and YUI attributes.
+        target.id = `section-${element.number}`;
+        // YUI uses section number as section id in data-sectionid, in principle if a format use components
+        // don't need this sectionid attribute anymore, but we keep the compatibility in case some plugin
+        // use it for legacy purposes.
+        target.dataset.sectionid = element.number;
+        // The data-number is the attribute used by components to store the section number.
+        target.dataset.number = element.number;
+
+        // Update title and title inplace editable, if any.
+        const inplace = inplaceeditable.getInplaceEditable(target.querySelector(this.selectors.SECTION_ITEM));
+        if (inplace) {
+            // The course content HTML can be modified at any moment, so the function need to do some checkings
+            // to make sure the inplace editable still represents the same itemid.
+            const currentvalue = inplace.getValue();
+            const currentitemid = inplace.getItemId();
+            // Unnamed sections must be recalculated.
+            if (inplace.getValue() === '' || element.timed) {                   // CHANGED.
+                // The value to send can be an empty value if it is a default name.
+                if (currentitemid == element.id
+                    && (currentvalue != element.rawtitle || element.rawtitle == '' || element.timed)) { // CHANGED.
+                    inplace.setValue(element.rawtitle);
+                }
+            }
+        }
     }
 
     /**
