@@ -85,7 +85,7 @@ export default class Component extends BaseComponent {
             const currentvalue = inplace.getValue();
             const currentitemid = inplace.getItemId();
             // Unnamed sections must be recalculated.
-            if (inplace.getValue() === '' || element.timed) {                   // CHANGED.
+            if (inplace.getValue() === '' || element.timed) { // CHANGED.
                 // The value to send can be an empty value if it is a default name.
                 if (currentitemid == element.id
                     && (currentvalue != element.rawtitle || element.rawtitle == '' || element.timed)) { // CHANGED.

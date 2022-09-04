@@ -13,7 +13,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-import MutationsBase from 'core_courseformat/local/courseeditor/mutations';
+// import MutationsBase from 'core_courseformat/local/courseeditor/mutations';
 
 /**
  * Default mutation manager
@@ -24,7 +24,7 @@ import MutationsBase from 'core_courseformat/local/courseeditor/mutations';
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-export default class extends MutationsBase {
+export default class /*extends MutationsBase*/ {
 
     /**
      * Move course modules to specific course location.
