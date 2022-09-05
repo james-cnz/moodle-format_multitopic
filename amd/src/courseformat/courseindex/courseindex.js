@@ -38,7 +38,7 @@ export default class Component extends BaseComponent {
      */
      static init(target, selectors) {
         const reactive = getCurrentCourseEditor();
-        reactive.addMutations(Mutations);
+        reactive.addMutations({fmtSectionMove: Mutations.prototype.fmtSectionMove.bind(reactive.mutations)});
         return new Component({
             element: document.getElementById(target),
             reactive: reactive,
