@@ -156,4 +156,19 @@ export default class Component extends ComponentBase {
         }
     }
 
+    /**
+     * Update a course index section using the state information.
+     *
+     * @param {Object} param details the update details.
+     * @param {Object} param.element the section element
+     */
+     _refreshSection({element}) {
+        super._refreshSection({element});
+        const linkHTML = this.element.querySelector("a.courseindex-link");
+        const link = element.sectionurl.replace("&amp;", "&");
+        if (linkHTML.href != link) {
+            linkHTML.href = link;
+        }
+     }
+
 }
