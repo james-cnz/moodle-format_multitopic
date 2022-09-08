@@ -16,14 +16,13 @@
 
 namespace format_multitopic\output\courseformat\state;
 
-global $CFG;
-require_once($CFG->dirroot . '/course/format/multitopic/lib.php');
-
 use core_courseformat\output\local\state\course as base_course;
-
 use core_courseformat\base as course_format;
 use moodle_url;
 use stdClass;
+
+defined('MOODLE_INTERNAL') || die();
+require_once(__DIR__ . '/../../../../lib.php');
 
 /**
  * Contains the ajax update course structure.
