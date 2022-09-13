@@ -146,7 +146,7 @@ export default class Component extends BaseComponent {
                 };
                 item = document.createElement("li");
                 container.appendChild(item);
-                Templates.render("format_multitopic/courseformat/tab", data).done(function (html) {
+                Templates.render("format_multitopic/courseformat/tab", data).done(function(html) {
                     Templates.replaceNode(item, html);
                 });
             }
@@ -166,7 +166,7 @@ export default class Component extends BaseComponent {
         let addTab = container.lastElementChild;
         while (container.children.length > neworder.length + 1) {
             var lastTab = container.lastChild;
-            if(lastTab !== addTab) {
+            if (lastTab !== addTab) {
                 container.removeChild(lastTab);
             } else {
                 container.removeChild(lastTab.previousSibling);
