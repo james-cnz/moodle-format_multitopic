@@ -105,7 +105,9 @@ export default class Component extends BaseComponent {
         // And the second row tabs match secondsectionlist.
         const childtabslist = element.secondsectionlist ?? [];
         let childtabs = this.element.querySelector('ul:nth-of-type(2)');
-        this._fixOrder(childtabs, childtabslist[this.activetab], this.childtabs);
+        if (childtabs) {
+            this._fixOrder(childtabs, childtabslist[this.activetab], this.childtabs);
+        }
     }
 
     /**
@@ -129,8 +131,8 @@ export default class Component extends BaseComponent {
 
         // Move the elements in order at the beginning of the list.
         neworder.forEach((itemid, index) => {
-            let item = allitems[itemid];
-            if (item === undefined) {
+
+            if (allitems[itemid] === undefined) {
                 // If we don't have an item, create it from the course index.
                 let selecta = "[data-id='" + itemid + "']";
                 let ciElement = document.querySelector(selecta);
@@ -144,12 +146,14 @@ export default class Component extends BaseComponent {
                     "title": ciLink.innerHTML,
                     "text": ciLink.innerHTML
                 };
-                item = document.createElement("li");
-                container.appendChild(item);
+                let tab = document.createElement("li");
+                allitems[itemid] = tab;
+                container.insertBefore(tab, container.lastElementChild);
                 Templates.render("format_multitopic/courseformat/tab", data).done(function(html) {
                     Templates.replaceNode(item, html);
                 });
             }
+            const item = allitems[itemid];
 
             // Get the current element at that position.
             const currentitem = container.children[index];
@@ -163,14 +167,8 @@ export default class Component extends BaseComponent {
         });
         // Remove the remaining elements.
         // But we don't want the "Add" blown away.
-        let addTab = container.lastElementChild;
         while (container.children.length > neworder.length + 1) {
-            var lastTab = container.lastChild;
-            if (lastTab !== addTab) {
-                container.removeChild(lastTab);
-            } else {
-                container.removeChild(lastTab.previousSibling);
-            }
+                container.removeChild(container.lastElementChild.previousSibling);
         }
 
     }

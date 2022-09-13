@@ -77,7 +77,7 @@ class course extends base_course {
         $parentindex = -1;
 
         foreach ($sections as $section) {
-            if ($section->uservisible) {
+            if ($format->is_section_visible($section)) {
                 $data->sectionlist[] = $section->id;
 
                 if ($section->level === 0) {
