@@ -35,9 +35,7 @@
 <div id="{{uniqid}}-course-tabs" class="course-section-tabs">
 <ul class="nav nav-tabs mb-3">
   {{#tabs}}
-    <li class="nav-item">
-      <a class="nav-link{{#active}} active{{/active}}{{#inactive}} disabled{{/inactive}}" {{#link}}href="{{{link}}}"{{/link}} title="{{title}}">{{{text}}}</a>
-    </li>
+    {{> format_multitopic/courseformat/tab }}
   {{/tabs}}
 </ul>
 

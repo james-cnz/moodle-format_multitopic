@@ -15,6 +15,8 @@
 
 import {BaseComponent} from 'core/reactive';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
+import Templates from 'core/templates';
+
 
 /**
  * Course section tabs updater.
@@ -127,7 +129,28 @@ export default class Component extends BaseComponent {
 
         // Move the elements in order at the beginning of the list.
         neworder.forEach((itemid, index) => {
-            const item = allitems[itemid];
+            let item = allitems[itemid];
+            if (item === undefined) {
+                // If we don't have an item, create it from the course index.
+                let selecta = "[data-id='" + itemid + "']";
+                let ciElement = document.querySelector(selecta);
+                let ciLink = ciElement.querySelector(" a.courseindex-link");
+                let data = {
+                    "active": 0,
+                    "inactive": ciElement.classList.contains("dimmed"),
+                    "link": [{
+                    "link": ciLink.getAttribute("href")
+                }],
+                    "title": ciLink.innerHTML,
+                    "text": ciLink.innerHTML
+                };
+                item = document.createElement("li");
+                container.appendChild(item);
+                Templates.render("format_multitopic/courseformat/tab", data).done(function (html) {
+                    Templates.replaceNode(item, html);
+                });
+            }
+
             // Get the current element at that position.
             const currentitem = container.children[index];
             if (currentitem === undefined) {
@@ -139,12 +162,17 @@ export default class Component extends BaseComponent {
             }
         });
         // Remove the remaining elements.
-        // Probably not necessary as we are not removing anything. And we don't want the "Add" blown away.
-        /*
-        while (container.children.length > neworder.length) {
-            container.removeChild(container.lastChild);
+        // But we don't want the "Add" blown away.
+        let addTab = container.lastElementChild;
+        while (container.children.length > neworder.length + 1) {
+            var lastTab = container.lastChild;
+            if(lastTab !== addTab) {
+                container.removeChild(lastTab);
+            } else {
+                container.removeChild(lastTab.previousSibling);
+            }
         }
-         */
+
     }
 
 }
