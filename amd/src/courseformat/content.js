@@ -93,6 +93,17 @@ export default class Component extends BaseComponent {
                 }
             }
         }
+
+        const pageSectionHTML = document.querySelector(".course-section[data-id='" + element.pageid + "']");
+        const pageSectionDisplay = pageSectionHTML.dataset.fmtonpage;
+        if (target.dataset.fmtonpage != pageSectionDisplay) {
+            target.dataset.fmtonpage = pageSectionDisplay;
+            target.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+            if (pageSectionDisplay == "1") {
+                this._refreshSectionCmlist({element});
+            }
+        }
+
     }
 
     /**
