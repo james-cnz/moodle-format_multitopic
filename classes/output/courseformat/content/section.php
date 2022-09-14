@@ -231,7 +231,7 @@ class section extends section_base {
             }
             if ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0') {
                 $sectionstyle .= ' section-topic-collapsible section-collapsed';
-                $iscollapsible = $onpage;
+                $iscollapsible = true;
             } else {
                 $sectionstyle .= ' section-topic-noncollapsible';
             }
