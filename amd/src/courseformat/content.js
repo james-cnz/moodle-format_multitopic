@@ -49,6 +49,69 @@ export default class Component extends BaseComponent {
     }
 
     /**
+     * Handle the collapse/expand all sections button.
+     *
+     * Toggler click is delegated to the main course content element because new sections can
+     * appear at any moment and this way we prevent accidental double bindings.
+     *
+     * @param {Event} event the triggered event
+     */
+     _allSectionToggler(event) {
+        event.preventDefault();
+
+        const target = event.target.closest(this.selectors.TOGGLEALL);
+        const isAllCollapsed = target.classList.contains(this.classes.COLLAPSED);
+
+        let sectionlist = [];
+        const sectionlistDom = document.querySelectorAll(".course-section.section-topic-collapsible[data-fmtonpage='1']");
+        for (var sectionCount = 0; sectionCount < sectionlistDom.length; sectionCount++) {
+            sectionlist.push(sectionlistDom[sectionCount].dataset.id);
+        }
+
+        this.reactive.dispatch(
+            'sectionContentCollapsed',
+            sectionlist,
+            !isAllCollapsed
+        );
+    }
+
+    /**
+     * Refresh the collapse/expand all sections element.
+     *
+     * @param {Object} state The state data
+     */
+     _refreshAllSectionsToggler(state) {
+        const target = this.getElement(this.selectors.TOGGLEALL);
+        if (!target) {
+            return;
+        }
+        // Check if we have all sections collapsed/expanded.
+        let allcollapsed = true;
+        let allexpanded = true;
+        let sectionCollapsible = {};
+        const sectionlistDom = document.querySelectorAll(".course-section.section-topic-collapsible[data-fmtonpage='1']");
+        for (var sectionCount = 0; sectionCount < sectionlistDom.length; sectionCount++) {
+            sectionCollapsible[sectionlistDom[sectionCount].dataset.id] = true;
+        }
+        state.section.forEach(
+            section => {
+                if (sectionCollapsible[section.id]) {
+                    allcollapsed = allcollapsed && section.contentcollapsed;
+                    allexpanded = allexpanded && !section.contentcollapsed;
+                }
+            }
+        );
+        if (allcollapsed) {
+            target.classList.add(this.classes.COLLAPSED);
+            target.setAttribute('aria-expanded', false);
+        }
+        if (allexpanded) {
+            target.classList.remove(this.classes.COLLAPSED);
+            target.setAttribute('aria-expanded', true);
+        }
+    }
+
+    /**
      * Update a course section when the section number changes.
      *
      * The courseActions module used for most course section tools still depends on css classes and
@@ -93,6 +156,17 @@ export default class Component extends BaseComponent {
                 }
             }
         }
+
+        const pageSectionHTML = document.querySelector(".course-section[data-id='" + element.pageid + "']");
+        const pageSectionDisplay = pageSectionHTML.dataset.fmtonpage;
+        if (target.dataset.fmtonpage != pageSectionDisplay) {
+            target.dataset.fmtonpage = pageSectionDisplay;
+            target.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+            if (pageSectionDisplay == "1") {
+                this._refreshSectionCmlist({element});
+            }
+        }
+
     }
 
     /**
