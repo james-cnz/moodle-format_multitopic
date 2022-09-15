@@ -74,19 +74,19 @@ class course extends base_course {
 
         $format = course_get_format($course->id);
         $sections = $format->fmt_get_sections();
-        $parentindex = -1;
+        $parentid = null;
 
         foreach ($sections as $section) {
             if ($format->is_section_visible($section)) {
                 $data->sectionlist[] = $section->id;
 
                 if ($section->level === 0) {
-                    $data->secondsectionlist[] = [$section->id]; // Tabs uses first item as parent, Course index might not.
-                    $parentindex ++;
+                    $parentid = $section->id;
+                    $data->secondsectionlist[$parentid] = [$section->id]; // Tabs uses first item as parent, Course index might not.
                     $data->firstsectionlist[] = $section->id;
                 }
                 if ($section->level == 1) {
-                    $data->secondsectionlist[$parentindex][] = $section->id;
+                    $data->secondsectionlist[$parentid][] = $section->id;
                 }
             }
         }

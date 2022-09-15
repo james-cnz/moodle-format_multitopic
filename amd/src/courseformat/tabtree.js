@@ -48,7 +48,7 @@ export default class Component extends BaseComponent {
         // Objects to keep tabs on the tabs
         this.tabs = {};
         this.childtabs = {};
-        this.activetab = 0;
+        this.activetab = [null, null];
     }
 
     getWatchers() {
@@ -78,7 +78,8 @@ export default class Component extends BaseComponent {
             let classes = tab.querySelector("a").classList.value;
             this.tabs[id] = tab;
             if (classes.indexOf(this.classes.ACTIVETAB) !== -1) {
-                this.activetab = i;
+                this.activetab[0] = id;
+                this.activetab[1] = id;
             }
         }
 
@@ -86,7 +87,11 @@ export default class Component extends BaseComponent {
         for (let i = 0; i < childtabs.length - 1; i++) { // Don't count last "add section" tab.
             let tab = childtabs.item(i);
             let id = tab.querySelector("a div").dataset.itemid;
+            let classes = tab.querySelector("a").classList.value;
             this.childtabs[id] = tab;
+            if (classes.indexOf(this.classes.ACTIVETAB) !== -1) {
+                this.activetab[1] = id;
+            }
         }
     }
 
@@ -97,16 +102,30 @@ export default class Component extends BaseComponent {
      * @param {Object} param.element
      */
     _refreshCourseSectionTabs({element}) {
+        // Change the active top-level tab, if necessary.
+        const activeTab1 = this.reactive.get('section', this.activetab[1]);
+        let newActiveTab0id = (activeTab1.levelsan >= 1) ? activeTab1.parentid : activeTab1.id;
+        if (newActiveTab0id != this.activetab[0]) {
+            let section = this.reactive.stateManager.state.section.get(this.activetab[0]);
+            let anchor = this.element.querySelector('ul:first-of-type div[data-itemid="'+this.activetab[0]+'"]').parentElement;
+            anchor.classList.remove("active");
+            anchor.href = section.sectionurl.replace("&amp;", "&");
+            this.activetab[0] = newActiveTab0id;
+            anchor = this.element.querySelector('ul:first-of-type div[data-itemid="'+this.activetab[0]+'"]').parentElement;
+            anchor.classList.add("active");
+            anchor.removeAttribute("href");
+        }
+
         // Do things that make the first row tabs match firstsectionlist.
         const toptabslist = element.firstsectionlist ?? [];
+        const childtabslist = element.secondsectionlist ?? [];
         let toptabs = this.element.querySelector('ul:first-of-type');
-        this._fixOrder(toptabs, toptabslist, this.tabs);
+        this._fixOrder(toptabs, toptabslist, this.tabs, childtabslist[this.activetab[0]].length > 1);
 
         // And the second row tabs match secondsectionlist.
-        const childtabslist = element.secondsectionlist ?? [];
         let childtabs = this.element.querySelector('ul:nth-of-type(2)');
         if (childtabs) {
-            this._fixOrder(childtabs, childtabslist[this.activetab], this.childtabs);
+            this._fixOrder(childtabs, childtabslist[this.activetab[0]], this.childtabs, false);
         }
     }
 
@@ -116,8 +135,9 @@ export default class Component extends BaseComponent {
      * @param {Element} container the HTML element to reorder.
      * @param {Array} neworder an array with the ids order
      * @param {Array} allitems the list of html elements that can be placed in the container
+     * @param {boolean} hassubtree
      */
-    _fixOrder(container, neworder, allitems) {
+    _fixOrder(container, neworder, allitems, hassubtree) {
 
         // Empty lists should not be visible.
         if (!neworder.length) {
@@ -131,7 +151,9 @@ export default class Component extends BaseComponent {
 
         // Move the elements in order at the beginning of the list.
         neworder.forEach((itemid, index) => {
-
+            const section = this.reactive.stateManager.state.section.get(itemid);
+            const visible = (section.visible && section.available || section.section == 0)
+                && (neworder.length > 1 || hassubtree);
             if (allitems[itemid] === undefined) {
                 // If we don't have an item, create it from the course index.
                 let selecta = "[data-id='" + itemid + "']";
@@ -139,12 +161,13 @@ export default class Component extends BaseComponent {
                 let ciLink = ciElement.querySelector(" a.courseindex-link");
                 let data = {
                     "active": 0,
-                    "inactive": ciElement.classList.contains("dimmed"),
+                    "inactive": 0,
                     "link": [{
                     "link": ciLink.getAttribute("href")
                 }],
                     "title": ciLink.innerHTML,
-                    "text": ciLink.innerHTML
+                    "text": '<div class="tab_content' + (visible ? '' : ' dimmed')
+                        + '" data-itemid="' + section.id + '">' + section.title + '</div>'
                 };
                 let tab = document.createElement("li");
                 allitems[itemid] = tab;
@@ -154,6 +177,15 @@ export default class Component extends BaseComponent {
                 });
             }
             const item = allitems[itemid];
+            // Update visibility
+            const content = item.querySelector("div.tab_content");
+            if (content && content.classList.contains("dimmed") == visible) {
+                if (visible) {
+                    content.classList.remove("dimmed");
+                } else {
+                    content.classList.add("dimmed");
+                }
+            }
 
             // Get the current element at that position.
             const currentitem = container.children[index];
