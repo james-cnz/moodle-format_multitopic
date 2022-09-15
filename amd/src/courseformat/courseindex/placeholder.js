@@ -53,6 +53,7 @@ export default class Component extends BaseComponent {
         // Collect section information from the state.
         const exporter = this.reactive.getExporter();
         const data = exporter.course(state);
+        data.sections = this._nestSections(data.sections);
         try {
             // To render an HTML into our component we just use the regular Templates module.
             const {html, js} = await Templates.renderForPromise(
@@ -68,5 +69,49 @@ export default class Component extends BaseComponent {
             this.pendingContent.resolve(error);
             throw error;
         }
+    }
+
+     _nestSections(sections) {
+        let topSections = [];
+        let parentSection = {};
+        let lastParent = {};
+
+        // Let's re-organise our sections.
+        for (let i = 0; i < sections.length; i++) {
+            let section = sections[i];
+            let isCurrent = false;
+            section.indexcollapsed = true;
+            section.contentcollapsed = true;
+            section.subsections = [];
+            section.topics = [];
+            if (isCurrent) {
+                section.indexcollapsed = false;
+                section.contentcollapsed = false;
+            }
+            if (window.location.href == section.sectionurl.replace(/&amp;/g, "&")) {
+                isCurrent = true;
+            }
+            if (section.indent === 0) {
+                parentSection = section;
+                lastParent = section;
+                topSections.push(section);
+            } else if (section.indent === 1) {
+                lastParent = section;
+                parentSection.subsections.push(section);
+                if (isCurrent) {
+                    parentSection.indexcollapsed = false;
+                    parentSection.contentcollapsed = false;
+                }
+            } else if (section.indent === 2) {
+                lastParent.topics.push(section);
+                if (isCurrent) {
+                    parentSection.indexcollapsed = false;
+                    parentSection.contentcollapsed = false;
+                    lastParent.indexcollapsed = false;
+                    lastParent.contentcollapsed = false;
+                }
+            }
+        }
+        return topSections;
     }
 }

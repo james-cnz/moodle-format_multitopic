@@ -29,6 +29,28 @@ import Mutations from 'format_multitopic/courseformat/courseeditor/mutations';
 
 export default class Component extends BaseComponent {
 
+    create() {
+        super.create();
+        this.selectors.TOPSECTION = `[data-for='section'][data-indent='0']`;
+        this.selectors.SECONDSECTIONS = `[data-for='section'][data-indent='1']`;
+        this.selectors.THIRDSECTIONS = `[data-for='section'][data-indent='2']`;
+        this.topsections = {};
+    }
+
+    /**
+     * Initial state ready method.
+     *
+     * @param {Object} state the state data
+     */
+    stateReady(state) {
+        super.stateReady(state);
+        // Get cms and sections elements.
+        const topsections = this.getElements(this.selectors.TOPSECTION);
+        topsections.forEach((section) => {
+            this.topsections[section.dataset.id] = section;
+        });
+    }
+
     /**
      * Static method to create a component instance form the mustache template.
      *
@@ -44,6 +66,55 @@ export default class Component extends BaseComponent {
             reactive: reactive,
             selectors,
         });
+    }
+
+    /**
+     * Refresh the section list.
+     *
+     * @param {object} param
+     * @param {Object} param.element
+     */
+    _refreshCourseSectionlist({element}) {
+        const topsectionslist = element.firstsectionlist ?? [];
+        this._fixOrder(this.element, topsectionslist, this.topsections);
+
+        for (let p in element.secondsectionlist) {
+            let secondorder = element.secondsectionlist[p];
+            secondorder.shift(); // the first item is the parent to match the tabs
+            let container = this.getElement("[data-id='" + p + "'] > .collapse > .subsections");
+            let secondsections = container.querySelectorAll(this.selectors.SECONDSECTIONS);
+            let secondsectionobj = {};
+            secondsections.forEach((section) => {
+                secondsectionobj[section.dataset.id] = section;
+            });
+            // First check we have all the subsections. If not move it here.
+            for (let j =0; j < secondorder.length; j++) {
+                let itemid = secondorder[j];
+                if (secondsectionobj[itemid] === undefined) {
+                    secondsectionobj[itemid] = this.sections[itemid];
+                }
+            }
+            this._fixOrder(container, secondorder, secondsectionobj);
+        }
+
+        for (let p in element.thirdsectionlist) {
+            let thirdorder = element.thirdsectionlist[p];
+            let container = this.getElement("[data-id='" + p + "'] > .collapse > .topics");
+            let thirdsections = container.querySelectorAll(this.selectors.THIRDSECTIONS);
+            let thirdsectionsobj = {};
+            thirdsections.forEach((section) => {
+                thirdsectionsobj[section.dataset.id] = section;
+            });
+            // First check we have all the topics. If not move it here.
+            for (let j =0; j < thirdorder.length; j++) {
+                let itemid = thirdorder[j];
+                if (thirdsectionsobj[itemid] === undefined) {
+                    thirdsectionsobj[itemid] = this.sections[itemid];
+                }
+            }
+            this._fixOrder(container, thirdorder, thirdsectionsobj);
+        }
+
     }
 
     /**

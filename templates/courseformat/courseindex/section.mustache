@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/courseindex/section
+    @template format_multitopic/courseformat/courseindex/section
 
     Displays a course index section entry.
 
@@ -65,6 +65,7 @@
     data-id="{{id}}"
     data-number="{{number}}"
     data-levelsan="{{levelsan}}"
+    data-indent="{{indent}}"
     role="treeitem"
     aria-owns="courseindexcollapse{{number}}"
     style="padding-left: {{indent}}em;"
@@ -120,6 +121,16 @@
             {{> core_courseformat/local/courseindex/cm }}
             {{/cms}}
         </ul>
+        <div class="topics">
+            {{#topics}}
+            {{> format_multitopic/courseformat/courseindex/section }}
+            {{/topics}}
+        </div>
+        <div class="subsections">
+            {{#subsections}}
+            {{> format_multitopic/courseformat/courseindex/section }}
+            {{/subsections}}
+        </div>
     </div>
 </div>
 {{#testingsection}}</div>{{/testingsection}}
