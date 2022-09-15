@@ -80,7 +80,7 @@ export default class Component extends BaseComponent {
 
         for (let p in element.secondsectionlist) {
             let secondorder = element.secondsectionlist[p];
-            secondorder.shift(); // the first item is the parent to match the tabs
+            secondorder.shift(); // The first item is the parent to match the tabs.
             let container = this.getElement("[data-id='" + p + "'] > .collapse > .subsections");
             let secondsections = container.querySelectorAll(this.selectors.SECONDSECTIONS);
             let secondsectionobj = {};
@@ -88,7 +88,7 @@ export default class Component extends BaseComponent {
                 secondsectionobj[section.dataset.id] = section;
             });
             // First check we have all the subsections. If not move it here.
-            for (let j =0; j < secondorder.length; j++) {
+            for (let j = 0; j < secondorder.length; j++) {
                 let itemid = secondorder[j];
                 if (secondsectionobj[itemid] === undefined) {
                     secondsectionobj[itemid] = this.sections[itemid];
@@ -106,7 +106,7 @@ export default class Component extends BaseComponent {
                 thirdsectionsobj[section.dataset.id] = section;
             });
             // First check we have all the topics. If not move it here.
-            for (let j =0; j < thirdorder.length; j++) {
+            for (let j = 0; j < thirdorder.length; j++) {
                 let itemid = thirdorder[j];
                 if (thirdsectionsobj[itemid] === undefined) {
                     thirdsectionsobj[itemid] = this.sections[itemid];

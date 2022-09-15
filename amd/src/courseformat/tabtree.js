@@ -107,11 +107,11 @@ export default class Component extends BaseComponent {
         let newActiveTab0id = (activeTab1.levelsan >= 1) ? activeTab1.parentid : activeTab1.id;
         if (newActiveTab0id != this.activetab[0]) {
             let section = this.reactive.stateManager.state.section.get(this.activetab[0]);
-            let anchor = this.element.querySelector('ul:first-of-type div[data-itemid="'+this.activetab[0]+'"]').parentElement;
+            let anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]').parentElement;
             anchor.classList.remove("active");
             anchor.href = section.sectionurl.replace("&amp;", "&");
             this.activetab[0] = newActiveTab0id;
-            anchor = this.element.querySelector('ul:first-of-type div[data-itemid="'+this.activetab[0]+'"]').parentElement;
+            anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]').parentElement;
             anchor.classList.add("active");
             anchor.removeAttribute("href");
         }
