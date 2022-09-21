@@ -39,7 +39,7 @@ export default class Component extends BaseComponent {
      * @param {number} sectionReturn the content section return
      * @return {Component}
      */
-     static init(target, selectors, sectionReturn) {
+    static init(target, selectors, sectionReturn) {
         return new Component({
             element: document.getElementById(target),
             reactive: getCurrentCourseEditor(),
@@ -56,7 +56,7 @@ export default class Component extends BaseComponent {
      *
      * @param {Event} event the triggered event
      */
-     _allSectionToggler(event) {
+    _allSectionToggler(event) {
         event.preventDefault();
 
         const target = event.target.closest(this.selectors.TOGGLEALL);
@@ -80,7 +80,7 @@ export default class Component extends BaseComponent {
      *
      * @param {Object} state The state data
      */
-     _refreshAllSectionsToggler(state) {
+    _refreshAllSectionsToggler(state) {
         const target = this.getElement(this.selectors.TOGGLEALL);
         if (!target) {
             return;
@@ -101,6 +101,7 @@ export default class Component extends BaseComponent {
                 }
             }
         );
+        target.style.display = (allexpanded && allcollapsed) ? "none" : "block";
         if (allcollapsed) {
             target.classList.add(this.classes.COLLAPSED);
             target.setAttribute('aria-expanded', false);
@@ -124,7 +125,7 @@ export default class Component extends BaseComponent {
      * @param {Object} param
      * @param {Object} param.element details the update details.
      */
-     _refreshSectionNumber({element}) {
+    _refreshSectionNumber({element}) {
         // Find the element.
         const target = this.getElement(this.selectors.SECTION, element.id);
         if (!target) {
@@ -170,11 +171,22 @@ export default class Component extends BaseComponent {
     }
 
     /**
+     * Refresh the section list.
+     *
+     * @param {Object} param
+     * @param {Object} param.element details the update details.
+     */
+    _refreshCourseSectionlist({element}) {
+        super._refreshCourseSectionlist({element});
+        this._refreshAllSectionsToggler(this.reactive.stateManager.state);
+    }
+
+    /**
      * Regenerate content indexes.
      *
      * This method is used when a legacy action refresh some content element.
      */
-     _indexContents() {
+    _indexContents() {
         // Find unindexed sections.
         this._scanIndex(
             this.selectors.SECTION,
