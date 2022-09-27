@@ -117,22 +117,26 @@ export default class Component extends ComponentBase {
      * @param {Object} dropdata the accepted drop data
      */
     hideDropZone(dropdata) {
-        const state = this.reactive.stateManager.state;
-        const origin = state.section.get(dropdata.id);
-        let target = this.section;
-        while (target.levelsan > origin.levelsan) {
-            target = state.section.get(this.course.sectionlist[target.number - 1]);
+        if (dropdata.type == 'cm') {
+            this.getLastCm()?.classList.remove(this.classes.DROPDOWN);
+        } else {
+            const state = this.reactive.stateManager.state;
+            const origin = state.section.get(dropdata.id);
+            let target = this.section;
+            while (target.levelsan > origin.levelsan) {
+                target = state.section.get(this.course.sectionlist[target.number - 1]);
+            }
+            const moveDirection = Math.sign(target.number - origin.number);
+            let targetEnd = target;
+            while (this.course.sectionlist.length > targetEnd.number + 1
+                    && state.section.get(this.course.sectionlist[targetEnd.number + 1]).levelsan > origin.levelsan) {
+                targetEnd = state.section.get(this.course.sectionlist[targetEnd.number + 1]);
+            }
+            const targetHTML = document.querySelector(
+                ".courseindex-section[data-id='" + (moveDirection <= 0 ? target : targetEnd).id + "']");
+            targetHTML.classList.remove(this.classes.DROPUP);
+            targetHTML.classList.remove(this.classes.DROPDOWN);
         }
-        const moveDirection = Math.sign(target.number - origin.number);
-        let targetEnd = target;
-        while (this.course.sectionlist.length > targetEnd.number + 1
-                && state.section.get(this.course.sectionlist[targetEnd.number + 1]).levelsan > origin.levelsan) {
-            targetEnd = state.section.get(this.course.sectionlist[targetEnd.number + 1]);
-        }
-        const targetHTML = document.querySelector(
-            ".courseindex-section[data-id='" + (moveDirection <= 0 ? target : targetEnd).id + "']");
-        targetHTML.classList.remove(this.classes.DROPUP);
-        targetHTML.classList.remove(this.classes.DROPDOWN);
     }
 
     /**

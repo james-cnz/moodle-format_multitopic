@@ -157,17 +157,6 @@ export default class Component extends BaseComponent {
                 }
             }
         }
-
-        const pageSectionHTML = document.querySelector(".course-section[data-id='" + element.pageid + "']");
-        const pageSectionDisplay = pageSectionHTML.dataset.fmtonpage;
-        if (target.dataset.fmtonpage != pageSectionDisplay) {
-            target.dataset.fmtonpage = pageSectionDisplay;
-            target.style.display = (pageSectionDisplay == "1") ? "block" : "none";
-            if (pageSectionDisplay == "1") {
-                this._refreshSectionCmlist({element});
-            }
-        }
-
     }
 
     /**
@@ -178,7 +167,41 @@ export default class Component extends BaseComponent {
      */
     _refreshCourseSectionlist({element}) {
         super._refreshCourseSectionlist({element});
-        this._refreshAllSectionsToggler(this.reactive.stateManager.state);
+        const state = this.reactive.stateManager.state;
+        const sections = state.section;
+        const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
+        for (var sdi = 0; sdi < sectionsDom.length; sdi++) {
+            const sectionDom = sectionsDom[sdi];
+            const section = sections.get(sectionDom.dataset.id);
+            let refreshCms = false;
+            const pageSectionHTML = this.element.querySelector(".course-section[data-id='" + section.pageid + "']");
+            const pageSectionDisplay = pageSectionHTML.dataset.fmtonpage;
+            if (sectionDom.dataset.fmtonpage != pageSectionDisplay) {
+                sectionDom.dataset.fmtonpage = pageSectionDisplay;
+                sectionDom.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+                if (pageSectionDisplay == "1") {
+                    refreshCms = true;
+                }
+            }
+            if (section.visible == sectionDom.classList.contains("hidden")) {
+                const badgeDom = sectionDom.querySelector("span.badge[data-type='hiddenfromstudents']");
+                if (section.visible) {
+                    sectionDom.classList.remove("hidden");
+                    badgeDom.classList.add("d-none");
+                } else {
+                    sectionDom.classList.add("hidden");
+                    badgeDom.classList.remove("d-none");
+                }
+                if (sectionDom.dataset.fmtonpage == "1") {
+                    refreshCms = true;
+                }
+            }
+            if (refreshCms) {
+                // Note: Visibility state doesn't get updated for CMs already rendered.
+                this._refreshSectionCmlist({element: section});
+            }
+        }
+        this._refreshAllSectionsToggler(state);
     }
 
     /**
