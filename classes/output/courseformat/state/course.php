@@ -81,17 +81,15 @@ class course extends base_course {
             if ($format->is_section_visible($section)) {
                 $data->sectionlist[] = $section->id;
 
-                if ($section->level === 0) {
+                if ($section->levelsan <= 0) {
                     $parentid = $section->id;
                     $lastparentid = $section->id;
                     $data->secondsectionlist[$parentid] = [$section->id]; // Tabs uses first item as parent, Course index might not.
                     $data->firstsectionlist[] = $section->id;
-                }
-                if ($section->level == 1) {
+                } else if ($section->levelsan == 1) {
                     $lastparentid = $section->id;
                     $data->secondsectionlist[$parentid][] = $section->id;
-                }
-                if ($section->level == 2) {
+                } else if ($section->levelsan == 2) {
                     $data->thirdsectionlist[$lastparentid][] = $section->id;
                 }
             }

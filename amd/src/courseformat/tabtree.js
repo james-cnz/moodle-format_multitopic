@@ -114,6 +114,9 @@ export default class Component extends BaseComponent {
             anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]').parentElement;
             anchor.classList.add("active");
             anchor.removeAttribute("href");
+            const addAnchor = this.element.querySelector('ul:nth-of-type(2) li:last-of-type a');
+            const addLink = addAnchor.href.replace(/&insertparentid=\d+/, "&insertparentid=" + this.activetab[0]);
+            addAnchor.setAttribute("href", addLink);
         }
 
         // Do things that make the first row tabs match firstsectionlist.
@@ -173,7 +176,7 @@ export default class Component extends BaseComponent {
                 allitems[itemid] = tab;
                 container.insertBefore(tab, container.lastElementChild);
                 Templates.render("format_multitopic/courseformat/tab", data).done(function(html) {
-                    Templates.replaceNode(item, html);
+                    allitems[itemid] = Templates.replaceNode(tab, html, "")[0];
                 });
             }
             const item = allitems[itemid];
