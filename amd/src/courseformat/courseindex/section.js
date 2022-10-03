@@ -65,30 +65,28 @@ export default class Component extends ComponentBase {
             }
             const moveDirection = Math.sign(target.number - origin.number);
             let targetPointer = target;
-            if (moveDirection > 0) {
-                if (!target.indexcollapsed) {
-                    let targetChild = target;
-                    let targetPointerNext = target;
-                    let collapsedLevel = 100;
-                    let broke = false;
-                    while (this.course.sectionlist.length > targetChild.number + 1
-                    && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
-                        targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
-                        if (collapsedLevel >= targetChild.levelsan) {
-                            collapsedLevel = targetChild.indexcollapsed ? targetChild.levelSan : 100;
-                        }
-                        targetPointer = targetPointerNext;
-                        if (collapsedLevel >= targetChild.levelsan) {
-                            targetPointerNext = targetChild;
-                        }
-                        if (targetChild.levelsan <= origin.levelsan) {
-                            broke = true;
-                            break;
-                        }
+            if (moveDirection > 0 && !target.indexcollapsed) {
+                let targetChild = target;
+                let targetPointerNext = target;
+                let collapsedLevel = 100;
+                let broke = false;
+                while (this.course.sectionlist.length > targetChild.number + 1
+                && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
+                    targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
+                    if (collapsedLevel >= targetChild.levelsan) {
+                        collapsedLevel = targetChild.indexcollapsed ? targetChild.levelSan : 100;
                     }
-                    if (!broke) {
-                        targetPointer = targetPointerNext;
+                    targetPointer = targetPointerNext;
+                    if (collapsedLevel >= targetChild.levelsan) {
+                        targetPointerNext = targetChild;
                     }
+                    if (targetChild.levelsan <= origin.levelsan) {
+                        broke = true;
+                        break;
+                    }
+                }
+                if (!broke) {
+                    targetPointer = targetPointerNext;
                 }
             }
             return origin.id != target.id && origin.id != sectionzeroid && target.id != sectionzeroid
@@ -117,17 +115,15 @@ export default class Component extends ComponentBase {
             const moveDirection = Math.sign(target.number - origin.number);
             let targetShow = target;
             let targetShowBorder = moveDirection;
-            if (moveDirection > 0) {
-                if (!target.indexcollapsed) {
-                    let targetChild = target;
-                    while (this.course.sectionlist.length > targetChild.number + 1
-                    && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
-                        targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
-                        if (targetChild.levelsan <= origin.levelsan) {
-                            targetShow = targetChild;
-                            targetShowBorder = -1;
-                            break;
-                        }
+            if (moveDirection > 0 && !target.indexcollapsed) {
+                let targetChild = target;
+                while (this.course.sectionlist.length > targetChild.number + 1
+                && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
+                    targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
+                    if (targetChild.levelsan <= origin.levelsan) {
+                        targetShow = targetChild;
+                        targetShowBorder = -1;
+                        break;
                     }
                 }
             }
@@ -161,17 +157,15 @@ export default class Component extends ComponentBase {
             const moveDirection = Math.sign(target.number - origin.number);
             let targetShow = target;
             let targetShowBorder = moveDirection;
-            if (moveDirection > 0) {
-                if (!target.indexcollapsed) {
-                    let targetChild = target;
-                    while (this.course.sectionlist.length > targetChild.number + 1
-                    && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
-                        targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
-                        if (targetChild.levelsan <= origin.levelsan) {
-                            targetShow = targetChild;
-                            targetShowBorder = -1;
-                            break;
-                        }
+            if (moveDirection > 0 && !target.indexcollapsed) {
+                let targetChild = target;
+                while (this.course.sectionlist.length > targetChild.number + 1
+                && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
+                    targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
+                    if (targetChild.levelsan <= origin.levelsan) {
+                        targetShow = targetChild;
+                        targetShowBorder = -1;
+                        break;
                     }
                 }
             }
@@ -204,15 +198,13 @@ export default class Component extends ComponentBase {
             }
             const moveDirection = Math.sign(target.number - origin.number);
             let targetCall = target;
-            if (moveDirection > 0) {
-                if (target.indexcollapsed) {
-                    let targetChild = target;
-                    while (this.course.sectionlist.length > targetChild.number + 1
-                    && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
-                        targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
-                        if (targetChild.levelsan >= origin.levelsan) {
-                            targetCall = targetChild;
-                        }
+            if (moveDirection > 0 && target.indexcollapsed) {
+                let targetChild = target;
+                while (this.course.sectionlist.length > targetChild.number + 1
+                && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
+                    targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
+                    if (targetChild.levelsan >= origin.levelsan) {
+                        targetCall = targetChild;
                     }
                 }
             }
