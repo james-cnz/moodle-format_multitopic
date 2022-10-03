@@ -27,4 +27,9 @@ body.format-multitopic.path-mod.pagelayout-incourse #page #page-content .activit
     display: none;
 }
 
+/* Course Index */
+body.format-multitopic .courseindex .courseindex-section.dropready .courseindex-item-content {
+    padding-bottom: 0;
+}
+
 /* END ADDED */
