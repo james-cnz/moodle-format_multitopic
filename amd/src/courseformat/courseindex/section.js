@@ -60,37 +60,7 @@ export default class Component extends ComponentBase {
             const state = this.reactive.stateManager.state;
             const origin = state.section.get(dropdata.id);
             let target = this.section;
-            while (target.levelsan > origin.levelsan) {
-                target = state.section.get(this.course.sectionlist[target.number - 1]);
-            }
-            const moveDirection = Math.sign(target.number - origin.number);
-            let targetPointer = target;
-            if (moveDirection > 0 && !target.indexcollapsed) {
-                let targetChild = target;
-                let targetPointerNext = target;
-                let collapsedLevel = 100;
-                let broke = false;
-                while (this.course.sectionlist.length > targetChild.number + 1
-                && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
-                    targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
-                    if (collapsedLevel >= targetChild.levelsan) {
-                        collapsedLevel = targetChild.indexcollapsed ? targetChild.levelSan : 100;
-                    }
-                    targetPointer = targetPointerNext;
-                    if (collapsedLevel >= targetChild.levelsan) {
-                        targetPointerNext = targetChild;
-                    }
-                    if (targetChild.levelsan <= origin.levelsan) {
-                        broke = true;
-                        break;
-                    }
-                }
-                if (!broke) {
-                    targetPointer = targetPointerNext;
-                }
-            }
-            return origin.id != target.id && origin.id != sectionzeroid && target.id != sectionzeroid
-                && this.id == targetPointer.id;
+            return target.levelsan <= origin.levelsan && origin.id != sectionzeroid && target.id != sectionzeroid;
         }
         return false;
     }
@@ -132,7 +102,7 @@ export default class Component extends ComponentBase {
             // The relative move of section depends on the section number.
             if (targetShowBorder > 0) {
                 targetHTML.classList.add(this.classes.DROPDOWN);
-            } else {
+            } else if (targetShowBorder < 0) {
                 targetHTML.classList.add(this.classes.DROPUP);
             }
         }
@@ -173,7 +143,7 @@ export default class Component extends ComponentBase {
                 ".courseindex-section[data-id='" + targetShow.id + "']");
             if (targetShowBorder > 0) {
                 targetHTML.classList.remove(this.classes.DROPDOWN);
-            } else {
+            } else if (targetShowBorder < 0) {
                 targetHTML.classList.remove(this.classes.DROPUP);
             }
         }
@@ -203,12 +173,14 @@ export default class Component extends ComponentBase {
                 while (this.course.sectionlist.length > targetChild.number + 1
                 && state.section.get(this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
                     targetChild = state.section.get(this.course.sectionlist[targetChild.number + 1]);
-                    if (targetChild.levelsan >= origin.levelsan) {
+                    if (targetChild.levelsan <= origin.levelsan) {
                         targetCall = targetChild;
                     }
                 }
             }
-            this.reactive.dispatch('fmtSectionMove', origin, targetCall);
+            if (moveDirection != 0) {
+                this.reactive.dispatch('fmtSectionMove', origin, targetCall);
+            }
         }
     }
 
