@@ -79,7 +79,7 @@ export default class Component extends BaseComponent {
         this._fixOrder(this.element, topsectionslist, this.topsections);
 
         for (let p in element.secondsectionlist) {
-            let secondorder = element.secondsectionlist[p];
+            let secondorder = Array.from(element.secondsectionlist[p]);
             secondorder.shift(); // The first item is the parent to match the tabs.
             let container = this.getElement("[data-id='" + p + "'] > .collapse > .subsections");
             let secondsections = container.querySelectorAll(this.selectors.SECONDSECTIONS);

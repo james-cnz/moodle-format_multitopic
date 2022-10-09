@@ -15,14 +15,14 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/courseindex/courseindex
+    @template format_multitopic/courseformat/courseindex/courseindex
 
     Displays the course index.
 
     Example context (json):
     {
         "editmode": true,
-        "sections": [
+        "sectionsnested": [
             {
                 "title": "General",
                 "id": 42,
@@ -30,6 +30,7 @@
                 "sectionurl": "#",
                 "indexcollapsed": 0,
                 "indent": 0,
+                "levelsan": 1,
                 "cms": [
                     {
                         "name": "Glossary of characters",
@@ -58,7 +59,9 @@
                         "uniqid": "0",
                         "accessvisible": 1
                     }
-                ]
+                ],
+                "subsections": [],
+                "topics": []
             },
             {
                 "title": "City of God or Cidade de Deus",
@@ -66,7 +69,8 @@
                 "number": "2",
                 "sectionurl": "#",
                 "indexcollapsed": 1,
-                "indent": 2,
+                "indent": 0,
+                "levelsan": 0,
                 "cms": [
                     {
                         "name": "Resources",
@@ -95,16 +99,20 @@
                         "uniqid": "0",
                         "accessvisible": 1
                     }
-                ]
+                ],
+                "subsections": [],
+                "topics": []
             }
-        ]
+        ],
+        "sections": []
     }
 
 }}
+
 <div id="{{uniqid}}-course-index" class="courseindex {{#editmode}} editing {{/editmode}}" role="tree">
-    {{#sections}}
+    {{#sectionsnested}}
     {{> format_multitopic/courseformat/courseindex/section }}
-    {{/sections}}
+    {{/sectionsnested}}
 </div>
 {{#js}}
 require(['format_multitopic/courseformat/courseindex/courseindex'], function(component) {
