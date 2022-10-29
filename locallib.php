@@ -133,11 +133,11 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
 /**
  * Moves a section within a course, from a position to another.
  *
- * @param stdClass $course
- * @param stdClass $section The section to be moved.  Must specify id.
- * @param stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
+ * @param \stdClass $course
+ * @param \stdClass|\section_info $section The section to be moved.  Must specify id.
+ * @param \stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
  */
-function format_multitopic_move_section_to(\stdClass $course, \stdClass $section, \stdClass $destination) {
+function format_multitopic_move_section_to(\stdClass $course, $section, \stdClass $destination) {
     // CHANGED LINE ABOVE: Use section info instead of number.  Removed $ignorenumsections param.  No return value (use exceptions).
     // Moves a course section within the course.
     // CHANGES THROUGHOUT: Use section info instead of number.
@@ -251,11 +251,11 @@ function format_multitopic_course_can_delete_section(\stdClass $course, \section
  * an origin, and a target, rebuilds the array.
  *
  * @param array $sections The list of sections.  Must specify fmt calculated properties.
- * @param stdClass $origin The section to be moved.  Must specify id.
- * @param stdClass $target The destination.  Must specify parentid, prevupid, or nextupid.  May specify level.
+ * @param \stdClass|\section_info $origin The section to be moved.  Must specify id.
+ * @param \stdClass $target The destination.  Must specify parentid, prevupid, or nextupid.  May specify level.
  * @return array
  */
-function format_multitopic_reorder_sections(array $sections, \stdClass $origin, \stdClass $target) : array {
+function format_multitopic_reorder_sections(array $sections, $origin, \stdClass $target) : array {
     // CHANGED THROUGHOUT: Section numbers changed to IDs, used exceptions instead of returning false.
     // Reads Calculated section values (levelsan, visiblesan).
     // Writes raw section values (level, visible).

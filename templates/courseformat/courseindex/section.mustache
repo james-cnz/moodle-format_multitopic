@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/courseindex/section
+    @template format_multitopic/courseformat/courseindex/section
 
     Displays a course index section entry.
 
@@ -31,6 +31,7 @@
         "visible": 1,
         "hasrestrictions": 0,
         "indent": 0,
+        "levelsan": -1,
         "cms": [
             {
                 "id": 10,
@@ -54,6 +55,8 @@
                 "isactive": 1
             }
         ],
+        "topics": [],
+        "subsections": [],
         "testingsection": true
     }
 }}
@@ -64,9 +67,10 @@
     data-for="section"
     data-id="{{id}}"
     data-number="{{number}}"
+    data-levelsan="{{levelsan}}"
+    data-indent="{{indent}}"
     role="treeitem"
     aria-owns="courseindexcollapse{{number}}"
-    style="padding-left: {{indent}}em;"
 >
     <div class="courseindex-item d-flex
             {{^visible}}dimmed{{/visible}}
@@ -74,6 +78,7 @@
             courseindex-section-title"
         id="courseindexsection{{number}}"
         data-for="section_item"
+        style="padding-left: {{indent}}em;"
     >
         <a data-toggle="collapse"
             href="#courseindexcollapse{{number}}"
@@ -114,16 +119,26 @@
         class="courseindex-item-content collapse {{^indexcollapsed}}show{{/indexcollapsed}}"
         aria-labelledby="courseindexsection{{number}}" role="group"
     >
-        <ul class="courseindex-sectioncontent unlist" data-for="cmlist" data-id="{{id}}" role="group">
+        <ul class="courseindex-sectioncontent unlist" data-for="cmlist" data-id="{{id}}" role="group" style="padding-left: {{indent}}em;">
             {{#cms}}
             {{> core_courseformat/local/courseindex/cm }}
             {{/cms}}
         </ul>
+        <div class="topics">
+            {{#topics}}
+            {{> format_multitopic/courseformat/courseindex/section }}
+            {{/topics}}
+        </div>
+        <div class="subsections">
+            {{#subsections}}
+            {{> format_multitopic/courseformat/courseindex/section }}
+            {{/subsections}}
+        </div>
     </div>
 </div>
 {{#testingsection}}</div>{{/testingsection}}
 {{#js}}
-require(['core_courseformat/local/courseindex/section'], function(component) {
+require(['format_multitopic/courseformat/courseindex/section'], function(component) {
     component.init('{{uniqid}}-course-index-section-{{id}}');
 });
 {{/js}}

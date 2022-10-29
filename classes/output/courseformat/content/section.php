@@ -74,7 +74,8 @@ class section extends section_base {
             'summary' => $summary->export_for_template($output),
             'highlightedlabel' => $format->get_section_highlighted_name(),
             'sitehome' => $course->id == SITEID,
-            'editing' => $PAGE->user_is_editing()
+            'editing' => $PAGE->user_is_editing(),
+            'levelsan' => $section->levelsan
         ];
 
         $haspartials = [];
@@ -230,7 +231,7 @@ class section extends section_base {
             }
             if ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0') {
                 $sectionstyle .= ' section-topic-collapsible section-collapsed';
-                $iscollapsible = $onpage;
+                $iscollapsible = true;
             } else {
                 $sectionstyle .= ' section-topic-noncollapsible';
             }

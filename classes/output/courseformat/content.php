@@ -57,14 +57,23 @@ class content extends content_base {
         $maxsections = $format->get_max_sections();
         $canaddmore = $maxsections > $format->get_last_section_number();
         $displaysection = $sections[$this->format->singlesectionid];
-        $sectionscollapsible = [];
-        foreach ($sections as $section) {
-            if ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
-                && ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0')) {
-                $sectionscollapsible[] = $section->id;
+        $activesectionids = [];
+        for ($activesn = $displaysection; /* ... */
+                $activesn; /* ... */
+                $activesn = (($activesn->parentid
+                    && ($activesn->levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1
+                        || $activesn->parentid != $format->fmtrootsectionid))
+                    ? $sections[$activesn->parentid] : null)) {
+            $activesectionids[$activesn->id] = true;
+        }
+        $sectionpreferencesarray = $format->get_sections_preferences();
+        $indexcollapsed = [];
+        foreach ($sectionpreferencesarray as $sectionid => $sectionpreferences) {
+            if (!empty($sectionpreferences->indexcollapsed) && !isset($activesectionids[$sectionid])) {
+                $indexcollapsed[] = $sectionid;
             }
         }
-        $format->set_sections_preference('contentcollapsed', $sectionscollapsible);
+        $format->set_sections_preference('indexcollapsed', $indexcollapsed);
         // END ADDED.
 
         $user = $USER;                              // INCLUDED from course/format/classes/output/local/content/section/cmlist.php .

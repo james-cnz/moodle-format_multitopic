@@ -19,6 +19,7 @@
  * @module     format_multitopic/courseformat/courseindex/placeholder
  * @class      format_multitopic/courseformat/courseindex/placeholder
  * @copyright  2022 James Calder and Otago Polytechnic
+ * @copyright  2022 Jeremy FitzPatrick and Te Wānanga o Aotearoa
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -53,6 +54,7 @@ export default class Component extends BaseComponent {
         // Collect section information from the state.
         const exporter = this.reactive.getExporter();
         const data = exporter.course(state);
+        data.sectionsnested = this._nestSections(data.sections);
         try {
             // To render an HTML into our component we just use the regular Templates module.
             const {html, js} = await Templates.renderForPromise(
@@ -68,5 +70,35 @@ export default class Component extends BaseComponent {
             this.pendingContent.resolve(error);
             throw error;
         }
+    }
+
+    /**
+     * Nest sections.
+     *
+     * @param {Array} sections
+     * @return {Array}
+     */
+    _nestSections(sections) {
+        let topSections = [];
+        let parentSection = {};
+        let lastParent = {};
+
+        // Let's re-organise our sections.
+        for (let i = 0; i < sections.length; i++) {
+            let section = sections[i];
+            section.subsections = [];
+            section.topics = [];
+            if (section.indent === 0) {
+                parentSection = section;
+                lastParent = section;
+                topSections.push(section);
+            } else if (section.indent === 1) {
+                lastParent = section;
+                parentSection.subsections.push(section);
+            } else if (section.indent === 2) {
+                lastParent.topics.push(section);
+            }
+        }
+        return topSections;
     }
 }

@@ -264,7 +264,7 @@ class controlmenu extends controlmenu_base {
                                 'icon' => 'i/up',
                                 'name' => $strmoveup,
                                 'pixattr' => ['class' => ''],
-                                'attr' => ['class' => 'icon moveup'],
+                                'attr' => ['class' => 'icon moveup whilenostate'],
                             ];
                         }
 
@@ -278,7 +278,7 @@ class controlmenu extends controlmenu_base {
                                 'icon' => 'i/down',
                                 'name' => $strmovedown,
                                 'pixattr' => ['class' => ''],
-                                'attr' => ['class' => 'icon movedown'],
+                                'attr' => ['class' => 'icon movedown whilenostate'],
                             ];
                         }
                     }

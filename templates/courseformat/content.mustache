@@ -179,7 +179,7 @@
     {{/movebutton}}
     <div style="clear: both;">
         {{#tabs}}
-            {{> core/tabtree}}
+        {{> format_multitopic/courseformat/tabtree}}
         {{/tabs}}
     </div>
     {{{completionhelp}}}
@@ -202,7 +202,7 @@
     {{/numsections}}
 </div>
 {{#js}}
-require(['core_courseformat/local/content'], function(component) {
+require(['format_multitopic/courseformat/content'], function(component) {
     component.init('{{uniqid}}-course-format');
 });
 {{/js}}

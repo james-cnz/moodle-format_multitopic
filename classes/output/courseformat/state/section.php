@@ -44,7 +44,15 @@ class section extends base_section {
     public function export_for_template(\renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
         $section = $this->section;
-        $data->indent = ($section->section == 0) ? 0 : $section->level;
+        $data->levelsan = $section->levelsan;
+        $data->indent = ($section->section == 0) ? 0 : $section->levelsan;
+        $data->pageid  = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
+        $data->timed = $section->dateend && ($section->datestart < $section->dateend);
+        $data->parentid = $section->parentid;
+        $data->available = $section->available;
+        $controlmenuclass = $this->format->get_output_classname('content\\section\\controlmenu');
+        $controlmenu = new $controlmenuclass($this->format, $this->section);
+        $data->controlmenu = $controlmenu->export_for_template($output);
         return $data;
     }
 }

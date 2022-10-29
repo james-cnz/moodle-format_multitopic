@@ -41,16 +41,14 @@ use core\output\inplace_editable;
 // ADDED.
 /** @var int The level of the General section, which represents the course as a whole.
  * Set to -1, to be a level above the top-level sections in OneTopic format, which are numbered 0.
- * NOTE: Not sure this can be changed without breaking stuff.
+ * NOTE: None of these constants can be changed anymore, as parts of the code assume these values.
  */
 const FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT    = -1;
 
 /** @var int Deepest level of page to let users create.  Must be between the root level and the topic level. */
 const FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE = 1;
 
-/** @var int Level of topics, which are displayed within pages.
- * NOTE: This could have been made larger, to allow more page levels, but more page levels seemed too confusing.
- */
+/** @var int Level of topics, which are displayed within pages. */
 const FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC   = 2;
 // END ADDED.
 
@@ -425,18 +423,7 @@ class format_multitopic extends core_courseformat\base {
     public function get_section_name($section) : string {
 
         // ADDED.
-        // If we don't have calculated data, don't bother fetching it.
-        if (!is_object($section) || !isset($section->fmtdata)) {
-            // INCLUDED: /course/format/topics/lib.php function get_section_name body .
-            $section = $this->get_section($section);
-            if ((string)$section->name !== '') {
-                return format_string($section->name, true,
-                        ['context' => context_course::instance($this->courseid)]);
-            } else {
-                return $this->get_default_section_name($section);
-            }
-            // END INCLUDED.
-        }
+        $section = $this->fmt_get_section($section);
 
         $weekword = new lang_string('week');
         $weeksword = get_string_manager()->string_exists('weeks_capitalised', 'format_multitopic') ?
@@ -542,6 +529,116 @@ class format_multitopic extends core_courseformat\base {
     // END INCLUDED.
 
     /**
+     * Return the format section preferences.
+     *
+     * @return array of preferences indexed by sectionid
+     */
+    public function get_sections_preferences(): array {
+
+        $course = $this->get_course();
+        $coursesectionscache = cache::make('core', 'coursesectionspreferences');
+
+        $coursesections = $coursesectionscache->get($course->id);
+        if ($coursesections) {
+            return $coursesections;
+        }
+
+        $result = $this->fmt_get_sections_preferences_sub();
+
+        $coursesectionscache->set($course->id, $result);
+        return $result;
+    }
+
+    /**
+     * Return the format section preferences.
+     *
+     * @return array of preferences indexed by sectionid
+     */
+    public function fmt_get_sections_preferences_sub(): array {
+        $result = [];
+        $course = $this->get_course();
+        $sections = $this->fmt_get_sections();
+        $sectionpreferences = $this->get_sections_preferences_by_preference();
+
+        foreach ($sectionpreferences as $preference => $sectionids) {
+            if (!empty($sectionids) && is_array($sectionids)) {
+                foreach ($sectionids as $sectionid) {
+                    if (!isset($result[$sectionid])) {
+                        $result[$sectionid] = new stdClass();
+                    }
+                    $result[$sectionid]->$preference = true;
+                }
+            }
+        }
+
+        $oldfmtcollapsedsetarray = $sectionpreferences['fmtcollapsedset'] ?? [];
+        $oldfmtcollapsedset = !empty($oldfmtcollapsedsetarray) ? max($oldfmtcollapsedsetarray) : 0;
+        $fmtcollapsedset = $oldfmtcollapsedset;
+
+        foreach ($sections as $section) {
+            if ($section->id > $oldfmtcollapsedset
+                    && $section->levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) {
+                if (!isset($result[$section->id])) {
+                    $result[$section->id] = new stdClass();
+                }
+                $result[$section->id]->indexcollapsed = true;
+            }
+            if ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                    && ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0')) {
+                if ($section->id > $oldfmtcollapsedset) {
+                    $result[$section->id]->contentcollapsed = true;
+                }
+            } else {
+                if (isset($result[$section->id]) && !empty($result[$section->id]->contentcollapsed)) {
+                    unset($result[$section->id]->contentcollapsed);
+                }
+            }
+            $fmtcollapsedset = max($fmtcollapsedset, $section->id);
+        }
+
+        foreach ($oldfmtcollapsedsetarray as $sectionid) {
+            unset($result[$sectionid]->fmtcollapsedset);
+        }
+        if (!isset($result[$fmtcollapsedset])) {
+            $result[$fmtcollapsedset] = new stdClass();
+        }
+        $result[$fmtcollapsedset]->fmtcollapsedset = true;
+
+        return $result;
+    }
+
+    /**
+     * Return the format section preferences.
+     *
+     * @param string $preferencename preference name
+     * @param int[] $sectionids affected section ids
+     *
+     */
+    public function set_sections_preference(string $preferencename, array $sectionids) {
+        global $USER;
+        $course = $this->get_course();
+        $sectionpreferencesobjs = $this->fmt_get_sections_preferences_sub();
+
+        $sectionpreferences = [];
+        foreach ($sectionpreferencesobjs as $sectionid => $sectionpreferencesobj) {
+            foreach ($sectionpreferencesobj as $key => $value) {
+                if ($value) {
+                    if (!isset($sectionpreferences[$key])) {
+                        $sectionpreferences[$key] = [];
+                    }
+                    $sectionpreferences[$key][] = $sectionid;
+                }
+            }
+        }
+
+        $sectionpreferences[$preferencename] = $sectionids;
+        set_user_preference('coursesectionspreferences_' . $course->id, json_encode($sectionpreferences), $USER->id);
+        // Invalidate section preferences cache.
+        $coursesectionscache = cache::make('core', 'coursesectionspreferences');
+        $coursesectionscache->delete($course->id);
+    }
+
+    /**
      * The URL to use for the specified course (with section).
      *
      * @param int|stdClass $section Section object from database or just field course_sections.section
@@ -616,7 +713,7 @@ class format_multitopic extends core_courseformat\base {
      * @return bool if the format is compatible with components.
      */
     public function supports_components() : bool {
-        return false;                                                           // TODO: Enable when supported.
+        return true;
     }
 
     /**
