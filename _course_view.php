@@ -165,7 +165,7 @@ if (true) {                                                                     
     // Must set layout before gettting section info. See MDL-47555.
     $PAGE->set_pagelayout('course');
 
-    if ($section and $section->section > 0) {
+    if ($section && $section->section > 0) {
         // CHANGED LINE ABOVE: section is now an object. Dereference number property.
 
         // Get section details and check it exists.
@@ -222,7 +222,7 @@ if (true) {                                                                     
         $USER->editing = 0;
     }
     if ($PAGE->user_allowed_editing()) {
-        if (($edit == 1) and confirm_sesskey()) {
+        if (($edit == 1) && confirm_sesskey()) {
             $USER->editing = 1;
             // Redirect to site root if Editing is toggled on frontpage.
             if ($course->id == SITEID) {
@@ -233,7 +233,7 @@ if (true) {                                                                     
                 $url = new \moodle_url($PAGE->url, array('notifyeditingon' => 1));
                 redirect($url);
             }
-        } else if (($edit == 0) and confirm_sesskey()) {
+        } else if (($edit == 0) && confirm_sesskey()) {
             $USER->editing = 0;
             if (!empty($USER->activitycopy) && $USER->activitycopycourse == $course->id) {
                 $USER->activitycopy       = false;
@@ -319,7 +319,7 @@ if (true) {                                                                     
     }
 
     // If viewing a section, make the title more specific.
-    if ($section and $section->section > 0 and course_format_uses_sections($course->format)) { // CHANGED: Dereference section num.
+    if ($section && $section->section > 0 && course_format_uses_sections($course->format)) { // CHANGED: Dereference section num.
         $sectionname = get_string('sectionname', "format_$course->format");
         $sectiontitle = get_section_name($course, $section);
         $PAGE->set_title(get_string('coursesectiontitle', 'moodle',

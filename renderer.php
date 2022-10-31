@@ -868,7 +868,7 @@ class format_multitopic_renderer extends format_section_renderer_base {
             // ADDED.
             // If we're at the end of a page-level section, then close it off.
             if ($thissection->nextanyid == $thissection->nextpageid) {
-                if ($this->page->user_is_editing() and has_capability('moodle/course:update', $context)) {
+                if ($this->page->user_is_editing() && has_capability('moodle/course:update', $context)) {
                     $insertsection = new stdClass();
                     $insertsection->parentid = $sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id;
                     echo $this->change_number_sections($course, null, $insertsection); // CHANGED.
