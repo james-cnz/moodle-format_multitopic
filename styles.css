@@ -11,7 +11,7 @@ body.format-multitopic ul.sections li.section .content.collapse:not(.show) {
 /* ADDED */
 
 /* Header */
-body.format-multitopic .page-header-headings {
+body.format-multitopic:not([class*=" cmid-"]) .page-header-headings {
     display: none;
 }
 body.format-multitopic #course-header {
