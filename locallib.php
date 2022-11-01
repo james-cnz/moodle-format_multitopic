@@ -199,7 +199,7 @@ function format_multitopic_move_section_to(\stdClass $course, \stdClass $section
         }
         // Apply section updates.
         if ($updates) {
-            course_update_section($course, $movedsection, $updates);
+            course_update_section($course, $sections[$id], $updates);
         }
     }
     // END ADDED.
