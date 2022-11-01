@@ -87,17 +87,8 @@ body.format-multitopic ul.sections li.section .section_image_holder img {
 }
 
 /* Section Anchor Jump Fix */
-body.format-multitopic ul.sections li.section::before {
-    display: block;
-    content: " ";
-    margin-top: -100px;
-    height: 100px;
-    visibility: hidden;
-    pointer-events: none;
-    position: initial;
-}
 body.format-multitopic ul.sections li.section {
-    background: none;
+    scroll-margin-top: 70px;
 }
 
 /* Page Section */
