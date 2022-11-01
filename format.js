@@ -337,7 +337,7 @@ M.course.format.fmtCollapseAllControlsUpdate = function() {
 M.course.format.fmtChangeName = function(e) {
     if (e.target.dataset.itemtype === 'sectionname') {
         var sectionid = e.target.dataset.itemid;
-        var newname = e.target.dataset.value;
+        var newname = e.target.dataset.value || e.target.querySelector("a").innerText;
         var tabs = document.querySelectorAll(".nav-tabs .tab_content[data-itemid='" + sectionid + "']");
         for (var ti = 0; ti < tabs.length; ti++) {
             tabs[ti].innerHTML = newname;
