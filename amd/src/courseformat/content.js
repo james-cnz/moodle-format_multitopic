@@ -28,6 +28,8 @@ import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
 import CmItem from 'core_courseformat/local/content/section/cmitem';
+import DispatchActions from 'format_multitopic/courseformat/content/actions'; // CHANGED.
+import * as CourseEvents from 'core_course/events';
 import Templates from 'core/templates';
 
 export default class Component extends BaseComponent {
@@ -55,7 +57,52 @@ export default class Component extends BaseComponent {
      * @param {Object} state the state data
      */
     stateReady(state) {
-        super.stateReady(state);
+        this._indexContents();
+        // Activate section togglers.
+        this.addEventListener(this.element, 'click', this._sectionTogglers);
+
+        // Collapse/Expand all sections button.
+        const toogleAll = this.getElement(this.selectors.TOGGLEALL);
+        if (toogleAll) {
+
+            // Ensure collapse menu button adds aria-controls attribute referring to each collapsible element.
+            const collapseElements = this.getElements(this.selectors.COLLAPSE);
+            const collapseElementIds = [...collapseElements].map(element => element.id);
+            toogleAll.setAttribute('aria-controls', collapseElementIds.join(' '));
+
+            this.addEventListener(toogleAll, 'click', this._allSectionToggler);
+            this.addEventListener(toogleAll, 'keydown', e => {
+                // Collapse/expand all sections when Space key is pressed on the toggle button.
+                if (e.key === ' ') {
+                    this._allSectionToggler(e);
+                }
+            });
+            this._refreshAllSectionsToggler(state);
+        }
+
+        if (this.reactive.supportComponents) {
+            // Actions are only available in edit mode.
+            if (this.reactive.isEditing) {
+                new DispatchActions(this); // CHANGED.
+            }
+
+            // Mark content as state ready.
+            this.element.classList.add(this.classes.STATEDREADY);
+        }
+
+        // Capture completion events.
+        this.addEventListener(
+            this.element,
+            CourseEvents.manualCompletionToggled,
+            this._completionHandler
+        );
+
+        // Capture page scroll to update page item.
+        this.addEventListener(
+            document.querySelector(this.selectors.PAGE),
+            "scroll",
+            this._scrollHandler
+        );
 
         // Set the initial state of collapsible sections.
         this.fmtCollapseOnHashChange();
