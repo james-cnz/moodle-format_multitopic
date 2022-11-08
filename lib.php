@@ -674,7 +674,6 @@ class format_multitopic extends core_courseformat\base {
         return $url;
     }
 
-    // INCLUDED instead /course/format/onetopic/lib.php function supports_ajax .
     /**
      * Returns the information about the ajax support in the given source format.
      *
@@ -684,23 +683,10 @@ class format_multitopic extends core_courseformat\base {
      * @return stdClass
      */
     public function supports_ajax() : stdClass {
-        global $COURSE, $USER;
-
-        if (!isset($USER->onetopic_da)) {
-            $USER->onetopic_da = array();
-        }
-
-        if (empty($COURSE)) {
-            $disableajax = false;
-        } else {
-            $disableajax = $USER->onetopic_da[$COURSE->id] ?? false;
-        }
-
         $ajaxsupport = new stdClass();
-        $ajaxsupport->capable = !$disableajax;
+        $ajaxsupport->capable = true;
         return $ajaxsupport;
     }
-    // END INCLUDED.
 
     /**
      * Returns true if this course format is compatible with content components.

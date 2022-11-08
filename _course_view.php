@@ -35,8 +35,6 @@ if (true) {                                                                     
     $id          = optional_param('id', 0, PARAM_INT);
     $name        = optional_param('name', '', PARAM_TEXT);
     $edit        = optional_param('edit', -1, PARAM_BOOL);
-    $disableajax = optional_param('onetopic_da', -1, PARAM_INT);
-    // INCLUDED LINE ABOVE from /course/format/onetopic/format.php $disableajax .
     $hideid      = optional_param('hideid', null, PARAM_INT);                   // CHANGED: Use ID.
     $showid      = optional_param('showid', null, PARAM_INT);                   // CHANGED: Use ID.
     $idnumber    = optional_param('idnumber', '', PARAM_RAW);
@@ -243,16 +241,6 @@ if (true) {                                                                     
                 redirect($PAGE->url);
             }
         }
-
-        // INCLUDED /course/format/onetopic/format.php $disableajax .
-        if (!isset($USER->onetopic_da)) {
-            $USER->onetopic_da = array();
-        }
-        if ($disableajax !== -1) {
-            $USER->onetopic_da[$course->id] = $disableajax ? true : false;
-            redirect($PAGE->url);
-        }
-        // END INCLUDED.
 
         if (has_capability('moodle/course:sectionvisibility', $context)) {
             // CHANGED: Call custom functions, pass section info.

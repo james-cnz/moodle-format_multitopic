@@ -236,36 +236,7 @@ class content extends content_base {
             'format' => $format->get_format(),
         ];
 
-        // INCLUDED /course/format/onetopic/renderer.php function print_single_section_page utilities (parts).
-        // Output the enable / disable button.
-        $disableajax = false;
-        if ($format->show_editor()) {
-
-            $url = course_get_url($course, $displaysection, ['fmtedit' => true]);
-            $url->param('sesskey', sesskey());
-
-            if ($USER->onetopic_da[$course->id] ?? false) {
-                $disableajax = true;
-                $url->param('onetopic_da', 0);
-                $buttontext = get_string_manager()->string_exists('activityclipboard_disable', 'format_multitopic') ?
-                                get_string('activityclipboard_disable', 'format_multitopic') : get_string('disable');
-            } else {
-                $url->param('onetopic_da', 1);
-                $buttontext = get_string_manager()->string_exists('activityclipboard_enable', 'format_multitopic') ?
-                                get_string('activityclipboard_enable', 'format_multitopic') : get_string('enable');
-            }
-
-            // ADDED.
-            $button = new \single_button($url, $buttontext, 'get');
-            $button->disabled = $disableajax && ismoving($course->id);
-            $data->movebutton = $button->export_for_template($output);
-            // END ADDED.
-        }
-        // END INCLUDED.
-
         // INCLUDED from course/format/classes/output/local/content/section/cmlist.php export_for_template() .
-        $data->showclipboard = $disableajax || ismoving($course->id);
-
         $showmovehere = ismoving($course->id);
 
         if ($showmovehere) {

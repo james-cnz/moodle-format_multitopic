@@ -167,16 +167,9 @@
 }}
 <div id="{{uniqid}}-course-format">
     <h2 class="accesshide">{{{title}}}</h2>
-    {{#movebutton}}
-    <div class="buttons visibleifjs" style="float: right;">{{> core/single_button}}</div>
-    {{#showclipboard}}
-    <p>
-    <i class="icon fa fa-clipboard fa-fw"></i>
-    {{#showmovehere}}{{movingstr}} (<a href="{{{cancelcopyurl}}}">{{#str}} cancel {{/str}}</a>){{/showmovehere}}
-    {{^showmovehere}}[ {{#str}}activityclipboard_placeholder, format_multitopic{{/str}} ]{{/showmovehere}}
-    </p>
-    {{/showclipboard}}
-    {{/movebutton}}
+    {{#showmovehere}}
+    <p><i class="icon fa fa-clipboard fa-fw"></i> {{movingstr}} (<a href="{{{cancelcopyurl}}}">{{#str}} cancel {{/str}}</a>)</p>
+    {{/showmovehere}}
     <div style="clear: both;">
         {{#tabs}}
         {{> format_multitopic/courseformat/tabtree}}
