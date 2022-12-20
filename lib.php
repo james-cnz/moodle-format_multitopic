@@ -664,7 +664,7 @@ class format_multitopic extends core_courseformat\base {
                 $url->param('sectionid', $pageid);
             }
             if ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-                if (!empty($options['navigation'])) {
+                if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
                     return null;
                 }
                 $url->set_anchor('sectionid-' . $section->id);
