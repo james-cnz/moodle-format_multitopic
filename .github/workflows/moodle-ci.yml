@@ -11,7 +11,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:10 # Moodle 4.0: >=10
+        image: postgres:12 # master: >=12
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -34,18 +34,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Moodle 4.0
+          # Moodle 4.0, PHP 7.3, PostgreSQL
           - php: '7.3' # 7.3-8.0
             moodle-branch: 'MOODLE_400_STABLE'
-            database: mariadb
-          # Moodle 4.0, PostgreSQL
-          - php: '7.4' # 7.3-8.0
-            moodle-branch: 'MOODLE_400_STABLE'
             database: pgsql
-          # Moodle master, PHP 8.0
-          - php: '8.0' # 7.3-8.0
-            moodle-branch: 'master'
+          # Moodle 4.1, PHP 7.4, MariaDB
+          - php: '7.4' # 7.4-8.0
+            moodle-branch: 'MOODLE_401_STABLE'
             database: mariadb
+          # Moodle master, PHP 8.0, PostgreSQL
+          - php: '8.0' # 7.4-8.0
+            moodle-branch: 'master'
+            database: pgsql
             # extensions: xmlrpc-beta
 
     steps:
