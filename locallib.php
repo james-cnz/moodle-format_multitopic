@@ -190,7 +190,7 @@ function format_multitopic_move_section_to(\stdClass $course, \stdClass $section
         if ($sections[$id]->level !== $movedsection->level) {
             $updates['level'] = $movedsection->level;
         }
-        if ($sections[$id]->visible !== $movedsection->visible) {
+        if ($sections[$id]->visible != $movedsection->visible) {
             $updates['visible'] = $movedsection->visible;
         }
         // Set page-level sections to untimed.
