@@ -11,7 +11,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:12 # master: >=12
+        image: postgres:13 # master: >=13
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
