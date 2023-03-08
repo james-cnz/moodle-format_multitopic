@@ -100,9 +100,9 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
 
     // First add section to the end.
     $cw = new \stdClass();
-    $cw->course   = $courseid;
-    $cw->section  = $lastsection + 1;
-    $cw->summary  = '';
+    $cw->course = $courseid;
+    $cw->section = $lastsection + 1;
+    $cw->summary = '';
     $cw->summaryformat = FORMAT_HTML;
     $cw->sequence = '';
     $cw->name = null;
@@ -395,9 +395,9 @@ function format_multitopic_reorder_sections(array $sections, \stdClass $origin, 
 function format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode) : string {
     $o = '';
     $authorwithurlarray = explode('|', $authorwithurl);
-    $authorhtml         = $authorwithurlarray[0];
+    $authorhtml = $authorwithurlarray[0];
     if (count($authorwithurlarray) > 1) {
-        $authorurl  = $authorwithurlarray[1];
+        $authorurl = $authorwithurlarray[1];
         $authorhtml = \html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
     }
     $licencehtml = ($licencecode && $licencecode != 'unknown') ? get_string($licencecode, 'license') : '';
@@ -465,16 +465,16 @@ function format_multitopic_week_date($date) {
 
     $config = get_config('format_multitopic');
 
-    $mstartwday     = $config->startwday;       // Starting week day, 0 = Sunday.
-    $wmd            = $config->weeks_mindays;   // First week of year contains a minimum of how many days of that year, 1-7.
-    $weekspartial   = $config->weeks_partial;   // Partial weeks.
+    $mstartwday = $config->startwday;       // Starting week day, 0 = Sunday.
+    $wmd = $config->weeks_mindays;          // First week of year contains a minimum of how many days of that year, 1-7.
+    $weekspartial = $config->weeks_partial; // Partial weeks.
 
-    $dow    = (date('w', $date) - $mstartwday + 7) % 7 + 1;                 // Day of week, 1 = starting week day.
-    $down   = new lang_string(strtolower(date('D', $date)), 'calendar');    // Day of week name.
+    $dow = (date('w', $date) - $mstartwday + 7) % 7 + 1;                // Day of week, 1 = starting week day.
+    $down = new lang_string(strtolower(date('D', $date)), 'calendar');  // Day of week name.
 
-    $y      = date('Y', $date);                     // Year.
-    $doy    = date('z', $date) + 1;                 // Day of year, 1 = Jan 1.
-    $woy    = intdiv(14 - $wmd + $doy - $dow, 7);   // Week of year, 1 = first.
+    $y = date('Y', $date);                      // Year.
+    $doy = date('z', $date) + 1;                // Day of year, 1 = Jan 1.
+    $woy = intdiv(14 - $wmd + $doy - $dow, 7);  // Week of year, 1 = first.
 
     if (!$weekspartial) {
         if ($woy < 1) { // Last week of previous year.

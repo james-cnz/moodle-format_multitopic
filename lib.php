@@ -42,7 +42,7 @@ use core\output\inplace_editable;
  * Set to -1, to be a level above the top-level sections in OneTopic format, which are numbered 0.
  * NOTE: Not sure this can be changed without breaking stuff.
  */
-const FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT    = -1;
+const FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT = -1;
 
 /** @var int Deepest level of page to let users create.  Must be between the root level and the topic level. */
 const FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE = 1;
@@ -50,7 +50,7 @@ const FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE = 1;
 /** @var int Level of topics, which are displayed within pages.
  * NOTE: This could have been made larger, to allow more page levels, but more page levels seemed too confusing.
  */
-const FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC   = 2;
+const FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC = 2;
 // END ADDED.
 
 /**
@@ -228,14 +228,14 @@ class format_multitopic extends format_base {
 
                 // Initialise tree-related properties to be set in the reverse pass.
                 $thissection->hassubsections = false;   // Whether this section has any subsections (page or topic).
-                $thissection->pagedepth     = $levelsan;   // The lowest level of all sub-pages.
+                $thissection->pagedepth = $levelsan;    // The lowest level of all sub-pages.
                 $thissection->pagedepthdirect = $levelsan; // The lowest level of direct sub-pages.
 
                 // Set visibility properties.
-                $thissection->parentvisiblesan  = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
+                $thissection->parentvisiblesan = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
                                                     true
                                                     : $sectionatlevel[$levelsan - 1]->visiblesan;
-                $thissection->visiblesan        = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
+                $thissection->visiblesan = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
                                                     true
                                                     : ($sectionatlevel[$levelsan - 1]->visiblesan && $thissection->visible);
 
@@ -284,7 +284,7 @@ class format_multitopic extends format_base {
                 $levelsan = $thissection->levelsan;
 
                 // Tree properties from next sections.
-                $thissection->nextupid  = $sectionnextatlevel[$levelsan] ?
+                $thissection->nextupid = $sectionnextatlevel[$levelsan] ?
                                                 $sectionnextatlevel[$levelsan]->id
                                                 : null;
                 $thissection->nextpageid = $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1] ?
@@ -503,7 +503,7 @@ class format_multitopic extends format_base {
         if ($section !== null) {                                                // CHANGED.
             $section = $this->fmt_get_section($section, MUST_EXIST);            // ADDED.
             // CHANGED.
-            $pageid  = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
+            $pageid = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
             if ($pageid != $this->fmtrootsectionid) {
                 $url->param('sectionid', $pageid);
             }

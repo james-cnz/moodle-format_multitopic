@@ -101,11 +101,11 @@ if ($deletesection) {
 }
 
 $editoroptions = array(
-    'context'   => $context,
-    'maxfiles'  => EDITOR_UNLIMITED_FILES,
-    'maxbytes'  => $CFG->maxbytes,
+    'context' => $context,
+    'maxfiles' => EDITOR_UNLIMITED_FILES,
+    'maxbytes' => $CFG->maxbytes,
     'trusttext' => false,
-    'noclean'   => true
+    'noclean' => true
 );
 // INCLUDED for Moodle >= 3.6.
 if ($CFG->version >= 2018120300) {
@@ -165,8 +165,8 @@ if ($mform->is_cancelled()) {
 }
 
 // The edit form is displayed for the first time or if there was validation error on the previous step.
-$sectionname  = get_section_name($course, $sectioninfo);                        // CHANGED: Pass sectioninfo rather than number.
-$stredit      = get_string('edita', '', " $sectionname");
+$sectionname = get_section_name($course, $sectioninfo);                         // CHANGED: Pass sectioninfo rather than number.
+$stredit = get_string('edita', '', " $sectionname");
 $strsummaryof = get_string('summaryof', '', " $sectionname");
 
 $PAGE->set_title($stredit);

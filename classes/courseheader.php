@@ -56,14 +56,14 @@ class courseheader implements \renderable {
         $contextid = \context_course::instance($course->id)->id;
 
         // Set course-related properties.
-        $this->coursename   = format_string($course->fullname, true, ['context' => $contextid]);
-        $this->bannerslice  = $course->bannerslice;
+        $this->coursename = format_string($course->fullname, true, ['context' => $contextid]);
+        $this->bannerslice = $course->bannerslice;
 
         // Clear image-related properties.
-        $this->imageurl     = null;
-        $this->imagename    = null;
+        $this->imageurl = null;
+        $this->imagename = null;
         $this->authorwithurl = null;
-        $this->licencecode  = null;
+        $this->licencecode = null;
 
         // Search for the course image.
         $fs = get_file_storage();
@@ -75,10 +75,10 @@ class courseheader implements \renderable {
                 $url = \moodle_url::make_file_url('/pluginfile.php' ,
                         '/' . $file->get_contextid() . '/course/overviewfiles' .
                         $file->get_filepath() . $filename);
-                $this->imageurl     = $url;
-                $this->imagename    = substr($filename, 0, $filenameextpos);
+                $this->imageurl = $url;
+                $this->imagename = substr($filename, 0, $filenameextpos);
                 $this->authorwithurl = $file->get_author();
-                $this->licencecode  = $file->get_license();
+                $this->licencecode = $file->get_license();
                 break;
             }
         }
@@ -105,8 +105,8 @@ class courseheader implements \renderable {
         $o .= \html_writer::end_tag('div');
 
         // Output the attribution.
-        $o .= \html_writer::start_tag('p', ['id'    => 'course-header-banner_attribution',
-                                                'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';']);
+        $o .= \html_writer::start_tag('p', ['id' => 'course-header-banner_attribution',
+                                            'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';']);
         $o .= format_multitopic_image_attribution($this->imagename, $this->authorwithurl, $this->licencecode);
         $o .= \html_writer::end_tag('p');
 

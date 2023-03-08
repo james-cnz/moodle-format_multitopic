@@ -7,7 +7,7 @@ on: [push, pull_request]
 
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     services:
       postgres:
@@ -148,7 +148,7 @@ jobs:
 
       - name: PHPUnit tests
         if: ${{ always() }}
-        run: moodle-plugin-ci phpunit
+        run: moodle-plugin-ci phpunit --fail-on-warning
 
       - name: Behat features
         if: ${{ (matrix.moodle-branch != 'MOODLE_34_STABLE' && matrix.moodle-branch != 'MOODLE_36_STABLE' && matrix.moodle-branch != 'MOODLE_37_STABLE') && always() }}
