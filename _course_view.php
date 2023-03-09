@@ -32,24 +32,24 @@
 
 if (true) {                                                                     // ADDED: To pass indentation style check.
 
-    $id          = optional_param('id', 0, PARAM_INT);
-    $name        = optional_param('name', '', PARAM_TEXT);
-    $edit        = optional_param('edit', -1, PARAM_BOOL);
-    $hideid      = optional_param('hideid', null, PARAM_INT);                   // CHANGED: Use ID.
-    $showid      = optional_param('showid', null, PARAM_INT);                   // CHANGED: Use ID.
-    $idnumber    = optional_param('idnumber', '', PARAM_RAW);
-    $sectionid   = optional_param('sectionid', 0, PARAM_INT);
-    $section     = optional_param('section', 0, PARAM_INT);
+    $id = optional_param('id', 0, PARAM_INT);
+    $name = optional_param('name', '', PARAM_TEXT);
+    $edit = optional_param('edit', -1, PARAM_BOOL);
+    $hideid = optional_param('hideid', null, PARAM_INT);                        // CHANGED: Use ID.
+    $showid = optional_param('showid', null, PARAM_INT);                        // CHANGED: Use ID.
+    $idnumber = optional_param('idnumber', '', PARAM_RAW);
+    $sectionid = optional_param('sectionid', 0, PARAM_INT);
+    $section = optional_param('section', 0, PARAM_INT);
     // REMOVED: move parameter.
     // ADDED instead: Specify destination via relationship to another section (identified by ID).
     $destparentid = optional_param('destparentid', null, PARAM_INT);
     $destprevupid = optional_param('destprevupid', null, PARAM_INT);
     $destnextupid = optional_param('destnextupid', null, PARAM_INT);
-    $destlevel    = optional_param('destlevel', null, PARAM_INT);
+    $destlevel = optional_param('destlevel', null, PARAM_INT);
     // END ADDED.
-    $marker      = optional_param('marker', -1, PARAM_INT);
-    $switchrole  = optional_param('switchrole', -1, PARAM_INT); // Deprecated, use course/switchrole.php instead.
-    $return      = optional_param('return', 0, PARAM_LOCALURL);
+    $marker = optional_param('marker', -1, PARAM_INT);
+    $switchrole = optional_param('switchrole', -1, PARAM_INT); // Deprecated, use course/switchrole.php instead.
+    $return = optional_param('return', 0, PARAM_LOCALURL);
 
     // ADDED.
     $hide = null;
@@ -176,7 +176,7 @@ if (true) {                                                                     
             // Check if coursesection has conditions affecting availability and if
             // so, output availability info.
             if ($coursesections->visible && $coursesections->availableinfo) {
-                $sectionname     = get_section_name($course, $coursesections);
+                $sectionname = get_section_name($course, $coursesections);
                 $message = get_string('notavailablecourse', '', $sectionname);
                 redirect(course_get_url($course), $message, null, \core\output\notification::NOTIFY_ERROR);
             } else {
@@ -229,7 +229,7 @@ if (true) {                                                                     
         } else if (($edit == 0) && confirm_sesskey()) {
             $USER->editing = 0;
             if (!empty($USER->activitycopy) && $USER->activitycopycourse == $course->id) {
-                $USER->activitycopy       = false;
+                $USER->activitycopy = false;
                 $USER->activitycopycourse = null;
             }
             // Redirect to site root if Editing is toggled on frontpage.

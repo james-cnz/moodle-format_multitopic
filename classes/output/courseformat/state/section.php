@@ -46,7 +46,7 @@ class section extends base_section {
         $section = $this->section;
         $data->levelsan = $section->levelsan;
         $data->indent = ($section->section == 0) ? 0 : $section->levelsan;
-        $data->pageid  = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
+        $data->pageid = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
         $data->timed = $section->dateend && ($section->datestart < $section->dateend);
         $data->parentid = $section->parentid;
         $data->available = $section->available;

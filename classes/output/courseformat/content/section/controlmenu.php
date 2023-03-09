@@ -81,7 +81,7 @@ class controlmenu extends controlmenu_base {
             }
 
             $controls['edit'] = [
-                'url'   => new \moodle_url('/course/format/multitopic/_course_editsection.php',
+                'url' => new \moodle_url('/course/format/multitopic/_course_editsection.php',
                                          ['id' => $section->id]),               // CHANGED.
                 'icon' => 'i/settings',
                 'name' => $streditsection,

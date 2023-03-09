@@ -65,23 +65,23 @@ class summary extends summary_base {
 
         // ADDED.
         // Variables for section image details.
-        $imageurl       = null;
-        $imagename      = null;
-        $authorwithurl  = null;
-        $licencecode    = null;
+        $imageurl = null;
+        $imagename = null;
+        $authorwithurl = null;
+        $licencecode = null;
 
         // Find section image details.
         $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, 'course', 'section', $section->id);
         foreach ($files as $file) {
-            $filename       = $file->get_filename();
+            $filename = $file->get_filename();
             $filenameextpos = strrpos($filename, '.');
             if ((substr($filename, 0, 4) == 'goi_') && $filenameextpos) {
-                $imageurl       = \moodle_url::make_file_url('/pluginfile.php' ,
+                $imageurl = \moodle_url::make_file_url('/pluginfile.php' ,
                                     "/{$file->get_contextid()}/course/section/{$section->id}{$file->get_filepath()}{$filename}");
-                $imagename      = substr($filename, 4, $filenameextpos - 4);
-                $authorwithurl  = $file->get_author();
-                $licencecode    = $file->get_license();
+                $imagename = substr($filename, 4, $filenameextpos - 4);
+                $authorwithurl = $file->get_author();
+                $licencecode = $file->get_license();
                 break;
             }
         }
