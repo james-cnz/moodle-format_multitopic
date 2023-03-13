@@ -11,7 +11,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13 # master: >=13
+        image: postgres:13 # Moodle 4.2: >=13
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -19,7 +19,7 @@ jobs:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
       mariadb:
-        image: mariadb:10 # Moodle 4.0 >=10.2.29
+        image: mariadb:10.6 # Moodle 4.2 >=10.6.7
         env:
           MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
@@ -39,13 +39,18 @@ jobs:
             moodle-branch: 'MOODLE_400_STABLE'
             database: pgsql
           # Moodle 4.1, PHP 7.4, MariaDB
-          - php: '7.4' # 7.4-8.0
+          - php: '7.4' # 7.4-8.1
             moodle-branch: 'MOODLE_401_STABLE'
             database: mariadb
-          # Moodle master, PHP 8.0, PostgreSQL
-          - php: '8.0' # 7.4-8.0
+          # Moodle 4.2, PHP 8.0, PostgreSQL
+          - php: '8.0' # 8.0-8.1
             moodle-branch: 'master'
             database: pgsql
+            # extensions: xmlrpc-beta
+          # Moodle 4.2, PHP 8.1, MariaDB
+          - php: '8.1' # 8.0-8.1
+            moodle-branch: 'master'
+            database: mariadb
             # extensions: xmlrpc-beta
 
     steps:

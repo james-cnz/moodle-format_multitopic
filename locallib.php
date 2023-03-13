@@ -394,7 +394,7 @@ function format_multitopic_reorder_sections(array $sections, $origin, \stdClass 
  */
 function format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode) : string {
     $o = '';
-    $authorwithurlarray = explode('|', $authorwithurl);
+    $authorwithurlarray = explode('|', $authorwithurl ?? '');
     $authorhtml = $authorwithurlarray[0];
     if (count($authorwithurlarray) > 1) {
         $authorurl = $authorwithurlarray[1];
@@ -430,7 +430,7 @@ function format_multitopic_image_attribution($imagename, $authorwithurl, $licenc
  */
 function format_multitopic_duration_as_days($duration) {
     $days = null;
-    $matchok = preg_match('/^([0-9]+) (day|week|month|year)(s)?$/', $duration, $matches);
+    $matchok = preg_match('/^([0-9]+) (day|week|month|year)(s)?$/', $duration ?? '', $matches);
     if ($matchok) {
         switch($matches[2]) {
             case 'day':
