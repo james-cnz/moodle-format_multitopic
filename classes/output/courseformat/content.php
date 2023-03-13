@@ -68,12 +68,19 @@ class content extends content_base {
         }
         $sectionpreferencesarray = $format->get_sections_preferences();
         $indexcollapsed = [];
+        $indexcollapsedchanged = false;
         foreach ($sectionpreferencesarray as $sectionid => $sectionpreferences) {
-            if (!empty($sectionpreferences->indexcollapsed) && !isset($activesectionids[$sectionid])) {
-                $indexcollapsed[] = $sectionid;
+            if (!empty($sectionpreferences->indexcollapsed)) {
+                if (!isset($activesectionids[$sectionid])) {
+                    $indexcollapsed[] = $sectionid;
+                } else {
+                    $indexcollapsedchanged = true;
+                }
             }
         }
-        $format->set_sections_preference('indexcollapsed', $indexcollapsed);
+        if ($indexcollapsedchanged) {
+            $format->set_sections_preference('indexcollapsed', $indexcollapsed);
+        }
         // END ADDED.
 
         $user = $USER;                              // INCLUDED from course/format/classes/output/local/content/section/cmlist.php .

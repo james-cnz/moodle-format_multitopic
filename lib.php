@@ -529,6 +529,201 @@ class format_multitopic extends core_courseformat\base {
     // END INCLUDED.
 
     /**
+     * Return the format section preferences.
+     *
+     * @return array of preferences indexed by section ID
+     */
+    public function get_sections_preferences(): array {
+
+        $result = [];
+
+        $course = $this->get_course();
+        $sections = $this->fmt_get_sections();
+        $coursesectionscache = cache::make('core', 'coursesectionspreferences');
+
+        $coursesections = $coursesectionscache->get($course->id);
+        $collapsedset = ($coursesections && count($coursesections) > 0) ? max(array_keys($coursesections)) : 0;
+        $collapsedset = ($collapsedset > 0 && isset($coursesections[$collapsedset]->fmtcollapsedset)) ?
+                        $collapsedset : 0;
+        if ($collapsedset >= max(array_keys($sections))) {
+            return $coursesections;
+        }
+
+        $sectionpreferences = $this->fmt_set_get_sections_preferences();
+
+        foreach ($sectionpreferences as $preference => $sectionids) {
+            if (!empty($sectionids) && is_array($sectionids)) {
+                foreach ($sectionids as $sectionid) {
+                    if (!isset($result[$sectionid])) {
+                        $result[$sectionid] = new stdClass();
+                    }
+                    $result[$sectionid]->$preference = true;
+                }
+            }
+        }
+
+        $coursesectionscache->set($course->id, $result);
+        return $result;
+    }
+
+    /**
+     * Return the format section preferences.
+     *
+     * @return array of preferences indexed by preference name
+     */
+    public function get_sections_preferences_by_preference(): array {
+        return $this->fmt_set_get_sections_preferences();
+    }
+
+    /**
+     * Set the format section preferences.
+     *
+     * @param string $preferencename preference name
+     * @param int[] $sectionids affected section IDs
+     *
+     */
+    public function set_sections_preference(string $preferencename, array $sectionids) {
+        $this->fmt_set_get_sections_preferences($preferencename, $sectionids);
+    }
+
+    /**
+     * Set and return the format section preferences.
+     *
+     * @param string $preferencename preference name
+     * @param int[] $sectionids affected section IDs
+     * @return array of preferences indexed by section ID
+     *
+     */
+    protected function fmt_set_get_sections_preferences(string $preferencename = null, array $sectionids = null): array {
+
+        $course = $this->get_course();
+        $sections = $this->fmt_get_sections();
+
+        $sectionpreferences = parent::get_sections_preferences_by_preference();
+
+        $collapsedsetold = (count($sectionpreferences['fmtcollapsedset'] ?? []) > 0) ?
+                            max($sectionpreferences['fmtcollapsedset']) : 0;
+
+        // Clean, and index content collapsed.
+        $contentcollapsedindexed = [];
+        foreach ($sectionpreferences as $prefname => $sectids) {
+            if ($prefname != 'fmtcollapsedset') {
+                foreach ($sectids as $i => $sectionid) {
+                    if (!isset($sections[$sectionid])) {
+                        unset($sectids[$i]);
+                    } else if ($prefname == 'contentcollapsed') {
+                        $contentcollapsedindexed[$sectionid] = true;
+                    }
+                }
+            }
+        }
+
+        // Try autocollapsing content.
+        $sectionidsold = $sectionpreferences['contentcollapsed'] ?? null;
+        $collapsedset = $collapsedsetold;
+        $autocollapsedchanged = false;
+        foreach ($sections as $sectionid => $section) {
+            if ($sectionid > $collapsedsetold
+                    && $section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                    && ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0')
+                    && !isset($contentcollapsedindexed[$sectionid])) {
+                if (!isset($sectionpreferences['contentcollapsed'])) {
+                    $sectionpreferences['contentcollapsed'] = [];
+                }
+                $sectionpreferences['contentcollapsed'][] = $sectionid;
+                $autocollapsedchanged = true;
+            }
+            $collapsedset = max($collapsedset, $sectionid);
+        }
+        $sectionpreferences['fmtcollapsedset'] = [ $collapsedset ];
+        $collapsedsetupdated = false;
+        if ($autocollapsedchanged) {
+            try {
+                $this->fmt_set_sections_preferences_sub($sectionpreferences);
+                $collapsedsetupdated = true;
+            } catch (coding_exception $e) {
+                if (isset($sectionidsold)) {
+                    $sectionpreferences['contentcollapsed'] = $sectionidsold;
+                } else {
+                    unset($sectionpreferences['contentcollapsed']);
+                }
+            }
+        }
+
+        // Try writing specified changes.
+        $error = null;
+        if ($preferencename) {
+            $sectionidsold = $sectionpreferences[$preferencename] ?? null;
+            $sectionpreferences[$preferencename] = $sectionids;
+            try {
+                $this->fmt_set_sections_preferences_sub($sectionpreferences);
+                $collapsedsetupdated = true;
+            } catch (coding_exception $e) {
+                $error = $e;  // We may want to rethrow this.
+            }
+
+            // Try writing specified changes without last seen section.
+            if ($error && isset($sectionidsold) && count($sectionids) < count($sectionidsold)
+                    && !$collapsedsetupdated && $collapsedset > $collapsedsetold) {
+                $error = null;
+                if ($collapsedsetold > 0) {
+                    $sectionpreferences['fmtcollapsedset'] = [ $collapsedsetold ];
+                } else {
+                    unset($sectionpreferences['fmtcollapsedset']);
+                }
+                try {
+                    $this->fmt_set_sections_preferences_sub($sectionpreferences);
+                } catch (coding_exception $e) {
+                    $error = $e;  // We will want to rethrow this.
+                }
+            }
+
+            if ($error) {
+                if (isset($sectionidsold)) {
+                    $sectionpreferences[$preferencename] = $sectionidsold;
+                } else {
+                    unset($sectionpreferences[$preferencename]);
+                }
+            }
+
+        }
+
+        // If nothing else, try writing last seen section.
+        if (!$collapsedsetupdated && $collapsedset > $collapsedsetold) {
+            $sectionpreferences['fmtcollapsedset'] = [ $collapsedset ];
+            try {
+                $this->fmt_set_sections_preferences_sub($sectionpreferences);
+                $collapsedsetupdated = true;
+            } catch (coding_exception $e) {
+                // Do nothing, because there's nothing we can do.
+                $collapsedsetupdated = false;
+            }
+        }
+
+        if ($error) {
+            throw $error;
+        }
+
+        return $sectionpreferences;
+
+    }
+
+    /**
+     * Set the format section preferences, given all preferences indexed by preference.
+     *
+     * @param array $sectionpreferences of preferences indexed by preference
+     *
+     */
+    protected function fmt_set_sections_preferences_sub(array $sectionpreferences) {
+        global $USER;
+        $course = $this->get_course();
+        set_user_preference('coursesectionspreferences_' . $course->id, json_encode($sectionpreferences), $USER->id);
+        // Invalidate section preferences cache.
+        $coursesectionscache = cache::make('core', 'coursesectionspreferences');
+        $coursesectionscache->delete($course->id);
+    }
+
+    /**
      * The URL to use for the specified course (with section).
      *
      * @param int|stdClass $section Section object from database or just field course_sections.section
