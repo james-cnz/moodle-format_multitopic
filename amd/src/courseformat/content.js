@@ -61,7 +61,7 @@ export default class Component extends BaseComponent {
         this.fmtCollapseOnHashChange();
 
         // Capture clicks on course section links.
-        window.addEventListener("hashchange", this.fmtCollapseOnHashChange);
+        window.addEventListener("hashchange", this.fmtCollapseOnHashChange.bind(this));
 
     }
 
