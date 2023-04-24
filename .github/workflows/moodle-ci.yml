@@ -44,11 +44,11 @@ jobs:
             database: mariadb
           # Moodle 4.2, PHP 8.0, PostgreSQL
           - php: '8.0' # 8.0-8.1
-            moodle-branch: 'master'
+            moodle-branch: 'MOODLE_402_STABLE'
             database: pgsql
             # extensions: xmlrpc-beta
-          # Moodle 4.2, PHP 8.1, MariaDB
-          - php: '8.1' # 8.0-8.1
+          # Moodle master, PHP 8.1, MariaDB
+          - php: '8.1'
             moodle-branch: 'master'
             database: mariadb
             # extensions: xmlrpc-beta
