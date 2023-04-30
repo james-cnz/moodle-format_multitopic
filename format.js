@@ -133,21 +133,6 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
 // REMAINDER ADDED.
 
 /**
- * Update the First and Second level tabs.
- * @param {event} e
- */
-M.course.format.fmtChangeName = function(e) {
-    if (e.target.dataset.itemtype === 'sectionname' || e.target.dataset.itemtype === 'sectionnamenl') {
-        var sectionid = e.target.dataset.itemid;
-        var newname = e.target.dataset.value || e.target.querySelector("a").innerText;
-        var tabs = document.querySelectorAll(".nav-tabs .tab_content[data-itemid='" + sectionid + "']");
-        for (var ti = 0; ti < tabs.length; ti++) {
-            tabs[ti].innerHTML = newname;
-        }
-    }
-};
-
-/**
  * Show notice dialog when trying to add sections and maximum has been reached.
  * @param {event} e
  * @return {boolean}
@@ -174,18 +159,12 @@ M.course.format.fmtWarnMaxsections = function(e) {
 };
 
 /**
- * Initialise: Set the initial state of collapsible sections, and watch for user input.
+ * Initialise: Watch for user input.
  * @param {YUI} Y
  * @param {string} max
  */
 M.course.format.fmtInit = function(Y, max) {
     M.course.format.fmtMaxsections = max;
-
-    // Add listener for section name inplace edited.
-    require(['jquery'], function($) {
-        var tabcontent = document.querySelector(".course-content ul.sections");
-        $(tabcontent).on('updated', M.course.format.fmtChangeName);
-    });
 
     // Capture clicks on add section links.
     document.querySelector(".course-content")

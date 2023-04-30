@@ -15,15 +15,17 @@
 
 import {BaseComponent} from 'core/reactive';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
+import Tab from 'format_multitopic/courseformat/contenttabs/tab';
 import Templates from 'core/templates';
 
 
 /**
  * Course section tabs updater.
  *
- * @module     format_multitopic/courseformat/tabtree
- * @class      format_multitopic/courseformat/tabtree
+ * @module     format_multitopic/courseformat/contenttabs/tabtree
+ * @class      format_multitopic/courseformat/contenttabs/tabtree
  * @copyright  2022 Jeremy FitzPatrick and Te Wānanga o Aotearoa
+ * @copyright  2023 James Calder and Otago Polytechnic
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,11 +37,12 @@ export default class Component extends BaseComponent {
      */
     create() {
         // Optional component name for debugging.
-        this.name = 'coursetabs';
+        this.name = 'contenttabs';
         // Default query selectors.
         this.selectors = {
             TAB: `ul:first-of-type li`,
-            CHILDTAB: `ul:nth-child(2) li`
+            CHILDTAB: `ul:nth-child(2) li`,
+            SECTION_ITEM: `a.nav-link`,
         };
         // Default classes
         this.classes = {
@@ -51,17 +54,10 @@ export default class Component extends BaseComponent {
         this.activetab = [null, null];
     }
 
-    getWatchers() {
-        return [
-            // Sections sorting.
-            {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionTabs},
-        ];
-    }
-
     static init(target) {
         return new this({
             element: document.getElementById(target),
-            reactive: getCurrentCourseEditor()
+            reactive: getCurrentCourseEditor(),
         });
     }
 
@@ -70,29 +66,14 @@ export default class Component extends BaseComponent {
      *
      */
     stateReady() {
-        // Get tab elements.
-        const tabs = this.getElements(this.selectors.TAB);
-        for (let i = 0; i < tabs.length - 1; i++) { // Don't count last "add section" tab.
-            let tab = tabs.item(i);
-            let id = tab.querySelector("a div").dataset.itemid;
-            let classes = tab.querySelector("a").classList.value;
-            this.tabs[id] = tab;
-            if (classes.indexOf(this.classes.ACTIVETAB) !== -1) {
-                this.activetab[0] = id;
-                this.activetab[1] = id;
-            }
-        }
+        this._indexContents();
+    }
 
-        const childtabs = this.getElements(this.selectors.CHILDTAB);
-        for (let i = 0; i < childtabs.length - 1; i++) { // Don't count last "add section" tab.
-            let tab = childtabs.item(i);
-            let id = tab.querySelector("a div").dataset.itemid;
-            let classes = tab.querySelector("a").classList.value;
-            this.childtabs[id] = tab;
-            if (classes.indexOf(this.classes.ACTIVETAB) !== -1) {
-                this.activetab[1] = id;
-            }
-        }
+    getWatchers() {
+        return [
+            // Sections sorting.
+            {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionTabs},
+        ];
     }
 
     /**
@@ -101,7 +82,7 @@ export default class Component extends BaseComponent {
      * @param {object} param
      * @param {Object} param.element
      */
-    _refreshCourseSectionTabs({element}) {
+    async _refreshCourseSectionTabs({element}) {
         // Change the active top-level tab, if necessary.
         const activeTab1 = this.reactive.get('section', this.activetab[1]);
         let newActiveTab0id = (activeTab1.levelsan >= 1) ? activeTab1.parentid : activeTab1.id;
@@ -123,13 +104,80 @@ export default class Component extends BaseComponent {
         const toptabslist = element.firstsectionlist ?? [];
         const childtabslist = element.secondsectionlist ?? [];
         let toptabs = this.element.querySelector('ul:first-of-type');
-        this._fixOrder(toptabs, toptabslist, this.tabs, childtabslist[this.activetab[0]].length > 1);
+        await this._fixOrder(toptabs, toptabslist, this.selectors.TAB, 0, childtabslist[this.activetab[0]].length > 1);
 
         // And the second row tabs match secondsectionlist.
         let childtabs = this.element.querySelector('ul:nth-of-type(2)');
         if (childtabs) {
-            this._fixOrder(childtabs, childtabslist[this.activetab[0]], this.childtabs, false);
+            await this._fixOrder(childtabs, childtabslist[this.activetab[0]], this.selectors.CHILDTAB, 1, false);
         }
+
+        this._indexContents();
+    }
+
+    /**
+     * Regenerate content indexes.
+     *
+     * This method is used when a legacy action refresh some content element.
+     */
+    _indexContents() {
+        // Find unindexed tabs.
+        this._scanIndex(
+            this.selectors.TAB,
+            this.tabs,
+            (item) => {
+                return new Tab(item);
+            },
+            0
+        );
+
+        // Find unindexed child tabs.
+        this._scanIndex(
+            this.selectors.CHILDTAB,
+            this.childtabs,
+            (item) => {
+                return new Tab(item);
+            },
+            1
+        );
+    }
+
+    /**
+     * Reindex a tab.
+     *
+     * This method is used internally by _indexContents.
+     *
+     * @param {string} selector the DOM selector to scan
+     * @param {*} index the index attribute to update
+     * @param {*} creationhandler method to create a new indexed element
+     * @param {int} level tab level
+     */
+    _scanIndex(selector, index, creationhandler, level) {
+        const items = this.getElements(`${selector}:not([data-indexed])`);
+        items.forEach((item) => {
+            if (!item?.dataset?.id) {
+                return;
+            }
+            // Delete previous item component.
+            if (index[item.dataset.id] !== undefined) {
+                index[item.dataset.id].unregister();
+            }
+            // Create the new component.
+            index[item.dataset.id] = creationhandler({
+                ...this,
+                element: item,
+            });
+            // Update selected tab
+            let classes = item.querySelector("a").classList.value;
+            if (classes.indexOf(this.classes.ACTIVETAB) !== -1) {
+                if (level <= 0) {
+                    this.activetab[0] = item.dataset.id;
+                }
+                this.activetab[1] = item.dataset.id;
+            }
+            // Mark as indexed.
+            item.dataset.indexed = true;
+        });
     }
 
     /**
@@ -137,10 +185,11 @@ export default class Component extends BaseComponent {
      *
      * @param {Element} container the HTML element to reorder.
      * @param {Array} neworder an array with the ids order
-     * @param {Array} allitems the list of html elements that can be placed in the container
+     * @param {string} selector the element selector
+     * @param {int} level the tab level
      * @param {boolean} hassubtree
      */
-    _fixOrder(container, neworder, allitems, hassubtree) {
+    async _fixOrder(container, neworder, selector, level, hassubtree) {
 
         // Empty lists should not be visible.
         if (!neworder.length) {
@@ -153,40 +202,46 @@ export default class Component extends BaseComponent {
         container.classList.remove('hidden');
 
         // Move the elements in order at the beginning of the list.
-        neworder.forEach((itemid, index) => {
+        for (const [index, itemid] of Object.entries(neworder)) {
             const section = this.reactive.get("section", itemid);
             const visible = (section.visible && section.available || section.section == 0)
                 && (neworder.length > 1 || hassubtree);
-            if (allitems[itemid] === undefined) {
-                // If we don't have an item, create it from the course index.
-                let selecta = "[data-id='" + itemid + "']";
-                let ciElement = document.querySelector(selecta);
-                let ciLink = ciElement.querySelector(" a.courseindex-link");
+            const current = (section.currentnestedlevel != undefined && section.currentnestedlevel >= level);
+            let item = this.getElement(selector, itemid);
+            if (item === null) {
+                // If we don't have an item, create it.
                 let data = {
+                    "sectionid": itemid,
+                    "level": level,
                     "active": 0,
                     "inactive": 0,
                     "link": [{
-                        "link": ciLink.getAttribute("href")
+                        "link": section.sectionurl
                     }],
-                    "title": ciLink.innerHTML,
-                    "text": '<div class="tab_content' + (visible ? '' : ' dimmed')
+                    "title": section.name,
+                    "text": '<div class="tab_content' + (visible ? '' : ' dimmed') + (current ? ' marker' : '')
                         + '" data-itemid="' + section.id + '">' + section.title + '</div>'
                 };
-                let tab = document.createElement("li");
-                allitems[itemid] = tab;
-                container.insertBefore(tab, container.lastElementChild);
-                Templates.render("format_multitopic/courseformat/tab", data).done(function(html) {
-                    allitems[itemid] = Templates.replaceNode(tab, html, "")[0];
-                });
+                item = document.createElement("li");
+                container.insertBefore(item, container.lastElementChild);
+                let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
+                item = Templates.replaceNode(item, html, "")[0];
             }
-            const item = allitems[itemid];
-            // Update visibility
+
+            // Update visibility & current marker
             const content = item.querySelector("div.tab_content");
             if (content && content.classList.contains("dimmed") == visible) {
                 if (visible) {
                     content.classList.remove("dimmed");
                 } else {
                     content.classList.add("dimmed");
+                }
+            }
+            if (content && content.classList.contains("marker") != current) {
+                if (current) {
+                    content.classList.add("marker");
+                } else {
+                    content.classList.remove("marker");
                 }
             }
 
@@ -199,7 +254,7 @@ export default class Component extends BaseComponent {
             if (currentitem !== item) {
                 container.insertBefore(item, currentitem);
             }
-        });
+        }
         // Remove the remaining elements.
         // But we don't want the "Add" blown away.
         while (container.children.length > neworder.length + 1) {

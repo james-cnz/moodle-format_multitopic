@@ -189,6 +189,78 @@ class stateactions extends \core_courseformat\stateactions {
     }
 
     /**
+     * Move course sections into another location in the same course.
+     *
+     * @param \core_courseformat\stateupdates $updates the affected course elements track
+     * @param \stdClass $course the course object
+     * @param int[] $ids the list of affected course section ids
+     * @param int $targetsectionid optional target section id
+     * @param int $targetcmid optional target cm id
+     */
+    public function fmt_section_move_into(
+        \core_courseformat\stateupdates $updates,
+        \stdClass $course,
+        array $ids,
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null
+    ): void {
+        // Validate target elements.
+        if (!$targetsectionid) {
+            throw new \moodle_exception("Action section_move_into requires targetsectionid");
+        }
+
+        $this->validate_sections($course, $ids, __FUNCTION__);
+
+        $coursecontext = \context_course::instance($course->id);
+        require_capability('moodle/course:movesections', $coursecontext);
+
+        // Target section.
+        $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
+
+        $format = course_get_format($course->id);
+        $allsections = $format->fmt_get_sections();
+        if (method_exists($this, 'sort_section_ids_by_section_number')) {
+            $ids = $this->sort_section_ids_by_section_number($course, $ids, false);
+        }
+
+        // ADDED.
+        $origins = [];
+        $subids = [];
+        foreach ($ids as $id) {
+            $origin = $allsections[$id];
+            $origins[] = $origin;
+            for ($originsub = $origin; /* ... */
+                    $originsub && ($originsub->id == $origin->id || $originsub->levelsan > $origin->levelsan); /* ... */
+                    $originsub = $originsub->nextanyid ? $allsections[$originsub->nextanyid] : null) {
+                $subids[] = $originsub->id;
+            }
+        }
+        $destination = (object)['parentid' => $targetsectionid];
+        // END ADDED.
+
+        $affectedsections = [$targetsectionid => true];
+
+        foreach ($subids as $id) {
+            $affectedsections[$id] = true;
+        }
+        format_multitopic_move_section_to($course, $origins, $destination);      // CHANGED.
+
+        // Use section_state to return the section and activities updated state.
+        $this->section_state($updates, $course, $subids, $targetsectionid);
+
+        // All course sections can be renamed because of the resort.
+        foreach ($allsections as $section) {
+            // Ignore the affected sections because they are already in the updates.
+            if (isset($affectedsections[$section->id])) {
+                continue;
+            }
+            $updates->add_section_put($section->id);
+        }
+        // The section order is at a course level.
+        $updates->add_course_put();
+    }
+
+    /**
      * Show/hide course sections.
      *
      * @param \core_courseformat\stateupdates $updates the affected course elements track

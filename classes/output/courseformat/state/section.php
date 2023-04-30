@@ -53,6 +53,7 @@ class section extends base_section {
         $data->timed = $section->dateend && ($section->datestart < $section->dateend);
         $data->parentid = $section->parentid;
         $data->available = $section->available;
+        $data->currentnestedlevel = $section->currentnestedlevel;
         $controlmenuclass = $this->format->get_output_classname('content\\section\\controlmenu');
         $controlmenu = new $controlmenuclass($this->format, $section);
         $data->controlmenu = $controlmenu->export_for_template($output);

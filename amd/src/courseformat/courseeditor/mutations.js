@@ -98,6 +98,39 @@ class MultitopicMutations extends DefaultMutations {
         this.sectionLock(stateManager, subsectionIds, false);
     };
 
+    /**
+     * Move course sections into a specific course location.
+     *
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} sectionIds the list of section ids to move
+     * @param {number} targetSectionId the target section id
+     */
+    fmtSectionMoveInto = async function(stateManager, sectionIds, targetSectionId) {
+        if (!targetSectionId) {
+            throw new Error(`Mutation sectionMoveInto requires targetSectionId`);
+        }
+        const course = stateManager.get('course');
+        // ADDED.
+        let subsectionIds = [];
+        for (const sectionId of sectionIds) {
+            const section = stateManager.get("section", sectionId);
+            for (let subsection = section;
+                    subsection && (subsection.id == section.id || subsection.levelsan > section.levelsan);
+                    subsection = (course.sectionlist.length > subsection.number + 1) ?
+                        stateManager.get("section", course.sectionlist[subsection.number + 1]) : null) {
+                subsectionIds.push(subsection.id);
+            }
+        }
+        // END ADDED.
+        this.sectionLock(stateManager, subsectionIds, true);
+        const updates = await this._callEditWebservice('fmt_section_move_into', course.id, sectionIds, targetSectionId);
+        if (typeof this.bulkReset === "function") {
+            this.bulkReset(stateManager);
+        }
+        stateManager.processUpdates(updates);
+        this.sectionLock(stateManager, subsectionIds, false);
+    };
+
 }
 
 export const init = () => {

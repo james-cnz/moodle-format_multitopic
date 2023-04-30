@@ -35,16 +35,20 @@
 <div id="{{uniqid}}-course-tabs" class="course-section-tabs">
 <ul class="nav nav-tabs mb-3">
   {{#tabs}}
-    {{> format_multitopic/courseformat/tab }}
+    {{> format_multitopic/courseformat/contenttabs/tab }}
   {{/tabs}}
 </ul>
 
 {{#secondrow}}
-  {{>core/tabtree}}
+  <ul class="nav nav-tabs mb-3">
+    {{#tabs}}
+      {{> format_multitopic/courseformat/contenttabs/tab }}
+    {{/tabs}}
+  </ul>
 {{/secondrow}}
 </div>
 {{#js}}
-require(['format_multitopic/courseformat/tabtree'], function(component) {
+require(['format_multitopic/courseformat/contenttabs/tabtree'], function(component) {
 component.init('{{uniqid}}-course-tabs');
 });
 {{/js}}

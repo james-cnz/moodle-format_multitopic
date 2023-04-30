@@ -230,6 +230,20 @@ class content extends content_base {
         $tabseft = (new \tabtree($tabs,
             "tab_id_{$displaysection->id}_l{$displaysection->pagedepthdirect}",
             $inactivetabs))->export_for_template($output);
+        foreach ($tabseft->tabs as $tabeft) {
+            if (preg_match('/^tab_id_(\d+)_l(\d+)$/', $tabeft->id, $matches)) {
+                $tabeft->sectionid = $matches[1];
+                $tabeft->level = $matches[2];
+            }
+        }
+        if ($tabseft->secondrow) {
+            foreach ($tabseft->secondrow->tabs as $tabeft) {
+                if (preg_match('/^tab_id_(\d+)_l(\d+)$/', $tabeft->id, $matches)) {
+                    $tabeft->sectionid = $matches[1];
+                    $tabeft->level = $matches[2];
+                }
+            }
+        }
 
         // END INCLUDED.
 
