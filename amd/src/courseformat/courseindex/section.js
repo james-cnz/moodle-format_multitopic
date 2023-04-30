@@ -20,7 +20,7 @@
  *
  * @module     format_multitopic/courseformat/courseindex/section
  * @class      format_multitopic/courseformat/courseindex/section
- * @copyright  2022 James Calder and Otago Polytechnic
+ * @copyright  2022 onwards James Calder and Otago Polytechnic
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -37,7 +37,7 @@ export default class Component extends ComponentBase {
      * @return {Component}
      */
      static init(target, selectors) {
-        return new Component({ // CHANGED.
+        return new this({
             element: document.getElementById(target),
             selectors,
         });
@@ -50,18 +50,15 @@ export default class Component extends ComponentBase {
      * @returns {boolean}
      */
     validateDropData(dropdata) {
-        // We accept any course module.
-        if (dropdata?.type === 'cm') {
-            return true;
-        }
         // We accept a section that fits
         if (dropdata?.type === 'section') {
             const sectionzeroid = this.course.sectionlist[0];
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
             return target.levelsan <= origin.levelsan && origin.id != sectionzeroid && target.id != sectionzeroid;
+        } else {
+            return super.validateDropData(dropdata);
         }
-        return false;
     }
 
 
@@ -71,9 +68,6 @@ export default class Component extends ComponentBase {
      * @param {Object} dropdata the accepted drop data
      */
     showDropZone(dropdata) {
-        if (dropdata.type == 'cm') {
-            this.getLastCm()?.classList.add(this.classes.DROPDOWN);
-        }
         if (dropdata.type == 'section') {
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
@@ -103,6 +97,8 @@ export default class Component extends ComponentBase {
             } else if (targetShowBorder < 0) {
                 targetDom.classList.add(this.classes.DROPUP);
             }
+        } else {
+            super.showDropZone(dropdata);
         }
     }
 
@@ -112,9 +108,6 @@ export default class Component extends ComponentBase {
      * @param {Object} dropdata the accepted drop data
      */
     hideDropZone(dropdata) {
-        if (dropdata.type == 'cm') {
-            this.getLastCm()?.classList.remove(this.classes.DROPDOWN);
-        }
         if (dropdata.type == 'section') {
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
@@ -143,6 +136,8 @@ export default class Component extends ComponentBase {
             } else if (targetShowBorder < 0) {
                 targetDom.classList.remove(this.classes.DROPUP);
             }
+        } else {
+            super.hideDropZone(dropdata);
         }
     }
 
@@ -150,12 +145,10 @@ export default class Component extends ComponentBase {
      * Drop event handler.
      *
      * @param {Object} dropdata the accepted drop data
+     * @param {Event} event the drop event
      */
-    drop(dropdata) {
+    drop(dropdata, event) {
         // Call the move mutation.
-        if (dropdata.type == 'cm') {
-            this.reactive.dispatch('cmMove', [dropdata.id], this.id);
-        }
         if (dropdata.type == 'section') {
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
@@ -175,8 +168,10 @@ export default class Component extends ComponentBase {
                 }
             }
             if (moveDirection != 0) {
-                this.reactive.dispatch('fmtSectionMove', origin, targetCall);
+                this.reactive.dispatch('sectionMove', [origin.id], targetCall.id);
             }
+        } else {
+            super.drop(dropdata, event);
         }
     }
 

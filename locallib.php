@@ -20,7 +20,7 @@
  * INCLUDED /course/lib.php selected functions
  *
  * @package   format_multitopic
- * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright 2019 onwards James Calder and Otago Polytechnic
  * @copyright based on work by 1999 Martin Dougiamas  http://dougiamas.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -131,15 +131,15 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
 
 
 /**
- * Moves a section within a course, from a position to another.
+ * Moves sections within a course, from a position to another.
  *
  * @param \stdClass $course
- * @param \stdClass|\section_info $section The section to be moved.  Must specify id.
+ * @param \stdClass|\section_info|array $origins The section(s) to be moved.  Must specify id.
  * @param \stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
  */
-function format_multitopic_move_section_to(\stdClass $course, $section, \stdClass $destination) {
+function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClass $destination) {
     // CHANGED LINE ABOVE: Use section info instead of number.  Removed $ignorenumsections param.  No return value (use exceptions).
-    // Moves a course section within the course.
+    // Moves course sections within the course.
     // CHANGES THROUGHOUT: Use section info instead of number.
     global $DB;                                                                 // CHANGED: Removed $USER.
 
@@ -155,7 +155,7 @@ function format_multitopic_move_section_to(\stdClass $course, $section, \stdClas
         throw new \moodle_exception('cannotcreateorfindstructs');               // CHANGED.
     }
 
-    $movedsections = format_multitopic_reorder_sections($sections, $section, $destination); // CHANGED.
+    $movedsections = format_multitopic_reorder_sections($sections, $origins, $destination); // CHANGED.
 
     // Update all sections. Do this in 2 steps to avoid breaking database
     // uniqueness constraint.
@@ -248,14 +248,14 @@ function format_multitopic_course_can_delete_section(\stdClass $course, \section
 
 /**
  * Reordering algorithm for course sections. Given an array of sections indexed by section->id,
- * an origin, and a target, rebuilds the array.
+ * origins, and a target, rebuilds the array.
  *
  * @param array $sections The list of sections.  Must specify fmt calculated properties.
- * @param \stdClass|\section_info $origin The section to be moved.  Must specify id.
+ * @param \stdClass|\section_info|array $origins The section(s) to be moved.  Must specify id.
  * @param \stdClass $target The destination.  Must specify parentid, prevupid, or nextupid.  May specify level.
  * @return array
  */
-function format_multitopic_reorder_sections(array $sections, $origin, \stdClass $target) : array {
+function format_multitopic_reorder_sections(array $sections, $origins, \stdClass $target) : array {
     // CHANGED THROUGHOUT: Section numbers changed to IDs, used exceptions instead of returning false.
     // Reads Calculated section values (levelsan, visiblesan).
     // Writes raw section values (level, visible).
@@ -263,27 +263,42 @@ function format_multitopic_reorder_sections(array $sections, $origin, \stdClass 
         throw new \moodle_exception('cannotcreateorfindstructs');
     }
 
-    // We can't move section position 0.
-    if (isset($origin->section) && $origin->section < 1) {
-        throw new \moodle_exception('cannotcreateorfindstructs');
-    }
+    $origins = !is_array($origins) ? [ $origins ] : $origins;
 
-    // Locate origin section in sections array.
-    if (!($origin = array_key_exists($origin->id, $sections) ? $sections[$origin->id] : null)) {
-        throw new \moodle_exception('sectionnotexist');
-    }
-
-    // Extract origin sections.
     $originarray = [];
-    for ($originsubkey = $origin->id; /* ... */
-        $originsubkey == $origin->id || $originsubkey && $sections[$originsubkey]->levelsan > $origin->levelsan; /* ... */
-        $originsubkey = $originarray[$originsubkey]->nextanyid) {
-        $originarray[$originsubkey] = $sections[$originsubkey];
-        unset($sections[$originsubkey]);
+    $originlevel = null;
+    foreach ($origins as $key => $origin) {
+
+        // Locate origin section in sections array.
+        if (!($origin = array_key_exists($origin->id, $sections) ? $sections[$origin->id] : null)) {
+            throw new \moodle_exception('sectionnotexist');
+        }
+
+        // We can't move section position 0.
+        if (isset($origin->section) && $origin->section < 1) {
+            throw new \moodle_exception('cannotcreateorfindstructs');
+        }
+
+        if (!isset($originlevel)) {
+            $originlevel = $origin->levelsan;
+        } else {
+            if ($origin->levelsan != $originlevel) {
+                throw new \moodle_exception('cannotcreateorfindstructs');
+            }
+        }
+
+        // Extract origin sections.
+        for ($originsubkey = $origin->id; /* ... */
+            $originsubkey == $origin->id || $originsubkey && $sections[$originsubkey]->levelsan > $origin->levelsan; /* ... */
+            $originsubkey = $originarray[$originsubkey]->nextanyid) {
+            $originarray[$originsubkey] = $sections[$originsubkey];
+            unset($sections[$originsubkey]);
+        }
+
     }
 
     // Find target position and extract remaining sections.
-    $target->level = $target->level ?? $origin->levelsan;
+    $target->level = $target->level ?? $originlevel;
     $parent = null;
     $prev = null;
     $found = false;
@@ -347,16 +362,15 @@ function format_multitopic_reorder_sections(array $sections, $origin, \stdClass 
     }
 
     // Append moved sections.
-    $levelchange = $target->level - $origin->levelsan;
+    $levelchange = $target->level - $originlevel;
     foreach ($originarray as $id => $section) {
         $sections[$id] = new \stdClass;
         $sections[$id]->id = $id;
-        $sections[$id]->visible = $section->visible && $parentvisible;
-        $sections[$id]->level = ($id == $origin->id) ?
-                                $target->level
-                                : ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ?
+        $sections[$id]->visible = $section->visiblesan && $parentvisible;
+        $sections[$id]->level = ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                                        && $section->levelsan != $originlevel) ?
                                     FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC       // Don't change topic level.
-                                    : $section->levelsan + $levelchange);
+                                    : $section->levelsan + $levelchange;
     }
 
     // Append rest of array.

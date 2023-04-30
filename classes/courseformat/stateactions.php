@@ -32,7 +32,7 @@ use format_multitopic;
  * extends core_courseformat\stateactions.
  *
  * @package    format_multitopic
- * @copyright  2022 James Calder and Otago Polytechnic
+ * @copyright  2022 onwards James Calder and Otago Polytechnic
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,11 +43,11 @@ class stateactions extends \core_courseformat\stateactions {
      *
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
-     * @param int[] $ids the list of affected course module ids
+     * @param int[] $ids the list of affected course section ids
      * @param int $targetsectionid optional target section id
      * @param int $targetcmid optional target cm id
      */
-    public function fmt_section_move(
+    public function section_move(
         \core_courseformat\stateupdates $updates,
         \stdClass $course,
         array $ids,
@@ -56,54 +56,130 @@ class stateactions extends \core_courseformat\stateactions {
     ): void {
         // Validate target elements.
         if (!$targetsectionid) {
-            throw new \moodle_exception("Action cm_move requires targetsectionid");
+            throw new \moodle_exception("Action section_move requires targetsectionid");
         }
-
-        // ADDED.
-        $format = course_get_format($course);
-        $sections = $format->fmt_get_sections();
-        $origin = $sections[$ids[0]];
-        $ids = [ $origin->id ];
-        $originsub = $origin;
-        while ($sections[$originsub->nextanyid] && $sections[$originsub->nextanyid]->levelsan > $origin->levelsan) {
-            $originsub = $sections[$originsub->nextanyid];
-            $ids[] = $originsub->id;
-        }
-        $targetsection = $sections[$targetsectionid];
-        if ($targetsection->section > $origin->section) {
-            $destination = (object)['prevupid' => $targetsectionid];
-        } else {
-            $destination = (object)['nextupid' => $targetsectionid];
-        }
-        // END ADDED.
 
         $this->validate_sections($course, $ids, __FUNCTION__);
 
         $coursecontext = \context_course::instance($course->id);
         require_capability('moodle/course:movesections', $coursecontext);
 
-        $modinfo = get_fast_modinfo($course);
+        // Target section.
+        $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
+
+        $format = course_get_format($course->id);
+        $allsections = $format->fmt_get_sections();
+        $draggedoriginsection = $allsections[$ids[0]];
+        if (method_exists($this, 'sort_section_ids_by_section_number')) {
+            $ids = $this->sort_section_ids_by_section_number($course, $ids, false);
+        }
+
+        // ADDED.
+        $origins = [];
+        $subids = [];
+        foreach ($ids as $id) {
+            $origin = $allsections[$id];
+            $origins[] = $origin;
+            for ($originsub = $origin; /* ... */
+                    $originsub && ($originsub->id == $origin->id || $originsub->levelsan > $origin->levelsan); /* ... */
+                    $originsub = $originsub->nextanyid ? $allsections[$originsub->nextanyid] : null) {
+                $subids[] = $originsub->id;
+            }
+        }
+        $targetsection = $allsections[$targetsectionid];
+        if ($targetsection->section > $draggedoriginsection->section) {
+            $destination = (object)['prevupid' => $targetsectionid];
+        } else {
+            $destination = (object)['nextupid' => $targetsectionid];
+        }
+        // END ADDED.
+
+        $affectedsections = [$targetsectionid => true];
+
+        foreach ($subids as $id) {
+            $affectedsections[$id] = true;
+        }
+        format_multitopic_move_section_to($course, $origins, $destination);      // CHANGED.
+
+        // Use section_state to return the section and activities updated state.
+        $this->section_state($updates, $course, $subids, $targetsectionid);
+
+        // All course sections can be renamed because of the resort.
+        foreach ($allsections as $section) {
+            // Ignore the affected sections because they are already in the updates.
+            if (isset($affectedsections[$section->id])) {
+                continue;
+            }
+            $updates->add_section_put($section->id);
+        }
+        // The section order is at a course level.
+        $updates->add_course_put();
+    }
+
+    /**
+     * Move course sections after another location in the same course.
+     *
+     * @param \core_courseformat\stateupdates $updates the affected course elements track
+     * @param \stdClass $course the course object
+     * @param int[] $ids the list of affected course section ids
+     * @param int $targetsectionid optional target section id
+     * @param int $targetcmid optional target cm id
+     */
+    public function section_move_after(
+        \core_courseformat\stateupdates $updates,
+        \stdClass $course,
+        array $ids,
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null
+    ): void {
+        // Validate target elements.
+        if (!$targetsectionid) {
+            throw new \moodle_exception("Action section_move_after requires targetsectionid");
+        }
+
+        $this->validate_sections($course, $ids, __FUNCTION__);
+
+        $coursecontext = \context_course::instance($course->id);
+        require_capability('moodle/course:movesections', $coursecontext);
 
         // Target section.
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
-        $targetsection = $modinfo->get_section_info_by_id($targetsectionid, MUST_EXIST);
 
-        $affectedsections = [$targetsection->section => true];
-
-        $sections = $this->get_section_info($modinfo, $ids);
-        foreach ($sections as $section) {
-            $affectedsections[$section->section] = true;
+        $format = course_get_format($course->id);
+        $allsections = $format->fmt_get_sections();
+        if (method_exists($this, 'sort_section_ids_by_section_number')) {
+            $ids = $this->sort_section_ids_by_section_number($course, $ids, false);
         }
-        format_multitopic_move_section_to($course, $origin, $destination);      // CHANGED.
+
+        // ADDED.
+        $origins = [];
+        $subids = [];
+        foreach ($ids as $id) {
+            $origin = $allsections[$id];
+            $origins[] = $origin;
+            for ($originsub = $origin; /* ... */
+                    $originsub && ($originsub->id == $origin->id || $originsub->levelsan > $origin->levelsan); /* ... */
+                    $originsub = $originsub->nextanyid ? $allsections[$originsub->nextanyid] : null) {
+                $subids[] = $originsub->id;
+            }
+        }
+        $destination = (object)['prevupid' => $targetsectionid];
+        // END ADDED.
+
+        $affectedsections = [$targetsectionid => true];
+
+        foreach ($subids as $id) {
+            $affectedsections[$id] = true;
+        }
+        format_multitopic_move_section_to($course, $origins, $destination);      // CHANGED.
 
         // Use section_state to return the section and activities updated state.
-        $this->section_state($updates, $course, $ids, $targetsectionid);
+        $this->section_state($updates, $course, $subids, $targetsectionid);
 
         // All course sections can be renamed because of the resort.
-        $allsections = $modinfo->get_section_info_all();
         foreach ($allsections as $section) {
             // Ignore the affected sections because they are already in the updates.
-            if (isset($affectedsections[$section->section])) {
+            if (isset($affectedsections[$section->id])) {
                 continue;
             }
             $updates->add_section_put($section->id);

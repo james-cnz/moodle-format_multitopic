@@ -26,7 +26,6 @@
 
 import BaseComponent from 'core_courseformat/local/courseindex/courseindex';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
-import Mutations from 'format_multitopic/courseformat/courseeditor/mutations';
 
 export default class Component extends BaseComponent {
 
@@ -60,13 +59,9 @@ export default class Component extends BaseComponent {
      * @return {Component}
      */
      static init(target, selectors) {
-        // ADDED.
-        const reactive = getCurrentCourseEditor();
-        reactive.addMutations({fmtSectionMove: Mutations.prototype.fmtSectionMove.bind(reactive.mutations)});
-        // END ADDED.
-        return new Component({
+        return new this({
             element: document.getElementById(target),
-            reactive: reactive, // CHANGED.
+            reactive: getCurrentCourseEditor(),
             selectors,
         });
     }

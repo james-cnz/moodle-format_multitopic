@@ -59,7 +59,7 @@ export default class Component extends BaseComponent {
     }
 
     static init(target) {
-        return new Component({
+        return new this({
             element: document.getElementById(target),
             reactive: getCurrentCourseEditor()
         });

@@ -27,6 +27,7 @@
 namespace format_multitopic\output\courseformat;
 
 use core_courseformat\output\local\content as content_base;
+use \renderer_base;
 
 /**
  * Base class to render a course format.
@@ -46,7 +47,10 @@ class content extends content_base {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output) {
+        global $PAGE;
         global $USER;                               // INCLUDED from course/format/classes/output/local/content/section/cmlist.php .
+
+        $PAGE->requires->js_call_amd('format_multitopic/courseformat/courseeditor/mutations', 'init');
 
         $format = $this->format;
 
