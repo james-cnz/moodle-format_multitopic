@@ -75,16 +75,25 @@ export default class Component extends BaseComponent {
             /* eslint-enable no-unused-vars */
 
         // Find the specified section.
-        const anchor = window.location.hash.substr(1);
-        const selSectionDom = anchor ?
-            document.querySelector("body.format-multitopic .course-content ul.sections li.section.section-topic." + anchor)
-            : null;
+        let anchor = window.location.hash;
+        if (!anchor.match(/^#sectionid-\d+(?:-title)?$/)) {
+            return;
+        }
+        let oldStyle = false;
+        if (anchor.match(/^#sectionid-\d+$/)) {
+            anchor = anchor + "-title";
+            oldStyle = true;
+            history.replaceState(history.state, "", anchor);
+        }
+        const selSectionHeaderDom =
+            document.querySelector(".course-content ul.sections li.section.section-topic .sectionname" + anchor);
 
         // Exit if there is no recognised section.
-        if (!selSectionDom) {
+        if (!selSectionHeaderDom) {
             return;
         }
 
+        const selSectionDom = selSectionHeaderDom.closest("li.section.section-topic");
         const sectionId = selSectionDom.getAttribute('data-id');
         const section = this.reactive.get('section', sectionId);
 
@@ -100,7 +109,9 @@ export default class Component extends BaseComponent {
         }
 
         // Scroll to the specified section.
-        selSectionDom.scrollIntoView();
+        if (oldStyle) {
+            selSectionDom.scrollIntoView();
+        }
 
     }
 

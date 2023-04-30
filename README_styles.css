@@ -87,7 +87,7 @@ body.format-multitopic ul.sections li.section .section_image_holder img {
 }
 
 /* Section Anchor Jump Fix */
-body.format-multitopic ul.sections li.section {
+body.format-multitopic ul.sections li.section .course-section-header .sectionname {
     scroll-margin-top: 70px;
 }
 

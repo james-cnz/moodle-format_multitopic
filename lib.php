@@ -758,7 +758,7 @@ class format_multitopic extends core_courseformat\base {
                 if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
                     return null;
                 }
-                $url->set_anchor('sectionid-' . $section->id);
+                $url->set_anchor('sectionid-' . $section->id . '-title');
             }
             // END CHANGED.
         }
