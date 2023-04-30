@@ -58,4 +58,14 @@ class section extends base_section {
         $data->controlmenu = $controlmenu->export_for_template($output);
         return $data;
     }
+
+    /**
+     * Return if the section can be selected for bulk editing.
+     * @return bool if the section can be edited in bulk
+     */
+    protected function is_bulk_editable(): bool {
+        $section = $this->section;
+        return ($section->section != 0); // Should be levelsan >= 2, this but doesn't work.
+    }
+
 }

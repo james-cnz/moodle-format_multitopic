@@ -47,6 +47,7 @@ class content extends content_base {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output) {
+        global $CFG;
         global $PAGE;
         global $USER;                               // INCLUDED from course/format/classes/output/local/content/section/cmlist.php .
 
@@ -265,6 +266,12 @@ class content extends content_base {
         // Allow next and back navigation between pages.
         $sectionnav = new \format_multitopic\output\courseformat\content\sectionnavigation($format, $displaysection);
         $data->sectionnavigation = $sectionnav->export_for_template($output);
+
+        if ($CFG->version >= 2023020300.01 && $format->show_editor()) {
+            $data->hasbulkedittools = true;
+            $bulkedittools = new $this->bulkedittoolsclass($format);
+            $data->bulkedittools = $bulkedittools->export_for_template($output);
+        }
 
         return $data;
     }

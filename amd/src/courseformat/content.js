@@ -27,7 +27,7 @@ import BaseComponent from 'core_courseformat/local/content';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
-import CmItem from 'core_courseformat/local/content/section/cmitem';
+import CmItem from 'format_multitopic/courseformat/content/section/cmitem';
 import Templates from 'core/templates';
 
 export default class Component extends BaseComponent {
@@ -289,7 +289,7 @@ export default class Component extends BaseComponent {
             this.selectors.CM,
             this.cms,
             (item) => {
-                return new CmItem(item);
+                return new CmItem(item); // CHANGED.
             }
         );
     }

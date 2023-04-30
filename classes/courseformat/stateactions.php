@@ -188,4 +188,34 @@ class stateactions extends \core_courseformat\stateactions {
         $updates->add_course_put();
     }
 
+    /**
+     * Show/hide course sections.
+     *
+     * @param \core_courseformat\stateupdates $updates the affected course elements track
+     * @param \stdClass $course the course object
+     * @param int[] $ids section ids
+     * @param int $visible the new visible value
+     */
+    protected function set_section_visibility (
+        \core_courseformat\stateupdates $updates,
+        \stdClass $course,
+        array $ids,
+        int $visible
+    ) {
+        $this->validate_sections($course, $ids, __FUNCTION__);
+        $coursecontext = \context_course::instance($course->id);
+        require_all_capabilities(['moodle/course:update', 'moodle/course:sectionvisibility'], $coursecontext);
+
+        $format = course_get_format($course->id);
+        $allsections = $format->fmt_get_sections();
+
+        foreach ($ids as $sectionid) {
+            $section = $allsections[$sectionid];
+            if (!$visible && $section->section || $visible && $section->parentvisiblesan) {
+                course_update_section($course, $section, ['visible' => $visible]);
+            }
+        }
+        $this->section_state($updates, $course, $ids);
+    }
+
 }

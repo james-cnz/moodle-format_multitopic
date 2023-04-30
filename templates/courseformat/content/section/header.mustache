@@ -29,6 +29,11 @@
     }
 }}
 
+    {{#hasbulkedittools}}
+        {{$ core_courseformat/local/content/section/bulkselect }}
+            {{> core_courseformat/local/content/section/bulkselect }}
+        {{/ core_courseformat/local/content/section/bulkselect }}
+    {{/hasbulkedittools}}
     {{#sitehome}}
         <h2 class="sectionid-{{id}}-title sectionname">
             {{{title}}}

@@ -23,9 +23,33 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import Header from 'format_multitopic/courseformat/content/section/header';
 import SectionBase from 'core_courseformat/local/content/section';
 
 export default class extends SectionBase {
+
+    /**
+     * Initial state ready method.
+     *
+     * @param {Object} state the initial state
+     */
+    stateReady(state) {
+        this.configState(state);
+        // Drag and drop is only available for components compatible course formats.
+        if (this.reactive.isEditing && this.reactive.supportComponents) {
+            // Section zero and other formats sections may not have a title to drag.
+            const sectionItem = this.getElement(this.selectors.SECTION_ITEM);
+            if (sectionItem) {
+                // Init the inner dragable element.
+                const headerComponent = new Header({ // CHANGED.
+                    ...this,
+                    element: sectionItem,
+                    fullregion: this.element,
+                });
+                this.configDragDrop(headerComponent);
+            }
+        }
+    }
 
     /**
      * Validate if the drop data can be dropped over the component.

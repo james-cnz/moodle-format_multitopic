@@ -197,6 +197,11 @@
             {{> format_multitopic/courseformat/content/addsection}}
         {{/ core_courseformat/local/content/addsection}}
     {{/numsections}}
+    {{#bulkedittools}}
+        {{$ core_courseformat/local/content/bulkedittools}}
+            {{> core_courseformat/local/content/bulkedittools}}
+        {{/ core_courseformat/local/content/bulkedittools}}
+    {{/bulkedittools}}
 </div>
 {{#js}}
 require(['format_multitopic/courseformat/content'], function(component) {
