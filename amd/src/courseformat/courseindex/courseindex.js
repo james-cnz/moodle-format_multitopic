@@ -118,6 +118,9 @@ export default class Component extends BaseComponent {
         for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
             const sectionDom = sectionsDom[sdi];
             const section = this.reactive.get("section", sectionDom.dataset.id);
+            if (!section) {
+                continue;
+            }
             const linkDom = sectionDom.querySelector("a.courseindex-link");
             const link = section.sectionurl.replace("&amp;", "&");
             if (linkDom.href != link) {

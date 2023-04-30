@@ -231,6 +231,9 @@ export default class Component extends BaseComponent {
         for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
             const sectionDom = sectionsDom[sdi];
             const section = this.reactive.get("section", sectionDom.dataset.id);
+            if (!section) {
+                continue;
+            }
             let refreshCms = false;
             const pageSectionDom = this.element.querySelector(".course-section[data-id='" + section.pageid + "']");
             const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;

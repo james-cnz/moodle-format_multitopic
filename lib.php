@@ -72,6 +72,9 @@ class format_multitopic extends core_courseformat\base {
     /** @var stdClass Multitopic-specific section information */
     private $fmtsections = null;
 
+    /** @var course_modinfo|null Mod info the Multitopic-specific section information was based on */
+    private $fmtmodinfo = null;
+
     /** @var bool Multitopic-specific section information is complete*/
     private $fmtsectionscomplete = false;
     // END ADDED.
@@ -184,16 +187,18 @@ class format_multitopic extends core_courseformat\base {
         // CHANGED LINE ABOVE.
 
         $course = $this->get_course();
+        $modinfo = $course ? $this->get_modinfo() : null;
 
-        if (isset($this->fmtsections)) {
+        if (isset($this->fmtsections) && $this->fmtmodinfo == $modinfo) {
 
             $fmtsections = $this->fmtsections;
 
         } else {
 
+            $this->fmtsectionscomplete = false;
+
             // CHANGED: Get info, but don't return it yet.
             if ($course) {
-                $modinfo = get_fast_modinfo($course);
                 $sections = $modinfo->get_section_info_all();
             } else {
                 $sections = [];
@@ -301,6 +306,7 @@ class format_multitopic extends core_courseformat\base {
             }
 
             $this->fmtsections = $fmtsections;
+            $this->fmtmodinfo = $modinfo;
 
         }
 

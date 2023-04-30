@@ -44,6 +44,9 @@ class section extends base_section {
     public function export_for_template(\renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
         $section = $this->section;
+        if (!isset($section->fmtdata)) {
+            $section = $this->format->fmt_get_section($section);
+        }
         $data->levelsan = $section->levelsan;
         $data->indent = ($section->section == 0) ? 0 : $section->levelsan;
         $data->pageid = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
@@ -51,7 +54,7 @@ class section extends base_section {
         $data->parentid = $section->parentid;
         $data->available = $section->available;
         $controlmenuclass = $this->format->get_output_classname('content\\section\\controlmenu');
-        $controlmenu = new $controlmenuclass($this->format, $this->section);
+        $controlmenu = new $controlmenuclass($this->format, $section);
         $data->controlmenu = $controlmenu->export_for_template($output);
         return $data;
     }
