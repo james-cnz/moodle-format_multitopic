@@ -101,6 +101,7 @@ class courseheader implements \renderable {
         ]);
             $o .= \html_writer::tag('div', $this->coursename, [
                 'id' => 'course-header-banner-text',
+                'class' => 'h2',
             ]);
         $o .= \html_writer::end_tag('div');
 

@@ -1,23 +1,34 @@
-body.format-multitopic ul.sections {
-    list-style: none;
-}
-
-/* INCLUDED from theme/boost/style/moodle.css */
-body.format-multitopic ul.sections li.section .content.collapse:not(.show) {
-    display: none;
-}
-/* END INCLUDED */
-
 /* ADDED */
 
-/* Header */
+/* Course header */
 body.format-multitopic:not([class*=" cmid-"]) .page-header-headings {
     display: none;
 }
 body.format-multitopic #course-header {
     width: 100%;
 }
+body.format-multitopic div#course-header > div#course-header-banner {
+    background-size: cover;
+}
+body.format-multitopic div#course-header > div#course-header-banner > div#course-header-banner-text {
+    padding: 1em;
+    background: rgba(255, 255, 255, 0.5);
+}
+body.format-multitopic div#course-header > p#course-header-banner_attribution {
+    text-align: right;
+    margin: 0;
+    font-size: xx-small;
+}
 
+/* Tabs */
+body.format-multitopic .course-content ul.nav-tabs li a div.tab_content.marker::before {
+    content: "";
+    border-left: solid 3px #0f6cbf;
+    padding-right: 5px;
+}
+body.format-multitopic .course-content ul.nav-tabs li a div.tab_content.dimmed {
+    color: #6a737b;
+}
 body.format-multitopic .course-content ul.nav-tabs li a.draggable {
     cursor: move;
 }
@@ -34,11 +45,31 @@ body.format-multitopic.dragging.dir-rtl .course-content ul.nav-tabs li.drop-befo
     border-bottom-right-radius: 0;
 }
 
+/* Section */
 body.format-multitopic ul.sections li.section .sectionname .inplaceeditable {
     display: inline;
 }
+body.format-multitopic ul.sections li.section .course-section-header .section_subtitle {
+    font-size: small;
+}
+body.format-multitopic ul.sections li.section .summarytext .section_image_holder {
+    float: right;
+    width: 240px;
+    text-align: right;
+    font-size: xx-small;
+}
+body.format-multitopic ul.sections li.section .summarytext .section_image_holder img {
+    width: 240px;
+    height: 180px;
+    object-fit: cover;
+}
 
-/* Hide activity navigation. */
+/* Section Anchor Jump Fix */
+body.format-multitopic ul.sections li.section .course-section-header .sectionname {
+    scroll-margin-top: 70px;
+}
+
+/* Hide activity navigation */
 body.format-multitopic.path-mod.pagelayout-incourse #page #page-content .activity-navigation {
     display: none;
 }
