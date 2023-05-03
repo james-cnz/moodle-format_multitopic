@@ -66,7 +66,7 @@ class section extends base_section {
      */
     protected function is_bulk_editable(): bool {
         $section = $this->section;
-        return ($section->section != 0); // Should be levelsan >= 2, this but doesn't work.
+        return ($section->levelsan >= 2);
     }
 
 }

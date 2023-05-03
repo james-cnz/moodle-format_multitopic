@@ -39,7 +39,7 @@ export default class extends HeaderBase {
             return false;
         }
         return (bulk.selectedType === '' || bulk.selectedType === 'section')
-            && (this.section.levelsan >= 2) && (this.fullregion.dataset.fmtonpage == '1'); // ADDED.
+            && (this.fullregion.dataset.fmtonpage == '1'); // ADDED.
     }
 
 }
