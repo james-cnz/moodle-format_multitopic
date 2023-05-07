@@ -38,24 +38,28 @@ jobs:
           - php: '7.3' # 7.3-8.0
             moodle-branch: 'MOODLE_400_STABLE'
             database: pgsql
+            plugin-ci: ^3
           # Moodle 4.1, PHP 7.4, MariaDB
           - php: '7.4' # 7.4-8.1
             moodle-branch: 'MOODLE_401_STABLE'
             database: mariadb
+            plugin-ci: ^3
           # Moodle 4.2, PHP 8.0, PostgreSQL
           - php: '8.0' # 8.0-8.1
             moodle-branch: 'MOODLE_402_STABLE'
             database: pgsql
+            plugin-ci: ^4
             # extensions: xmlrpc-beta
           # Moodle master, PHP 8.1, MariaDB
           - php: '8.1'
             moodle-branch: 'master'
             database: mariadb
+            plugin-ci: ^4
             # extensions: xmlrpc-beta
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: plugin
 
@@ -65,11 +69,13 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: ${{ matrix.extensions }} # PHP 8 changes
           ini-values: max_input_vars=5000
+          # If you are not using code coverage, keep "none". Otherwise, use "pcov" (Moodle 3.10 and up) or "xdebug".
+          # If you try to use code coverage with "none", it will fallback to phpdbg (which has known problems).
           coverage: none
 
       - name: Initialise moodle-plugin-ci
         run: |
-          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^3
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ${{ matrix.plugin-ci }}
           echo $(cd ci/bin; pwd) >> $GITHUB_PATH
           echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
           sudo locale-gen en_AU.UTF-8
@@ -98,7 +104,7 @@ jobs:
 
       - name: Moodle Code Checker
         if: ${{ always() }}
-        run: moodle-plugin-ci codechecker --max-warnings 0
+        run: moodle-plugin-ci phpcs --max-warnings 0
 
       - name: Moodle PHPDoc Checker
         if: ${{ always() }}
