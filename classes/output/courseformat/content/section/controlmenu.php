@@ -54,13 +54,14 @@ class controlmenu extends controlmenu_base {
      * @return array of edit control items
      */
     public function section_control_items() {
-        global $USER;
+        global $USER, $CFG;
 
         $format = $this->format;
         $section = $format->fmt_get_section($this->section);                    // CHANGED.
         $onsectionpage = $section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; // ADDED.
         $course = $format->get_course();
         $user = $USER;
+        $usecomponents = $format->supports_components();
         $coursecontext = context_course::instance($course->id);
 
         $baseurl = course_get_url($course, $section, ['fmtedit' => true]);      // CHANGED.
@@ -186,7 +187,23 @@ class controlmenu extends controlmenu_base {
                 }
                 // END CHANGED.
 
-                // TODO: Add move section control.
+                if ($usecomponents && $CFG->version >= 2023042400 && !array_key_exists('movesection', $parentcontrols)) {
+                    // This tool will appear only when the state is ready.
+                    $url = clone ($baseurl);
+                    $url->param('movesection', $section->section);
+                    $url->param('section', $section->section);
+                    $movecontrols['movesection'] = [
+                        'url' => $url,
+                        'icon' => 'i/dragdrop',
+                        'name' => get_string('move', 'moodle'),
+                        'pixattr' => ['class' => ''],
+                        'attr' => [
+                            'class' => 'icon move waitstate',
+                            'data-action' => 'moveSection',
+                            'data-id' => $section->id,
+                        ],
+                    ];
+                }
 
                 $url = clone($baseurl);
                 if ($section->prevupid != $section->parentid
@@ -288,7 +305,11 @@ class controlmenu extends controlmenu_base {
         }
 
         if (array_key_exists('movesection', $merged)) {
-            unset($merged['movesection']);
+            if (!has_capability('moodle/course:movesections', $coursecontext, $user)
+                    || !has_capability('moodle/course:sectionvisibility', $coursecontext, $user)
+                    || $onsectionpage || !$usecomponents || $CFG->version < 2023042400) {
+                unset($merged['movesection']);
+            }
         }
 
         if (array_key_exists('moveup', $merged)) {
