@@ -134,6 +134,7 @@ jobs:
         if: ${{ always() }}
         run: |
           cd moodle
+          php admin/tool/phpunit/cli/init.php
           vendor/bin/phpunit --filter test_get_component_classes_in_namespace
           cd ..
 
