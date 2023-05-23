@@ -130,6 +130,13 @@ jobs:
         if: ${{ always() }}
         run: moodle-plugin-ci phpunit --fail-on-warning
 
+      - name: PHPUnit test_get_component_classes_in_namespace
+        if: ${{ always() }}
+        run: |
+          cd moodle
+          vendor/bin/phpunit --filter test_get_component_classes_in_namespace
+          cd ..
+
       - name: Behat features
         if: ${{ always() }}
         run: moodle-plugin-ci behat --profile chrome
