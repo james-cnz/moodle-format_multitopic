@@ -44,8 +44,8 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
-     * @param int $targetsectionid optional target section id
-     * @param int $targetcmid optional target cm id
+     * @param int|null $targetsectionid optional target section id
+     * @param int|null $targetcmid optional target cm id
      */
     public function section_move(
         \core_courseformat\stateupdates $updates,
@@ -122,8 +122,8 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
-     * @param int $targetsectionid optional target section id
-     * @param int $targetcmid optional target cm id
+     * @param int|null $targetsectionid optional target section id
+     * @param int|null $targetcmid optional target cm id
      */
     public function section_move_after(
         \core_courseformat\stateupdates $updates,
@@ -194,8 +194,8 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
-     * @param int $targetsectionid optional target section id
-     * @param int $targetcmid optional target cm id
+     * @param int|null $targetsectionid optional target section id
+     * @param int|null $targetcmid optional target cm id
      */
     public function fmt_section_move_into(
         \core_courseformat\stateupdates $updates,
