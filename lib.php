@@ -152,7 +152,11 @@ class format_multitopic extends core_courseformat\base {
      * @return bool if the course format uses indentation.
      */
     public function uses_indentation(): bool {
-        return false;
+        global $CFG;
+        return (($CFG->version >= 2022041907.09 && $CFG->version < 2022042000
+              || $CFG->version >= 2022112802.09 && $CFG->version < 2022112900
+              || $CFG->version >= 2023031400)
+            && get_config('format_multitopic', 'indentation')) ? true : false;
     }
 
     // INCLUDED /course/format/classes/base functions get_sections and get_section .

@@ -55,4 +55,21 @@ if ($ADMIN->fulltree) {
         0
     ));
 
+    if ($CFG->version >= 2022041907.09 && $CFG->version < 2022042000
+     || $CFG->version >= 2022112802.09 && $CFG->version < 2022112900
+     || $CFG->version >= 2023031400) {
+        if ($CFG->version < 2022112900 || $CFG->version >= 2023032200) {
+            $url = new moodle_url('/admin/course/resetindentation.php', ['format' => 'multitopic']);
+            $link = '<br />' . html_writer::link($url, get_string('resetindentation', 'admin'));
+        } else {
+            $link = '';
+        }
+        $settings->add(new admin_setting_configcheckbox(
+            'format_multitopic/indentation',
+            new lang_string('indentation', 'format_topics'),
+            new lang_string('indentation_help', 'format_topics') . $link,
+            1
+        ));
+    }
+
 }

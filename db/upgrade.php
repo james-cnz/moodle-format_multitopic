@@ -30,7 +30,7 @@
  * @return bool result
  */
 function xmldb_format_multitopic_upgrade($oldversion) {
-    global $DB;
+    global $CFG, $DB;
 
     if ($oldversion < 2020090400) {
 
@@ -60,6 +60,20 @@ function xmldb_format_multitopic_upgrade($oldversion) {
         );
 
         upgrade_plugin_savepoint(true, 2022012100, 'format', 'multitopic');
+    }
+
+    if ($oldversion < 2023051800) {                                             // TODO: Use correct version.
+        // For sites migrating from 4.0.x or 4.1.x where the indentation was removed,
+        // we are disabling 'indentation' value by default.
+        if ($oldversion >= 2022061400
+            || !($CFG->version >= 2022041907.09 && $CFG->version < 2022042000
+              || $CFG->version >= 2022112802.09 && $CFG->version < 2022112900
+              || $CFG->version >= 2023031400)) {
+            set_config('indentation', 0, 'format_multitopic');
+        } else {
+            set_config('indentation', 1, 'format_multitopic');
+        }
+        upgrade_plugin_savepoint(true, 2023051800, 'format', 'multitopic');     // TODO: Use correct version.
     }
 
     return true;
