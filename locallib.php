@@ -115,7 +115,7 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
     if (true) {                                                                 // CHANGED: We've already checked the parent exists.
         $course = is_object($courseorid) ? $courseorid : get_course($courseorid);
         rebuild_course_cache($courseid, true);                                  // ADDED.
-        format_multitopic_move_section_to($course, $cw, $section, true);        // CHANGED: Use section info instead of position.
+        format_multitopic_move_section_to($course, $cw, $section);              // CHANGED: Use section info instead of position.
         // END CHANGED.
         $cw->section = (int)$DB->get_field_sql('SELECT section from {course_sections} WHERE course = ? AND id = ?',
                                                 [$courseid, $cw->id]);          // CHANGED.
@@ -446,18 +446,19 @@ function format_multitopic_duration_as_days($duration) {
     $days = null;
     $matchok = preg_match('/^([0-9]+) (day|week|month|year)(s)?$/', $duration ?? '', $matches);
     if ($matchok) {
+        $match1 = (int)$matches[1];
         switch($matches[2]) {
             case 'day':
-                $days = $matches[1] * 1;
+                $days = $match1 * 1;
                 break;
             case 'week':
-                $days = $matches[1] * 7;
+                $days = $match1 * 7;
                 break;
             case 'month':
-                $days = $matches[1] * 30;
+                $days = $match1 * 30;
                 break;
             case 'year':
-                $days = $matches[1] * 365;
+                $days = $match1 * 365;
                 break;
             default:
                 $days = null;

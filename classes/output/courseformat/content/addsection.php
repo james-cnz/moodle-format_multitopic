@@ -40,8 +40,8 @@ class addsection extends addsection_base {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param renderer_base $output typically, the renderer that's calling this function
-     * @return stdClass data context for a mustache template
+     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): \stdClass {
 
@@ -85,7 +85,7 @@ class addsection extends addsection_base {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @param int $lastsection the last section number
      * @param int $maxsections the maximum number of sections
-     * @return stdClass data context for a mustache template
+     * @return \stdClass data context for a mustache template
      */
     protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections): \stdClass {
         $format = $this->format;

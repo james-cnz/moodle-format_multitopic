@@ -77,6 +77,9 @@ class format_multitopic extends core_courseformat\base {
 
     /** @var bool Multitopic-specific section information is complete*/
     private $fmtsectionscomplete = false;
+
+    /** @var int the current section ID */
+    public $singlesectionid;
     // END ADDED.
 
     // INCLUDED declaration /course/format/classes/base.php class base function __construct.
@@ -87,7 +90,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @param string $format
      * @param int $courseid
-     * @return course_format
+     * @return format_multitopic
      */
     protected function __construct($format, $courseid) {
         global $DB;
@@ -185,7 +188,7 @@ class format_multitopic extends core_courseformat\base {
      * - fmtdata:           Flag to indicate the presence of calculated properties
      *
      * @param bool $needall do we need all properties
-     * @return array of section_info objects
+     * @return section_info[]
      */
     final public function fmt_get_sections($needall = true) : array {
         // CHANGED LINE ABOVE.
@@ -1387,7 +1390,7 @@ class format_multitopic extends core_courseformat\base {
      * @param int $sr unused
      * @return null|array any data for the Javascript post-processor (must be json-encodeable)
      */
-    public function section_action($section, $action, $sr): array {
+    public function section_action($section, $action, $sr) {
         global $PAGE;
 
         // REMOVED: marker.

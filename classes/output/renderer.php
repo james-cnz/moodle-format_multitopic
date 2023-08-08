@@ -118,8 +118,8 @@ class renderer extends section_renderer {
     /**
      * Generate the section title.
      *
-     * @param section_info|stdClass $section The course_section entry from DB
-     * @param stdClass $course The course entry from DB
+     * @param \section_info|\stdClass $section The course_section entry from DB
+     * @param \stdClass $course The course entry from DB
      * @param bool $linkifneeded Whether to add link
      * @return string HTML to output.
      */
@@ -156,8 +156,8 @@ class renderer extends section_renderer {
     /**
      * Generate the section title to be displayed on the section page, without a link.
      *
-     * @param section_info|stdClass $section The course_section entry from DB
-     * @param int|stdClass $course The course entry from DB
+     * @param \section_info|\stdClass $section The course_section entry from DB
+     * @param int|\stdClass $course The course entry from DB
      * @return string HTML to output.
      */
     public function section_title_without_link($section, $course) : string {
@@ -173,7 +173,7 @@ class renderer extends section_renderer {
      *
      * If the format is not compatible with the course index, this method will return an empty string.
      *
-     * @param \course_courseformat\base $format the course format
+     * @param \core_courseformat\base $format the course format
      * @return String the course index HTML.
      */
     public function course_index_drawer(\core_courseformat\base $format): ?String {

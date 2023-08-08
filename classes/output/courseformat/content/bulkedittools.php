@@ -22,7 +22,7 @@ defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
-if ($CFG->version >= 2023020300.01) {
+if ($CFG->version >= 2023021000) {
 
     /**
      * Contains the bulk editor tools bar.

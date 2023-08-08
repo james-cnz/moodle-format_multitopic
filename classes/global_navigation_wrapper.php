@@ -50,12 +50,12 @@ class global_navigation_wrapper {
     // CHANGED LINE ABOVE.
 
     // ADDED.
-    /** @var global_navigation wrapped renderer */
+    /** @var \global_navigation wrapped renderer */
     private $inner;
     // END ADDED.
 
     // NOTE: We need access to these private variables, so store our own copy.
-    /** @var moodle_page The Moodle page this navigation object belongs to. */
+    /** @var \moodle_page The Moodle page this navigation object belongs to. */
     protected $innerpage;
     /** @var bool A switch for whether to show empty sections in the navigation. */
     protected $innershowemptysections = true;

@@ -40,7 +40,7 @@ use core_courseformat\output\local\content\section\summary as summary_base;
  */
 class summary extends summary_base {
 
-    /** @var section_info the course section class */
+    /** @var \section_info the course section class */
     protected $fmtsection;
 
     /**

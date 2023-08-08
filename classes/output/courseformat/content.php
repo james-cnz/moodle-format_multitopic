@@ -40,11 +40,14 @@ use \renderer_base;
  */
 class content extends content_base {
 
+    /** @var \section_info[] course sections */
+    protected $fmtsections;
+
     /**
      * Export this data so it can be used as the context for a mustache template (core/inplace_editable).
      *
      * @param renderer_base $output typically, the renderer that's calling this function
-     * @return stdClass data context for a mustache template
+     * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output) {
         global $CFG;
@@ -281,7 +284,7 @@ class content extends content_base {
         $sectionnav = new \format_multitopic\output\courseformat\content\sectionnavigation($format, $displaysection);
         $data->sectionnavigation = $sectionnav->export_for_template($output);
 
-        if ($CFG->version >= 2023020300.01 && $format->show_editor()) {
+        if ($CFG->version >= 2023021000 && $format->show_editor()) {
             $data->hasbulkedittools = true;
             $bulkedittools = new $this->bulkedittoolsclass($format);
             $data->bulkedittools = $bulkedittools->export_for_template($output);
@@ -348,8 +351,8 @@ class content extends content_base {
      * This method is used to differentiate between display a specific section
      * or a list of them.
      *
-     * @param course_modinfo $modinfo the current course modinfo object
-     * @return section_info[] an array of section_info to display
+     * @param \course_modinfo $modinfo the current course modinfo object
+     * @return \section_info[] an array of section_info to display
      */
     private function get_sections_to_display(\course_modinfo $modinfo): array {
         return $this->fmtsections;
