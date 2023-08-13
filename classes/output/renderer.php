@@ -127,7 +127,6 @@ class renderer extends section_renderer {
         // CHANGED LINE ABOVE.
 
         // ADDED.
-        /** @var \format_multitopic */
         $format = course_get_format($course);
         $section = $format->fmt_get_section($section);
 

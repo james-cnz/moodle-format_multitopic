@@ -42,7 +42,6 @@ function format_multitopic_set_section_visible(int $courseid, \stdClass $section
     $resourcestotoggle = array();
     // ADDED.
     // Fetch section info.
-    /** @var \format_multitopic */
     $format = course_get_format($courseid);
     $sections = $format->fmt_get_sections();
     $section = array_key_exists($section->id, $sections) ? $sections[$section->id] : null;
@@ -153,7 +152,6 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // REMOVED.
 
     // Get all sections for this course and re-order them.
-    /** @var \format_multitopic */
     $format = course_get_format($course);
     if (!$sections = $format->fmt_get_sections()) {                             // CHANGED.
         throw new \moodle_exception('cannotcreateorfindstructs');               // CHANGED.

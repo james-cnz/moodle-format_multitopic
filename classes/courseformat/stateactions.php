@@ -67,7 +67,6 @@ class stateactions extends \core_courseformat\stateactions {
         // Target section.
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
-        /** @var \format_multitopic */
         $format = course_get_format($course->id);
         $allsections = $format->fmt_get_sections();
         $draggedoriginsection = $allsections[$ids[0]];
@@ -146,7 +145,6 @@ class stateactions extends \core_courseformat\stateactions {
         // Target section.
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
-        /** @var \format_multitopic */
         $format = course_get_format($course->id);
         $allsections = $format->fmt_get_sections();
         if (method_exists($this, 'sort_section_ids_by_section_number')) {
@@ -219,7 +217,6 @@ class stateactions extends \core_courseformat\stateactions {
         // Target section.
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
-        /** @var \format_multitopic */
         $format = course_get_format($course->id);
         $allsections = $format->fmt_get_sections();
         if (method_exists($this, 'sort_section_ids_by_section_number')) {
@@ -281,7 +278,6 @@ class stateactions extends \core_courseformat\stateactions {
         $coursecontext = \context_course::instance($course->id);
         require_all_capabilities(['moodle/course:update', 'moodle/course:sectionvisibility'], $coursecontext);
 
-        /** @var \format_multitopic */
         $format = course_get_format($course->id);
         $allsections = $format->fmt_get_sections();
 

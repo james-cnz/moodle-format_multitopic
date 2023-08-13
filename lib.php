@@ -212,10 +212,7 @@ class format_multitopic extends core_courseformat\base {
             $sectionatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
                                         FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
-            foreach ($sections as $thissectionorig) {
-
-                /** @var \format_multitopic\section_info */
-                $thissection = $thissectionorig;
+            foreach ($sections as $thissection) {
 
                 // Check section number is not negative.
                 if ($thissection->section < 0) {
@@ -740,7 +737,7 @@ class format_multitopic extends core_courseformat\base {
             // CHANGED.
             $pageid = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
             if ($pageid != $this->fmtrootsectionid) {
-                $url->param('sectionid', $pageid);
+                $url->param('sectionid', (string)$pageid);
             }
             if ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                 if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {

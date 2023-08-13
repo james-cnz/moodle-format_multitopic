@@ -92,7 +92,6 @@ class global_navigation_wrapper {
         require_once($CFG->dirroot . '/course/lib.php');
 
         $modinfo = get_fast_modinfo($course);
-        /** @var \format_multitopic */
         $format = course_get_format($course);
         $sections = $format->fmt_get_sections();                                // CHANGED: Use custom call.
 
