@@ -85,14 +85,16 @@ class global_navigation_wrapper {
      * Generates an array of sections and an array of activities for the given course.
      *
      * @param \stdClass $course
-     * @return array Array($sections, $activities)
+     * @return array{array<int, \format_multitopic\section_info>, array<int, \stdClass>} Array($sections, $activities)
      */
     protected function generate_sections_and_activities(\stdClass $course) : array {
         global $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
 
         $modinfo = get_fast_modinfo($course);
-        $sections = course_get_format($course)->fmt_get_sections();             // CHANGED: Use custom call.
+        /** @var \format_multitopic */
+        $format = course_get_format($course);
+        $sections = $format->fmt_get_sections();                                // CHANGED: Use custom call.
 
         // For course formats using 'numsections' trim the sections list.
         // REMOVED.
@@ -146,7 +148,7 @@ class global_navigation_wrapper {
      *
      * @param \stdClass $course
      * @param \navigation_node $coursenode
-     * @return array An array of course section nodes
+     * @return array<int, \section_info> An array of course section nodes
      */
     public function load_generic_course_sections(\stdClass $course, \navigation_node $coursenode) : array {
         global $CFG, $SITE;                                                     // CHANGED: Removed $DB and $USER.
@@ -235,9 +237,10 @@ class global_navigation_wrapper {
      *
      * @param \navigation_node $sectionnode
      * @param \section_info $section
-     * @param array $activities An array of activites as returned by see global_navigation::generate_sections_and_activities()
+     * @param array<int,\stdClass> $activities An array of activites
+     *          as returned by see global_navigation::generate_sections_and_activities()
      * @param \stdClass $course The course object the section and activities relate to.
-     * @return array Array of activity nodes
+     * @return array<int, \navigation_node> Array of activity nodes
      */
     protected function load_section_activities(\navigation_node $sectionnode, \section_info $section, array $activities,
                                                 \stdClass $course = null) : array {

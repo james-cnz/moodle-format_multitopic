@@ -127,7 +127,9 @@ class renderer extends section_renderer {
         // CHANGED LINE ABOVE.
 
         // ADDED.
-        $section = course_get_format($course)->fmt_get_section($section);
+        /** @var \format_multitopic */
+        $format = course_get_format($course);
+        $section = $format->fmt_get_section($section);
 
         // Date range for the topic, to be placed under the title.
         $datestring = '';
@@ -157,7 +159,7 @@ class renderer extends section_renderer {
      * Generate the section title to be displayed on the section page, without a link.
      *
      * @param \section_info|\stdClass $section The course_section entry from DB
-     * @param int|\stdClass $course The course entry from DB
+     * @param \stdClass $course The course entry from DB
      * @return string HTML to output.
      */
     public function section_title_without_link($section, $course) : string {

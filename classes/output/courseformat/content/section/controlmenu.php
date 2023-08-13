@@ -40,12 +40,15 @@ use core_courseformat\output\local\content\section\controlmenu as controlmenu_ba
  */
 class controlmenu extends controlmenu_base {
 
+    /** @var \format_multitopic the course format class */
+    protected $format;
+
     /**
      * Generate the edit control items of a section.
      *
      * This method must remain public until the final deprecation of section_edit_control_items.
      *
-     * @return array of edit control items
+     * @return array<string, array<string, mixed>> array of edit control items
      */
     public function section_control_items() {
         global $USER, $CFG;
@@ -110,7 +113,7 @@ class controlmenu extends controlmenu_base {
 
                 $url = clone($baseurl);
                 // CHANGED: Replaced up with previous.
-                if (isset($section->prevupid) && $section->prevupid != course_get_format($course)->fmtrootsectionid) {
+                if (isset($section->prevupid) && $section->prevupid != $format->fmtrootsectionid) {
                         // Add a arrow to move section back.
                     $url->param('sectionid', $section->id);
                     $url->param('destnextupid', $section->prevupid);

@@ -36,7 +36,7 @@ class coursecontentheaderfooter implements \renderable {
 
     /** @var int -1 for header, 1 for footer */
     private $pos;
-    /** @var \moodle_url URL for relevant course section */
+    /** @var ?\moodle_url URL for relevant course section */
     private $sectionurl;
 
     /**

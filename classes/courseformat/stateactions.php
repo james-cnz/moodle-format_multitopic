@@ -44,8 +44,8 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
-     * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
+     * @param ?int $targetsectionid optional target section id
+     * @param ?int $targetcmid optional target cm id
      */
     public function section_move(
         \core_courseformat\stateupdates $updates,
@@ -67,6 +67,7 @@ class stateactions extends \core_courseformat\stateactions {
         // Target section.
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
+        /** @var \format_multitopic */
         $format = course_get_format($course->id);
         $allsections = $format->fmt_get_sections();
         $draggedoriginsection = $allsections[$ids[0]];
@@ -122,8 +123,8 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
-     * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
+     * @param ?int $targetsectionid optional target section id
+     * @param ?int $targetcmid optional target cm id
      */
     public function section_move_after(
         \core_courseformat\stateupdates $updates,
@@ -145,6 +146,7 @@ class stateactions extends \core_courseformat\stateactions {
         // Target section.
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
+        /** @var \format_multitopic */
         $format = course_get_format($course->id);
         $allsections = $format->fmt_get_sections();
         if (method_exists($this, 'sort_section_ids_by_section_number')) {
@@ -194,8 +196,8 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
-     * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
+     * @param ?int $targetsectionid optional target section id
+     * @param ?int $targetcmid optional target cm id
      */
     public function fmt_section_move_into(
         \core_courseformat\stateupdates $updates,
@@ -217,6 +219,7 @@ class stateactions extends \core_courseformat\stateactions {
         // Target section.
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
+        /** @var \format_multitopic */
         $format = course_get_format($course->id);
         $allsections = $format->fmt_get_sections();
         if (method_exists($this, 'sort_section_ids_by_section_number')) {
@@ -273,11 +276,12 @@ class stateactions extends \core_courseformat\stateactions {
         \stdClass $course,
         array $ids,
         int $visible
-    ) {
+    ) : void {
         $this->validate_sections($course, $ids, __FUNCTION__);
         $coursecontext = \context_course::instance($course->id);
         require_all_capabilities(['moodle/course:update', 'moodle/course:sectionvisibility'], $coursecontext);
 
+        /** @var \format_multitopic */
         $format = course_get_format($course->id);
         $allsections = $format->fmt_get_sections();
 

@@ -40,13 +40,16 @@ use \renderer_base;
  */
 class content extends content_base {
 
-    /** @var \section_info[] course sections */
+    /** @var \format_multitopic the course format class */
+    protected $format;
+
+    /** @var \format_multitopic\section_info[] course sections */
     protected $fmtsections;
 
     /**
      * Export this data so it can be used as the context for a mustache template (core/inplace_editable).
      *
-     * @param renderer_base $output typically, the renderer that's calling this function
+     * @param \core_renderer $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output) {
@@ -297,7 +300,7 @@ class content extends content_base {
      * Export sections array data.
      *
      * @param renderer_base $output typically, the renderer that's calling this function
-     * @return array data context for a mustache template
+     * @return object[] data context for a mustache template
      */
     protected function export_sections(\renderer_base $output): array {
 
@@ -352,7 +355,7 @@ class content extends content_base {
      * or a list of them.
      *
      * @param \course_modinfo $modinfo the current course modinfo object
-     * @return \section_info[] an array of section_info to display
+     * @return \format_multitopic\section_info[] an array of section_info to display
      */
     private function get_sections_to_display(\course_modinfo $modinfo): array {
         return $this->fmtsections;

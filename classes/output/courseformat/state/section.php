@@ -35,6 +35,12 @@ use context_course;
  */
 class section extends base_section {
 
+    /** @var \format_multitopic the course format class */
+    protected $format;
+
+    /** @var \format_multitopic\section_info the section info */
+    protected $section;
+
     /**
      * Export this data so it can be used as state object in the course editor.
      *

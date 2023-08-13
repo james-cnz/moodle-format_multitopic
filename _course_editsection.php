@@ -48,7 +48,9 @@ $context = \context_course::instance($course->id);
 require_capability('moodle/course:update', $context);
 
 // Get section_info object with all availability options.
-$sectioninfo = course_get_format($course)->fmt_get_section($section);           // CHANGED: Use custom function, pass section info.
+/** @var \format_multitopic */
+$courseformat = course_get_format($course);
+$sectioninfo = $courseformat->fmt_get_section($section);                        // CHANGED: Use custom function, pass section info.
 
 // Deleting the section.
 if ($deletesection) {

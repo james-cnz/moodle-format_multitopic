@@ -32,13 +32,13 @@ namespace format_multitopic;
 class courseheader implements \renderable {
     // See https://docs.moodle.org/dev/Course_formats#Additional_footer_or_header_on_any_page_inside_the_course .
 
-    /** @var \moodle_url|null course image URL */
+    /** @var ?\moodle_url course image URL */
     private $imageurl;
-    /** @var string|null course image name */
+    /** @var ?string course image name */
     private $imagename;
-    /** @var string|null course image author's name, optionally followed by vertical bar and URL */
+    /** @var ?string course image author's name, optionally followed by vertical bar and URL */
     private $authorwithurl;
-    /** @var string|null course image licence */
+    /** @var ?string course image licence */
     private $licencecode;
     /** @var int how far down the course image (in percent) to take the banner slice from */
     private $bannerslice;

@@ -69,9 +69,9 @@ function xmldb_format_multitopic_upgrade($oldversion) {
             || !($CFG->version >= 2022041907.09 && $CFG->version < 2022042000
               || $CFG->version >= 2022112802.09 && $CFG->version < 2022112900
               || $CFG->version >= 2023031400)) {
-            set_config('indentation', 0, 'format_multitopic');
+            set_config('indentation', (string)0, 'format_multitopic');
         } else {
-            set_config('indentation', 1, 'format_multitopic');
+            set_config('indentation', (string)1, 'format_multitopic');
         }
         upgrade_plugin_savepoint(true, 2023072900, 'format', 'multitopic');
     }

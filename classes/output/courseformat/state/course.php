@@ -34,15 +34,15 @@ require_once(__DIR__ . '/../../../../lib.php');
  */
 class course extends base_course {
 
-    /** @var course_format the course format class */
+    /** @var \format_multitopic the course format class */
     protected $format;
 
     /**
      * Constructor.
      *
-     * @param course_format $format the course format
+     * @param \format_multitopic $format the course format
      */
-    public function __construct(course_format $format) {
+    public function __construct(\format_multitopic $format) {
         $this->format = $format;
     }
 

@@ -37,6 +37,9 @@ use core_courseformat\output\local\content\addsection as addsection_base;
  */
 class addsection extends addsection_base {
 
+    /** @var \format_multitopic the course format class */
+    protected $format;
+
     /**
      * Export this data so it can be used as the context for a mustache template.
      *

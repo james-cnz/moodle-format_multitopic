@@ -38,6 +38,12 @@ use core_courseformat\base as course_format;
  */
 class section extends section_base {
 
+    /** @var \format_multitopic the course format */
+    protected $format;
+
+    /** @var \format_multitopic\section_info the section info */
+    protected $section;
+
     // ADDED.
     /**
      * Constructor.
@@ -54,7 +60,7 @@ class section extends section_base {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param \core_course_renderer $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): \stdClass {
@@ -156,7 +162,7 @@ class section extends section_base {
      * Add the section editor attributes to the data structure.
      *
      * @param \stdClass $data the current cm data reference
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param \core_course_renderer $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
     protected function add_editor_data(\stdClass &$data, \renderer_base $output): bool {

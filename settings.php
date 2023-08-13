@@ -52,7 +52,7 @@ if ($ADMIN->fulltree) {
         'format_multitopic/weeks_partial',
         new lang_string('weeks_partial',    'format_multitopic'),
         new lang_string('weeks_partial_desc', 'format_multitopic'),
-        0
+        (string)0
     ));
 
     if ($CFG->version >= 2022041907.09 && $CFG->version < 2022042000
@@ -68,7 +68,7 @@ if ($ADMIN->fulltree) {
             'format_multitopic/indentation',
             new lang_string('indentation', 'format_topics'),
             new lang_string('indentation_help', 'format_topics') . $link,
-            1
+            (string)1
         ));
     }
 

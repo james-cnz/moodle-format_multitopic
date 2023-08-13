@@ -36,20 +36,20 @@ use stdClass;
  *
  * @package   format_multitopic
  * @copyright 2022 Te Wānanga o Aotearoa
- * @author Jeremy FitzPatrick
+ * @author    Jeremy FitzPatrick
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class sectionnavigation extends sectionnavigation_base {
 
     use courseformat_named_templatable;
 
-    /** @var course_format the course format class */
+    /** @var \format_multitopic the course format class */
     protected $format;
 
     /** @var int the course displayed section number */
     protected $sectionno;
 
-    /** @var stdClass the course displayed section */
+    /** @var \format_multitopic\section_info the course displayed section */
     protected $section;
 
     /** @var stdClass the calculated data to prevent calculations when rendered several times */
@@ -58,10 +58,10 @@ class sectionnavigation extends sectionnavigation_base {
     /**
      * Constructor.
      *
-     * @param course_format $format the course format
-     * @param stdClass $section section info
+     * @param \format_multitopic $format the course format
+     * @param \format_multitopic\section_info $section section info
      */
-    public function __construct(course_format $format, $section) {
+    public function __construct(\format_multitopic $format, $section) {
         $this->format = $format;
         $section = $format->fmt_get_section($section);
         $this->section = $section;
@@ -71,7 +71,7 @@ class sectionnavigation extends sectionnavigation_base {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param \core_renderer $output typically, the renderer that's calling this function
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): stdClass {

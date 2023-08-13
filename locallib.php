@@ -42,7 +42,9 @@ function format_multitopic_set_section_visible(int $courseid, \stdClass $section
     $resourcestotoggle = array();
     // ADDED.
     // Fetch section info.
-    $sections = course_get_format($courseid)->fmt_get_sections();
+    /** @var \format_multitopic */
+    $format = course_get_format($courseid);
+    $sections = $format->fmt_get_sections();
     $section = array_key_exists($section->id, $sections) ? $sections[$section->id] : null;
     // We will recurse if setting visibility to hidden, because hidden sections should not contain visible sections.
     $recurse = ($visibility == 0);
@@ -134,10 +136,10 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
  * Moves sections within a course, from a position to another.
  *
  * @param \stdClass $course
- * @param \stdClass|\section_info|array $origins The section(s) to be moved.  Must specify id.
+ * @param \section_info|array<\section_info> $origins The section(s) to be moved.  Must specify id.
  * @param \stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
  */
-function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClass $destination) {
+function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClass $destination) : void {
     // CHANGED LINE ABOVE: Use section info instead of number.  Removed $ignorenumsections param.  No return value (use exceptions).
     // Moves course sections within the course.
     // CHANGES THROUGHOUT: Use section info instead of number.
@@ -151,7 +153,9 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // REMOVED.
 
     // Get all sections for this course and re-order them.
-    if (!$sections = course_get_format($course)->fmt_get_sections()) {          // CHANGED.
+    /** @var \format_multitopic */
+    $format = course_get_format($course);
+    if (!$sections = $format->fmt_get_sections()) {                             // CHANGED.
         throw new \moodle_exception('cannotcreateorfindstructs');               // CHANGED.
     }
 
@@ -250,10 +254,10 @@ function format_multitopic_course_can_delete_section(\stdClass $course, \section
  * Reordering algorithm for course sections. Given an array of sections indexed by section->id,
  * origins, and a target, rebuilds the array.
  *
- * @param array $sections The list of sections.  Must specify fmt calculated properties.
- * @param \stdClass|\section_info|array $origins The section(s) to be moved.  Must specify id.
+ * @param \format_multitopic\section_info[] $sections The list of sections.  Must specify fmt calculated properties.
+ * @param \section_info|array<\section_info> $origins The section(s) to be moved.  Must specify id.
  * @param \stdClass $target The destination.  Must specify parentid, prevupid, or nextupid.  May specify level.
- * @return array
+ * @return \stdClass[]
  */
 function format_multitopic_reorder_sections(array $sections, $origins, \stdClass $target) : array {
     // CHANGED THROUGHOUT: Section numbers changed to IDs, used exceptions instead of returning false.
@@ -401,9 +405,9 @@ function format_multitopic_reorder_sections(array $sections, $origins, \stdClass
 /**
  * Generate attribution string from info
  *
- * @param string|null $imagename
- * @param string|null $authorwithurl
- * @param string|null $licencecode
+ * @param ?string $imagename
+ * @param ?string $authorwithurl
+ * @param ?string $licencecode
  * @return string
  */
 function format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode) : string {
@@ -439,8 +443,8 @@ function format_multitopic_image_attribution($imagename, $authorwithurl, $licenc
  * Convert duration string to days.
  * Note: Doesn't handle months or years correctly.
  *
- * @param string|null $duration
- * @return int|null
+ * @param ?string $duration
+ * @return ?int
  */
 function format_multitopic_duration_as_days($duration) {
     $days = null;
@@ -509,7 +513,7 @@ function format_multitopic_week_date($date) {
 
     $result = new \stdClass();
     $result->o = $y;                                    // Year.
-    $result->W = str_pad($woy, 2, "0", STR_PAD_LEFT);   // Week of year.
+    $result->W = str_pad((string)$woy, 2, "0", STR_PAD_LEFT); // Week of year.
     $result->N = $dow;                                  // Day of week (number).
     $result->D = $down;                                 // Day of week (name).
     return $result;

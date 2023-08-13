@@ -69,10 +69,10 @@ class format_multitopic extends core_courseformat\base {
     /** @var int ID of section 0 / the General section, treated as the section root by the Multitopic format */
     public $fmtrootsectionid;
 
-    /** @var stdClass Multitopic-specific section information */
+    /** @var ?\format_multitopic\section_info[] Multitopic-specific section information */
     private $fmtsections = null;
 
-    /** @var course_modinfo|null Mod info the Multitopic-specific section information was based on */
+    /** @var ?course_modinfo Mod info the Multitopic-specific section information was based on */
     private $fmtmodinfo = null;
 
     /** @var bool Multitopic-specific section information is complete*/
@@ -167,28 +167,9 @@ class format_multitopic extends core_courseformat\base {
      * Returns a list of sections used in the course.
      *
      * CHANGED: Indexed by ID, with calculated properties:
-     * - levelsan:          Sanatised section level
-     * - parentid:          ID of section's parent (previous section at a higher level)
-     * - prevupid:          ID of the previous section at the same or higher level
-     * - prevpageid:        ID of the previous section above topic level
-     * - prevanyid:         ID of the previous section at any level
-     * - nextupid:          ID of the next section at the same or higher level
-     * - nextpageid:        ID of the next section above topic level
-     * - nextanyid:         ID of the next section at any level
-     * - hassubsections:    Whether this section has subsections
-     * - pagedepth:         The lowest level of subpages
-     * - pagedepthdirect:   The lowest level of shown direct subpages
-     * - parentvisiblesan:  Sanatised parent's visibility
-     * - visiblesan:        Sanatised visibility
-     * - datestart:         Section's start date
-     * - dateend:           Section's end date
-     * - currentnestedlevel: The level down to which this section contains the current section.
-     *                      A page-level section may be represented as multiple levels of tabs,
-     *                      and higher levels may contain the current section, while lower levels don't.
-     * - fmtdata:           Flag to indicate the presence of calculated properties
      *
      * @param bool $needall do we need all properties
-     * @return section_info[]
+     * @return array<int, \format_multitopic\section_info>
      */
     final public function fmt_get_sections($needall = true) : array {
         // CHANGED LINE ABOVE.
@@ -231,7 +212,10 @@ class format_multitopic extends core_courseformat\base {
             $sectionatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
                                         FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
-            foreach ($sections as $thissection) {
+            foreach ($sections as $thissectionorig) {
+
+                /** @var \format_multitopic\section_info */
+                $thissection = $thissectionorig;
 
                 // Check section number is not negative.
                 if ($thissection->section < 0) {
@@ -387,9 +371,9 @@ class format_multitopic extends core_courseformat\base {
      * NOTE: If passed section info with calculated properties already in place, they will be returned as is.
      * see fmt_get_sections() for details of calculated properties.
      *
-     * @param int|stdClass $section either section number (field course_section.section) or row from course_section table
+     * @param int|stdClass|\section_info $section section number (field course_section.section) or row from course_section table
      * @param int $strictness
-     * @return section_info
+     * @return \format_multitopic\section_info
      */
     final public function fmt_get_section($section, int $strictness = IGNORE_MISSING) {
         // CHANGED: Convert from section number to section info, rather than the other way around.
@@ -504,7 +488,7 @@ class format_multitopic extends core_courseformat\base {
      * If the section number is not 0, the base implementation of course_format::get_default_section_name which uses
      * the string with the key = 'sectionname' from the course format's lang file + the section number will be used.
      *
-     * @param stdClass $section Section object from database or just field course_sections section
+     * @param stdClass|\section_info $section Section object from database or just field course_sections section
      * @return string The default value for the section name.
      */
     public function get_default_section_name($section) : string {
@@ -544,7 +528,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Return the format section preferences.
      *
-     * @return array of preferences indexed by section ID
+     * @return array<int, \stdClass> array of preferences indexed by section ID
      */
     public function get_sections_preferences(): array {
 
@@ -582,7 +566,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Return the format section preferences.
      *
-     * @return array of preferences indexed by preference name
+     * @return array<string, int[]> array of preferences indexed by preference name
      */
     public function get_sections_preferences_by_preference(): array {
         return $this->fmt_set_get_sections_preferences();
@@ -593,9 +577,8 @@ class format_multitopic extends core_courseformat\base {
      *
      * @param string $preferencename preference name
      * @param int[] $sectionids affected section IDs
-     *
      */
-    public function set_sections_preference(string $preferencename, array $sectionids) {
+    public function set_sections_preference(string $preferencename, array $sectionids) : void {
         $this->fmt_set_get_sections_preferences($preferencename, $sectionids);
     }
 
@@ -604,8 +587,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @param string $preferencename preference name
      * @param int[] $sectionids affected section IDs
-     * @return array of preferences indexed by section ID
-     *
+     * @return array<string, int[]> array of preferences indexed by preference name
      */
     protected function fmt_set_get_sections_preferences(string $preferencename = null, array $sectionids = null): array {
 
@@ -724,10 +706,9 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Set the format section preferences, given all preferences indexed by preference.
      *
-     * @param array $sectionpreferences of preferences indexed by preference
-     *
+     * @param array<string, int[]> $sectionpreferences of preferences indexed by preference
      */
-    protected function fmt_set_sections_preferences_sub(array $sectionpreferences) {
+    protected function fmt_set_sections_preferences_sub(array $sectionpreferences) : void {
         global $USER;
         $course = $this->get_course();
         set_user_preference('coursesectionspreferences_' . $course->id, json_encode($sectionpreferences), $USER->id);
@@ -742,10 +723,10 @@ class format_multitopic extends core_courseformat\base {
      * @param int|stdClass $section Section object from database or just field course_sections.section
      *                      Should specify fmt calculated properties,
      *                      specifically levelsan, and parentid where levelsan is topic level.
-     * @param array $options options for view URL. At the moment core uses:
+     * @param array<string, mixed> $options options for view URL. At the moment we use:
      *     'fmtedit' (bool)    if true, return URL for edit page rather than view page
      *     'navigation' (bool) if true and section has no separate page, the function returns null
-     * @return null|moodle_url
+     * @return ?moodle_url
      */
     public function get_view_url($section, $options = []) {
         global $CFG;
@@ -841,7 +822,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * Used in course/rest.php
      *
-     * @return array This will be passed in ajax respose
+     * @return array<string, mixed> This will be passed in ajax respose
      */
     public function ajax_section_move() : array {
         global $PAGE;
@@ -865,7 +846,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Returns the list of blocks to be automatically added for the newly created course.
      *
-     * @return array of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
+     * @return array<string, string[]> of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
      *     each of values is an array of block names (for left and right side columns)
      */
     public function get_default_blocks() : array {
@@ -884,7 +865,7 @@ class format_multitopic extends core_courseformat\base {
      * - bannerslice (custom option): how far down the course image to take the banner slice from (0-100).
      *
      * @param bool $foreditform
-     * @return array of options
+     * @return array<string, array<string, mixed>> of options
      */
     public function course_format_options($foreditform = false) : array {
         static $courseformatoptions = false;
@@ -1012,7 +993,7 @@ class format_multitopic extends core_courseformat\base {
      * $this->get_format_options($section);
      *
      * @param bool $foreditform
-     * @return array
+     * @return array<string, array<string, mixed>>
      */
     public function section_format_options($foreditform = false) : array {
         // INCLUDED instead /course/format/topics/lib.php function course_format_options body (excluding array items).
@@ -1112,7 +1093,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @param MoodleQuickForm $mform form the elements are added to.
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
-     * @return array array of references to the added form elements.
+     * @return HTMLPurifier_ElementDef[] array of references to the added form elements.
      */
     public function create_edit_form_elements(&$mform, $forsection = false) : array {
         $elements = parent::create_edit_form_elements($mform, $forsection);
@@ -1172,7 +1153,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Create course header: A banner showing the course name, with a slice of the course image as the background.
      *
-     * @return null|renderable
+     * @return ?renderable
      */
     public function course_header() {
         // REMOVED: Removed empty function body.
@@ -1186,7 +1167,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Create course content header when applicable: A "back to course" button.
      *
-     * @return renderable|null
+     * @return ?renderable
      */
     public function course_content_header() {
         global $PAGE;
@@ -1204,7 +1185,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Create course content footer when applicable: Another "back to course" button.
      *
-     * @return renderable|null
+     * @return ?renderable
      */
     public function course_content_footer() {
         global $PAGE;
@@ -1267,7 +1248,7 @@ class format_multitopic extends core_courseformat\base {
      * @param bool $available the 'available' propery of the section_info as it was evaluated by conditional availability.
      * @param string $availableinfo the 'availableinfo' propery of the section_info as it was evaluated by conditional availability.
      */
-    public function section_get_available_hook(section_info $section, &$available, &$availableinfo) {
+    public function section_get_available_hook(section_info $section, &$available, &$availableinfo) : void {
         $sections = $this->fmt_get_sections(false);
         $parentid = $sections[$section->id]->parentid;
         if (isset($parentid)) {
@@ -1388,7 +1369,7 @@ class format_multitopic extends core_courseformat\base {
      * @param section_info|stdClass $section
      * @param string $action
      * @param int $sr unused
-     * @return null|array any data for the Javascript post-processor (must be json-encodeable)
+     * @return null|array<string, mixed> any data for the Javascript post-processor (must be json-encodeable)
      */
     public function section_action($section, $action, $sr) {
         global $PAGE;
@@ -1396,7 +1377,7 @@ class format_multitopic extends core_courseformat\base {
         // REMOVED: marker.
 
         // For show/hide actions call the parent method and return the new content for .section_availability element.
-        $rv = parent::section_action($section, $action, null);                  // CHANGED: removed section return.
+        $rv = parent::section_action($section, $action, 0);                     // CHANGED: removed section return.
         $renderer = $PAGE->get_renderer('format_multitopic');                   // CHANGED.
 
         if (!($section instanceof section_info)) {
@@ -1413,12 +1394,14 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Return the plugin configs for external functions.
      *
-     * @return array the list of configuration settings
+     * @return array<string, mixed> the list of configuration settings
      * @since Moodle 3.5
      */
     public function get_config_for_external() : array {
         // Return everything (nothing to hide).
-        return $this->get_format_options();
+        $formatoptions = $this->get_format_options();
+        $formatoptions['indentation'] = get_config('format_multitopic', 'indentation');
+        return $formatoptions;
     }
 }
 
