@@ -273,7 +273,7 @@ class stateactions extends \core_courseformat\stateactions {
         \stdClass $course,
         array $ids,
         int $visible
-    ) : void {
+    ): void {
         $this->validate_sections($course, $ids, __FUNCTION__);
         $coursecontext = \context_course::instance($course->id);
         require_all_capabilities(['moodle/course:update', 'moodle/course:sectionvisibility'], $coursecontext);

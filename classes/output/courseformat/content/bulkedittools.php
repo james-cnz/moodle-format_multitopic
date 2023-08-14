@@ -40,7 +40,7 @@ if ($CFG->version >= 2023021000) {
          * Format plugins can override the method to add or remove elements
          * from the toolbar.
          *
-         * @return array<string, array<string, string>> of edit control items
+         * @return array<string,array<string,string>> of edit control items
          */
         protected function section_control_items(): array {
             global $USER;
