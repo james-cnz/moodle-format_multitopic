@@ -1,0 +1,18 @@
+includes:
+    - ../../../phpstan.neon.dist
+parameters:
+    scanFiles:
+        - ../../../config.php
+        - ../../../backup/util/helper/async_helper.class.php
+        - ../../../calendar/lib.php
+        - ../../../lib/completionlib.php
+        - ../../../lib/filelib.php
+        - ../../../lib/formslib.php
+        - ../../lib.php
+        - ../lib.php
+        - format.php
+        - lib.php
+        - locallib.php
+        - classes/global_navigation_wrapper.php
+        - classes/courseheader.php
+        - classes/coursecontentheaderfooter.php
