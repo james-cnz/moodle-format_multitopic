@@ -37,7 +37,8 @@
  */
 function format_multitopic_set_section_visible(int $courseid, \stdClass $section, int $visibility): array {
     // CHANGED LINE ABOVE: Use sectioninfo, not section number.
-    global $DB;
+    global $CFG, $DB;
+    require_once($CFG->dirroot . '/course/lib.php');
 
     $resourcestotoggle = array();
     // ADDED.
@@ -142,7 +143,8 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // CHANGED LINE ABOVE: Use section info instead of number.  Removed $ignorenumsections param.  No return value (use exceptions).
     // Moves course sections within the course.
     // CHANGES THROUGHOUT: Use section info instead of number.
-    global $DB;                                                                 // CHANGED: Removed $USER.
+    global $CFG, $DB;                                                           // CHANGED: Removed $USER.
+    require_once($CFG->dirroot . '/course/lib.php');
 
     if (!isset($destination)) {                                                 // CHANGED.
         throw new \moodle_exception('sectionnotexist');                         // CHANGED.
@@ -221,6 +223,9 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
  */
 function format_multitopic_course_can_delete_section(\stdClass $course, \section_info $section): bool {
     // CHANGED LINE ABOVE.
+    global $CFG;
+    require_once($CFG->dirroot . '/course/lib.php');
+
     // REMOVED: extract number from section parameter.
     if (!$section->section) {                                                   // CHANGED: Check inside section info.
         // Not possible to delete 0-section.

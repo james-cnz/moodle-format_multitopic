@@ -60,6 +60,9 @@ class summary extends summary_base {
      * @return string HTML to output.
      */
     public function format_summary_text(): string {
+        // global $CFG;
+        // require_once($CFG->dirroot . '/lib/filelib.php');
+
         $section = $this->fmtsection;
         $context = context_course::instance($section->course);
 

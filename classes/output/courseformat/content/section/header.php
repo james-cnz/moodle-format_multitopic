@@ -27,6 +27,8 @@ namespace format_multitopic\output\courseformat\content\section;
 
 use core_courseformat\output\local\content\section\header as header_base;
 
+require_once ($CFG->dirroot . '/course/format/multitopic/lib.php');
+
 /**
  * Base class to render a section header.
  *
@@ -36,9 +38,6 @@ use core_courseformat\output\local\content\section\header as header_base;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class header extends header_base {
-
-    /** @var \format_multitopic\section_info the course section class */
-    protected $section;
 
     /**
      * Export this data so it can be used as the context for a mustache template.

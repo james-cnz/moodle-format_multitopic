@@ -43,16 +43,13 @@ class sectionnavigation extends sectionnavigation_base {
 
     use courseformat_named_templatable;
 
-    /** @var \format_multitopic the course format class */
-    protected $format;
-
     /** @var int the course displayed section number */
     protected $sectionno;
 
     /** @var \format_multitopic\section_info the course displayed section */
     protected $section;
 
-    /** @var stdClass the calculated data to prevent calculations when rendered several times */
+    /** @var ?stdClass the calculated data to prevent calculations when rendered several times */
     private $data = null;
 
     /**
@@ -75,7 +72,8 @@ class sectionnavigation extends sectionnavigation_base {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): stdClass {
-        global $USER;
+        global $CFG, $USER;
+        require_once($CFG->dirroot . '/course/lib.php');
 
         if ($this->data !== null) {
             return $this->data;

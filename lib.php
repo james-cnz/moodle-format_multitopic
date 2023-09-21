@@ -31,9 +31,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/lib.php');
 // ADDED.
 require_once(__DIR__ . '/locallib.php');
-require_once(__DIR__ . '/classes/global_navigation_wrapper.php');
-require_once(__DIR__ . '/classes/courseheader.php');
-require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 // END ADDED.
 
 use core\output\inplace_editable;

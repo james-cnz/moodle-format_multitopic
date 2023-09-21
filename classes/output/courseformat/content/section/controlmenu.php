@@ -52,6 +52,7 @@ class controlmenu extends controlmenu_base {
      */
     public function section_control_items() {
         global $USER, $CFG;
+        require_once($CFG->dirroot . '/course/lib.php');
 
         $format = $this->format;
         $section = $format->fmt_get_section($this->section);                    // CHANGED.

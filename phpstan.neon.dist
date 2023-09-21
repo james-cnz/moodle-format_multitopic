@@ -3,7 +3,10 @@ includes:
 parameters:
     scanFiles:
         - ../../../config.php
+        - ../../../backup/moodle2/restore_format_plugin.class.php
+        - ../../../backup/moodle2/restore_plugin.class.php
         - ../../../backup/util/helper/async_helper.class.php
+        - ../../../backup/util/structure/restore_path_element.class.php
         - ../../../calendar/lib.php
         - ../../../lib/completionlib.php
         - ../../../lib/filelib.php
@@ -13,6 +16,3 @@ parameters:
         - format.php
         - lib.php
         - locallib.php
-        - classes/global_navigation_wrapper.php
-        - classes/courseheader.php
-        - classes/coursecontentheaderfooter.php
