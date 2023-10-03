@@ -35,12 +35,12 @@ $id = required_param('id', PARAM_INT);    // Course_sections.id .
 // REMOVED $sectionreturn .
 $deletesection = optional_param('delete', 0, PARAM_BOOL);
 
-$PAGE->set_url('/course/format/multitopic/_course_editsection.php', array('id' => $id));
+$PAGE->set_url('/course/format/multitopic/_course_editsection.php', ['id' => $id]);
 // CHANGED LINE ABOVE: Custom script, and omit $sectionreturn.
 // NOTE: Can't revert this without changing reference to $PAGE->url ?
 
-$section = $DB->get_record('course_sections', array('id' => $id), '*', MUST_EXIST);
-$course = $DB->get_record('course', array('id' => $section->course), '*', MUST_EXIST);
+$section = $DB->get_record('course_sections', ['id' => $id], '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $section->course], '*', MUST_EXIST);
 // REMOVED sectionnum .
 
 require_login($course);
@@ -84,7 +84,7 @@ if ($deletesection) {
             $PAGE->set_heading($course->fullname);
             echo $OUTPUT->header();
             echo $OUTPUT->box_start('noticebox');
-            $optionsyes = array('id' => $id, 'confirm' => 1, 'delete' => 1, 'sesskey' => sesskey());
+            $optionsyes = ['id' => $id, 'confirm' => 1, 'delete' => 1, 'sesskey' => sesskey()];
             $deleteurl = new \moodle_url('/course/format/multitopic/_course_editsection.php', $optionsyes);
             // CHANGED LINE ABOVE: Custom script.
             $formcontinue = new \single_button($deleteurl, get_string('delete'));
@@ -100,23 +100,23 @@ if ($deletesection) {
     }
 }
 
-$editoroptions = array(
+$editoroptions = [
     'context' => $context,
     'maxfiles' => EDITOR_UNLIMITED_FILES,
     'maxbytes' => $CFG->maxbytes,
     'trusttext' => false,
     'noclean' => true,
-    'subdirs' => true
-);
+    'subdirs' => true,
+];
 
 $courseformat = course_get_format($course);
 $defaultsectionname = $courseformat->get_default_section_name($sectioninfo);    // CHANGED: Use custom section info.
 
-$customdata = array(
+$customdata = [
     'cs' => $sectioninfo,
     'editoroptions' => $editoroptions,
-    'defaultsectionname' => $defaultsectionname
-);
+    'defaultsectionname' => $defaultsectionname,
+];
 $mform = $courseformat->editsection_form($PAGE->url, $customdata);
 
 // Set current value, make an editable copy of section_info object.

@@ -75,7 +75,7 @@ class section extends section_base {
             'highlightedlabel' => $format->get_section_highlighted_name(),
             'sitehome' => $course->id == SITEID,
             'editing' => $PAGE->user_is_editing(),
-            'levelsan' => $section->levelsan
+            'levelsan' => $section->levelsan,
         ];
 
         $haspartials = [];

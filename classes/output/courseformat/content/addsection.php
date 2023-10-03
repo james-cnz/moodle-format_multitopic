@@ -104,7 +104,7 @@ class addsection extends addsection_base {
                     'sesskey' => sesskey(),
                     'returnurl' => new \moodle_url("/course/view.php?id={$course->id}"
                         . (($format->singlesectionid != $format->fmtrootsectionid) ?
-                        "&sectionid={$format->singlesectionid}" : ""))];
+                        "&sectionid={$format->singlesectionid}" : "")), ];
 
         // REMOVED section return.
 

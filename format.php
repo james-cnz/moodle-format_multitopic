@@ -47,7 +47,7 @@ $renderer = $PAGE->get_renderer('format_multitopic');
 // ADDED.
 if ($sectionid) {
     $displaysection = $DB->get_record('course_sections',
-                            array('id' => $sectionid, 'course' => $course->id), '*', MUST_EXIST);
+                            ['id' => $sectionid, 'course' => $course->id], '*', MUST_EXIST);
 }
 // END ADDED.
 if (isset($displaysection)) {

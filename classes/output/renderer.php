@@ -176,7 +176,7 @@ class renderer extends section_renderer {
      * @param \core_courseformat\base $format the course format
      * @return String the course index HTML.
      */
-    public function course_index_drawer(\core_courseformat\base $format): ?String {
+    public function course_index_drawer(\core_courseformat\base $format): String {
         if ($format->uses_course_index()) {
             include_course_editor($format);
             return $this->render_from_template('format_multitopic/courseformat/courseindex/drawer', []);

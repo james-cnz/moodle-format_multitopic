@@ -27,7 +27,7 @@
 namespace format_multitopic\output\courseformat;
 
 use core_courseformat\output\local\content as content_base;
-use \renderer_base;
+use renderer_base;
 
 /**
  * Base class to render a course format.
@@ -112,8 +112,8 @@ class content extends content_base {
         // and /course/format/onetopic/renderer.php function print_single_section_page tabs parts CHANGED.
 
         // Init custom tabs.
-        $tabs = array();
-        $inactivetabs = array();
+        $tabs = [];
+        $inactivetabs = [];
 
         $tabln = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1,
                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1, null);
@@ -156,7 +156,7 @@ class content extends content_base {
                             . ($thissection->currentnestedlevel >= $level ? ' marker' : '')
                             . ((!$thissection->visible || !$thissection->available) && ($thissection->section != 0)
                                || $level > $thissection->pagedepthdirect ? ' dimmed' : ''),
-                            'data-itemid' => $thissection->id
+                            'data-itemid' => $thissection->id,
                         ]),
                         $sectionname);
                     $newtab->level = $level - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;

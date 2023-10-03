@@ -85,7 +85,7 @@ class global_navigation_wrapper {
      * Generates an array of sections and an array of activities for the given course.
      *
      * @param \stdClass $course
-     * @return array Array($sections, $activities)
+     * @return array [$sections, $activities]
      */
     protected function generate_sections_and_activities(\stdClass $course) : array {
         global $CFG;
@@ -97,7 +97,7 @@ class global_navigation_wrapper {
         // For course formats using 'numsections' trim the sections list.
         // REMOVED.
 
-        $activities = array();
+        $activities = [];
 
         foreach ($sections as $key => $section) {
             // Clone and unset summary to prevent $SESSION bloat (MDL-31802).
@@ -138,7 +138,7 @@ class global_navigation_wrapper {
             }
         }
 
-        return array($sections, $activities);
+        return [$sections, $activities];
     }
 
     /**
@@ -154,7 +154,7 @@ class global_navigation_wrapper {
 
         list($sections, $activities) = $this->generate_sections_and_activities($course);
 
-        $navigationsections = array();
+        $navigationsections = [];
         // ADDED.
         // Navigation node at level n.
         // This is a list of the navigation nodes currently at each level,
@@ -184,7 +184,7 @@ class global_navigation_wrapper {
 
                 // CHANGED.
                 $sectionname = get_section_name($course, $section);
-                $url = course_get_url($course, $section, array('navigation' => true)); // CHANGED: Custom call.
+                $url = course_get_url($course, $section, ['navigation' => true]); // CHANGED: Custom call.
 
                 // Add multiple nodes per section, one per level as required.
                 // The course node already exists, so we must start below course level.
@@ -246,7 +246,7 @@ class global_navigation_wrapper {
         // A static counter for JS function naming.
         static $legacyonclickcounter = 0;
 
-        $activitynodes = array();
+        $activitynodes = [];
         if (empty($activities)) {
             return $activitynodes;
         }
@@ -270,7 +270,7 @@ class global_navigation_wrapper {
             }
 
             // Prepare the default name and url for the node.
-            $activityname = format_string($activity->name, true, array('context' => \context_module::instance($activity->id)));
+            $activityname = format_string($activity->name, true, ['context' => \context_module::instance($activity->id)]);
             $action = new \moodle_url($activity->url);
 
             // Check if the onclick property is set (puke!).

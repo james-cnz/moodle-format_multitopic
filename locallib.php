@@ -39,7 +39,7 @@ function format_multitopic_set_section_visible(int $courseid, \stdClass $section
     // CHANGED LINE ABOVE: Use sectioninfo, not section number.
     global $DB;
 
-    $resourcestotoggle = array();
+    $resourcestotoggle = [];
     // ADDED.
     // Fetch section info.
     $sections = course_get_format($courseid)->fmt_get_sections();
@@ -51,10 +51,10 @@ function format_multitopic_set_section_visible(int $courseid, \stdClass $section
         $subsection && ($subsection->id == $section->id || $recurse && $subsection->levelsan > $section->levelsan); /* ... */
         $subsection = array_key_exists($subsection->nextanyid, $sections) ? $sections[$subsection->nextanyid] : null) {
         // CHANGED LINES ABOVE: Recurse, if necessary.
-        course_update_section($courseid, $subsection, array('visible' => $visibility)); // CHANGED: $section -> $subsection .
+        course_update_section($courseid, $subsection, ['visible' => $visibility]); // CHANGED: $section -> $subsection .
 
         // Determine which modules are visible for AJAX update.
-        $modules = !empty($subsection->sequence) ? explode(',', $subsection->sequence) : array();
+        $modules = !empty($subsection->sequence) ? explode(',', $subsection->sequence) : [];
         // CHANGED LINE ABOVE: $section -> $subsection.
         if (!empty($modules)) {
             list($insql, $params) = $DB->get_in_or_equal($modules);
@@ -164,13 +164,13 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     foreach ($movedsections as $id => $movedsection) {
         $position = $movedsection->section;
         if ($sections[$id]->section !== $position) {
-            $DB->set_field('course_sections', 'section', -$position, array('id' => $id));
+            $DB->set_field('course_sections', 'section', -$position, ['id' => $id]);
         }
     }
     foreach ($movedsections as $id => $movedsection) {
         $position = $movedsection->section;
         if ($sections[$id]->section !== $position) {
-            $DB->set_field('course_sections', 'section', $position, array('id' => $id));
+            $DB->set_field('course_sections', 'section', $position, ['id' => $id]);
         }
     }
     // END CHANGED.
@@ -230,7 +230,7 @@ function format_multitopic_course_can_delete_section(\stdClass $course, \section
     }
     // Make sure user has capability to update course and move sections.
     $context = \context_course::instance(is_object($course) ? $course->id : $course);
-    if (!has_all_capabilities(array('moodle/course:movesections', 'moodle/course:update'), $context)) {
+    if (!has_all_capabilities(['moodle/course:movesections', 'moodle/course:update'], $context)) {
         return false;
     }
     // Make sure user has capability to delete each activity in this section.
@@ -302,7 +302,7 @@ function format_multitopic_reorder_sections(array $sections, $origins, \stdClass
     $parent = null;
     $prev = null;
     $found = false;
-    $appendarray = array();
+    $appendarray = [];
     foreach ($sections as $id => $section) {
         if ($found) {
             // Target position already found, extract remaining sections.

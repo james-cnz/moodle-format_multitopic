@@ -51,10 +51,10 @@ if (isset($insertparentid)) {
 }
 // END ADDED.
 
-$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+$course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 $courseformatoptions = course_get_format($course)->get_format_options();
 
-$PAGE->set_url('/course/changenumsections.php', array('courseid' => $courseid));
+$PAGE->set_url('/course/changenumsections.php', ['courseid' => $courseid]);
 // TODO: Change?
 
 // Authorisation checks.
@@ -99,8 +99,8 @@ if (false) {                                                                    
     // Don't go less than 0, intentionally redirect silently (for the case of
     // double clicks).
     if ($courseformatoptions['numsections'] >= 0) {
-        update_course((object)array('id' => $course->id,
-            'numsections' => $courseformatoptions['numsections']));
+        update_course((object)['id' => $course->id,
+            'numsections' => $courseformatoptions['numsections'], ]);
     }
     // Overwriting returnurl to be consistent with block below even though we never get here.
     $returnurl = course_get_url($course);

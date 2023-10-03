@@ -871,7 +871,7 @@ class format_multitopic extends core_courseformat\base {
     public function get_default_blocks() : array {
         return [
             BLOCK_POS_LEFT => [],
-            BLOCK_POS_RIGHT => []
+            BLOCK_POS_RIGHT => [],
         ];
     }
 
@@ -894,13 +894,13 @@ class format_multitopic extends core_courseformat\base {
                 // INCLUDED /course/format/periods/lib.php function course_format_options 'periodduration'.
                 'periodduration' => [
                     'default' => null,                                          // CHANGED.
-                    'type' => PARAM_NOTAGS
+                    'type' => PARAM_NOTAGS,
                 ],
                 // END INCLUDED.
                 // ADDED.
                 'collapsible' => [
                     'default' => '1',
-                    'type' => PARAM_ALPHANUM
+                    'type' => PARAM_ALPHANUM,
                 ],
                 // END ADDED.
                 'hiddensections' => [
@@ -930,7 +930,7 @@ class format_multitopic extends core_courseformat\base {
                         null => new lang_string('period_undefined', 'format_multitopic'),
                         '1 day' => new lang_string('numday', '', 1),
                         '1 week' => new lang_string('numweek', '', 1),
-                    ]],
+                    ], ],
                     // END ADDED.
                 ],
                 // END INCLUDED.
@@ -942,7 +942,7 @@ class format_multitopic extends core_courseformat\base {
                         [
                             '0' => get_string('no'),
                             '1' => get_string('yes'),
-                        ]
+                        ],
                     ],
                     'help' => 'collapsibledefault',
                     'help_component' => 'format_multitopic',
@@ -956,8 +956,8 @@ class format_multitopic extends core_courseformat\base {
                     'element_attributes' => [
                         [
                             0 => new lang_string('hiddensectionscollapsed'),
-                            1 => new lang_string('hiddensectionsinvisible')
-                        ]
+                            1 => new lang_string('hiddensectionsinvisible'),
+                        ],
                     ],
                 ],
                 // REMOVED: coursedisplay .
@@ -978,7 +978,7 @@ class format_multitopic extends core_courseformat\base {
                               '70%', '71%', '72%', '73%', '74%', '75%', '76%', '77%', '78%', '79%',
                               '80%', '81%', '82%', '83%', '84%', '85%', '86%', '87%', '88%', '89%',
                               '90%', '91%', '92%', '93%', '94%', '95%', '96%', '97%', '98%', '99%',
-                              '100%']
+                              '100%', ],
                     ],
                 ],
                 // END ADDED.
@@ -1022,19 +1022,19 @@ class format_multitopic extends core_courseformat\base {
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options 'level'.
                 'level' => [
                     'default' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,         // CHANGED.
-                    'type' => PARAM_INT
+                    'type' => PARAM_INT,
                 ],
                 // END INCLUDED.
                 // INCLUDED /course/format/periods/lib.php function section_format_options 'periodduration'.
                 'periodduration' => [
                     'default' => null,                                          // ADDED.
-                    'type' => PARAM_NOTAGS
+                    'type' => PARAM_NOTAGS,
                 ],
                 // END INCLUDED.
                 // ADDED.
                 'collapsible' => [
                     'default' => null,
-                    'type' => PARAM_ALPHANUM
+                    'type' => PARAM_ALPHANUM,
                 ],
                 // END ADDED.
             ];
@@ -1050,8 +1050,8 @@ class format_multitopic extends core_courseformat\base {
                         [
                             FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1 => get_string('asprincipal', 'format_multitopic'), // CHANGED.
                             FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 2 => get_string('aschild', 'format_multitopic'),     // CHANGED.
-                            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC => get_string('topic') // ADDED.
-                        ]
+                            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC => get_string('topic'), // ADDED.
+                        ],
                     ],
                     'help' => 'level',
                     'help_component' => 'format_multitopic',
@@ -1078,7 +1078,7 @@ class format_multitopic extends core_courseformat\base {
                         '2 week' => new lang_string('numweeks', '', 2),
                         '3 week' => new lang_string('numweeks', '', 3),
                         '4 week' => new lang_string('numweeks', '', 4),
-                    ]],
+                    ], ],
                     // END ADDED.
                 ],
                 // END INCLUDED.
@@ -1091,7 +1091,7 @@ class format_multitopic extends core_courseformat\base {
                             null => new lang_string('default'),
                             '0' => get_string('no'),
                             '1' => get_string('yes'),
-                        ]
+                        ],
                     ],
                     'help' => 'collapsibleoverride',
                     'help_component' => 'format_multitopic',
@@ -1332,7 +1332,7 @@ class format_multitopic extends core_courseformat\base {
         $displayvalue = $title = get_section_name($section->course, $section);  // CHANGED.
         if ($linkifneeded) {
             // Display link under the section name, for page sections.
-            $url = course_get_url($section->course, $section, array('navigation' => true)); // CHANGED.
+            $url = course_get_url($section->course, $section, ['navigation' => true]); // CHANGED.
             if ($url) {
                 $displayvalue = html_writer::link($url, $title);
             }

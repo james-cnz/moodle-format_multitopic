@@ -339,7 +339,7 @@ class controlmenu extends controlmenu_base {
                     'id' => $section->id,
                     // REMOVED: section return.
                     'delete' => 1,
-                    'sesskey' => sesskey()
+                    'sesskey' => sesskey(),
                 ]
             );
             $merged['delete']['url'] = $url;

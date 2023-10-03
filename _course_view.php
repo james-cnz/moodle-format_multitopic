@@ -80,27 +80,27 @@ if (true) {                                                                     
     }
     // END ADDED.
 
-    $params = array();
+    $params = [];
     if (!empty($name)) {
-        $params = array('shortname' => $name);
+        $params = ['shortname' => $name];
     } else if (!empty($idnumber)) {
-        $params = array('idnumber' => $idnumber);
+        $params = ['idnumber' => $idnumber];
     } else if (!empty($id)) {
-        $params = array('id' => $id);
+        $params = ['id' => $id];
     } else {
         throw new moodle_exception('unspecifycourseid', 'error');
     }
 
     $course = $DB->get_record('course', $params, '*', MUST_EXIST);
 
-    $urlparams = array('id' => $course->id);
+    $urlparams = ['id' => $course->id];
 
     // Sectionid should get priority over section number.
     // CHANGED.
     if ($sectionid) {
-        $section = $DB->get_record('course_sections', array('id' => $sectionid, 'course' => $course->id), '*', MUST_EXIST);
+        $section = $DB->get_record('course_sections', ['id' => $sectionid, 'course' => $course->id], '*', MUST_EXIST);
     } else {
-        $section = $DB->get_record('course_sections', array('section' => $section, 'course' => $course->id), '*', MUST_EXIST);
+        $section = $DB->get_record('course_sections', ['section' => $section, 'course' => $course->id], '*', MUST_EXIST);
     }
     if ($section->section) {
         // NOTE: This parameter is changed from number to ID, in renderer.php for view pages, and here for edit pages.
@@ -223,7 +223,7 @@ if (true) {                                                                     
             } else if (!empty($return)) {
                 redirect($CFG->wwwroot . $return);
             } else {
-                $url = new \moodle_url($PAGE->url, array('notifyeditingon' => 1));
+                $url = new \moodle_url($PAGE->url, ['notifyeditingon' => 1]);
                 redirect($url);
             }
         } else if (($edit == 0) && confirm_sesskey()) {
@@ -301,9 +301,9 @@ if (true) {                                                                     
         $sectionname = get_string('sectionname', "format_$course->format");
         $sectiontitle = get_section_name($course, $section);
         $PAGE->set_title(get_string('coursesectiontitle', 'moodle',
-            array('course' => $course->fullname, 'sectiontitle' => $sectiontitle, 'sectionname' => $sectionname)));
+            ['course' => $course->fullname, 'sectiontitle' => $sectiontitle, 'sectionname' => $sectionname]));
     } else {
-        $PAGE->set_title(get_string('coursetitle', 'moodle', array('course' => $course->fullname)));
+        $PAGE->set_title(get_string('coursetitle', 'moodle', ['course' => $course->fullname]));
     }
 
     $PAGE->set_heading($course->fullname);
@@ -320,7 +320,7 @@ if (true) {                                                                     
     }
 
     // Course wrapper start.
-    echo \html_writer::start_tag('div', array('class' => 'course-content'));
+    echo \html_writer::start_tag('div', ['class' => 'course-content']);
 
     // Make sure that section 0 exists (this function will create one if it is missing).
     course_create_sections_if_missing($course, 0);
