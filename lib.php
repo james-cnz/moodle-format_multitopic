@@ -531,7 +531,7 @@ class format_multitopic extends format_base {
         global $COURSE, $USER;
 
         if (!isset($USER->onetopic_da)) {
-            $USER->onetopic_da = array();
+            $USER->onetopic_da = [];
         }
 
         if (empty($COURSE)) {
@@ -617,7 +617,7 @@ class format_multitopic extends format_base {
     public function get_default_blocks() : array {
         return [
             BLOCK_POS_LEFT => [],
-            BLOCK_POS_RIGHT => []
+            BLOCK_POS_RIGHT => [],
         ];
     }
 
@@ -640,13 +640,13 @@ class format_multitopic extends format_base {
                 // INCLUDED /course/format/periods/lib.php function course_format_options 'periodduration'.
                 'periodduration' => [
                     'default' => null,                                          // CHANGED.
-                    'type' => PARAM_NOTAGS
+                    'type' => PARAM_NOTAGS,
                 ],
                 // END INCLUDED.
                 // ADDED.
                 'collapsible' => [
                     'default' => '1',
-                    'type' => PARAM_ALPHANUM
+                    'type' => PARAM_ALPHANUM,
                 ],
                 // END ADDED.
                 'hiddensections' => [
@@ -676,7 +676,7 @@ class format_multitopic extends format_base {
                         null => new lang_string('period_undefined', 'format_multitopic'),
                         '1 day' => new lang_string('numday', '', 1),
                         '1 week' => new lang_string('numweek', '', 1),
-                    ]],
+                    ], ],
                     // END ADDED.
                 ],
                 // END INCLUDED.
@@ -688,7 +688,7 @@ class format_multitopic extends format_base {
                         [
                             '0' => get_string('no'),
                             '1' => get_string('yes'),
-                        ]
+                        ],
                     ],
                     'help' => 'collapsibledefault',
                     'help_component' => 'format_multitopic',
@@ -702,8 +702,8 @@ class format_multitopic extends format_base {
                     'element_attributes' => [
                         [
                             0 => new lang_string('hiddensectionscollapsed'),
-                            1 => new lang_string('hiddensectionsinvisible')
-                        ]
+                            1 => new lang_string('hiddensectionsinvisible'),
+                        ],
                     ],
                 ],
                 // REMOVED: coursedisplay .
@@ -724,7 +724,7 @@ class format_multitopic extends format_base {
                               '70%', '71%', '72%', '73%', '74%', '75%', '76%', '77%', '78%', '79%',
                               '80%', '81%', '82%', '83%', '84%', '85%', '86%', '87%', '88%', '89%',
                               '90%', '91%', '92%', '93%', '94%', '95%', '96%', '97%', '98%', '99%',
-                              '100%']
+                              '100%', ],
                     ],
                 ],
                 // END ADDED.
@@ -768,19 +768,19 @@ class format_multitopic extends format_base {
                 // INCLUDED /course/format/onetopic/lib.php function section_format_options 'level'.
                 'level' => [
                     'default' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,         // CHANGED.
-                    'type' => PARAM_INT
+                    'type' => PARAM_INT,
                 ],
                 // END INCLUDED.
                 // INCLUDED /course/format/periods/lib.php function section_format_options 'periodduration'.
                 'periodduration' => [
                     'default' => null,                                          // ADDED.
-                    'type' => PARAM_NOTAGS
+                    'type' => PARAM_NOTAGS,
                 ],
                 // END INCLUDED.
                 // ADDED.
                 'collapsible' => [
                     'default' => null,
-                    'type' => PARAM_ALPHANUM
+                    'type' => PARAM_ALPHANUM,
                 ],
                 // END ADDED.
             ];
@@ -796,8 +796,8 @@ class format_multitopic extends format_base {
                         [
                             FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1 => get_string('asprincipal', 'format_multitopic'), // CHANGED.
                             FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 2 => get_string('aschild', 'format_multitopic'),     // CHANGED.
-                            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC => get_string('topic') // ADDED.
-                        ]
+                            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC => get_string('topic'), // ADDED.
+                        ],
                     ],
                     'help' => 'level',
                     'help_component' => 'format_multitopic',
@@ -824,7 +824,7 @@ class format_multitopic extends format_base {
                         '2 week' => new lang_string('numweeks', '', 2),
                         '3 week' => new lang_string('numweeks', '', 3),
                         '4 week' => new lang_string('numweeks', '', 4),
-                    ]],
+                    ], ],
                     // END ADDED.
                 ],
                 // END INCLUDED.
@@ -837,7 +837,7 @@ class format_multitopic extends format_base {
                             null => new lang_string('default'),
                             '0' => get_string('no'),
                             '1' => get_string('yes'),
-                        ]
+                        ],
                     ],
                     'help' => 'collapsibleoverride',
                     'help_component' => 'format_multitopic',
@@ -1053,7 +1053,7 @@ class format_multitopic extends format_base {
 
         $displayvalue = $title = html_writer::tag('i', '', ['class' =>
                                         ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'icon fa fa-folder-o fa-fw'
-                                                                                                    : 'icon fa fa-list fa-fw')])
+                                                                                                    : 'icon fa fa-list fa-fw'), ])
                                     . ' ' . get_section_name($section->course, $section);  // CHANGED.
         // TODO: Fix collapse icon for AJAX rename, somehow?
         if ($linkifneeded) {
@@ -1061,7 +1061,7 @@ class format_multitopic extends format_base {
             $navigation = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
                         || ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) == '0')
                         || !$section->uservisible;                              // ADDED.
-            $url = course_get_url($section->course, $section, array('navigation' => $navigation)); // CHANGED.
+            $url = course_get_url($section->course, $section, ['navigation' => $navigation]); // CHANGED.
             if ($url && !(empty($CFG->linkcoursesections) && $navigation)) {   // CHANGED.
                 $displayvalue = html_writer::link($url, $title);
             }
@@ -1119,7 +1119,7 @@ class format_multitopic extends format_base {
      * @param int $sr unused
      * @return null|array any data for the Javascript post-processor (must be json-encodeable)
      */
-    public function section_action($section, $action, $sr): array {
+    public function section_action($section, $action, $sr) {
         global $PAGE;
 
         // REMOVED: marker.

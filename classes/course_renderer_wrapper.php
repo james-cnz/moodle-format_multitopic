@@ -82,7 +82,7 @@ class course_renderer_wrapper {
      *     option 'inblock' => true, suggesting to display controls vertically
      * @return string
      */
-    public function course_section_add_cm_control($course, $section, $sectionreturn = null, $displayoptions = array()) : string {
+    public function course_section_add_cm_control($course, $section, $sectionreturn = null, $displayoptions = []) : string {
         // CHANGED ABOVE: Specify section info instead of number.
         // TODO:
         // 2020-02-10 MDL-67264 core_course: Begin set up for Activity chooser
@@ -108,10 +108,10 @@ class course_renderer_wrapper {
 
         // Retrieve all modules with associated metadata.
         $modules = get_module_metadata($course, $modnames);                     // CHANGED: Removed sectionreturn.
-        $urlparams = array('sectionid' => $section->id);                        // CHANGED: Used section ID.
+        $urlparams = ['sectionid' => $section->id];                             // CHANGED: Used section ID.
 
         // We'll sort resources and activities into two lists.
-        $activities = array(MOD_CLASS_ACTIVITY => array(), MOD_CLASS_RESOURCE => array());
+        $activities = [MOD_CLASS_ACTIVITY => [], MOD_CLASS_RESOURCE => []];
 
         foreach ($modules as $module) {
             $activityclass = MOD_CLASS_ACTIVITY;
@@ -132,27 +132,27 @@ class course_renderer_wrapper {
         $stractivitylabel = get_string('addactivitytosection', null, $sectionname);
 
         $output = \html_writer::start_tag('div',
-            array('class' => 'section_add_menus'));                             // CHANGED: Removed HTML ID--not used?
+            ['class' => 'section_add_menus']);                                  // CHANGED: Removed HTML ID--not used?
 
         if (!$vertical) {
-            $output .= \html_writer::start_tag('div', array('class' => 'horizontal'));
+            $output .= \html_writer::start_tag('div', ['class' => 'horizontal']);
         }
 
         if (!empty($activities[MOD_CLASS_RESOURCE])) {
-            $select = new \url_select($activities[MOD_CLASS_RESOURCE], '', array('' => $straddresource));
+            $select = new \url_select($activities[MOD_CLASS_RESOURCE], '', ['' => $straddresource]);
             // CHANGED LINE ABOVE: Removed form ID.
             $select->set_help_icon('resources');
-            $select->set_label($strresourcelabel, array('class' => 'accesshide'));
+            $select->set_label($strresourcelabel, ['class' => 'accesshide']);
             $output .= preg_replace('/\/course\/jumpto.php\b/', '/course/format/multitopic/_course_jumpto.php',
                                     $this->inneroutput->render($select));
             // CHANGED LINE ABOVE: Use custom script to convert section ID back to section number.
         }
 
         if (!empty($activities[MOD_CLASS_ACTIVITY])) {
-            $select = new \url_select($activities[MOD_CLASS_ACTIVITY], '', array('' => $straddactivity));
+            $select = new \url_select($activities[MOD_CLASS_ACTIVITY], '', ['' => $straddactivity]);
             // CHANGED LINE ABOVE: Removed form ID.
             $select->set_help_icon('activities');
-            $select->set_label($stractivitylabel, array('class' => 'accesshide'));
+            $select->set_label($stractivitylabel, ['class' => 'accesshide']);
             $output .= preg_replace('/\/course\/jumpto.php\b/', '/course/format/multitopic/_course_jumpto.php',
                                     $this->inneroutput->render($select));
             // CHANGED LINE ABOVE: Use custom script to convert section ID back to section number.
@@ -168,23 +168,23 @@ class course_renderer_wrapper {
             // Modchooser can be added only for the current course set on the page!
             $straddeither = get_string('addresourceoractivity');
             // The module chooser link.
-            $modchooser = \html_writer::start_tag('div', array('class' => 'mdl-right'));
-            $modchooser .= \html_writer::start_tag('div', array('class' => 'section-modchooser'));
+            $modchooser = \html_writer::start_tag('div', ['class' => 'mdl-right']);
+            $modchooser .= \html_writer::start_tag('div', ['class' => 'section-modchooser']);
             $icon = $this->inneroutput->pix_icon('t/add', '');              // CHANGED.
-            $span = \html_writer::tag('span', $straddeither, array('class' => 'section-modchooser-text'));
-            $modchooser .= \html_writer::tag('span', $icon . $span, array('class' => 'section-modchooser-link'));
+            $span = \html_writer::tag('span', $straddeither, ['class' => 'section-modchooser-text']);
+            $modchooser .= \html_writer::tag('span', $icon . $span, ['class' => 'section-modchooser-link']);
             $modchooser .= \html_writer::end_tag('div');
             $modchooser .= \html_writer::end_tag('div');
 
             // Wrap the normal output in a noscript div.
             $usemodchooser = get_user_preferences('usemodchooser', $CFG->modchooserdefault);
             if ($usemodchooser) {
-                $output = \html_writer::tag('div', $output, array('class' => 'hiddenifjs addresourcedropdown'));
-                $modchooser = \html_writer::tag('div', $modchooser, array('class' => 'visibleifjs addresourcemodchooser'));
+                $output = \html_writer::tag('div', $output, ['class' => 'hiddenifjs addresourcedropdown']);
+                $modchooser = \html_writer::tag('div', $modchooser, ['class' => 'visibleifjs addresourcemodchooser']);
             } else {
                 // If the module chooser is disabled, we need to ensure that the dropdowns are shown even if javascript is disabled.
-                $output = \html_writer::tag('div', $output, array('class' => 'show addresourcedropdown'));
-                $modchooser = \html_writer::tag('div', $modchooser, array('class' => 'hide addresourcemodchooser'));
+                $output = \html_writer::tag('div', $output, ['class' => 'show addresourcedropdown']);
+                $modchooser = \html_writer::tag('div', $modchooser, ['class' => 'hide addresourcemodchooser']);
             }
             $output = $this->inner->course_modchooser($modules, $course) . $modchooser . $output; // CHANGED.
         }

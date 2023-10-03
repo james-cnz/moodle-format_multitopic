@@ -207,19 +207,19 @@ class format_multitopic_renderer extends format_section_renderer_base {
             'aria-labelledby' => "sectionid-{$section->id}-title",
             'aria-label' => get_section_name($course, $section),                // For Sharing Cart.
             'data-sectionid' => $section->section,
-            'data-sectionreturnid' => $section->section                         // CHANGED.
+            'data-sectionreturnid' => $section->section,                        // CHANGED.
         ]);
 
         // Create a span that contains the section title to be used to create the keyboard section move menu.
-        $o .= html_writer::tag('span', get_section_name($course, $section), array('class' => 'hidden sectionname'));
+        $o .= html_writer::tag('span', get_section_name($course, $section), ['class' => 'hidden sectionname']);
         // TODO: Remove above line?  MDL-68189.
 
         $leftcontent = $this->section_left_content($section, $course, $onsectionpage);
-        $o .= html_writer::tag('div', $leftcontent, array('class' => 'left side'));
+        $o .= html_writer::tag('div', $leftcontent, ['class' => 'left side']);
 
         $rightcontent = $this->section_right_content($section, $course, $onsectionpage);
-        $o .= html_writer::tag('div', $rightcontent, array('class' => 'right side'));
-        $o .= html_writer::start_tag('div', array('class' => 'content'));
+        $o .= html_writer::tag('div', $rightcontent, ['class' => 'right side']);
+        $o .= html_writer::start_tag('div', ['class' => 'content']);
 
         // REMOVED: section title display rules.  Always display the section title.
         if (true) {
@@ -231,7 +231,7 @@ class format_multitopic_renderer extends format_section_renderer_base {
 
         $o .= $this->section_availability($section);
 
-        $o .= html_writer::start_tag('div', array('class' => 'summary'));
+        $o .= html_writer::start_tag('div', ['class' => 'summary']);
         if ($section->uservisible || ($section->section == 0)) {
             // Do not show summary if section is hidden.
             $o .= $this->format_summary_text($section);
@@ -253,7 +253,7 @@ class format_multitopic_renderer extends format_section_renderer_base {
      */
     protected function section_edit_control_items($course, $section, $onsectionpage = false) : array {
         if (!$this->page->user_is_editing()) {
-            return array();
+            return [];
         }
 
         // REMOVED sectionreturn .
@@ -267,7 +267,7 @@ class format_multitopic_renderer extends format_section_renderer_base {
         $baseurl = course_get_url($course, $section, ['fmtedit' => true]);      // CHANGED.
         $baseurl->param('sesskey', sesskey());
 
-        $controls = array();
+        $controls = [];
 
         if (!$isstealth && has_capability('moodle/course:update', $coursecontext)) {
             if ($section->section > 0
@@ -277,13 +277,13 @@ class format_multitopic_renderer extends format_section_renderer_base {
                 $streditsection = get_string('editsection');
             }
 
-            $controls['edit'] = array(
+            $controls['edit'] = [
                 'url' => new moodle_url('/course/format/multitopic/_course_editsection.php',
-                                         array('id' => $section->id)),          // CHANGED.
+                                         ['id' => $section->id]),               // CHANGED.
                 'icon' => 'i/settings',
                 'name' => $streditsection,
-                'pixattr' => array('class' => ''),
-                'attr' => array('class' => 'icon edit'));
+                'pixattr' => ['class' => ''],
+                'attr' => ['class' => 'icon edit'], ];
         }
 
         if ($section->section) {
@@ -295,13 +295,13 @@ class format_multitopic_renderer extends format_section_renderer_base {
                                                 get_string('hidefromothers', 'format_' . $course->format)
                                                 : get_string('hide');           // CHANGED.
                         $url->param('hideid', $section->id);                    // CHANGED.
-                        $controls['visiblity'] = array(
+                        $controls['visiblity'] = [
                             'url' => $url,
                             'icon' => 'i/hide',
                             'name' => $strhidefromothers,
-                            'pixattr' => array('class' => ''),
-                            'attr' => array('class' => 'icon editing_showhide',
-                                ));                                             // REMOVED section return & AJAX action .
+                            'pixattr' => ['class' => ''],
+                            'attr' => ['class' => 'icon editing_showhide',
+                                ], ];                                           // REMOVED section return & AJAX action .
                         // ADDED: AJAX action added back for topic-level sections only.
                         if (!$onsectionpage) {
                             $controls['visiblity']['attr']['data-action'] = 'hide';
@@ -312,13 +312,13 @@ class format_multitopic_renderer extends format_section_renderer_base {
                                                 get_string('showfromothers', 'format_' . $course->format)
                                                 : get_string('show');           // CHANGED.
                         $url->param('showid',  $section->id);                   // CHANGED.
-                        $controls['visiblity'] = array(
+                        $controls['visiblity'] = [
                             'url' => $url,
                             'icon' => 'i/show',
                             'name' => $strshowfromothers,
-                            'pixattr' => array('class' => ''),
-                            'attr' => array('class' => 'icon editing_showhide',
-                                )); // REMOVED section return & AJAX action.
+                            'pixattr' => ['class' => ''],
+                            'attr' => ['class' => 'icon editing_showhide',
+                                ], ]; // REMOVED section return & AJAX action.
                         // ADDED: AJAX action added back for topic-level sections only.
                         if (!$onsectionpage) {
                             $controls['visiblity']['attr']['data-action'] = 'show';
@@ -341,12 +341,12 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             $strmovelevelup = get_string_manager()->string_exists('move_level_up', 'format_multitopic') ?
                                                 get_string('move_level_up', 'format_multitopic') : get_string('moveup');
                             // END CHANGED.
-                            $controls['movelevelup'] = array(                   // CHANGED.
+                            $controls['movelevelup'] = [                        // CHANGED.
                                 'url' => $url,
                                 'icon' => 'i/up',
                                 'name' => $strmovelevelup,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon fmtmovelevelup')); // CHANGED.
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'icon fmtmovelevelup'], ]; // CHANGED.
                         }
 
                         $url = clone($baseurl);
@@ -358,12 +358,12 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             $strmoveleveldown = get_string_manager()->string_exists('move_level_down', 'format_multitopic') ?
                                                 get_string('move_level_down', 'format_multitopic') : get_string('movedown');
                             // END CHANGED.
-                            $controls['moveleveldown'] = array(                 // CHANGED.
+                            $controls['moveleveldown'] = [                      // CHANGED.
                                 'url' => $url,
                                 'icon' => 'i/down',
                                 'name' => $strmoveleveldown,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon fmtmoveleveldown')); // CHANGED.
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'icon fmtmoveleveldown'], ]; // CHANGED.
                         }
                     }
                     if (has_capability('moodle/course:movesections', $coursecontext)
@@ -376,12 +376,12 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             $url->param('destnextupid', $section->prevupid);
                             $strmovepageprev = get_string_manager()->string_exists('move_page_prev', 'format_multitopic') ?
                                                 get_string('move_page_prev', 'format_multitopic') : get_string('moveleft');
-                            $controls['moveprev'] = array(
+                            $controls['moveprev'] = [
                                 'url' => $url,
                                 'icon' => 't/left',
                                 'name' => $strmovepageprev,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon fmtmovepageprev'));
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'icon fmtmovepageprev'], ];
                         }
                         // END CHANGED.
 
@@ -392,12 +392,12 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             $url->param('destprevupid', $section->nextupid);
                             $strmovepagenext = get_string_manager()->string_exists('move_page_next', 'format_multitopic') ?
                                                 get_string('move_page_next', 'format_multitopic') : get_string('moveright');
-                            $controls['movenext'] = array(
+                            $controls['movenext'] = [
                                 'url' => $url,
                                 'icon' => 't/right',
                                 'name' => $strmovepagenext,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon fmtmovepagenext'));
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'icon fmtmovepagenext'], ];
                         }
                         // END CHANGED.
                     }
@@ -412,12 +412,12 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             $url->param('destparentid', $section->prevpageid);
                             $strmovetoprevpage = get_string_manager()->string_exists('move_to_prev_page', 'format_multitopic') ?
                                                  get_string('move_to_prev_page', 'format_multitopic') : get_string('moveleft');
-                            $controls['movetoprevpage'] = array(
+                            $controls['movetoprevpage'] = [
                                 'url' => $url,
                                 'icon' => 't/left',
                                 'name' => $strmovetoprevpage,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon fmtmovetoprevpage'));
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'icon fmtmovetoprevpage'], ];
                         }
                         // END CHANGED.
 
@@ -428,12 +428,12 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             $url->param('destparentid', $section->nextpageid);
                             $strmovetonextpage = get_string_manager()->string_exists('move_to_next_page', 'format_multitopic') ?
                                                  get_string('move_to_next_page', 'format_multitopic') : get_string('moveright');
-                            $controls['movetonextpage'] = array(
+                            $controls['movetonextpage'] = [
                                 'url' => $url,
                                 'icon' => 't/right',
                                 'name' => $strmovetonextpage,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon fmtmovetonextpage'));
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'icon fmtmovetonextpage'], ];
                         }
                         // END CHANGED.
 
@@ -445,12 +445,12 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             $url->param('sectionid', $section->id);
                             $url->param('destnextupid', $section->prevupid);
                             $strmoveup = get_string('moveup');
-                            $controls['moveup'] = array(
+                            $controls['moveup'] = [
                                 'url' => $url,
                                 'icon' => 'i/up',
                                 'name' => $strmoveup,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon moveup'));
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'icon moveup'], ];
                         }
 
                         $url = clone($baseurl);
@@ -459,12 +459,12 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             $url->param('sectionid', $section->id);
                             $url->param('destprevupid', $section->nextupid);
                             $strmovedown = get_string('movedown');
-                            $controls['movedown'] = array(
+                            $controls['movedown'] = [
                                 'url' => $url,
                                 'icon' => 'i/down',
                                 'name' => $strmovedown,
-                                'pixattr' => array('class' => ''),
-                                'attr' => array('class' => 'icon movedown'));
+                                'pixattr' => ['class' => ''],
+                                'attr' => ['class' => 'icon movedown'], ];
                         }
                     }
                 }
@@ -476,17 +476,17 @@ class format_multitopic_renderer extends format_section_renderer_base {
                 } else {
                     $strdelete = get_string('deletesection');
                 }
-                $url = new moodle_url('/course/format/multitopic/_course_editsection.php', array(
+                $url = new moodle_url('/course/format/multitopic/_course_editsection.php', [
                     'id' => $section->id,
                     // REMOVED: section return.
                     'delete' => 1,
-                    'sesskey' => sesskey()));
-                $controls['delete'] = array(
+                    'sesskey' => sesskey(), ]);
+                $controls['delete'] = [
                     'url' => $url,
                     'icon' => 'i/delete',
                     'name' => $strdelete,
-                    'pixattr' => array('class' => ''),
-                    'attr' => array('class' => 'icon editing_delete'));
+                    'pixattr' => ['class' => ''],
+                    'attr' => ['class' => 'icon editing_delete'], ];
             }
         }
 
@@ -557,16 +557,16 @@ class format_multitopic_renderer extends format_section_renderer_base {
 
         // Output the clipboard itself.
         if ($disableajax || ismoving($course->id)) {                            // TODO: Also show when JS disabled?
-            $o .= html_writer::start_tag('div', array('class' => 'clipboard'));
+            $o .= html_writer::start_tag('div', ['class' => 'clipboard']);
             $o .= html_writer::tag('i', '', ['class' => 'icon fa fa-clipboard fa-fw']) . ' ';
 
             // If currently moving a file then show the current clipboard.
             if (ismoving($course->id)) {
                 $url = new moodle_url('/course/mod.php',
-                    array('sesskey' => sesskey(),
+                    ['sesskey' => sesskey(),
                         'cancelcopy' => true,
                         // REMOVED section return.
-                    )
+                    ]
                 );
 
                 $o .= strip_tags(get_string('activityclipboard', '', $USER->activitycopyname));
@@ -669,8 +669,8 @@ class format_multitopic_renderer extends format_section_renderer_base {
         // and /course/format/onetopic/renderer.php function print_single_section_page tabs parts CHANGED.
 
         // Init custom tabs.
-        $tabs = array();
-        $inactivetabs = array();
+        $tabs = [];
+        $inactivetabs = [];
 
         $tabln = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1,
                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1, null);
@@ -713,7 +713,7 @@ class format_multitopic_renderer extends format_section_renderer_base {
                             . ($thissection->currentnestedlevel >= $level ? ' marker' : '')
                             . ((!$thissection->visible || !$thissection->available) && ($thissection->section != 0)
                                || $level > $thissection->pagedepthdirect ? ' dimmed' : ''),
-                            'data-itemid' => $thissection->id
+                            'data-itemid' => $thissection->id,
                         ]),
                         $sectionname);
                     $newtab->level = $level - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
@@ -805,11 +805,11 @@ class format_multitopic_renderer extends format_section_renderer_base {
             $thissection = $thissection->nextanyid ? $sections[$thissection->nextanyid] : null;
         }
         echo html_writer::start_tag('div',
-                array('class' => 'collapsible-actions', 'style' => $collapsiblenum ? '' : 'display: none;'));
+                ['class' => 'collapsible-actions', 'style' => $collapsiblenum ? '' : 'display: none;']);
         echo html_writer::tag('a', get_string('expandall'),
-                array('href' => '#', 'class' => 'collapseexpand expand-all', 'role' => 'button'));
+                ['href' => '#', 'class' => 'collapseexpand expand-all', 'role' => 'button']);
         echo html_writer::tag('a', get_string('collapseall'),
-                array('href' => '#', 'class' => 'collapseexpand collapse-all', 'role' => 'button', 'style' => 'display: none;'));
+                ['href' => '#', 'class' => 'collapseexpand collapse-all', 'role' => 'button', 'style' => 'display: none;']);
         echo html_writer::end_tag('div');
         // END ADDED.
 
@@ -918,7 +918,7 @@ class format_multitopic_renderer extends format_section_renderer_base {
             // Note to course format developers: inserting sections in the other positions should check both
             // capabilities 'moodle/course:update' and 'moodle/course:movesections'.
             $o = '';
-            $o .= html_writer::start_tag('div', array('id' => 'changenumsections', 'class' => 'mdl-right'));
+            $o .= html_writer::start_tag('div', ['id' => 'changenumsections', 'class' => 'mdl-right']);
             if (get_string_manager()->string_exists('addsectiontopic', 'format_' . $course->format)) {
                 $straddsections = get_string('addsectiontopic', 'format_' . $course->format);
             } else {

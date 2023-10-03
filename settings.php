@@ -36,7 +36,7 @@ if ($ADMIN->fulltree) {
             0 => new lang_string('sunday',  'calendar'),
             1 => new lang_string('monday',  'calendar'),
             5 => new lang_string('friday',  'calendar'),
-            6 => new lang_string('saturday', 'calendar')
+            6 => new lang_string('saturday', 'calendar'),
         ]
     ));
 

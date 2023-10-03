@@ -97,7 +97,7 @@ class courseheader implements \renderable {
         $o = \html_writer::start_tag('div', [
             'id' => 'course-header-banner',
             'style' => "background-image: url('{$this->imageurl}'); "
-                     . "background-position: center {$this->bannerslice}%;"
+                     . "background-position: center {$this->bannerslice}%;",
         ]);
             $o .= \html_writer::tag('div', $this->coursename, [
                 'id' => 'course-header-banner-text',
@@ -106,7 +106,7 @@ class courseheader implements \renderable {
 
         // Output the attribution.
         $o .= \html_writer::start_tag('p', ['id' => 'course-header-banner_attribution',
-                                            'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';']);
+                                            'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';', ]);
         $o .= format_multitopic_image_attribution($this->imagename, $this->authorwithurl, $this->licencecode);
         $o .= \html_writer::end_tag('p');
 
