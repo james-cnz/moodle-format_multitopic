@@ -40,6 +40,20 @@ use core_courseformat\output\local\content\section\controlmenu as controlmenu_ba
  */
 class controlmenu extends controlmenu_base {
 
+    /** @var \format_multitopic\section_info_extra Multitopic-specific section information */
+    protected $fmtsectionextra;
+
+    /**
+     * Constructor.
+     *
+     * @param \format_multitopic $format the course format
+     * @param \section_info $section the section info
+     */
+    public function __construct(\format_multitopic $format, \section_info $section) {
+        parent::__construct($format, $section);
+        $this->fmtsectionextra = $format->fmt_get_section_extra($section);
+    }
+
     /**
      * Generate the edit control items of a section.
      *
@@ -51,8 +65,9 @@ class controlmenu extends controlmenu_base {
         global $USER, $CFG;
 
         $format = $this->format;
-        $section = $format->fmt_get_section($this->section);                    // CHANGED.
-        $onsectionpage = $section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; // ADDED.
+        $section = $this->section;
+        $sectionextra = $this->fmtsectionextra;                                 // ADDED.
+        $onsectionpage = $sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; // ADDED.
         $course = $format->get_course();
         $user = $USER;
         $usecomponents = $format->supports_components();
@@ -72,11 +87,11 @@ class controlmenu extends controlmenu_base {
             if ($onsectionpage) {                                               // CHANGED.
                 if (has_capability('moodle/course:update', $coursecontext, $user)) {
                     $url = clone($baseurl);
-                    if ($section->levelsan - 1 > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) { // Raise section. // CHANGED.
+                    if ($sectionextra->levelsan - 1 > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) { // Raise section. // CHANGED.
                         // CHANGED.
                         $url->param('sectionid', $section->id);
-                        $url->param('destprevupid', $section->parentid);
-                        $url->param('destlevel', $section->levelsan - 1);
+                        $url->param('destprevupid', $sectionextra->parentid);
+                        $url->param('destlevel', $sectionextra->levelsan - 1);
                         $strmovelevelup = get_string_manager()->string_exists('move_level_up', 'format_multitopic') ?
                                             get_string('move_level_up', 'format_multitopic') : get_string('moveup');
                         // END CHANGED.
@@ -90,11 +105,11 @@ class controlmenu extends controlmenu_base {
                     }
 
                     $url = clone($baseurl);
-                    if ($section->pagedepth + 1 <= FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE) { // Lower section. CHANGED.
+                    if ($sectionextra->pagedepth + 1 <= FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE) { // Lower section. CHANGED.
                         // CHANGED.
                         $url->param('sectionid', $section->id);
-                        $url->param('destparentid', $section->prevupid);
-                        $url->param('destlevel', $section->levelsan + 1);
+                        $url->param('destparentid', $sectionextra->prevupid);
+                        $url->param('destlevel', $sectionextra->levelsan + 1);
                         $strmoveleveldown = get_string_manager()->string_exists('move_level_down', 'format_multitopic') ?
                                             get_string('move_level_down', 'format_multitopic') : get_string('movedown');
                         // END CHANGED.
@@ -110,10 +125,10 @@ class controlmenu extends controlmenu_base {
 
                 $url = clone($baseurl);
                 // CHANGED: Replaced up with previous.
-                if (isset($section->prevupid) && $section->prevupid != course_get_format($course)->fmtrootsectionid) {
+                if (isset($sectionextra->prevupid) && $sectionextra->prevupid != course_get_format($course)->fmtrootsectionid) {
                         // Add a arrow to move section back.
                     $url->param('sectionid', $section->id);
-                    $url->param('destnextupid', $section->prevupid);
+                    $url->param('destnextupid', $sectionextra->prevupid);
                     $strmovepageprev = get_string_manager()->string_exists('move_page_prev', 'format_multitopic') ?
                                         get_string('move_page_prev', 'format_multitopic') : get_string('moveleft');
                     $movecontrols['moveprev'] = [
@@ -128,9 +143,9 @@ class controlmenu extends controlmenu_base {
 
                 $url = clone($baseurl);
                 // CHANGED: Replaced down with next.
-                if (isset($section->nextupid)) { // Add a arrow to move section forward.
+                if (isset($sectionextra->nextupid)) { // Add a arrow to move section forward.
                     $url->param('sectionid', $section->id);
-                    $url->param('destprevupid', $section->nextupid);
+                    $url->param('destprevupid', $sectionextra->nextupid);
                     $strmovepagenext = get_string_manager()->string_exists('move_page_next', 'format_multitopic') ?
                                         get_string('move_page_next', 'format_multitopic') : get_string('moveright');
                     $movecontrols['movenext'] = [
@@ -149,9 +164,9 @@ class controlmenu extends controlmenu_base {
 
                 $url = clone($baseurl);
                 // CHANGED: Replaced up with to previous page.
-                if ($section->prevpageid) { // Add a arrow to move section to previous page.
+                if ($sectionextra->prevpageid) { // Add a arrow to move section to previous page.
                     $url->param('sectionid', $section->id);
-                    $url->param('destparentid', $section->prevpageid);
+                    $url->param('destparentid', $sectionextra->prevpageid);
                     $strmovetoprevpage = get_string_manager()->string_exists('move_to_prev_page', 'format_multitopic') ?
                                             get_string('move_to_prev_page', 'format_multitopic') : get_string('moveleft');
                     $movecontrols['movetoprevpage'] = [
@@ -166,9 +181,9 @@ class controlmenu extends controlmenu_base {
 
                 $url = clone($baseurl);
                 // CHANGED: Replaced down with to next page.
-                if ($section->nextpageid) { // Add a arrow to move section to next page.
+                if ($sectionextra->nextpageid) { // Add a arrow to move section to next page.
                     $url->param('sectionid', $section->id);
-                    $url->param('destparentid', $section->nextpageid);
+                    $url->param('destparentid', $sectionextra->nextpageid);
                     $strmovetonextpage = get_string_manager()->string_exists('move_to_next_page', 'format_multitopic') ?
                                             get_string('move_to_next_page', 'format_multitopic') : get_string('moveright');
                     $movecontrols['movetonextpage'] = [
@@ -200,10 +215,10 @@ class controlmenu extends controlmenu_base {
                 }
 
                 $url = clone($baseurl);
-                if ($section->prevupid != $section->parentid
+                if ($sectionextra->prevupid != $sectionextra->parentid
                         && !array_key_exists('moveup', $parentcontrols)) { // Add a arrow to move section up.
                     $url->param('sectionid', $section->id);
-                    $url->param('destnextupid', $section->prevupid);
+                    $url->param('destnextupid', $sectionextra->prevupid);
                     $strmoveup = get_string('moveup');
                     $movecontrols['moveup'] = [
                         'url' => $url,
@@ -215,10 +230,10 @@ class controlmenu extends controlmenu_base {
                 }
 
                 $url = clone($baseurl);
-                if ($section->nextupid != $section->nextpageid
+                if ($sectionextra->nextupid != $sectionextra->nextpageid
                         && !array_key_exists('movedown', $parentcontrols)) { // Add a arrow to move section down.
                     $url->param('sectionid', $section->id);
-                    $url->param('destprevupid', $section->nextupid);
+                    $url->param('destprevupid', $sectionextra->nextupid);
                     $strmovedown = get_string('movedown');
                     $movecontrols['movedown'] = [
                         'url' => $url,
@@ -284,7 +299,7 @@ class controlmenu extends controlmenu_base {
                     unset($merged['visiblity']['attr']['data-action']);
                 }
                 $merged['visiblity']['attr']['data-swapname'] = $strshowfromothers;
-            } else if (!$section->parentvisiblesan) {
+            } else if (!$sectionextra->parentvisiblesan) {
                 unset($merged['visiblity']);
             } else {
                 $url->param('showid',  $section->id);                           // CHANGED.
@@ -309,12 +324,12 @@ class controlmenu extends controlmenu_base {
         if (array_key_exists('moveup', $merged)) {
             if (!has_capability('moodle/course:movesections', $coursecontext, $user)
                     || !has_capability('moodle/course:sectionvisibility', $coursecontext, $user)
-                    || $onsectionpage || $section->prevupid == $section->parentid) {
+                    || $onsectionpage || $sectionextra->prevupid == $sectionextra->parentid) {
                 unset($merged['moveup']);
             } else {
                 $url = clone($baseurl);
                 $url->param('sectionid', $section->id);
-                $url->param('destnextupid', $section->prevupid);
+                $url->param('destnextupid', $sectionextra->prevupid);
                 $merged['moveup']['url'] = $url;
             }
         }
@@ -322,12 +337,12 @@ class controlmenu extends controlmenu_base {
         if (array_key_exists('movedown', $merged)) {
             if (!has_capability('moodle/course:movesections', $coursecontext, $user)
                     || !has_capability('moodle/course:sectionvisibility', $coursecontext, $user)
-                    || $onsectionpage || $section->nextupid == $section->nextpageid) {
+                    || $onsectionpage || $sectionextra->nextupid == $sectionextra->nextpageid) {
                 unset($merged['movedown']);
             } else {
                 $url = clone($baseurl);
                 $url->param('sectionid', $section->id);
-                $url->param('destprevupid', $section->nextupid);
+                $url->param('destprevupid', $sectionextra->nextupid);
                 $merged['movedown']['url'] = $url;
             }
         }

@@ -127,15 +127,15 @@ class renderer extends section_renderer {
         // CHANGED LINE ABOVE.
 
         // ADDED.
-        $section = course_get_format($course)->fmt_get_section($section);
+        $sectionextra = course_get_format($course)->fmt_get_section_extra($section);
 
         // Date range for the topic, to be placed under the title.
         $datestring = '';
-        if (isset($section->dateend) && ($section->datestart < $section->dateend)) {
+        if (isset($sectionextra->dateend) && ($sectionextra->datestart < $sectionextra->dateend)) {
 
             $dateformat = get_string('strftimedateshort');
-            $startday = userdate($section->datestart + 12 * 60 * 60, $dateformat);
-            $endday = userdate($section->dateend - 12 * 60 * 60, $dateformat);
+            $startday = userdate($sectionextra->datestart + 12 * 60 * 60, $dateformat);
+            $endday = userdate($sectionextra->dateend - 12 * 60 * 60, $dateformat);
 
             if ($startday == $endday) {
                 $datestring = "({$startday})";

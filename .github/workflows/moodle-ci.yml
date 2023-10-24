@@ -50,10 +50,16 @@ jobs:
             database: pgsql
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle master, PHP 8.1, MariaDB
+          # Moodle 4.3, PHP 8.1, MariaDB
           - php: '8.1'
-            moodle-branch: 'master'
+            moodle-branch: 'MOODLE_403_STABLE'
             database: mariadb
+            plugin-ci: ^4
+            # extensions: xmlrpc-beta
+          # Moodle master, PHP 8.2, PostgreSQL
+          - php: '8.2'
+            moodle-branch: 'master'
+            database: pgsql
             plugin-ci: ^4
             # extensions: xmlrpc-beta
 

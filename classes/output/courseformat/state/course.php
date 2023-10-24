@@ -18,7 +18,6 @@ namespace format_multitopic\output\courseformat\state;
 
 use core_courseformat\output\local\state\course as base_course;
 use core_courseformat\base as course_format;
-use moodle_url;
 use stdClass;
 
 defined('MOODLE_INTERNAL') || die();
@@ -59,21 +58,23 @@ class course extends base_course {
         $data->secondsectionlist = [];
 
         $format = $this->format;
-        $sections = $format->fmt_get_sections();
+        $sectionsextra = $format->fmt_get_sections_extra();
         $parentid = null;
         $lastparentid = null;
 
-        foreach ($sections as $section) {
+        foreach ($sectionsextra as $sectionextra) {
+            $section = $sectionextra->sectionbase;
             if ($format->is_section_visible($section)) {
-                if ($section->levelsan <= 0) {
+                if ($sectionextra->levelsan <= 0) {
                     $parentid = $section->id;
                     $lastparentid = $section->id;
-                    $data->secondsectionlist[$parentid] = [$section->id]; // Tabs uses first item as parent, Course index might not.
+                    // Tabs uses first item as parent, Course index might not.
+                    $data->secondsectionlist[$parentid] = [$section->id];
                     $data->firstsectionlist[] = $section->id;
-                } else if ($section->levelsan == 1) {
+                } else if ($sectionextra->levelsan == 1) {
                     $lastparentid = $section->id;
                     $data->secondsectionlist[$parentid][] = $section->id;
-                } else if ($section->levelsan == 2) {
+                } else if ($sectionextra->levelsan == 2) {
                     $data->thirdsectionlist[$lastparentid][] = $section->id;
                 }
             }

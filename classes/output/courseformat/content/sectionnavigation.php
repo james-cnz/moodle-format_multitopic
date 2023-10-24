@@ -25,9 +25,7 @@
 namespace format_multitopic\output\courseformat\content;
 
 use core_courseformat\output\local\content\sectionnavigation as sectionnavigation_base;
-use context_course;
 use core_courseformat\base as course_format;
-use core_courseformat\output\local\courseformat_named_templatable;
 use stdClass;
 
 
@@ -36,21 +34,16 @@ use stdClass;
  *
  * @package   format_multitopic
  * @copyright 2022 Te Wānanga o Aotearoa
- * @author Jeremy FitzPatrick
+ * @author    Jeremy FitzPatrick
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class sectionnavigation extends sectionnavigation_base {
 
-    use courseformat_named_templatable;
-
-    /** @var course_format the course format class */
-    protected $format;
-
-    /** @var int the course displayed section number */
-    protected $sectionno;
-
-    /** @var stdClass the course displayed section */
+    /** @var \section_info the course displayed section */
     protected $section;
+
+    /** @var \format_multitopic\section_info_extra Multitopic-specific section information */
+    protected $fmtsectionextra;
 
     /** @var stdClass the calculated data to prevent calculations when rendered several times */
     private $data = null;
@@ -59,13 +52,12 @@ class sectionnavigation extends sectionnavigation_base {
      * Constructor.
      *
      * @param course_format $format the course format
-     * @param stdClass $section section info
+     * @param \section_info $section section info
      */
     public function __construct(course_format $format, $section) {
-        $this->format = $format;
-        $section = $format->fmt_get_section($section);
+        parent::__construct($format, $section->section);
         $this->section = $section;
-        $this->sectionno = $section->section;
+        $this->fmtsectionextra = $format->fmt_get_section_extra($section);
     }
 
     /**
@@ -75,7 +67,6 @@ class sectionnavigation extends sectionnavigation_base {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): stdClass {
-        global $USER;
 
         if ($this->data !== null) {
             return $this->data;
@@ -84,7 +75,7 @@ class sectionnavigation extends sectionnavigation_base {
         $format = $this->format;
         $course = $format->get_course();
 
-        $sections = $format->fmt_get_sections();
+        $sectionsextra = $format->fmt_get_sections_extra();
 
         $data = (object)[
             'previousurl' => '',
@@ -95,8 +86,10 @@ class sectionnavigation extends sectionnavigation_base {
         ];
 
         $back = $this->section;
-        while (isset($back->prevpageid)) {
-            $back = $sections[$back->prevpageid];
+        $backextra = $this->fmtsectionextra;
+        while (isset($backextra->prevpageid)) {
+            $backextra = $sectionsextra[$backextra->prevpageid];
+            $back = $backextra->sectionbase;
             if ($back->uservisible) {
                 $data->previousname = get_section_name($course, $back);
                 $data->previousurl = course_get_url($course, $back);
@@ -106,8 +99,10 @@ class sectionnavigation extends sectionnavigation_base {
         }
 
         $next = $this->section;
-        while (isset($next->nextpageid)) {
-            $next = $sections[$next->nextpageid];
+        $nextextra = $this->fmtsectionextra;
+        while (isset($nextextra->nextpageid)) {
+            $nextextra = $sectionsextra[$nextextra->nextpageid];
+            $next = $nextextra->sectionbase;
             if ($next->uservisible) {
                 $data->nextname = get_section_name($course, $next);
                 $data->nexturl = course_get_url($course, $next);

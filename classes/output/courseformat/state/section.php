@@ -18,12 +18,9 @@ namespace format_multitopic\output\courseformat\state;
 
 use core_courseformat\output\local\state\section as base_section;
 
-use core_availability\info_section;
 use core_courseformat\base as course_format;
 use section_info;
-use renderable;
 use stdClass;
-use context_course;
 
 /**
  * Contains the ajax update section structure.
@@ -35,6 +32,20 @@ use context_course;
  */
 class section extends base_section {
 
+    /** @var \format_multitopic\section_info_extra Multitopic-specific section information */
+    protected $fmtsectionextra;
+
+    /**
+     * Constructor.
+     *
+     * @param course_format $format the course format
+     * @param section_info $section the section info
+     */
+    public function __construct(course_format $format, section_info $section) {
+        parent::__construct($format, $section);
+        $this->fmtsectionextra = $format->fmt_get_section_extra($section);
+    }
+
     /**
      * Export this data so it can be used as state object in the course editor.
      *
@@ -44,16 +55,14 @@ class section extends base_section {
     public function export_for_template(\renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
         $section = $this->section;
-        if (!isset($section->fmtdata)) {
-            $section = $this->format->fmt_get_section($section);
-        }
-        $data->levelsan = $section->levelsan;
-        $data->indent = ($section->section == 0) ? 0 : $section->levelsan;
-        $data->pageid = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
-        $data->timed = $section->dateend && ($section->datestart < $section->dateend);
-        $data->parentid = $section->parentid;
+        $sectionextra = $this->fmtsectionextra;
+        $data->levelsan = $sectionextra->levelsan;
+        $data->indent = max($sectionextra->levelsan, 0);
+        $data->pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $sectionextra->parentid;
+        $data->timed = $sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend);
+        $data->parentid = $sectionextra->parentid;
         $data->available = $section->available;
-        $data->currentnestedlevel = $section->currentnestedlevel;
+        $data->currentnestedlevel = $sectionextra->currentnestedlevel;
         $controlmenuclass = $this->format->get_output_classname('content\\section\\controlmenu');
         $controlmenu = new $controlmenuclass($this->format, $section);
         $data->controlmenu = $controlmenu->export_for_template($output);

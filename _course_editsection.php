@@ -48,7 +48,8 @@ $context = \context_course::instance($course->id);
 require_capability('moodle/course:update', $context);
 
 // Get section_info object with all availability options.
-$sectioninfo = course_get_format($course)->fmt_get_section($section);           // CHANGED: Use custom function, pass section info.
+$sectioninfo = get_fast_modinfo($course)->get_section_info_by_id($section->id); // CHANGED.
+$sectioninfoextra = course_get_format($course)->fmt_get_section_extra($section); // ADDED.
 
 // Deleting the section.
 if ($deletesection) {
@@ -65,10 +66,10 @@ if ($deletesection) {
             // ADDED.
             // If section was topic level, return to page, else return to previous section.
             $sectionreturn = new \stdClass();
-            if ($sectioninfo->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-                $sectionreturn->id = $sectioninfo->parentid;
+            if ($sectioninfoextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+                $sectionreturn->id = $sectioninfoextra->parentid;
             } else {
-                $sectionreturn->id = $sectioninfo->prevupid;
+                $sectionreturn->id = $sectioninfoextra->prevupid;
             }
             // END ADDED.
             $courseurl = course_get_url($course, $sectionreturn);               // CHANGED: Use sectionreturn defined above.
@@ -110,7 +111,7 @@ $editoroptions = [
 ];
 
 $courseformat = course_get_format($course);
-$defaultsectionname = $courseformat->get_default_section_name($sectioninfo);    // CHANGED: Use custom section info.
+$defaultsectionname = $courseformat->get_default_section_name($sectioninfo);    // CHANGED: Use section info.
 
 $customdata = [
     'cs' => $sectioninfo,
@@ -144,15 +145,15 @@ if ($mform->is_cancelled()) {
     }
     course_update_section($course, $section, $data);
     // ADDED: Update section info for return URL.
-    if (isset($data->level) && ($data->level != $sectioninfo->levelsan) && ($sectioninfo->section > 0)) {
+    if (isset($data->level) && ($data->level != $sectioninfoextra->levelsan) && ($sectioninfo->section > 0)) {
         // If the level was changed, update the section info properties relevant to generating the URL.
-        // This is a hack to avoid recalculating section properties.
-        if (($sectioninfo->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
+        // This is a hack to avoid recalculating section properties.  TODO: Remove?
+        if (($sectioninfoextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
             && ($data->level >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)) {
             // If the section was changed to Topic level, the former previous page will be the new parent page.
-            $sectioninfo->parentid = $sectioninfo->prevpageid;
+            $sectioninfoextra->parentid = $sectioninfoextra->prevpageid;
         }
-        $sectioninfo->levelsan = $data->level;
+        $sectioninfoextra->levelsan = $data->level;
     }
     // END ADDED.
 

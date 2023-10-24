@@ -31,26 +31,29 @@
  * and does the same for every activity in that section
  *
  * @param int $courseid course id
- * @param stdClass $section The section to adjust.  Must specify id
+ * @param stdClass|\section_info $section The section to adjust.  Must specify id
  * @param int $visibility The new visibility.  0 = hidden, 1 = visible
  * @return array A list of resources which were hidden in the section
  */
-function format_multitopic_set_section_visible(int $courseid, \stdClass $section, int $visibility) : array {
+function format_multitopic_set_section_visible(int $courseid, $section, int $visibility) : array {
     // CHANGED LINE ABOVE: Use sectioninfo, not section number.
     global $DB;
 
     $resourcestotoggle = [];
     // ADDED.
     // Fetch section info.
-    $sections = course_get_format($courseid)->fmt_get_sections();
-    $section = array_key_exists($section->id, $sections) ? $sections[$section->id] : null;
+    $sectionsextra = course_get_format($courseid)->fmt_get_sections_extra();
+    $sectionextra = array_key_exists($section->id, $sectionsextra) ? $sectionsextra[$section->id] : null;
     // We will recurse if setting visibility to hidden, because hidden sections should not contain visible sections.
     $recurse = ($visibility == 0);
     // END ADDED.
-    for ($subsection = $section; /* ... */
-        $subsection && ($subsection->id == $section->id || $recurse && $subsection->levelsan > $section->levelsan); /* ... */
-        $subsection = array_key_exists($subsection->nextanyid, $sections) ? $sections[$subsection->nextanyid] : null) {
+    for ($subsectionextra = $sectionextra; /* ... */
+        $subsectionextra && ($subsectionextra->id == $section->id
+                            || $recurse && $subsectionextra->levelsan > $sectionextra->levelsan); /* ... */
+        $subsectionextra = array_key_exists($subsectionextra->nextanyid, $sectionsextra) ?
+            $sectionsextra[$subsectionextra->nextanyid] : null) {
         // CHANGED LINES ABOVE: Recurse, if necessary.
+        $subsection = $subsectionextra->sectionbase;
         course_update_section($courseid, $subsection, ['visible' => $visibility]); // CHANGED: $section -> $subsection .
 
         // Determine which modules are visible for AJAX update.
@@ -151,11 +154,11 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // REMOVED.
 
     // Get all sections for this course and re-order them.
-    if (!$sections = course_get_format($course)->fmt_get_sections()) {          // CHANGED.
+    if (!$sectionsextra = course_get_format($course)->fmt_get_sections_extra()) { // CHANGED.
         throw new \moodle_exception('cannotcreateorfindstructs');               // CHANGED.
     }
 
-    $movedsections = format_multitopic_reorder_sections($sections, $origins, $destination); // CHANGED.
+    $movedsections = format_multitopic_reorder_sections($sectionsextra, $origins, $destination); // CHANGED.
 
     // Update all sections. Do this in 2 steps to avoid breaking database
     // uniqueness constraint.
@@ -163,13 +166,13 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // CHANGED.
     foreach ($movedsections as $id => $movedsection) {
         $position = $movedsection->section;
-        if ($sections[$id]->section !== $position) {
+        if ($sectionsextra[$id]->section !== $position) {
             $DB->set_field('course_sections', 'section', -$position, ['id' => $id]);
         }
     }
     foreach ($movedsections as $id => $movedsection) {
         $position = $movedsection->section;
-        if ($sections[$id]->section !== $position) {
+        if ($sectionsextra[$id]->section !== $position) {
             $DB->set_field('course_sections', 'section', $position, ['id' => $id]);
         }
     }
@@ -187,19 +190,20 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     foreach ($movedsections as $id => $movedsection) {
         // Find differences between original section and moved section, and store as updates.
         $updates = [];
-        if ($sections[$id]->level !== $movedsection->level) {
-            $updates['level'] = $movedsection->level;
+        if ($sectionsextra[$id]->sectionbase->level !== max($movedsection->level, 0)) {
+            $updates['level'] = max($movedsection->level, 0);
         }
-        if ($sections[$id]->visible != $movedsection->visible) {
+        if ($sectionsextra[$id]->sectionbase->visible != $movedsection->visible) {
             $updates['visible'] = $movedsection->visible;
         }
         // Set page-level sections to untimed.
-        if ($movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $sections[$id]->periodduration != '0 day') {
+        if ($movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                && $sectionsextra[$id]->sectionbase->periodduration != '0 day') {
             $updates['periodduration'] = '0 day';
         }
         // Apply section updates.
         if ($updates) {
-            course_update_section($course, $sections[$id], $updates);
+            course_update_section($course, $sectionsextra[$id]->sectionbase, $updates);
         }
     }
     // END ADDED.
@@ -250,94 +254,96 @@ function format_multitopic_course_can_delete_section(\stdClass $course, \section
  * Reordering algorithm for course sections. Given an array of sections indexed by section->id,
  * origins, and a target, rebuilds the array.
  *
- * @param array $sections The list of sections.  Must specify fmt calculated properties.
+ * @param \format_multitopic\section_info_extra[] $sectionsextra The list of sections.
  * @param \stdClass|\section_info|array $origins The section(s) to be moved.  Must specify id.
  * @param \stdClass $target The destination.  Must specify parentid, prevupid, or nextupid.  May specify level.
  * @return array
  */
-function format_multitopic_reorder_sections(array $sections, $origins, \stdClass $target) : array {
+function format_multitopic_reorder_sections(array $sectionsextra, $origins, \stdClass $target) : array {
     // CHANGED THROUGHOUT: Section numbers changed to IDs, used exceptions instead of returning false.
     // Reads Calculated section values (levelsan, visiblesan).
     // Writes raw section values (level, visible).
-    if (!is_array($sections)) {
+    if (!is_array($sectionsextra)) {
         throw new \moodle_exception('cannotcreateorfindstructs');
     }
 
     $origins = !is_array($origins) ? [ $origins ] : $origins;
 
-    $originarray = [];
+    $originextraarray = [];
     $originlevel = null;
-    foreach ($origins as $key => $origin) {
+    foreach ($origins as $origin) {
 
         // Locate origin section in sections array.
-        if (!($origin = array_key_exists($origin->id, $sections) ? $sections[$origin->id] : null)) {
+        if (!($originextra = array_key_exists($origin->id, $sectionsextra) ? $sectionsextra[$origin->id] : null)) {
             throw new \moodle_exception('sectionnotexist');
         }
 
         // We can't move section position 0.
-        if (isset($origin->section) && $origin->section < 1) {
+        if (isset($originextra->section) && $originextra->section < 1) {
             throw new \moodle_exception('cannotcreateorfindstructs');
         }
 
         if (!isset($originlevel)) {
-            $originlevel = $origin->levelsan;
+            $originlevel = $originextra->levelsan;
         } else {
-            if ($origin->levelsan != $originlevel) {
+            if ($originextra->levelsan != $originlevel) {
                 throw new \moodle_exception('cannotcreateorfindstructs');
             }
         }
 
         // Extract origin sections.
-        for ($originsubkey = $origin->id; /* ... */
-            $originsubkey == $origin->id || $originsubkey && $sections[$originsubkey]->levelsan > $origin->levelsan; /* ... */
-            $originsubkey = $originarray[$originsubkey]->nextanyid) {
-            $originarray[$originsubkey] = $sections[$originsubkey];
-            unset($sections[$originsubkey]);
+        for ($originsubkey = $originextra->id; /* ... */
+            $originsubkey == $originextra->id
+                || $originsubkey && $sectionsextra[$originsubkey]->levelsan > $originextra->levelsan; /* ... */
+            $originsubkey = $originextraarray[$originsubkey]->nextanyid) {
+            $originextraarray[$originsubkey] = $sectionsextra[$originsubkey];
+            unset($sectionsextra[$originsubkey]);
         }
 
     }
 
     // Find target position and extract remaining sections.
     $target->level = $target->level ?? $originlevel;
-    $parent = null;
-    $prev = null;
+    $parentextra = null;
+    $prevextra = null;
     $found = false;
-    $appendarray = [];
-    foreach ($sections as $id => $section) {
+    $appendextraarray = [];
+    foreach ($sectionsextra as $id => $sectionextra) {
         if ($found) {
             // Target position already found, extract remaining sections.
-            $appendarray[$id] = $section;
-            unset($sections[$id]);
-        } else if (isset($target->parentid) && $section->id == $target->parentid) {
+            $appendextraarray[$id] = $sectionextra;
+            unset($sectionsextra[$id]);
+        } else if (isset($target->parentid) && $sectionextra->id == $target->parentid) {
             // Reached the target parent section, remember it.
-            $parent = $section;
-            if ($target->level <= $parent->levelsan) {
+            $parentextra = $sectionextra;
+            if ($target->level <= $parentextra->levelsan) {
                 // The moved section can not be a child of the specified parent.
                 throw new \moodle_exception('cannotcreateorfindstructs');
             }
-        } else if (isset($target->prevupid) && $section->id == $target->prevupid) {
+        } else if (isset($target->prevupid) && $sectionextra->id == $target->prevupid) {
             // Reached the target previous section, remember it.
-            $prev = $section;
-            if ($target->level < $prev->levelsan) {
+            $prevextra = $sectionextra;
+            if ($target->level < $prevextra->levelsan) {
                 // The moved section can not have the specified section as its previous.
                 throw new \moodle_exception('cannotcreateorfindstructs');
             }
-        } else if (isset($parent) && ($section->levelsan < $target->level || $section->levelsan <= $parent->levelsan)
-                    || isset($prev) && ($section->levelsan <= $target->level)
-                    || isset($target->nextupid) && $section->id == $target->nextupid) {
+        } else if (isset($parentextra)
+                        && ($sectionextra->levelsan < $target->level || $sectionextra->levelsan <= $parentextra->levelsan)
+                    || isset($prevextra) && ($sectionextra->levelsan <= $target->level)
+                    || isset($target->nextupid) && $sectionextra->id == $target->nextupid) {
             // Reached the last position in a specified parent in which the moved section would be a (direct) child,
             // or the appropriate position after a specified previous section,
             // or the position before a specified next section.
-            if ($section->levelsan > $target->level) {
+            if ($sectionextra->levelsan > $target->level) {
                 // If inserted here, the moved section would absorb other sections.
                 throw new \moodle_exception('cannotcreateorfindstructs');
             }
-            $appendarray[$id] = $section;
-            unset($sections[$id]);
+            $appendextraarray[$id] = $sectionextra;
+            unset($sectionsextra[$id]);
             $found = true;
         }
     }
-    if (isset($parent) || isset($prev)) {
+    if (isset($parentextra) || isset($prevextra)) {
         // If a specified parent or previous was found, but no position within the section list was appropriate,
         // the appropriate position must be the end of the section list.
         $found = true;
@@ -346,40 +352,42 @@ function format_multitopic_reorder_sections(array $sections, $origins, \stdClass
         throw new \moodle_exception('sectionnotexist');
     }
 
+    $sections = [];
+
     // Clone pre-target sections (to avoid cross-linking),
     // and check if the target location's parent is visible.
     $parentvisible = true;
     if (true) {
-        foreach ($sections as $id => $section) {
+        foreach ($sectionsextra as $id => $sectionextra) {
             $sections[$id] = new \stdClass;
             $sections[$id]->id = $id;
-            $sections[$id]->visible = $section->visiblesan;
-            $sections[$id]->level = $section->levelsan;
-            if ($section->levelsan < $target->level) {
-                $parentvisible = $section->visiblesan;
+            $sections[$id]->visible = $sectionextra->visiblesan;
+            $sections[$id]->level = $sectionextra->levelsan;
+            if ($sectionextra->levelsan < $target->level) {
+                $parentvisible = $sectionextra->visiblesan;
             }
         }
     }
 
     // Append moved sections.
     $levelchange = $target->level - $originlevel;
-    foreach ($originarray as $id => $section) {
+    foreach ($originextraarray as $id => $sectionextra) {
         $sections[$id] = new \stdClass;
         $sections[$id]->id = $id;
-        $sections[$id]->visible = $section->visiblesan && $parentvisible;
-        $sections[$id]->level = ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
-                                        && $section->levelsan != $originlevel) ?
+        $sections[$id]->visible = $sectionextra->visiblesan && $parentvisible;
+        $sections[$id]->level = ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                                        && $sectionextra->levelsan != $originlevel) ?
                                     FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC       // Don't change topic level.
-                                    : $section->levelsan + $levelchange;
+                                    : $sectionextra->levelsan + $levelchange;
     }
 
     // Append rest of array.
     if (true) {                                                                 // CHANGED: Don't need to check for empty array?
-        foreach ($appendarray as $id => $section) {
+        foreach ($appendextraarray as $id => $sectionextra) {
             $sections[$id] = new \stdClass;
             $sections[$id]->id = $id;
-            $sections[$id]->visible = $section->visiblesan;
-            $sections[$id]->level = $section->levelsan;
+            $sections[$id]->visible = $sectionextra->visiblesan;
+            $sections[$id]->level = $sectionextra->levelsan;
         }
     }
 

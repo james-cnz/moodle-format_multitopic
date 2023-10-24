@@ -70,13 +70,13 @@ class format_multitopic extends core_courseformat\base {
     public $fmtrootsectionid;
 
     /** @var stdClass Multitopic-specific section information */
-    private $fmtsections = null;
+    private $fmtsectionsextra = null;
 
     /** @var course_modinfo|null Mod info the Multitopic-specific section information was based on */
     private $fmtmodinfo = null;
 
     /** @var bool Multitopic-specific section information is complete*/
-    private $fmtsectionscomplete = false;
+    private $fmtsectionsextracomplete = false;
 
     /** @var int the current section ID */
     public $singlesectionid;
@@ -97,7 +97,7 @@ class format_multitopic extends core_courseformat\base {
         parent::__construct($format, $courseid);
         if ($courseid) {
             $this->fmtrootsectionid = $DB->get_field('course_sections', 'id', ['section' => 0, 'course' => $courseid]);
-            // TODO: Check if this is set correctly for new courses? Do this in fmt_get_sections instead?
+            // TODO: Check if this is set correctly for new courses?
         }
     }
     // END INCLUDED.
@@ -162,57 +162,31 @@ class format_multitopic extends core_courseformat\base {
             && get_config('format_multitopic', 'indentation')) ? true : false;
     }
 
-    // INCLUDED /course/format/classes/base functions get_sections and get_section .
+    // ADDED.
     /**
-     * Returns a list of sections used in the course.
-     *
-     * CHANGED: Indexed by ID, with calculated properties:
-     * - levelsan:          Sanatised section level
-     * - parentid:          ID of section's parent (previous section at a higher level)
-     * - prevupid:          ID of the previous section at the same or higher level
-     * - prevpageid:        ID of the previous section above topic level
-     * - prevanyid:         ID of the previous section at any level
-     * - nextupid:          ID of the next section at the same or higher level
-     * - nextpageid:        ID of the next section above topic level
-     * - nextanyid:         ID of the next section at any level
-     * - hassubsections:    Whether this section has subsections
-     * - pagedepth:         The lowest level of subpages
-     * - pagedepthdirect:   The lowest level of shown direct subpages
-     * - parentvisiblesan:  Sanatised parent's visibility
-     * - visiblesan:        Sanatised visibility
-     * - datestart:         Section's start date
-     * - dateend:           Section's end date
-     * - currentnestedlevel: The level down to which this section contains the current section.
-     *                      A page-level section may be represented as multiple levels of tabs,
-     *                      and higher levels may contain the current section, while lower levels don't.
-     * - fmtdata:           Flag to indicate the presence of calculated properties
+     * Returns a list of Multitopic-specific section information.
      *
      * @param bool $needall do we need all properties
-     * @return section_info[]
+     * @return \format_multitopic\section_info_extra[]
      */
-    final public function fmt_get_sections($needall = true) : array {
-        // CHANGED LINE ABOVE.
+    final public function fmt_get_sections_extra($needall = true) : array {
 
         $course = $this->get_course();
         $modinfo = $course ? $this->get_modinfo() : null;
 
-        if (isset($this->fmtsections) && $this->fmtmodinfo == $modinfo) {
+        if (isset($this->fmtsectionsextra) && $this->fmtmodinfo == $modinfo) {
 
-            $fmtsections = $this->fmtsections;
+            $fmtsectionsextra = $this->fmtsectionsextra;
 
         } else {
 
-            $this->fmtsectionscomplete = false;
+            $this->fmtsectionsextracomplete = false;
 
-            // CHANGED: Get info, but don't return it yet.
             if ($course) {
                 $sections = $modinfo->get_section_info_all();
             } else {
                 $sections = [];
             }
-            // END CHANGED.
-
-            // ADDED.
 
             $timenow = time();
 
@@ -221,14 +195,14 @@ class format_multitopic extends core_courseformat\base {
             // Forward pass.
 
             // Initialise generated list of sections.
-            $fmtsections = [];
+            $fmtsectionsextra = [];
 
             // The previous section at, or above, each level.
-            $sectionprevatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+            $sectionextraprevatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
                                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
             // The current section at, or above, each level.
-            $sectionatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+            $sectionextraatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
                                         FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
             foreach ($sections as $thissection) {
@@ -238,56 +212,52 @@ class format_multitopic extends core_courseformat\base {
                     throw new moodle_exception('cannotcreateorfindstructs');
                 }
 
-                // Add this section to the list.
-                $fmtsections[$thissection->id] = $thissection;
+                // Create new object.
+                $thissectionextra = new \format_multitopic\section_info_extra($thissection);
 
                 // Fix the section's level within appropriate bounds.
-                $levelsan = ($sectionatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT] == null) ?
+                $levelsan = ($sectionextraatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT] == null) ?
                         FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT
                         : max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1,
                         min($thissection->level ?? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC, FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC));
-                $thissection->levelsan = $levelsan;
+                $thissectionextra->levelsan = $levelsan;
 
                 // Update remembered sections.
                 for ($sublevel = $levelsan; $sublevel <= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; $sublevel++) {
-                    $sectionprevatlevel[$sublevel] = $sectionatlevel[$sublevel];
-                    $sectionatlevel[$sublevel] = $thissection;
+                    $sectionextraprevatlevel[$sublevel] = $sectionextraatlevel[$sublevel];
+                    $sectionextraatlevel[$sublevel] = $thissectionextra;
                 }
 
                 // The previous section at or above this section's level.
-                $thissection->prevupid = $sectionprevatlevel[$levelsan] ? $sectionprevatlevel[$levelsan]->id : null;
+                $thissectionextra->prevupid = $sectionextraprevatlevel[$levelsan] ? $sectionextraprevatlevel[$levelsan]->id : null;
 
                 // The previous page.
-                $thissection->prevpageid = $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1] ?
-                                                $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id
-                                                : null;
+                $thissectionextra->prevpageid = $sectionextraprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1] ?
+                                                $sectionextraprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id : null;
 
                 // The previous section at any level.
-                $thissection->prevanyid = $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
-                                                $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->id
-                                                : null;
+                $thissectionextra->prevanyid = $sectionextraprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
+                                                $sectionextraprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->id : null;
 
                 // The section's parent.
-                $thissection->parentid = ($levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
-                                                $sectionatlevel[$levelsan - 1]->id
-                                                : null;
+                $thissectionextra->parentid = ($levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
+                                                $sectionextraatlevel[$levelsan - 1]->id : null;
 
                 // Initialise tree-related properties to be set in the reverse pass.
-                $thissection->hassubsections = false;   // Whether this section has any subsections (page or topic).
-                $thissection->pagedepth = $levelsan;    // The lowest level of all sub-pages.
-                $thissection->pagedepthdirect = $levelsan; // The lowest level of direct sub-pages.
+                $thissectionextra->hassubsections = false;  // Whether this section has any subsections (page or topic).
+                $thissectionextra->pagedepth = $levelsan;   // The lowest level of all sub-pages.
+                $thissectionextra->pagedepthdirect = $levelsan; // The lowest level of direct sub-pages.
 
                 // Set visibility properties.
-                $thissection->parentvisiblesan = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
+                $thissectionextra->parentvisiblesan = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
+                                                    true : $sectionextraatlevel[$levelsan - 1]->visiblesan;
+                $thissectionextra->visiblesan = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
                                                     true
-                                                    : $sectionatlevel[$levelsan - 1]->visiblesan;
-                $thissection->visiblesan = ($levelsan <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) ?
-                                                    true
-                                                    : ($sectionatlevel[$levelsan - 1]->visiblesan && $thissection->visible);
+                                                    : ($sectionextraatlevel[$levelsan - 1]->visiblesan && $thissection->visible);
 
                 // Set date-start property from previous section.
-                $thissection->datestart = $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
-                                                $sectionprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->dateend
+                $thissectionextra->datestart = $sectionextraprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
+                                                $sectionextraprevatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->dateend
                                                 : (is_null($courseperioddays) ? null : $course->startdate);
 
                 // Set date-end property.
@@ -299,25 +269,28 @@ class format_multitopic extends core_courseformat\base {
                         $sectionperioddays = $courseperioddays;
                     }
                 }
-                $thissection->dateend = (is_null($thissection->datestart) || is_null($sectionperioddays)) ?
+                $thissectionextra->dateend = (is_null($thissectionextra->datestart) || is_null($sectionperioddays)) ?
                                             null
-                                            : ($thissection->datestart + $sectionperioddays * 24 * 60 * 60);
+                                            : ($thissectionextra->datestart + $sectionperioddays * 24 * 60 * 60);
 
                 // The level down to which this section contains the current section.
                 // Initialise for reverse pass.
-                $iscurrent = $thissection->dateend
-                            && ($thissection->datestart <= $timenow) && ($timenow < $thissection->dateend);
-                $thissection->currentnestedlevel = $iscurrent ? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                $iscurrent = $thissectionextra->dateend
+                            && ($thissectionextra->datestart <= $timenow) && ($timenow < $thissectionextra->dateend);
+                $thissectionextra->currentnestedlevel = $iscurrent ? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
                                                             : FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1;
+
+                // Add this section to the list.
+                $fmtsectionsextra[$thissection->id] = $thissectionextra;
 
             }
 
-            $this->fmtsections = $fmtsections;
+            $this->fmtsectionsextra = $fmtsectionsextra;
             $this->fmtmodinfo = $modinfo;
 
         }
 
-        if ($needall && !$this->fmtsectionscomplete) {
+        if ($needall && !$this->fmtsectionsextracomplete) {
 
             // Reverse pass.
 
@@ -325,31 +298,26 @@ class format_multitopic extends core_courseformat\base {
             $sectionnextatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
                                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
-            for ($thissection = end($fmtsections); /* ... */
-                    $thissection; /* ... */
-                    $thissection = $thissection->prevanyid ? $fmtsections[$thissection->prevanyid] : null) {
-                $levelsan = $thissection->levelsan;
+            for ($thissectionextra = end($fmtsectionsextra); /* ... */
+                    $thissectionextra; /* ... */
+                    $thissectionextra = $thissectionextra->prevanyid ? $fmtsectionsextra[$thissectionextra->prevanyid] : null) {
+                $thissection = $thissectionextra->sectionbase;
+                $levelsan = $thissectionextra->levelsan;
 
                 // Tree properties from next sections.
-                $thissection->nextupid = $sectionnextatlevel[$levelsan] ?
-                                                $sectionnextatlevel[$levelsan]->id
-                                                : null;
-                $thissection->nextpageid = $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1] ?
-                                                $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id
-                                                : null;
-                $thissection->nextanyid = $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
-                                                $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->id
-                                                : null;
-
-                // Flag to indicate the presence of calculated properties.
-                $thissection->fmtdata = true;
+                $thissectionextra->nextupid = $sectionnextatlevel[$levelsan] ?
+                                                $sectionnextatlevel[$levelsan]->id : null;
+                $thissectionextra->nextpageid = $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1] ?
+                                                $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->id : null;
+                $thissectionextra->nextanyid = $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC] ?
+                                                $sectionnextatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC]->id : null;
 
                 // Parent's tree properties.
-                if ($thissection->parentid) {
-                    $parent = $fmtsections[$thissection->parentid];
+                if ($thissectionextra->parentid) {
+                    $parent = $fmtsectionsextra[$thissectionextra->parentid];
                     $parent->hassubsections = true;
                     if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-                        $parent->pagedepth = max($parent->pagedepth, $thissection->pagedepth);
+                        $parent->pagedepth = max($parent->pagedepth, $thissectionextra->pagedepth);
                         $showsection = $thissection->uservisible || ($thissection->section == 0) ||
                                 ($parent->uservisible || ($parent->section == 0))
                                 && ($thissection->visible || !$course->hiddensections)
@@ -358,95 +326,82 @@ class format_multitopic extends core_courseformat\base {
                             $parent->pagedepthdirect = max($parent->pagedepthdirect, $levelsan);
                         }
                     }
-                    if ($thissection->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) {
+                    if ($thissectionextra->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) {
                         $parent->currentnestedlevel = max($parent->currentnestedlevel, $levelsan - 1);
                     }
                 }
 
                 // Update remembered next sections.
                 for ($sublevel = $levelsan; $sublevel <= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; $sublevel++) {
-                    $sectionnextatlevel[$sublevel] = $thissection;
+                    $sectionnextatlevel[$sublevel] = $thissectionextra;
                 }
 
             }
 
-            $this->fmtsections = $fmtsections;
-            $this->fmtsectionscomplete = true;
+            $this->fmtsectionsextra = $fmtsectionsextra;
+            $this->fmtsectionsextracomplete = true;
 
         }
 
-        return $fmtsections;
-
-        // END ADDED.
+        return $fmtsectionsextra;
 
     }
 
     /**
-     * Returns information about section used in course.
+     * Returns Multitopic-specific section information.
      *
-     * NOTE: If passed section info with calculated properties already in place, they will be returned as is.
-     * see fmt_get_sections() for details of calculated properties.
-     *
-     * @param int|stdClass $section either section number (field course_section.section) or row from course_section table
+     * @param int|stdClass|\section_info $section either section number or row from course_section table
      * @param int $strictness
-     * @return section_info
+     * @return \format_multitopic\section_info_extra
      */
-    final public function fmt_get_section($section, int $strictness = IGNORE_MISSING) {
-        // CHANGED: Convert from section number to section info, rather than the other way around.
-        if (is_numeric($section)) {
-            $sectionnum = $section;
-            $section = new stdClass();
-            $section->section = $sectionnum;
+    final public function fmt_get_section_extra($section, int $strictness = IGNORE_MISSING) {
+        if (!is_object($section)) {
+            $section = (object)['section' => $section];
         }
-        // END CHANGED.
-        // ADDED.
-        if (isset($section->fmtdata) && $section->fmtdata) {
-            return $section;
-        }
-        // END ADDED.
-        // CHANGED.
-        $sections = $this->fmt_get_sections();
+        $sectionsextra = $this->fmt_get_sections_extra();
         if (isset($section->id)) {
-            if (array_key_exists($section->id, $sections)) {
-                return $sections[$section->id];
+            if (array_key_exists($section->id, $sectionsextra)) {
+                return $sectionsextra[$section->id];
             }
         } else if (isset($section->section)) {
-            foreach ($sections as $thissection) {
-                if ($thissection->section == $section->section) {
-                    return $thissection;
+            foreach ($sectionsextra as $thissectionextra) {
+                if ($thissectionextra->section == $section->section) {
+                    return $thissectionextra;
                 }
             }
         }
-        // END CHANGED.
         if ($strictness == MUST_EXIST) {
             throw new moodle_exception('sectionnotexist');
         }
         return null;
     }
-    // END INCLUDED.
+    // END ADDED.
 
     /**
      * Returns the display name of the given section that the course prefers.
      *
      * Use section name is specified by user. Otherwise use default.
      *
-     * @param int|stdClass $section Section object from database.  Should specify fmt calculated properties.
+     * @param int|stdClass|\section_info $section Section object from database.
      * @return string Display name that the course format prefers, e.g. "Section 2"
      */
     public function get_section_name($section) : string {
 
         // ADDED.
-        $section = $this->fmt_get_section($section);
+        if (!is_object($section)) {
+            $section = $this->get_section($section);
+        }
+        $sectionextra = $this->fmt_get_section_extra($section);
 
         $weekword = new lang_string('week');
         $weeksword = get_string_manager()->string_exists('weeks_capitalised', 'format_multitopic') ?
             get_string('weeks_capitalised', 'format_multitopic') : get_string('weeks');
         // Figure out the string for the week number.
         $daystring = '';
-        if ($section->dateend && ($section->datestart < $section->dateend)) {
+        if ($sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend)) {
             $currentyear = format_multitopic_week_date(time())->o;
-            $datestart = format_multitopic_week_date($section->datestart + 12 * 60 * 60);
-            $dateend = format_multitopic_week_date($section->dateend - 12 * 60 * 60);
+            $datestart = format_multitopic_week_date($sectionextra->datestart + 12 * 60 * 60);
+            $dateend = format_multitopic_week_date($sectionextra->dateend - 12 * 60 * 60);
             if ($datestart->o == $dateend->o) {
                 // Within one year.
                 $yearstring = $datestart->o != $currentyear ? ($datestart->o . ' ') : '';
@@ -522,17 +477,20 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Set which section page will be shown.
      *
-     * @param int|stdClass $singlesection section or num
+     * @param int|stdClass|\section_info $singlesection section or num
      */
     public function set_section_number($singlesection): void {
-        $singlesection = $this->get_section($singlesection);
+        if (!is_object($singlesection) || !isset($singlesection->level)) {
+            $singlesection = $this->get_section($singlesection);
+        }
 
         // If display section is a topic, get the page it is on instead.
         if (isset($singlesection) && $singlesection->level >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-            $sections = $this->fmt_get_sections();
-            $singlesection = $sections[$singlesection->id];
-            if (isset($singlesection) && $singlesection->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-                $singlesection = $sections[$singlesection->parentid];
+            $sectionsextra = $this->fmt_get_sections_extra();
+            $singlesectionextra = $sectionsextra[$singlesection->id];
+            if (isset($singlesectionextra) && $singlesectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+                $singlesectionextra = $sectionsextra[$singlesectionextra->parentid];
+                $singlesection = $singlesectionextra->sectionbase;
             }
         }
 
@@ -551,14 +509,14 @@ class format_multitopic extends core_courseformat\base {
         $result = [];
 
         $course = $this->get_course();
-        $sections = $this->fmt_get_sections();
+        $sectionsextra = $this->fmt_get_sections_extra();
         $coursesectionscache = cache::make('core', 'coursesectionspreferences');
 
         $coursesections = $coursesectionscache->get($course->id);
         $collapsedset = ($coursesections && count($coursesections) > 0) ? max(array_keys($coursesections)) : 0;
         $collapsedset = ($collapsedset > 0 && isset($coursesections[$collapsedset]->fmtcollapsedset)) ?
                         $collapsedset : 0;
-        if ($collapsedset >= max(array_keys($sections))) {
+        if ($collapsedset >= max(array_keys($sectionsextra))) {
             return $coursesections;
         }
 
@@ -610,7 +568,7 @@ class format_multitopic extends core_courseformat\base {
     protected function fmt_set_get_sections_preferences(string $preferencename = null, array $sectionids = null): array {
 
         $course = $this->get_course();
-        $sections = $this->fmt_get_sections();
+        $sectionsextra = $this->fmt_get_sections_extra();
 
         $sectionpreferences = parent::get_sections_preferences_by_preference();
 
@@ -622,7 +580,7 @@ class format_multitopic extends core_courseformat\base {
         foreach ($sectionpreferences as $prefname => $sectids) {
             if ($prefname != 'fmtcollapsedset') {
                 foreach ($sectids as $i => $sectionid) {
-                    if (!isset($sections[$sectionid])) {
+                    if (!isset($sectionsextra[$sectionid])) {
                         unset($sectids[$i]);
                     } else if ($prefname == 'contentcollapsed') {
                         $contentcollapsedindexed[$sectionid] = true;
@@ -635,9 +593,10 @@ class format_multitopic extends core_courseformat\base {
         $sectionidsold = $sectionpreferences['contentcollapsed'] ?? null;
         $collapsedset = $collapsedsetold;
         $autocollapsedchanged = false;
-        foreach ($sections as $sectionid => $section) {
+        foreach ($sectionsextra as $sectionid => $sectionextra) {
+            $section = $sectionextra->sectionbase;
             if ($sectionid > $collapsedsetold
-                    && $section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                    && $sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
                     && ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0')
                     && !isset($contentcollapsedindexed[$sectionid])) {
                 if (!isset($sectionpreferences['contentcollapsed'])) {
@@ -755,17 +714,18 @@ class format_multitopic extends core_courseformat\base {
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
         if ($section !== null) {                                                // CHANGED.
-            $section = $this->fmt_get_section($section, MUST_EXIST);            // ADDED.
+            $sectionextra = $this->fmt_get_section_extra($section, MUST_EXIST); // ADDED.
             // CHANGED.
-            $pageid = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $section->parentid;
+            $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+                $sectionextra->id : $sectionextra->parentid;
             if ($pageid != $this->fmtrootsectionid) {
                 $url->param('sectionid', $pageid);
             }
-            if ($section->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+            if ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                 if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
                     return null;
                 }
-                $url->set_anchor('sectionid-' . $section->id . '-title');
+                $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
             }
             // END CHANGED.
         }
@@ -848,13 +808,13 @@ class format_multitopic extends core_courseformat\base {
         $titles = [];
         $current = -1;
         $course = $this->get_course();
-        // REMOVED: Replaced $modinfo with fmt_get_sections.
+        $modinfo = get_fast_modinfo($course);
         $renderer = $this->get_renderer($PAGE);
-        if ($renderer && ($sections = $this->fmt_get_sections())) {             // CHANGED: Replaced $modinfo with fmt_get_sections.
-            foreach ($sections as $section) {
-                $titles[$section->section] = $renderer->section_title($section, $course);
+        if ($renderer && ($sections = $modinfo->get_section_info_all())) {
+            foreach ($sections as $number => $section) {
+                $titles[$number] = $renderer->section_title($section, $course);
                 if ($this->is_section_current($section)) {
-                    $current = $section->section;
+                    $current = $number;
                 }
             }
         }
@@ -1226,13 +1186,8 @@ class format_multitopic extends core_courseformat\base {
      * @return bool
      */
     public function is_section_current($section) : bool {
-
-        // If we don't have calculated data, don't bother fetching it.
-        if (!is_object($section) || !isset($section->fmtdata)) {
-            return false;
-        }
-
-        return ($section->section && $section->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // CHANGED.
+        $sectionextra = $this->fmt_get_section_extra($section);                 // ADDED.
+        return ($sectionextra->section && $sectionextra->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // CHANGED.
     }
     // END INCLUDED.
 
@@ -1268,10 +1223,10 @@ class format_multitopic extends core_courseformat\base {
      * @param string $availableinfo the 'availableinfo' propery of the section_info as it was evaluated by conditional availability.
      */
     public function section_get_available_hook(section_info $section, &$available, &$availableinfo) {
-        $sections = $this->fmt_get_sections(false);
-        $parentid = $sections[$section->id]->parentid;
+        $sectionsextra = $this->fmt_get_sections_extra(false);
+        $parentid = $sectionsextra[$section->id]->parentid;
         if (isset($parentid)) {
-            $parent = $sections[$parentid];
+            $parent = $sectionsextra[$parentid]->sectionbase;
             if (!($parent->visible && $parent->available) && ($parent->id != $this->fmtrootsectionid)) {
                 $available = false;
                 if (!$parent->uservisible) {
@@ -1287,12 +1242,11 @@ class format_multitopic extends core_courseformat\base {
      * Do not call this function directly, instead use see course_can_delete_section().
      *
      * @param int|stdClass|section_info $section The section to check.
-     *                                  Must specify section number or id.  Should specify fmt calculated properties.
      * @return bool
      */
     public function can_delete_section($section) : bool {
-        $section = $this->fmt_get_section($section);                            // ADDED.
-        return !$section->hassubsections;                                       // CHANGED.
+        $sectionextra = $this->fmt_get_section_extra($section);                 // ADDED.
+        return !$sectionextra->hassubsections;                                  // CHANGED.
     }
 
     // TODO: Customise delete_section to be recursive?
@@ -1309,8 +1263,6 @@ class format_multitopic extends core_courseformat\base {
      */
     public function inplace_editable_render_section_name($section, $linkifneeded = true,
             $editable = null, $edithint = null, $editlabel = null) : \core\output\inplace_editable {
-        $section = $this->fmt_get_section($section);                            // ADDED.
-        $course = course_get_format($section->course)->get_course();            // ADDED.
         if (empty($edithint)) {
             $edithint = new lang_string('editsectionname');                     // CHANGED.
         }
@@ -1329,7 +1281,7 @@ class format_multitopic extends core_courseformat\base {
                     context_course::instance($section->course));
         }
 
-        $displayvalue = $title = get_section_name($section->course, $section);  // CHANGED.
+        $displayvalue = $title = get_section_name($section->course, $section);
         if ($linkifneeded) {
             // Display link under the section name, for page sections.
             $url = course_get_url($section->course, $section, ['navigation' => true]); // CHANGED.

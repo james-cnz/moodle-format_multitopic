@@ -68,8 +68,8 @@ class stateactions extends \core_courseformat\stateactions {
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
         $format = course_get_format($course->id);
-        $allsections = $format->fmt_get_sections();
-        $draggedoriginsection = $allsections[$ids[0]];
+        $allsectionsextra = $format->fmt_get_sections_extra();
+        $draggedoriginsection = $allsectionsextra[$ids[0]];
         if (method_exists($this, 'sort_section_ids_by_section_number')) {
             $ids = $this->sort_section_ids_by_section_number($course, $ids, false);
         }
@@ -78,15 +78,16 @@ class stateactions extends \core_courseformat\stateactions {
         $origins = [];
         $subids = [];
         foreach ($ids as $id) {
-            $origin = $allsections[$id];
-            $origins[] = $origin;
-            for ($originsub = $origin; /* ... */
-                    $originsub && ($originsub->id == $origin->id || $originsub->levelsan > $origin->levelsan); /* ... */
-                    $originsub = $originsub->nextanyid ? $allsections[$originsub->nextanyid] : null) {
-                $subids[] = $originsub->id;
+            $originextra = $allsectionsextra[$id];
+            $origins[] = $originextra;
+            for ($originsubextra = $originextra; /* ... */
+                    $originsubextra && ($originsubextra->id == $originextra->id
+                                        || $originsubextra->levelsan > $originextra->levelsan); /* ... */
+                    $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null) {
+                $subids[] = $originsubextra->id;
             }
         }
-        $targetsection = $allsections[$targetsectionid];
+        $targetsection = $allsectionsextra[$targetsectionid];
         if ($targetsection->section > $draggedoriginsection->section) {
             $destination = (object)['prevupid' => $targetsectionid];
         } else {
@@ -105,7 +106,7 @@ class stateactions extends \core_courseformat\stateactions {
         $this->section_state($updates, $course, $subids, $targetsectionid);
 
         // All course sections can be renamed because of the resort.
-        foreach ($allsections as $section) {
+        foreach ($allsectionsextra as $section) {
             // Ignore the affected sections because they are already in the updates.
             if (isset($affectedsections[$section->id])) {
                 continue;
@@ -146,7 +147,7 @@ class stateactions extends \core_courseformat\stateactions {
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
         $format = course_get_format($course->id);
-        $allsections = $format->fmt_get_sections();
+        $allsectionsextra = $format->fmt_get_sections_extra();
         if (method_exists($this, 'sort_section_ids_by_section_number')) {
             $ids = $this->sort_section_ids_by_section_number($course, $ids, false);
         }
@@ -155,12 +156,13 @@ class stateactions extends \core_courseformat\stateactions {
         $origins = [];
         $subids = [];
         foreach ($ids as $id) {
-            $origin = $allsections[$id];
-            $origins[] = $origin;
-            for ($originsub = $origin; /* ... */
-                    $originsub && ($originsub->id == $origin->id || $originsub->levelsan > $origin->levelsan); /* ... */
-                    $originsub = $originsub->nextanyid ? $allsections[$originsub->nextanyid] : null) {
-                $subids[] = $originsub->id;
+            $originextra = $allsectionsextra[$id];
+            $origins[] = $originextra;
+            for ($originsubextra = $originextra; /* ... */
+                    $originsubextra && ($originsubextra->id == $originextra->id
+                                        || $originsubextra->levelsan > $originextra->levelsan); /* ... */
+                    $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null) {
+                $subids[] = $originsubextra->id;
             }
         }
         $destination = (object)['prevupid' => $targetsectionid];
@@ -177,7 +179,7 @@ class stateactions extends \core_courseformat\stateactions {
         $this->section_state($updates, $course, $subids, $targetsectionid);
 
         // All course sections can be renamed because of the resort.
-        foreach ($allsections as $section) {
+        foreach ($allsectionsextra as $section) {
             // Ignore the affected sections because they are already in the updates.
             if (isset($affectedsections[$section->id])) {
                 continue;
@@ -218,7 +220,7 @@ class stateactions extends \core_courseformat\stateactions {
         $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
 
         $format = course_get_format($course->id);
-        $allsections = $format->fmt_get_sections();
+        $allsectionsextra = $format->fmt_get_sections_extra();
         if (method_exists($this, 'sort_section_ids_by_section_number')) {
             $ids = $this->sort_section_ids_by_section_number($course, $ids, false);
         }
@@ -227,12 +229,13 @@ class stateactions extends \core_courseformat\stateactions {
         $origins = [];
         $subids = [];
         foreach ($ids as $id) {
-            $origin = $allsections[$id];
-            $origins[] = $origin;
-            for ($originsub = $origin; /* ... */
-                    $originsub && ($originsub->id == $origin->id || $originsub->levelsan > $origin->levelsan); /* ... */
-                    $originsub = $originsub->nextanyid ? $allsections[$originsub->nextanyid] : null) {
-                $subids[] = $originsub->id;
+            $originextra = $allsectionsextra[$id];
+            $origins[] = $originextra;
+            for ($originsubextra = $originextra; /* ... */
+                    $originsubextra && ($originsubextra->id == $originextra->id
+                                        || $originsubextra->levelsan > $originextra->levelsan); /* ... */
+                    $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null) {
+                $subids[] = $originsubextra->id;
             }
         }
         $destination = (object)['parentid' => $targetsectionid];
@@ -249,7 +252,7 @@ class stateactions extends \core_courseformat\stateactions {
         $this->section_state($updates, $course, $subids, $targetsectionid);
 
         // All course sections can be renamed because of the resort.
-        foreach ($allsections as $section) {
+        foreach ($allsectionsextra as $section) {
             // Ignore the affected sections because they are already in the updates.
             if (isset($affectedsections[$section->id])) {
                 continue;
@@ -279,12 +282,12 @@ class stateactions extends \core_courseformat\stateactions {
         require_all_capabilities(['moodle/course:update', 'moodle/course:sectionvisibility'], $coursecontext);
 
         $format = course_get_format($course->id);
-        $allsections = $format->fmt_get_sections();
+        $allsectionsextra = $format->fmt_get_sections_extra();
 
         foreach ($ids as $sectionid) {
-            $section = $allsections[$sectionid];
-            if (!$visible && $section->section || $visible && $section->parentvisiblesan) {
-                course_update_section($course, $section, ['visible' => $visible]);
+            $sectionextra = $allsectionsextra[$sectionid];
+            if (!$visible && $sectionextra->section || $visible && $sectionextra->parentvisiblesan) {
+                course_update_section($course, $sectionextra->sectionbase, ['visible' => $visible]);
             }
         }
         $this->section_state($updates, $course, $ids);

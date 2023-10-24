@@ -39,6 +39,9 @@ use core_courseformat\base as course_format;
 class section extends section_base {
 
     // ADDED.
+    /** @var \format_multitopic\section_info_extra the section info */
+    protected $fmtsectionextra;
+
     /**
      * Constructor.
      *
@@ -47,6 +50,7 @@ class section extends section_base {
      */
     public function __construct(course_format $format, \section_info $section) {
         parent::__construct($format, $section);
+        $this->fmtsectionextra = $format->fmt_get_section_extra($section);
         $this->isstealth = false;
     }
     // END ADDED.
@@ -63,6 +67,7 @@ class section extends section_base {
         $format = $this->format;
         $course = $format->get_course();
         $section = $this->section;
+        $sectionextra = $this->fmtsectionextra;
 
         $summary = new $this->summaryclass($format, $section);
 
@@ -75,7 +80,7 @@ class section extends section_base {
             'highlightedlabel' => $format->get_section_highlighted_name(),
             'sitehome' => $course->id == SITEID,
             'editing' => $PAGE->user_is_editing(),
-            'levelsan' => $section->levelsan,
+            'levelsan' => $sectionextra->levelsan,
         ];
 
         $haspartials = [];
@@ -123,14 +128,14 @@ class section extends section_base {
         $result = false;
 
         $section = $this->section;
+        $sectionextra = $this->fmtsectionextra;
         $format = $this->format;
 
         // REMOVED index code.
 
         // ADDED.
-        $singlesection = (object) [ 'id' => $format->singlesectionid ];
-        $pageid = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id
-            : $section->parentid;
+        $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+                    $section->id : $sectionextra->parentid;
         $onpage = ($pageid == $format->singlesectionid);
         // END ADDED.
         $showcmlist = ($section->uservisible || $section->section == 0);        // CHANGED.
@@ -187,6 +192,7 @@ class section extends section_base {
      */
     protected function add_format_data(\stdClass &$data, array $haspartials, \renderer_base $output): bool {
         $section = $this->section;
+        $sectionextra = $this->fmtsectionextra;
         $format = $this->format;
 
         // REMOVED coursedisplay setting.
@@ -213,14 +219,13 @@ class section extends section_base {
 
         // ADDED.
         $course = $this->format->get_course();
-        $singlesection = (object) [ 'id' => $format->singlesectionid ];
-        $pageid = ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id
-            : $section->parentid;
+        $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+                    $section->id : $sectionextra->parentid;
         $onpage = ($pageid == $format->singlesectionid);
         $sectionstyle = " sectionid-{$section->id}";
         $iscollapsible = false;
         // Determine the section type.
-        if ($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+        if ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionstyle .= ' section-page';
         } else {
             $sectionstyle .= ' section-topic';

@@ -92,14 +92,16 @@ class global_navigation_wrapper {
         require_once($CFG->dirroot . '/course/lib.php');
 
         $modinfo = get_fast_modinfo($course);
-        $sections = course_get_format($course)->fmt_get_sections();             // CHANGED: Use custom call.
+        $sectionsorig = $modinfo->get_section_info_all();
 
         // For course formats using 'numsections' trim the sections list.
         // REMOVED.
 
+        $sections = [];
         $activities = [];
 
-        foreach ($sections as $key => $section) {
+        foreach ($sectionsorig as $section) {                                   // CHANGED.
+            $key = $section->id;                                                // ADDED.
             // Clone and unset summary to prevent $SESSION bloat (MDL-31802).
             $sections[$key] = clone($section);
             unset($sections[$key]->summary);
@@ -171,11 +173,12 @@ class global_navigation_wrapper {
         // END ADDED.
         foreach ($sections as $sectionid => $section) {
             $section = clone($section);
+            $sectionextra = course_get_format($course)->fmt_get_section_extra($section); // ADDED.
             if ($course->id == $SITE->id) {
                 $this->load_section_activities($coursenode, $section, $activities); // CHANGED: Pass section info rather than num.
             } else {
                 if ((!$section->uservisible && $section->section != 0) || (!$this->innershowemptysections &&
-                        !$section->hasactivites && !$section->hassubsections
+                        !$section->hasactivites && !$sectionextra->hassubsections
                         && $this->inner->includesectionnum !== $section->section    // TODO: Remove?
                         && $this->innerincludesectionid !== $section->id)) {
                             // CHANGED ABOVE: Use sanitised visibility, check for subsections, and use section ID.
@@ -191,15 +194,15 @@ class global_navigation_wrapper {
                 // And activities don't seem to get removed from the course node in the Boost theme,
                 // so we need at least one section node to attach activities to.
                 // ADDED.
-                $firstlevel = max($section->levelsan, FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1);
-                $lastlevel = max($section->pagedepthdirect, $firstlevel);
+                $firstlevel = max($sectionextra->levelsan, FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1);
+                $lastlevel = max($sectionextra->pagedepthdirect, $firstlevel);
                 // END ADDED.
                 for ($level = $firstlevel; $level <= $lastlevel; $level++) {
                     $parentnode = $nodeln[$level - 1];                          // ADDED.
                     $nodeid = ($level == $lastlevel) ? $sectionid : $extraid--; // ADDED.
                     $sectionnode = $parentnode->add($sectionname, $url, \navigation_node::TYPE_SECTION,
                         null, $nodeid,
-                        new \pix_icon($section->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'i/section'
+                        new \pix_icon($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'i/section'
                                                                                                  : 'e/bullet_list', ''));
                     // CHANGED ABOVE: Attach to parentnode with nodeid as defined above, and use a list icon for topic sections.
                     $sectionnode->nodetype = \navigation_node::NODETYPE_BRANCH;
@@ -215,13 +218,11 @@ class global_navigation_wrapper {
 
                 if ($this->inner->includesectionnum !== false && $this->inner->includesectionnum == $section->section
                         || isset($this->innerincludesectionid) && $this->innerincludesectionid == $section->id
-                        || $section->hassubsections) {
+                        || $sectionextra->hassubsections) {
                             // CHANGED ABOVE: Use section ID.
                             // Also check for subsections, because activities might not get loaded otherwise.
                     $this->load_section_activities($sectionnode, $section, $activities);
                 }
-
-                $section->sectionnode = $sectionnode;
                 $navigationsections[$sectionid] = $section;
                 // END CHANGED.
 
