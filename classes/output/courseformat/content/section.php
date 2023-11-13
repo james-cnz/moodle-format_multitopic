@@ -136,7 +136,7 @@ class section extends section_base {
         // ADDED.
         $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                     $section->id : $sectionextra->parentid;
-        $onpage = ($pageid == $format->singlesectionid);
+        $onpage = ($pageid == $format->singlesectionid) || ($format->singlesectionid === null);
         // END ADDED.
         $showcmlist = ($section->uservisible || $section->section == 0);        // CHANGED.
 
@@ -197,7 +197,7 @@ class section extends section_base {
 
         // REMOVED coursedisplay setting.
 
-        if ($section->id == $format->singlesectionid) {
+        if ($sectionextra->levelsan < 2 && ($section->id == $format->singlesectionid || $format->singlesectionid === null)) {
             $data->collapsemenu = true;
         }
 
@@ -221,7 +221,7 @@ class section extends section_base {
         $course = $this->format->get_course();
         $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                     $section->id : $sectionextra->parentid;
-        $onpage = ($pageid == $format->singlesectionid);
+        $onpage = ($pageid == $format->singlesectionid) || ($format->singlesectionid === null);
         $sectionstyle = " sectionid-{$section->id}";
         $iscollapsible = false;
         // Determine the section type.

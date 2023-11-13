@@ -58,6 +58,7 @@ class header extends header_base {
      * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): \stdClass {
+        global $CFG;
 
         $format = $this->format;
         $section = $this->section;
@@ -95,6 +96,8 @@ class header extends header_base {
         // REMOVED index page.
 
         $data->name = get_section_name($course, $section);
+
+        $data->sectionbulk = ($CFG->version >= 2023021000);
 
         return $data;
     }

@@ -284,7 +284,6 @@ class content extends content_base {
         $data->sectionnavigation = $sectionnav->export_for_template($output);
 
         if ($CFG->version >= 2023021000 && $format->show_editor()) {
-            $data->hasbulkedittools = true;
             $bulkedittools = new $this->bulkedittoolsclass($format);
             $data->bulkedittools = $bulkedittools->export_for_template($output);
         }

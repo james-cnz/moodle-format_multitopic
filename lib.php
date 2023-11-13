@@ -78,8 +78,8 @@ class format_multitopic extends core_courseformat\base {
     /** @var bool Multitopic-specific section information is complete*/
     private $fmtsectionsextracomplete = false;
 
-    /** @var int the current section ID */
-    public $singlesectionid;
+    /** @var ?int the current section ID */
+    public $singlesectionid = null;
     // END ADDED.
 
     // INCLUDED declaration /course/format/classes/base.php class base function __construct.
