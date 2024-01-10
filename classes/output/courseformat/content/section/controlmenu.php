@@ -265,6 +265,10 @@ class controlmenu extends controlmenu_base {
             $addedmovecontrols = true;
         }
 
+        if (array_key_exists('view', $merged)) {
+            unset($merged['view']);
+        }
+
         if (array_key_exists('edit', $merged)) {
             $merged['edit']['url'] = new \moodle_url('/course/format/multitopic/_course_editsection.php',
                                             ['id' => $section->id]);            // CHANGED.
