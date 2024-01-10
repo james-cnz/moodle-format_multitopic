@@ -55,7 +55,8 @@ export default class Component extends ComponentBase {
             const sectionzeroid = this.course.sectionlist[0];
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
-            return target.levelsan <= origin.levelsan && origin.id != sectionzeroid && target.id != sectionzeroid;
+            return target.levelsan <= origin.levelsan && origin.id != sectionzeroid
+                && (target.id != sectionzeroid || this.course.draganddropsectionmoveafter);
         } else {
             return super.validateDropData(dropdata);
         }
@@ -74,7 +75,8 @@ export default class Component extends ComponentBase {
             while (target.levelsan > origin.levelsan) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
-            const moveDirection = Math.sign(target.number - origin.number);
+            const moveDirection = this.course.draganddropsectionmoveafter ?
+                (target.number != origin.number) : Math.sign(target.number - origin.number);
             let targetShow = target;
             let targetShowBorder = moveDirection;
             if (moveDirection > 0 && !target.indexcollapsed) {
@@ -114,7 +116,8 @@ export default class Component extends ComponentBase {
             while (target.levelsan > origin.levelsan) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
-            const moveDirection = Math.sign(target.number - origin.number);
+            const moveDirection = this.course.draganddropsectionmoveafter ?
+                (target.number != origin.number) : Math.sign(target.number - origin.number);
             let targetShow = target;
             let targetShowBorder = moveDirection;
             if (moveDirection > 0 && !target.indexcollapsed) {
@@ -155,7 +158,8 @@ export default class Component extends ComponentBase {
             while (target.levelsan > origin.levelsan) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
-            const moveDirection = Math.sign(target.number - origin.number);
+            const moveDirection = this.course.draganddropsectionmoveafter ?
+                (target.number != origin.number) : Math.sign(target.number - origin.number);
             let targetCall = target;
             if (moveDirection > 0 && target.indexcollapsed) {
                 let targetChild = target;
@@ -168,7 +172,8 @@ export default class Component extends ComponentBase {
                 }
             }
             if (moveDirection != 0) {
-                this.reactive.dispatch('sectionMove', [origin.id], targetCall.id);
+                this.reactive.dispatch(this.course.draganddropsectionmoveafter ? 'sectionMoveAfter' : 'sectionMove',
+                    [origin.id], targetCall.id);
             }
         } else {
             super.drop(dropdata, event);
