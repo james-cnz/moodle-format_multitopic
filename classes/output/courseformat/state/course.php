@@ -52,10 +52,12 @@ class course extends base_course {
      * @return stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): stdClass {
+        global $CFG;
         $data = parent::export_for_template($output);
 
         $data->firstsectionlist = [];
         $data->secondsectionlist = [];
+        $data->draganddropsectionmoveafter = $CFG->version >= 2023120100;
 
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();

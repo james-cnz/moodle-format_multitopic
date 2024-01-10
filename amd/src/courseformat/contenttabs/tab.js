@@ -94,7 +94,8 @@ export default class extends DndSection {
             const target = this.section;
             const targettablevel = this.element.className.match(/\btab_level_(\d+)\b/)[1];
             return dropdata?.id != this.id && targettablevel == origin.levelsan
-                    && (target.levelsan == targettablevel || target.number > origin.number)
+                    && (target.levelsan == targettablevel || target.number > origin.number
+                        || this.course.draganddropsectionmoveafter)
                     && origin.id != sectionzeroid;
         }
         return false;
@@ -111,7 +112,7 @@ export default class extends DndSection {
             const targettablevel = this.element.className.match(/\btab_level_(\d+)\b/)[1];
             if (targettablevel == origin.levelsan) {
                 // The relative move of section depends on the section number.
-                if (this.section.number > dropdata.number) {
+                if (this.section.number > dropdata.number || this.course.draganddropsectionmoveafter) {
                     this.element.classList.remove(this.classes.DROPBEFORE);
                     this.element.classList.add(this.classes.DROPAFTER);
                 } else {
@@ -142,7 +143,8 @@ export default class extends DndSection {
             const target = this.section;
             const targettablevel = this.element.className.match(/\btab_level_(\d+)\b/)[1];
             if (targettablevel == origin.levelsan) {
-                this.reactive.dispatch('sectionMove', [origin.id], target.id);
+                this.reactive.dispatch(this.course.draganddropsectionmoveafter ? 'sectionMoveAfter' : 'sectionMove',
+                    [origin.id], target.id);
             }
         }
     }

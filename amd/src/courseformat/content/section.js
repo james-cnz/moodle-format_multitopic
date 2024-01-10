@@ -61,7 +61,8 @@ export default class extends SectionBase {
         if (dropdata?.type === 'section') {
             const origin = this.reactive.get("section", dropdata.id);
             if (origin.id == this.section.id || origin.levelsan < 2
-                    || this.section.levelsan < 2 && this.section.section < origin.section) {
+                    || this.section.levelsan < 2 && this.section.section < origin.section
+                        && !this.course.draganddropsectionmoveafter) {
                 return false;
             }
         }
