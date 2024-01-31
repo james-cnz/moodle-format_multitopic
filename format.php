@@ -51,7 +51,7 @@ if ($sectionid) {
 }
 // END ADDED.
 if (isset($displaysection)) {
-    $format->set_section_number($displaysection);
+    $format->set_sectionnum($displaysection);
 }
 $outputclass = $format->get_output_classname('content');
 $widget = new $outputclass($format);

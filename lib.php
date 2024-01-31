@@ -78,8 +78,8 @@ class format_multitopic extends core_courseformat\base {
     /** @var bool Multitopic-specific section information is complete*/
     private $fmtsectionsextracomplete = false;
 
-    /** @var ?int the current section ID */
-    public $singlesectionid = null;
+    /** @var ?int the sectionid selected */
+    protected $singlesectionid = null;
     // END ADDED.
 
     // INCLUDED declaration /course/format/classes/base.php class base function __construct.
@@ -473,13 +473,47 @@ class format_multitopic extends core_courseformat\base {
         }
     }
 
-    // INCLUDED /course/format/classes/base function set_section_number .
+    /**
+     * Set the section to show.
+     * 
+     * @param int|null $sectionid null for general section or a sectionid.
+     */
+    public function set_sectionid(?int $sectionid): void {
+        $this->set_sectionnum($sectionid ? (object)['id' => $sectionid] : 0);
+    }
+
+    /**
+     * Get the section to show.
+     *
+     * @return int the sectionid.
+     */
+    public function get_sectionid(): int {
+        if ($this->singlesectionid === null) {
+            $this->singlesectionid = $this->get_section(0)->id;
+            $this->singlesection = 0;
+        }
+        return $this->singlesectionid;
+    }
+
     /**
      * Set which section page will be shown.
      *
-     * @param int|stdClass|\section_info $singlesection section or num
+     * @param int $singlesection a section number
+     * @deprecated
      */
-    public function set_section_number($singlesection): void {
+    public function set_section_number(int $singlesection): void {
+        $this->set_sectionnum($singlesection);
+    }
+
+    /**
+     * Set the current section number to display.
+     *
+     * @param int|stdClass|\section_info|null $singlesection section or num.
+     */
+    public function set_sectionnum($singlesection): void {
+        if ($singlesection === null) {
+            $singlesection = 0;
+        }
         if (!is_object($singlesection) || !isset($singlesection->level)) {
             $singlesection = $this->get_section($singlesection);
         }
@@ -497,7 +531,29 @@ class format_multitopic extends core_courseformat\base {
         $this->singlesectionid = $singlesection->id;
         $this->singlesection = $singlesection->section;
     }
-    // END INCLUDED.
+
+    /**
+     * Get the current section number to display.
+     *
+     * @return int the current section number.
+     */
+    public function get_sectionnum(): int {
+        if ($this->singlesection === null) {
+            $this->singlesectionid = $this->get_section(0)->id;
+            $this->singlesection = 0;
+        }
+        return $this->singlesection;
+    }
+
+    /**
+     * Get the current section number to show.
+     *
+     * @return int the section number
+     * @deprecated
+     */
+    public function get_section_number(): int {
+        return $this->get_sectionnum();
+    }
 
     /**
      * Return the format section preferences.
