@@ -60,7 +60,7 @@ class content extends content_base {
         $sectionsextra = $this->format->fmt_get_sections_extra();
         $maxsections = $format->get_max_sections();
         $canaddmore = $maxsections > $format->get_last_section_number();
-        $displaysectionextra = $sectionsextra[$this->format->singlesectionid];
+        $displaysectionextra = $sectionsextra[$this->format->get_sectionid()];
         $activesectionids = [];
         for ($activesectionextra = $displaysectionextra; /* ... */
                 $activesectionextra; /* ... */
@@ -202,8 +202,8 @@ class content extends content_base {
                         'insertparentid' => $sectionextraatlevel[$level - 1]->id,
                         'insertlevel' => $level,
                         'returnurl' => new \moodle_url("/course/view.php?id={$course->id}"
-                            . (($format->singlesectionid != $format->fmtrootsectionid) ?
-                            "&sectionid={$format->singlesectionid}" : "")),
+                            . (($format->get_sectionid() != $format->fmtrootsectionid) ?
+                            "&sectionid={$format->get_sectionid()}" : "")),
                     ];
                     $url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
                     $attrs = !$canaddmore ? ['class' => 'dimmed_text cantadd'] : null;
@@ -341,7 +341,7 @@ class content extends content_base {
         foreach ($sectionsextra as $thissectionextra) {
             $pageid = ($thissectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                         $thissectionextra->id : $thissectionextra->parentid;
-            $onpage = ($pageid == $format->singlesectionid);
+            $onpage = ($pageid == $format->get_sectionid());
             if ($onpage || $format->show_editor()) {
                 $sectionstodisplay[] = $thissectionextra->sectionbase;
             }
