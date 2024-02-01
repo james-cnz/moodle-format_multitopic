@@ -475,7 +475,7 @@ class format_multitopic extends core_courseformat\base {
 
     /**
      * Set the section to show.
-     * 
+     *
      * @param int|null $sectionid null for general section or a sectionid.
      */
     public function set_sectionid(?int $sectionid): void {
