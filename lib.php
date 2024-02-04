@@ -476,7 +476,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Set if the current format instance will show all pages or an individual one.
      *
-     * @param ?int $sectionid null for all pages, or a page's sectionid.
+     * @param int|null $sectionid null for all pages, or a page's sectionid.
      */
     public function set_sectionid(?int $sectionid): void {
         $this->set_sectionnum(isset($sectionid) ? (object)['id' => $sectionid] : null);
@@ -485,7 +485,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Get if the current format instance will show all pages or an individual one.
      *
-     * @return ?int null for all pages or the page's sectionid.
+     * @return int|null null for all pages or the page's sectionid.
      */
     public function get_sectionid(): ?int {
         return $this->singlesectionid;
@@ -528,7 +528,7 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Get the current page's section number to display.
      *
-     * @return ?int the current page's section number or null when there is no single page.
+     * @return int|null the current page's section number or null when there is no single page.
      */
     public function get_sectionnum(): ?int {
         return $this->singlesection;
