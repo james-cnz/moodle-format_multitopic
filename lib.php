@@ -474,31 +474,27 @@ class format_multitopic extends core_courseformat\base {
     }
 
     /**
-     * Set the section to show.
+     * Set if the current format instance will show all pages or an individual one.
      *
-     * @param int|null $sectionid null for general section or a sectionid.
+     * @param ?int $sectionid null for all pages, or a page's sectionid.
      */
     public function set_sectionid(?int $sectionid): void {
-        $this->set_sectionnum($sectionid ? (object)['id' => $sectionid] : 0);
+        $this->set_sectionnum(isset($sectionid) ? (object)['id' => $sectionid] : null);
     }
 
     /**
-     * Get the section to show.
+     * Get if the current format instance will show all pages or an individual one.
      *
-     * @return int the sectionid.
+     * @return ?int null for all pages or the page's sectionid.
      */
-    public function get_sectionid(): int {
-        if ($this->singlesectionid === null) {
-            $this->singlesectionid = $this->get_section(0)->id;
-            $this->singlesection = 0;
-        }
+    public function get_sectionid(): ?int {
         return $this->singlesectionid;
     }
 
     /**
-     * Set which section page will be shown.
+     * Set which section page the current format instance will show.
      *
-     * @param int $singlesection a section number
+     * @param int $singlesection a page's section number
      * @deprecated
      */
     public function set_section_number(int $singlesection): void {
@@ -506,53 +502,50 @@ class format_multitopic extends core_courseformat\base {
     }
 
     /**
-     * Set the current section number to display.
+     * Set the current page to display.
      *
-     * @param int|stdClass|\section_info|null $singlesection section or num.
+     * @param \section_info|stdClass|int|null $section null for all pages or a page's section info or number.
      */
-    public function set_sectionnum($singlesection): void {
-        if ($singlesection === null) {
-            $singlesection = 0;
+    public function set_sectionnum($section): void {
+        if ($section === null) {
+            $this->singlesection = null;
+            $this->singlesectionid = null;
+            return;
         }
-        if (!is_object($singlesection) || !isset($singlesection->level)) {
-            $singlesection = $this->get_section($singlesection);
-        }
+
+        $sectionextra = $this->fmt_get_section_extra($section);
 
         // If display section is a topic, get the page it is on instead.
-        if (isset($singlesection) && $singlesection->level >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+        if ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionsextra = $this->fmt_get_sections_extra();
-            $singlesectionextra = $sectionsextra[$singlesection->id];
-            if (isset($singlesectionextra) && $singlesectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-                $singlesectionextra = $sectionsextra[$singlesectionextra->parentid];
-                $singlesection = $singlesectionextra->sectionbase;
-            }
+            $sectionextra = $sectionsextra[$sectionextra->parentid];
         }
 
-        $this->singlesectionid = $singlesection->id;
-        $this->singlesection = $singlesection->section;
+        $this->singlesectionid = $sectionextra->id;
+        $this->singlesection = $sectionextra->section;
     }
 
     /**
-     * Get the current section number to display.
+     * Get the current page's section number to display.
      *
-     * @return int the current section number.
+     * @return ?int the current page's section number or null when there is no single page.
      */
-    public function get_sectionnum(): int {
-        if ($this->singlesection === null) {
-            $this->singlesectionid = $this->get_section(0)->id;
-            $this->singlesection = 0;
-        }
+    public function get_sectionnum(): ?int {
         return $this->singlesection;
     }
 
     /**
-     * Get the current section number to show.
+     * Get the section number of the page the current format instance will show.
      *
-     * @return int the section number
+     * @return int the page's section number
      * @deprecated
      */
     public function get_section_number(): int {
-        return $this->get_sectionnum();
+        if ($this->singlesection === null) {
+            return 0;
+        }
+
+        return $this->singlesection;
     }
 
     /**
