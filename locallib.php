@@ -111,7 +111,7 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
     $cw->name = null;
     $cw->visible = 1;
     $cw->availability = null;
-    if ($CFG->version >= 2023121500.01) {
+    if ($CFG->version >= 2023122100.01) {
         $cw->component = null;
         $cw->itemid = null;
     }
