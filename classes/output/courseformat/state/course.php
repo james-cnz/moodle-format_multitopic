@@ -66,7 +66,7 @@ class course extends base_course {
 
         foreach ($sectionsextra as $sectionextra) {
             $section = $sectionextra->sectionbase;
-            if ($format->is_section_visible($section)) {
+            if (empty($section->component) && $format->is_section_visible($section)) {
                 if ($sectionextra->levelsan <= 0) {
                     $parentid = $section->id;
                     $lastparentid = $section->id;

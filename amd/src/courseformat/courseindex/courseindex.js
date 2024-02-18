@@ -70,9 +70,11 @@ export default class Component extends BaseComponent {
      * Refresh the section list.
      *
      * @param {object} param
-     * @param {Object} param.element
+     * @param {Object} param.element (Moodle <4.4)
+     * @param {Object} param.state (Moodle >=4.4)
      */
-    _refreshCourseSectionlist({element}) {
+    _refreshCourseSectionlist(param) {
+        const element = param.state ? param.state.course : param.element;
         const topsectionslist = element.firstsectionlist ?? [];
         this._fixOrder(this.element, topsectionslist, this.topsections);
 

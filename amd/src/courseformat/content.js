@@ -234,10 +234,11 @@ export default class Component extends BaseComponent {
      * Refresh the section list.
      *
      * @param {Object} param
-     * @param {Object} param.element details the update details.
+     * @param {Object} param.element details the update details (Moodle <4.4).
+     * @param {Object} param.state the full state object (Moodle >=4.4).
      */
-    _refreshCourseSectionlist({element}) {
-        super._refreshCourseSectionlist({element});
+    _refreshCourseSectionlist(param) {
+        super._refreshCourseSectionlist(param);
         const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
         for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
             const sectionDom = sectionsDom[sdi];
