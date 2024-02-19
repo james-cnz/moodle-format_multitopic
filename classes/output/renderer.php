@@ -123,7 +123,7 @@ class renderer extends section_renderer {
      * @param bool $linkifneeded Whether to add link
      * @return string HTML to output.
      */
-    public function section_title($section, $course, bool $linkifneeded = true) : string {
+    public function section_title($section, $course, bool $linkifneeded = true): string {
         // CHANGED LINE ABOVE.
 
         // ADDED.
@@ -160,7 +160,7 @@ class renderer extends section_renderer {
      * @param int|\stdClass $course The course entry from DB
      * @return string HTML to output.
      */
-    public function section_title_without_link($section, $course) : string {
+    public function section_title_without_link($section, $course): string {
         return $this->section_title($section, $course, false);                  // CHANGED.
     }
 
@@ -193,7 +193,7 @@ class renderer extends section_renderer {
      * @param \format_multitopic\courseheader $header header to render
      * @return string HTML to output.
      */
-    protected function render_courseheader(\format_multitopic\courseheader $header) : string {
+    protected function render_courseheader(\format_multitopic\courseheader $header): string {
         return $header->output();
     }
 
@@ -204,7 +204,7 @@ class renderer extends section_renderer {
      * @return string HTML to output.
      */
     protected function render_coursecontentheaderfooter(
-                            \format_multitopic\coursecontentheaderfooter $headerfooter) : string {
+                            \format_multitopic\coursecontentheaderfooter $headerfooter): string {
         return $headerfooter->output();
     }
     // END ADDED.
