@@ -271,7 +271,7 @@ class stateactions extends \core_courseformat\stateactions {
      * @param int[] $ids section ids
      * @param int $visible the new visible value
      */
-    protected function set_section_visibility (
+    protected function set_section_visibility(
         \core_courseformat\stateupdates $updates,
         \stdClass $course,
         array $ids,
