@@ -163,10 +163,10 @@ if ($mform->is_cancelled()) {
 
 // The edit form is displayed for the first time or if there was validation error on the previous step.
 $sectionname = get_section_name($course, $sectioninfo);                         // CHANGED: Pass sectioninfo rather than number.
-$stredit = get_string('edita', '', " $sectionname");
-$strsummaryof = get_string('summaryof', '', " $sectionname");
+$stredit = get_string(($CFG->version >= 2024021500) ? 'editsectiontitle' : 'edita', '', $sectionname);
+$strsummaryof = get_string(($CFG->version >= 2024021500) ? 'editsectionsettings' : 'summaryof', '', $sectionname);
 
-$PAGE->set_title($stredit);
+$PAGE->set_title($stredit . ($CFG->version >= 2024021500 ? (moodle_page::TITLE_SEPARATOR . $course->shortname) : ''));
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add($stredit);
 echo $OUTPUT->header();
