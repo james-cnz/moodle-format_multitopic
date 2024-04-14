@@ -56,16 +56,16 @@ jobs:
             database: mariadb
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle master, PHP 8.2, PostgreSQL
+          # Moodle main, PHP 8.2, PostgreSQL
           - php: '8.2'
-            moodle-branch: 'master'
+            moodle-branch: 'main'
             database: pgsql
             plugin-ci: ^4
             # extensions: xmlrpc-beta
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: plugin
 

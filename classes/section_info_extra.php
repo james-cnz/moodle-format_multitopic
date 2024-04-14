@@ -40,25 +40,25 @@ class section_info_extra {
     /** @var int Sanatised section level */
     public $levelsan;
 
-    /** @var ?int ID of section's parent (previous section at a higher level) */
+    /** @var int|null ID of section's parent (previous section at a higher level) */
     public $parentid;
 
-    /** @var ?int ID of the previous section at the same or higher level */
+    /** @var int|null ID of the previous section at the same or higher level */
     public $prevupid;
 
-    /** @var ?int ID of the previous section above topic level */
+    /** @var int|null ID of the previous section above topic level */
     public $prevpageid;
 
-    /** @var ?int ID of the previous section at any level */
+    /** @var int|null ID of the previous section at any level */
     public $prevanyid;
 
-    /** @var ?int ID of the next section at the same or higher level */
+    /** @var int|null ID of the next section at the same or higher level */
     public $nextupid;
 
-    /** @var ?int ID of the next section above topic level */
+    /** @var int|null ID of the next section above topic level */
     public $nextpageid;
 
-    /** @var ?int ID of the next section at any level */
+    /** @var int|null ID of the next section at any level */
     public $nextanyid;
 
     /** @var bool Whether this section has subsections */
@@ -76,10 +76,10 @@ class section_info_extra {
     /** @var bool Sanatised visibility */
     public $visiblesan;
 
-    /** @var ?int Section's start date */
+    /** @var int|null Section's start date */
     public $datestart;
 
-    /** @var ?int Section's end date */
+    /** @var int|null Section's end date */
     public $dateend;
 
     /** @var int The level down to which this section contains the current section.

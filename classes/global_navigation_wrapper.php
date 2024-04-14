@@ -87,7 +87,7 @@ class global_navigation_wrapper {
      * @param \stdClass $course
      * @return array [$sections, $activities]
      */
-    protected function generate_sections_and_activities(\stdClass $course) : array {
+    protected function generate_sections_and_activities(\stdClass $course): array {
         global $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
 
@@ -150,7 +150,7 @@ class global_navigation_wrapper {
      * @param \navigation_node $coursenode
      * @return array An array of course section nodes
      */
-    public function load_generic_course_sections(\stdClass $course, \navigation_node $coursenode) : array {
+    public function load_generic_course_sections(\stdClass $course, \navigation_node $coursenode): array {
         global $CFG, $SITE;                                                     // CHANGED: Removed $DB and $USER.
         require_once($CFG->dirroot . '/course/lib.php');
 
@@ -241,7 +241,7 @@ class global_navigation_wrapper {
      * @return array Array of activity nodes
      */
     protected function load_section_activities(\navigation_node $sectionnode, \section_info $section, array $activities,
-                                                \stdClass $course = null) : array {
+                                                \stdClass $course = null): array {
         // CHANGED ABOVE: Use section info instead of number.
         global $CFG, $SITE;
         // A static counter for JS function naming.

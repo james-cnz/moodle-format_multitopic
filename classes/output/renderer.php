@@ -123,7 +123,7 @@ class renderer extends section_renderer {
      * @param bool $linkifneeded Whether to add link
      * @return string HTML to output.
      */
-    public function section_title($section, $course, bool $linkifneeded = true) : string {
+    public function section_title($section, $course, bool $linkifneeded = true): string {
         // CHANGED LINE ABOVE.
 
         // ADDED.
@@ -160,7 +160,7 @@ class renderer extends section_renderer {
      * @param int|\stdClass $course The course entry from DB
      * @return string HTML to output.
      */
-    public function section_title_without_link($section, $course) : string {
+    public function section_title_without_link($section, $course): string {
         return $this->section_title($section, $course, false);                  // CHANGED.
     }
 
@@ -174,9 +174,9 @@ class renderer extends section_renderer {
      * If the format is not compatible with the course index, this method will return an empty string.
      *
      * @param \core_courseformat\base $format the course format
-     * @return String the course index HTML.
+     * @return string the course index HTML.
      */
-    public function course_index_drawer(\core_courseformat\base $format): String {
+    public function course_index_drawer(\core_courseformat\base $format): string {
         if ($format->uses_course_index()) {
             include_course_editor($format);
             return $this->render_from_template('format_multitopic/courseformat/courseindex/drawer', []);
@@ -193,7 +193,7 @@ class renderer extends section_renderer {
      * @param \format_multitopic\courseheader $header header to render
      * @return string HTML to output.
      */
-    protected function render_courseheader(\format_multitopic\courseheader $header) : string {
+    protected function render_courseheader(\format_multitopic\courseheader $header): string {
         return $header->output();
     }
 
@@ -204,7 +204,7 @@ class renderer extends section_renderer {
      * @return string HTML to output.
      */
     protected function render_coursecontentheaderfooter(
-                            \format_multitopic\coursecontentheaderfooter $headerfooter) : string {
+                            \format_multitopic\coursecontentheaderfooter $headerfooter): string {
         return $headerfooter->output();
     }
     // END ADDED.
