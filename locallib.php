@@ -84,7 +84,7 @@ function format_multitopic_set_section_visible(int $courseid, $section, int $vis
  */
 function format_multitopic_course_create_section(\stdClass $courseorid, \stdClass $section): \stdClass {
     // CHANGED LINE ABOVE: Use section info, specifying parentid and level, instead of section number.
-    global $DB;
+    global $CFG, $DB;
     $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
 
     // ADDED: Require that the parent exists.
@@ -111,6 +111,10 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
     $cw->name = null;
     $cw->visible = 1;
     $cw->availability = null;
+    if ($CFG->version >= 2023122100.01) {
+        $cw->component = null;
+        $cw->itemid = null;
+    }
     $cw->timemodified = time();
     $cw->id = $DB->insert_record("course_sections", $cw);
 
