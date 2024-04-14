@@ -722,7 +722,7 @@ class format_multitopic extends core_courseformat\base {
                 $url->param('sectionid', $pageid);
             }
             if ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-                if (empty($CFG->linkcoursesections) && !empty($options['navigation'])) {
+                if (empty($CFG->linkcoursesections) && !empty($options['navigation']) && $CFG->version < 2023120700) {
                     return null;
                 }
                 $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
