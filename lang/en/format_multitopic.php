@@ -25,54 +25,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// CHANGED.
 $string['addsectionpage'] = 'Add page';
 $string['addsectiontopic'] = 'Add topic';
-$string['currentsection'] = 'This section';
-// REMOVED 'editsection' .
-// REMOVED 'editsectionname' .
-// REMOVED 'deletesection' .
-// REMOVED 'newsectionname' .
-$string['sectionname'] = 'Section';
-$string['pluginname'] = 'Multitopic format';
-$string['section0name'] = 'General';
-$string['page-course-view-multitopic'] = 'Any course main page in Multitopic format';
-$string['page-course-view-multitopic-x'] = 'Any course page in Multitopic format';
-$string['hidefromothers'] = 'Hide section';
-$string['showfromothers'] = 'Show section';
-$string['privacy:metadata'] = 'The Multitopic format plugin does not store any personal data.';
-// END CHANGED.
 
-// INCLUDED /lang/en/moodle.php $string['topicoutline'] CHANGED.
-$string['sectionoutline'] = 'Section outline';
-// END INCLUDED.
-
-// INCLUDED /course/format/onetopic/lang/en/format_onetopic.php $string['level'] - $string['level_help'] CHANGED.
-$string['level'] = 'Level';
-// REMOVED 'index' .
-$string['asprincipal'] = 'First-level page';
-// REMOVED 'asbrother' .
 $string['aschild'] = 'Second-level page';
-$string['level_help'] = 'Set the section level.
- This is an advanced setting.
- Where possible, it is recommended to use page "Edit" menu options "Raise page level" and "Lower page level" instead.';
-// END INCLUDED.
-
-// INCLUDED /course/format/periods/lang/en/format_periods.php $string['perioddurationdefault'] - $string['perioddurationoverride_help'] CHANGED.
-$string['perioddurationdefault'] = 'Topic duration';
-$string['perioddurationoverride'] = 'Topic duration override';
-$string['perioddurationdefault_help'] = 'Set the default duration for topics to have dates shown.
- e.g. A setting of "1 week" would be like the Weekly course format.
- Set to "Unspecified" to not have dates shown, like the Topics course format.';
-$string['perioddurationoverride_help'] = 'The duration of this topic.
- Set to "No time" for, e.g., assignments that students are to complete while working on other topics.
- (Not applicable to pages.)';
-// END INCLUDED.
-
-// ADDED.
-$string['activityclipboard_disable'] = 'Disable activity clipboard';
-$string['activityclipboard_enable'] = 'Enable activity clipboard';
-$string['activityclipboard_placeholder'] = 'Click the up/down arrows next to an activity to move it to the clipboard.';
+$string['asprincipal'] = 'First-level page';
 
 $string['back_to_course'] = 'Back to course';
 
@@ -86,9 +43,17 @@ $string['collapsibleoverride'] = 'Collapsible topic override';
 $string['collapsibleoverride_help'] = 'Whether this topic is collapsible.
  (Not applicable to pages.)';
 
+$string['currentsection'] = 'This section';
+$string['hidefromothers'] = 'Hide section';
+
 $string['image'] = 'Image';
 $string['image_by'] = 'by';
 $string['image_licence'] = 'licence';
+
+$string['level'] = 'Level';
+$string['level_help'] = 'Set the section level.
+ This is an advanced setting.
+ Where possible, it is recommended to use page "Edit" menu options "Raise page level" and "Lower page level" instead.';
 
 $string['move_level_down'] = 'Lower page level';
 $string['move_level_up'] = 'Raise page level';
@@ -97,11 +62,37 @@ $string['move_page_prev'] = 'Move page left';
 $string['move_to_next_page'] = 'Move to next page';
 $string['move_to_prev_page'] = 'Move to previous page';
 
+$string['page-course-view-multitopic'] = 'Any course main page in Multitopic format';
+$string['page-course-view-multitopic-x'] = 'Any course page in Multitopic format';
+
 $string['period_0_days'] = 'No time';
 $string['period_undefined'] = 'Unspecified';
+
+$string['perioddurationdefault'] = 'Topic duration';
+$string['perioddurationdefault_help'] = 'Set the default duration for topics to have dates shown.
+ e.g. A setting of "1 week" would be like the Weekly course format.
+ Set to "Unspecified" to not have dates shown, like the Topics course format.';
+$string['perioddurationoverride'] = 'Topic duration override';
+$string['perioddurationoverride_help'] = 'The duration of this topic.
+ Set to "No time" for, e.g., assignments that students are to complete while working on other topics.
+ (Not applicable to pages.)';
+
+$string['pluginname'] = 'Multitopic format';
+$string['privacy:metadata'] = 'The Multitopic format plugin does not store any personal data.';
+$string['section0name'] = 'General';
+$string['sectionname'] = 'Section';
+
+$string['sectionoutline'] = 'Section outline';
+
+$string['showfromothers'] = 'Show section';
+
 $string['weeks_capitalised'] = 'Weeks';
 $string['weeks_mindays'] = 'First week minimum days of year';
 $string['weeks_mindays_desc'] = 'The first week of the year contains a minimum of how many days of the year?';
 $string['weeks_partial'] = 'Partial weeks';
 $string['weeks_partial_desc'] = 'Whether there are partial weeks at the start and end of the year.';
-// END ADDED.
+
+// Deprecated since Multitopic v4.1.
+$string['activityclipboard_disable'] = 'Disable activity clipboard';
+$string['activityclipboard_enable'] = 'Enable activity clipboard';
+$string['activityclipboard_placeholder'] = 'Click the up/down arrows next to an activity to move it to the clipboard.';
