@@ -78,8 +78,8 @@ class format_multitopic extends core_courseformat\base {
     /** @var bool Multitopic-specific section information is complete*/
     private $fmtsectionsextracomplete = false;
 
-    /** @var int|null the current section ID */
-    public $singlesectionid = null;
+    /** @var int|null the sectionid selected */
+    protected $singlesectionid = null;
     // END ADDED.
 
     // INCLUDED declaration /course/format/classes/base.php class base function __construct.
@@ -473,31 +473,80 @@ class format_multitopic extends core_courseformat\base {
         }
     }
 
-    // INCLUDED /course/format/classes/base function set_section_number .
     /**
-     * Set which section page will be shown.
+     * Set if the current format instance will show all pages or an individual one.
      *
-     * @param int|stdClass|\section_info $singlesection section or num
+     * @param int|null $sectionid null for all pages, or a page's sectionid.
      */
-    public function set_section_number($singlesection): void {
-        if (!is_object($singlesection) || !isset($singlesection->level)) {
-            $singlesection = $this->get_section($singlesection);
+    public function set_sectionid(?int $sectionid): void {
+        $this->set_sectionnum(isset($sectionid) ? (object)['id' => $sectionid] : null);
+    }
+
+    /**
+     * Get if the current format instance will show all pages or an individual one.
+     *
+     * @return int|null null for all pages or the page's sectionid.
+     */
+    public function get_sectionid(): ?int {
+        return $this->singlesectionid;
+    }
+
+    /**
+     * Set which section page the current format instance will show.
+     *
+     * @param int $singlesection a page's section number
+     * @deprecated
+     */
+    public function set_section_number(int $singlesection): void {
+        $this->set_sectionnum($singlesection);
+    }
+
+    /**
+     * Set the current page to display.
+     *
+     * @param \section_info|stdClass|int|null $section null for all pages or a page's section info or number.
+     */
+    public function set_sectionnum($section): void {
+        if ($section === null) {
+            $this->singlesection = null;
+            $this->singlesectionid = null;
+            return;
         }
+
+        $sectionextra = $this->fmt_get_section_extra($section);
 
         // If display section is a topic, get the page it is on instead.
-        if (isset($singlesection) && $singlesection->level >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+        if ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionsextra = $this->fmt_get_sections_extra();
-            $singlesectionextra = $sectionsextra[$singlesection->id];
-            if (isset($singlesectionextra) && $singlesectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-                $singlesectionextra = $sectionsextra[$singlesectionextra->parentid];
-                $singlesection = $singlesectionextra->sectionbase;
-            }
+            $sectionextra = $sectionsextra[$sectionextra->parentid];
         }
 
-        $this->singlesectionid = $singlesection->id;
-        $this->singlesection = $singlesection->section;
+        $this->singlesectionid = $sectionextra->id;
+        $this->singlesection = $sectionextra->section;
     }
-    // END INCLUDED.
+
+    /**
+     * Get the current page's section number to display.
+     *
+     * @return int|null the current page's section number or null when there is no single page.
+     */
+    public function get_sectionnum(): ?int {
+        return $this->singlesection;
+    }
+
+    /**
+     * Get the section number of the page the current format instance will show.
+     *
+     * @return int the page's section number
+     * @deprecated
+     */
+    public function get_section_number(): int {
+        if ($this->singlesection === null) {
+            return 0;
+        }
+
+        return $this->singlesection;
+    }
 
     /**
      * Return the format section preferences.

@@ -99,12 +99,12 @@ class addsection extends addsection_base {
         }
 
         $params = ['courseid' => $course->id,                               // CHANGED.
-                    'insertparentid' => $format->singlesectionid,
+                    'insertparentid' => $format->get_sectionid(),
                     'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
                     'sesskey' => sesskey(),
                     'returnurl' => new \moodle_url("/course/view.php?id={$course->id}"
-                        . (($format->singlesectionid != $format->fmtrootsectionid) ?
-                        "&sectionid={$format->singlesectionid}" : "")), ];
+                        . (($format->get_sectionid() != $format->fmtrootsectionid) ?
+                        "&sectionid={$format->get_sectionid()}" : "")), ];
 
         // REMOVED section return.
 
