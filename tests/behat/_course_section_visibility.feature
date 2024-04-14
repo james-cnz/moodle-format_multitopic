@@ -16,32 +16,16 @@ Feature: Show/hide course sections (Multitopic format)
       | user | course | role |
       | teacher1 | C1 | editingteacher |
       | student1 | C1 | student |
+    And the following "activities" exist:
+      | activity | course | section | name                      | visible |
+      | forum    | C1     | 1       | Test hidden forum 11 name | 0       |
+      | forum    | C1     | 1       | Test hidden forum 12 name | 1       |
+      | forum    | C1     | 2       | Test hidden forum 21 name | 0       |
+      | forum    | C1     | 2       | Test hidden forum 22 name | 1       |
+      | forum    | C1     | 3       | Test hidden forum 31 name | 0       |
+      | forum    | C1     | 3       | Test hidden forum 32 name | 1       |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I add a "Forum" to section "1" and I fill the form with:
-      | Forum name | Test hidden forum 11 name |
-      | Description | Test hidden forum 11 description |
-      | Availability | Hide on course page |
-    And I add a "Forum" to section "1" and I fill the form with:
-      | Forum name | Test hidden forum 12 name |
-      | Description | Test hidden forum 12 description |
-      | Availability | Show on course page |
-    And I add a "Forum" to section "2" and I fill the form with:
-      | Forum name | Test hidden forum 21 name |
-      | Description | Test hidden forum 21 description |
-      | Availability | Hide on course page |
-    And I add a "Forum" to section "2" and I fill the form with:
-      | Forum name | Test hidden forum 22 name |
-      | Description | Test hidden forum 22 description |
-      | Availability | Show on course page |
-    And I add a "Forum" to section "3" and I fill the form with:
-      | Forum name | Test hidden forum 31 name |
-      | Description | Test hidden forum 31 description |
-      | Availability | Hide on course page |
-    And I add a "Forum" to section "3" and I fill the form with:
-      | Forum name | Test hidden forum 32 name |
-      | Description | Test hidden forum 32 description |
-      | Availability | Show on course page |
 
   @javascript
   Scenario: Show / hide section icon functions correctly
