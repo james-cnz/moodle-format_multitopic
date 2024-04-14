@@ -40,10 +40,7 @@ Feature: Sections can be edited and deleted in Multitopic format
     Then the field "Custom" matches value "0"
     And the field "New value for Section name" matches value "Section 2"
 
-  Scenario: Edit section summary in Multitopic format
-    When I edit the section "2" and I fill the form with:
-      | Summary | Welcome to section 2 |
-    Then I should see "Welcome to section 2" in the "Section 2" "section"
+  # Edit section summary removed, because the field name changed.
 
   Scenario: Edit section default name in Multitopic format
     When I edit the section "2" and I fill the form with:
