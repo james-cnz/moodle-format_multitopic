@@ -1,45 +1,18 @@
-# Moodle Multitopic Format ⭐
+# Moodle Multitopic Format
+
+Shows multiple topics per page, with tabbed navigation between pages.
+Topics are collapsible, and can optionally be timed.
+
+If you like the Multitopic format, and use the latest version,
+please support the project by reporting any bugs you find.
+
+Developed at [Otago Polytechnic](https://www.op.ac.nz/) by James Calder.
 
 
-> Shows multiple topics per page, with tabbed navigation between pages.  Topics are collapsible, and can optionally be timed.
+## Links
 
-### 🏠 [Otago Polytechnic](https://op.ac.nz)
-
-
-## Install
-
-1. Copy files to moodle/course/format/multitopic.
-2. Log in as an admin, and visit moodle/admin/index.php, to update plugin data.
-3. (Moodle 3.x version only) Site administration > Appearance > Additional HTML > Within HEAD (or other location appropriate for CSS): Copy and paste styles from README_styles.css (customising appropriately).
-4. Site administration > Appearance > Themes > Theme settings > Allow category themes: Yes (if you want categories to have custom CSS).
-
-
-## Features
-
-* Tabbed pages (like Onetopic format)
-* Multiple topics per page (a bit like Flexible Sections format)
-* Collapsible topics (like Collapsed Topics format)
-* Optionally timed topics (a bit like Periods format)
-* Course banner image (like Snap theme)
-* Section images (a bit like Grid format)
-
-
-## Author
-
-👤 **James Calder**
-
-* Github: [@james-cnz](https://github.com/james-cnz)
-
-
-## Docs
-
-🚀 [Roadmap](docs/roadmap.md)
-📄 [Contributing](docs/contributing.md)
-
-
-## Acknowledgements
-
-The Multitopic format is based on ideas from several other course formats, and notably includes code copied from:
-
-* Onetopic format by David Herney Bernal García (including code for displaying tabs, disabling asychronous editing, and managing settings)
-* Periods format by Marina Glancy (code for managing settings)
+* [Home page](https://moodle.org/plugins/format_multitopic)
+* [Documentation](https://github.com/james-cnz/moodle-format_multitopic/wiki)
+* [Source control](https://github.com/james-cnz/moodle-format_multitopic)
+* [Bug tracker](https://github.com/james-cnz/moodle-format_multitopic/issues)
+* [Discussion](https://moodle.org/mod/forum/discuss.php?d=394619)
