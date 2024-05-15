@@ -55,7 +55,7 @@ export default class Component extends ComponentBase {
             const sectionzeroid = this.course.sectionlist[0];
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
-            return target.levelsan <= origin.levelsan && origin.id != sectionzeroid
+            return target.indent <= origin.indent && origin.id != sectionzeroid
                 && (target.id != sectionzeroid || this.course.draganddropsectionmoveafter);
         } else {
             return super.validateDropData(dropdata);
@@ -72,32 +72,33 @@ export default class Component extends ComponentBase {
         if (dropdata.type == 'section') {
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
-            while (target.levelsan > origin.levelsan) {
+            while (target.indent > origin.indent) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
             const moveDirection = this.course.draganddropsectionmoveafter ?
                 (target.number != origin.number) : Math.sign(target.number - origin.number);
+            const targetContentDom = this.element.querySelector(".courseindex-item-content");
             let targetShow = target;
             let targetShowBorder = moveDirection;
-            if (moveDirection > 0 && !target.indexcollapsed) {
+            if (moveDirection > 0 && targetContentDom.classList.contains("show")) {
                 let targetChild = target;
                 while (this.course.sectionlist.length > targetChild.number + 1
-                && this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
+                && this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]).indent > target.indent) {
                     targetChild = this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]);
-                    if (targetChild.levelsan <= origin.levelsan) {
+                    if (targetChild.indent <= origin.indent) {
                         targetShow = targetChild;
                         targetShowBorder = -1;
                         break;
                     }
                 }
             }
-            const targetDom = document.querySelector(
+            const targetShowDom = document.querySelector(
                 ".courseindex-section[data-id='" + targetShow.id + "']");
             // The relative move of section depends on the section number.
             if (targetShowBorder > 0) {
-                targetDom.classList.add(this.classes.DROPDOWN);
+                targetShowDom.classList.add(this.classes.DROPDOWN);
             } else if (targetShowBorder < 0) {
-                targetDom.classList.add(this.classes.DROPUP);
+                targetShowDom.classList.add(this.classes.DROPUP);
             }
         } else {
             super.showDropZone(dropdata);
@@ -113,31 +114,32 @@ export default class Component extends ComponentBase {
         if (dropdata.type == 'section') {
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
-            while (target.levelsan > origin.levelsan) {
+            while (target.indent > origin.indent) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
             const moveDirection = this.course.draganddropsectionmoveafter ?
                 (target.number != origin.number) : Math.sign(target.number - origin.number);
+            const targetContentDom = this.element.querySelector(".courseindex-item-content");
             let targetShow = target;
             let targetShowBorder = moveDirection;
-            if (moveDirection > 0 && !target.indexcollapsed) {
+            if (moveDirection > 0 && targetContentDom.classList.contains("show")) {
                 let targetChild = target;
                 while (this.course.sectionlist.length > targetChild.number + 1
-                && this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
+                && this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]).indent > target.indent) {
                     targetChild = this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]);
-                    if (targetChild.levelsan <= origin.levelsan) {
+                    if (targetChild.indent <= origin.indent) {
                         targetShow = targetChild;
                         targetShowBorder = -1;
                         break;
                     }
                 }
             }
-            const targetDom = document.querySelector(
+            const targetShowDom = document.querySelector(
                 ".courseindex-section[data-id='" + targetShow.id + "']");
             if (targetShowBorder > 0) {
-                targetDom.classList.remove(this.classes.DROPDOWN);
+                targetShowDom.classList.remove(this.classes.DROPDOWN);
             } else if (targetShowBorder < 0) {
-                targetDom.classList.remove(this.classes.DROPUP);
+                targetShowDom.classList.remove(this.classes.DROPUP);
             }
         } else {
             super.hideDropZone(dropdata);
@@ -155,18 +157,19 @@ export default class Component extends ComponentBase {
         if (dropdata.type == 'section') {
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
-            while (target.levelsan > origin.levelsan) {
+            while (target.indent > origin.indent) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
             const moveDirection = this.course.draganddropsectionmoveafter ?
                 (target.number != origin.number) : Math.sign(target.number - origin.number);
+            const targetContentDom = this.element.querySelector(".courseindex-item-content");
             let targetCall = target;
-            if (moveDirection > 0 && target.indexcollapsed) {
+            if (moveDirection > 0 && !targetContentDom.classList.contains("show")) {
                 let targetChild = target;
                 while (this.course.sectionlist.length > targetChild.number + 1
-                && this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]).levelsan > target.levelsan) {
+                && this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]).indent > target.indent) {
                     targetChild = this.reactive.get("section", this.course.sectionlist[targetChild.number + 1]);
-                    if (targetChild.levelsan <= origin.levelsan) {
+                    if (targetChild.indent <= origin.indent) {
                         targetCall = targetChild;
                     }
                 }
