@@ -440,12 +440,12 @@ class format_multitopic extends core_courseformat\base {
                             . '–' . $yearendstring . $weekword . ' ' . $dateend->W . ' ' . $dateend->D;
                 }
             }
-            $daystring = $daystring . ': ';
+            $daystring = '<span class="section-title-prefix">' . $daystring . ': ' . '</span>';
         }
         // END ADDED.
 
         if ((string)$section->name !== '') {
-            return format_string($daystring . $section->name, true,
+            return $daystring . format_string($section->name, true,
                     ['context' => context_course::instance($this->courseid)]);  // CHANGED.
         } else {
             return $daystring . $this->get_default_section_name($section);
