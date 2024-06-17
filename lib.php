@@ -609,12 +609,12 @@ class format_multitopic extends core_courseformat\base {
     /**
      * Set and return the format section preferences.
      *
-     * @param string $preferencename preference name
-     * @param int[] $sectionids affected section IDs
+     * @param string|null $preferencename preference name
+     * @param int[]|null $sectionids affected section IDs
      * @return array of preferences indexed by section ID
      *
      */
-    protected function fmt_set_get_sections_preferences(string $preferencename = null, array $sectionids = null): array {
+    protected function fmt_set_get_sections_preferences(?string $preferencename = null, ?array $sectionids = null): array {
 
         $course = $this->get_course();
         $sectionsextra = $this->fmt_get_sections_extra();

@@ -237,11 +237,11 @@ class global_navigation_wrapper {
      * @param \navigation_node $sectionnode
      * @param \section_info $section
      * @param array $activities An array of activites as returned by see global_navigation::generate_sections_and_activities()
-     * @param \stdClass $course The course object the section and activities relate to.
+     * @param \stdClass|null $course The course object the section and activities relate to.
      * @return array Array of activity nodes
      */
     protected function load_section_activities(\navigation_node $sectionnode, \section_info $section, array $activities,
-                                                \stdClass $course = null): array {
+                                                ?\stdClass $course = null): array {
         // CHANGED ABOVE: Use section info instead of number.
         global $CFG, $SITE;
         // A static counter for JS function naming.
