@@ -192,10 +192,21 @@
             {{/ core_courseformat/local/content/section }}
         {{/sections}}
     </ul>
+    {{#singlesection}}
+        <div class="single-section">
+            <ul class="{{format}}">
+                {{$ core_courseformat/local/content/section }}
+                    {{> core_courseformat/local/content/section }}
+                {{/ core_courseformat/local/content/section }}
+            </ul>
+        </div>
+    {{/singlesection}}
     {{#numsections}}
-        {{$ core_courseformat/local/content/addsection}}
-            {{> format_multitopic/courseformat/content/addsection}}
-        {{/ core_courseformat/local/content/addsection}}
+        {{^singlesection}}
+            {{$ core_courseformat/local/content/addsection}}
+                {{> format_multitopic/courseformat/content/addsection}}
+            {{/ core_courseformat/local/content/addsection}}
+        {{/singlesection}}
     {{/numsections}}
     {{#bulkedittools}}
         {{$ core_courseformat/local/content/bulkedittools}}

@@ -112,8 +112,11 @@ class section extends section_base {
         $header = new $this->headerclass($format, $section);
         $headerdata = $header->export_for_template($output);
 
-        // REMOVED singlesection code.
-        $data->header = $headerdata;
+        if (!empty($section->component)) {
+            $data->singleheader = $headerdata;
+        } else {
+            $data->header = $headerdata;
+        }
         return true;
     }
 
@@ -134,7 +137,7 @@ class section extends section_base {
         // REMOVED index code.
 
         // ADDED.
-        $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+        $pageid = ($sectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                     $section->id : $sectionextra->parentid;
         $onpage = ($pageid == $format->get_sectionid()) || ($format->get_sectionid() === null);
         // END ADDED.
@@ -219,7 +222,7 @@ class section extends section_base {
 
         // ADDED.
         $course = $this->format->get_course();
-        $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+        $pageid = ($sectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                     $section->id : $sectionextra->parentid;
         $onpage = ($pageid == $format->get_sectionid()) || ($format->get_sectionid() === null);
         $sectionstyle = " sectionid-{$section->id}";

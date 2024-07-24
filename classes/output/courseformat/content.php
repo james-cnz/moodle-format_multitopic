@@ -51,16 +51,20 @@ class content extends content_base {
         global $PAGE;
         global $USER;                               // INCLUDED from course/format/classes/output/local/content/section/cmlist.php .
 
+        $sectionsextra = $this->format->fmt_get_sections_extra();
+        $displaysectionextra = $sectionsextra[$this->format->get_sectionid()];
+        if (!empty($displaysectionextra->sectionbase->component)) {
+            return parent::export_for_template($output);
+        }
+
         $PAGE->requires->js_call_amd('format_multitopic/courseformat/courseeditor/mutations', 'init');
 
         $format = $this->format;
 
         // ADDED.
         $course = $format->get_course();
-        $sectionsextra = $this->format->fmt_get_sections_extra();
         $maxsections = $format->get_max_sections();
         $canaddmore = $maxsections > $format->get_last_section_number();
-        $displaysectionextra = $sectionsextra[$this->format->get_sectionid()];
         $activesectionids = [];
         for ($activesectionextra = $displaysectionextra; /* ... */
                 $activesectionextra; /* ... */
@@ -118,6 +122,10 @@ class content extends content_base {
 
         foreach ($sectionsextra as $thissectionextra) {
             $thissection = $thissectionextra->sectionbase;
+
+            if (!empty($thissection->component)) {
+                continue;
+            }
 
             for ($level = $thissectionextra->levelsan; $level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; $level++) {
                 $sectionextraatlevel[$level] = $thissectionextra;
@@ -337,12 +345,13 @@ class content extends content_base {
     private function get_sections_to_display(\course_modinfo $modinfo): array {
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();
+        $displaysectionextra = $sectionsextra[$format->get_sectionid()];
         $sectionstodisplay = [];
         foreach ($sectionsextra as $thissectionextra) {
-            $pageid = ($thissectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+            $pageid = ($thissectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                         $thissectionextra->id : $thissectionextra->parentid;
             $onpage = ($pageid == $format->get_sectionid());
-            if ($onpage || $format->show_editor()) {
+            if ($onpage || $format->show_editor() && empty($displaysectionextra->sectionbase->component) && empty($thissectionextra->sectionbase->component)) {
                 $sectionstodisplay[] = $thissectionextra->sectionbase;
             }
         }

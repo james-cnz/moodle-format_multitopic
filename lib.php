@@ -207,13 +207,14 @@ class format_multitopic extends core_courseformat\base {
 
             foreach ($sections as $thissection) {
 
-                // Check section number is not negative.
-                if ($thissection->section < 0) {
-                    throw new moodle_exception('cannotcreateorfindstructs');
-                }
-
                 // Create new object.
                 $thissectionextra = new \format_multitopic\section_info_extra($thissection);
+
+                if (!empty($thissection->component)) {
+                    $thissectionextra->levelsan = FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC + 1;
+                    $fmtsectionsextra[$thissection->id] = $thissectionextra;
+                    continue;
+                }
 
                 // Fix the section's level within appropriate bounds.
                 $levelsan = ($sectionextraatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT] == null) ?
@@ -298,10 +299,13 @@ class format_multitopic extends core_courseformat\base {
             $sectionnextatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
                                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, null);
 
-            for ($thissectionextra = end($fmtsectionsextra); /* ... */
-                    $thissectionextra; /* ... */
-                    $thissectionextra = $thissectionextra->prevanyid ? $fmtsectionsextra[$thissectionextra->prevanyid] : null) {
+            foreach (array_reverse($fmtsectionsextra) as $thissectionextra) {
                 $thissection = $thissectionextra->sectionbase;
+
+                if (!empty($thissection->component)) {
+                    continue;
+                }
+
                 $levelsan = $thissectionextra->levelsan;
 
                 // Tree properties from next sections.
@@ -516,7 +520,7 @@ class format_multitopic extends core_courseformat\base {
         $sectionextra = $this->fmt_get_section_extra($section);
 
         // If display section is a topic, get the page it is on instead.
-        if ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+        if ($sectionextra->levelsan == FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionsextra = $this->fmt_get_sections_extra();
             $sectionextra = $sectionsextra[$sectionextra->parentid];
         }
@@ -765,16 +769,18 @@ class format_multitopic extends core_courseformat\base {
         if ($section !== null) {                                                // CHANGED.
             $sectionextra = $this->fmt_get_section_extra($section, MUST_EXIST); // ADDED.
             // CHANGED.
-            $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+            $pageid = ($sectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                 $sectionextra->id : $sectionextra->parentid;
             if ($pageid != $this->fmtrootsectionid) {
                 $url->param('sectionid', $pageid);
             }
-            if ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+            if ($sectionextra->levelsan == FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                 if (empty($CFG->linkcoursesections) && !empty($options['navigation']) && $CFG->version < 2023120700) {
                     return null;
                 }
                 $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
+            } else if ($sectionextra->levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+                $url = new moodle_url( '/course/section.php', ['id' => $sectionextra->id]);
             }
             // END CHANGED.
         }
