@@ -54,7 +54,9 @@ class content extends content_base {
         $sectionsextra = $this->format->fmt_get_sections_extra();
         $displaysectionextra = $sectionsextra[$this->format->get_sectionid()];
         if (!empty($displaysectionextra->sectionbase->component)) {
-            return parent::export_for_template($output);
+            $data = parent::export_for_template($output);
+            $data->displayonesection = true;
+            return $data;
         }
 
         $PAGE->requires->js_call_amd('format_multitopic/courseformat/courseeditor/mutations', 'init');
