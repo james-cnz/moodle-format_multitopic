@@ -353,7 +353,8 @@ class content extends content_base {
             $pageid = ($thissectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                         $thissectionextra->id : $thissectionextra->parentid;
             $onpage = ($pageid == $format->get_sectionid());
-            if ($onpage || $format->show_editor() && empty($displaysectionextra->sectionbase->component) && empty($thissectionextra->sectionbase->component)) {
+            if ($onpage || $format->show_editor() && empty($displaysectionextra->sectionbase->component)
+                            && empty($thissectionextra->sectionbase->component)) {
                 $sectionstodisplay[] = $thissectionextra->sectionbase;
             }
         }
