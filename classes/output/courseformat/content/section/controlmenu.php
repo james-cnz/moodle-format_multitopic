@@ -286,7 +286,7 @@ class controlmenu extends controlmenu_base {
             }
         }
 
-        if (array_key_exists('visiblity', $merged)) {
+        if (array_key_exists('visiblity', $merged) || array_key_exists('visibility', $merged)) {
             $url = clone($baseurl);
             $strhidefromothers = get_string_manager()->string_exists('hidefromothers', 'format_' . $course->format) ?
                                     get_string('hidefromothers', 'format_' . $course->format)
@@ -294,26 +294,27 @@ class controlmenu extends controlmenu_base {
             $strshowfromothers = get_string_manager()->string_exists('showfromothers', 'format_' . $course->format) ?
                                     get_string('showfromothers', 'format_' . $course->format)
                                     : get_string('show');                       // CHANGED.
+            $visibilitystr = array_key_exists('visibility', $merged) ? 'visibility' : 'visiblity';
             if ($section->visible) { // Show the hide/show eye.
                 $url->param('hideid',  $section->id);                           // CHANGED.
-                $merged['visiblity']['url'] = $url;
-                $merged['visiblity']['name'] = $strhidefromothers;
-                unset($merged['visiblity']['attr']['data-sectionreturn']);
+                $merged[$visibilitystr]['url'] = $url;
+                $merged[$visibilitystr]['name'] = $strhidefromothers;
+                unset($merged[$visibilitystr]['attr']['data-sectionreturn']);
                 if ($onsectionpage) {
-                    unset($merged['visiblity']['attr']['data-action']);
+                    unset($merged[$visibilitystr]['attr']['data-action']);
                 }
-                $merged['visiblity']['attr']['data-swapname'] = $strshowfromothers;
+                $merged[$visibilitystr]['attr']['data-swapname'] = $strshowfromothers;
             } else if (!$sectionextra->parentvisiblesan) {
-                unset($merged['visiblity']);
+                unset($merged[$visibilitystr]);
             } else {
                 $url->param('showid',  $section->id);                           // CHANGED.
-                $merged['visiblity']['url'] = $url;
-                $merged['visiblity']['name'] = $strshowfromothers;
-                unset($merged['visiblity']['attr']['data-sectionreturn']);
+                $merged[$visibilitystr]['url'] = $url;
+                $merged[$visibilitystr]['name'] = $strshowfromothers;
+                unset($merged[$visibilitystr]['attr']['data-sectionreturn']);
                 if ($onsectionpage) {
-                    unset($merged['visiblity']['attr']['data-action']);
+                    unset($merged[$visibilitystr]['attr']['data-action']);
                 }
-                $merged['visiblity']['attr']['data-swapname'] = $strhidefromothers;
+                $merged[$visibilitystr]['attr']['data-swapname'] = $strhidefromothers;
             }
         }
 
