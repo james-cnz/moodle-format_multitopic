@@ -112,7 +112,7 @@ class addsection extends addsection_base {
             'url' => new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params),
             'title' => $addstring,
             'newsection' => $maxsections - $lastsection,
-            'canaddmore' => $maxsections > $lastsection,
+            'canaddsection' => $lastsection < $maxsections,
         ];
         return $data;
     }

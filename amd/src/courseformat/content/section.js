@@ -49,6 +49,13 @@ export default class extends SectionBase {
                 this.configDragDrop(headerComponent);
             }
         }
+
+        const pageSectionDom = document.querySelector(".course-section[data-id='" + this.section.pageid + "']");
+        const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;
+        if (this.element.dataset.fmtonpage != pageSectionDisplay) {
+            this.element.dataset.fmtonpage = pageSectionDisplay;
+            this.element.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+        }
     }
 
     /**

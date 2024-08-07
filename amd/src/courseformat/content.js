@@ -29,8 +29,20 @@ import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
 import CmItem from 'format_multitopic/courseformat/content/section/cmitem';
 import Templates from 'core/templates';
+import DispatchActions from 'format_multitopic/courseformat/content/actions';
+import * as CourseEvents from 'core_course/events';
 
 export default class Component extends BaseComponent {
+
+    /**
+     * Constructor hook.
+     *
+     * @param {Object} descriptor the component descriptor
+     */
+    create(descriptor) {
+        super.create(descriptor);
+        this.version = descriptor.version;
+    }
 
     /**
      * Static method to create a component instance form the mustahce template.
@@ -38,14 +50,16 @@ export default class Component extends BaseComponent {
      * @param {string} target the DOM main element or its ID
      * @param {object} selectors optional css selector overrides
      * @param {number} sectionReturn the content section return
+     * @param {number} version Moodle version number
      * @return {Component}
      */
-    static init(target, selectors, sectionReturn) {
+    static init(target, selectors, sectionReturn, version) {
         return new this({ // CHANGED.
             element: document.getElementById(target),
             reactive: getCurrentCourseEditor(),
             selectors,
             sectionReturn,
+            version,
         });
     }
 
@@ -55,7 +69,52 @@ export default class Component extends BaseComponent {
      * @param {Object} state the state data
      */
     stateReady(state) {
-        super.stateReady(state);
+        this._indexContents();
+        // Activate section togglers.
+        this.addEventListener(this.element, 'click', this._sectionTogglers);
+
+        // Collapse/Expand all sections button.
+        const toogleAll = this.getElement(this.selectors.TOGGLEALL);
+        if (toogleAll) {
+
+            // Ensure collapse menu button adds aria-controls attribute referring to each collapsible element.
+            const collapseElements = this.getElements(this.selectors.COLLAPSE);
+            const collapseElementIds = [...collapseElements].map(element => element.id);
+            toogleAll.setAttribute('aria-controls', collapseElementIds.join(' '));
+
+            this.addEventListener(toogleAll, 'click', this._allSectionToggler);
+            this.addEventListener(toogleAll, 'keydown', e => {
+                // Collapse/expand all sections when Space key is pressed on the toggle button.
+                if (e.key === ' ') {
+                    this._allSectionToggler(e);
+                }
+            });
+            this._refreshAllSectionsToggler(state);
+        }
+
+        if (this.reactive.supportComponents) {
+            // Actions are only available in edit mode.
+            if (this.reactive.isEditing) {
+                new DispatchActions(this); // CHANGED.
+            }
+
+            // Mark content as state ready.
+            this.element.classList.add(this.classes.STATEDREADY);
+        }
+
+        // Capture completion events.
+        this.addEventListener(
+            this.element,
+            CourseEvents.manualCompletionToggled,
+            this._completionHandler
+        );
+
+        // Capture page scroll to update page item.
+        this.addEventListener(
+            (this.version >= 2023081800) ? document : document.querySelector(this.selectors.PAGE),
+            "scroll",
+            this._scrollHandler
+        );
 
         // Set the initial state of collapsible sections.
         this.fmtCollapseOnHashChange();

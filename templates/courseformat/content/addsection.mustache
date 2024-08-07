@@ -30,16 +30,27 @@
     }
 }}
 {{#showaddsection}}
-<div id="fmtchangenumsections" class="mdl-right">
+<div id="course-addsection" class="mdl-right">
     {{#addsections}}
-    <a
-        href="{{{url}}}"
-        class="fmtadd-sections{{^canaddmore}} cantadd dimmed{{/canaddmore}}"
-        data-add-sections="{{title}}"
-        data-new-sections="{{newsection}}"
-    >
-        {{#pix}} t/add, moodle {{/pix}} {{title}}
-    </a>
+        <a
+            href="{{{url}}}"
+            class="add-section"
+            data-add-sections="{{title}}"
+            data-new-sections="{{newsection}}"
+            data-action="addSection"
+            {{#fmtinsertinto}} data-into-id="{{fmtpageid}}" {{/fmtinsertinto}}
+        >
+            {{#pix}} t/add, core {{/pix}}
+            {{title}}
+        </a>
+        <div class="d-none p-3 max-section-alert" data-region="max-sections-warning">
+            <div class="w-100 text-center">
+                {{#pix}}t/block, moodle{{/pix}}
+            </div>
+            <div class="w-100 font-italic text-center">
+                {{#str}}maxsectionaddmessage, core_courseformat{{/str}}
+            </div>
+        </div>
     {{/addsections}}
 </div>
 {{/showaddsection}}

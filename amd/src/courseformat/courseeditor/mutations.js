@@ -131,6 +131,19 @@ class MultitopicMutations extends DefaultMutations {
         this.sectionLock(stateManager, subsectionIds, false);
     };
 
+    /**
+     * Add a new section to a specific course location.
+     *
+     * @param {StateManager} stateManager the current state manager
+     * @param {number} targetSectionId the target section id
+     * @param {number} newLevel the new section level
+     */
+    fmtAddSectionInto = async function(stateManager, targetSectionId, newLevel) {
+        const course = stateManager.get('course');
+        const updates = await this._callEditWebservice('fmt_section_add_into', course.id, [], targetSectionId, newLevel);
+        stateManager.processUpdates(updates);
+    };
+
 }
 
 export const init = () => {

@@ -264,6 +264,55 @@ class stateactions extends \core_courseformat\stateactions {
     }
 
     /**
+     * Create a course section.
+     *
+     * This method follows the same logic as changenumsections.php.
+     *
+     * @param \core_courseformat\stateupdates $updates the affected course elements track
+     * @param \stdClass $course the course object
+     * @param int[] $ids not used
+     * @param int $targetsectionid target section id
+     * @param int $newlevel the new section level
+     */
+    public function fmt_section_add_into(
+        \core_courseformat\stateupdates $updates,
+        \stdClass $course,
+        array $ids = [],
+        ?int $targetsectionid = null,
+        ?int $newlevel = null
+    ): void {
+
+        $coursecontext = \context_course::instance($course->id);
+        require_capability('moodle/course:update', $coursecontext);
+
+        // Get course format settings.
+        $format = course_get_format($course->id);
+        $lastsectionnumber = $format->get_last_section_number();
+        $maxsections = $format->get_max_sections();
+
+        if ($lastsectionnumber >= $maxsections) {
+            throw new \moodle_exception('maxsectionslimit', 'moodle', '', $maxsections);
+        }
+
+        $modinfo = get_fast_modinfo($course);
+
+        // Get target section.
+        if ($targetsectionid) {
+            $this->validate_sections($course, [$targetsectionid], __FUNCTION__);
+            // Inserting sections at any position except in the very end requires capability to move sections.
+            require_capability('moodle/course:movesections', $coursecontext);
+            $insertposition = (object)[ 'parentid' => $targetsectionid, 'level' => $newlevel ];
+        } else {
+            throw new \moodle_exception('sectionnotexist');
+        }
+
+        format_multitopic_course_create_section($course, $insertposition);
+
+        // Adding a section affects the full course structure.
+        $this->course_state($updates, $course);
+    }
+
+    /**
      * Show/hide course sections.
      *
      * @param \core_courseformat\stateupdates $updates the affected course elements track

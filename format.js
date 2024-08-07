@@ -15,10 +15,8 @@
 
 /**
  * @file       Javascript functions for Multitopic course format.
- * @copyright  2019 James Calder and Otago Polytechnic
- * @author     James Calder
- * @author     Jeremy FitzPatrick
- * @author     Kuslan Kabalin and others.
+ * @copyright  2019 onwards James Calder and Otago Polytechnic
+ * @copyright  based on work by Ruslan Kabalin and others
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -128,45 +126,4 @@ M.course.format.process_sections = function(Y, sectionlist, response, sectionfro
         }
         // END INCLUDED.
     }
-};
-
-// REMAINDER ADDED.
-
-/**
- * Show notice dialog when trying to add sections and maximum has been reached.
- * @param {event} e
- * @return {boolean}
- */
-M.course.format.fmtWarnMaxsections = function(e) {
-    var cantaddlink = e.target.matches('.cantadd');
-
-    if (cantaddlink === false && e.target.firstElementChild !== null) {
-        // Maybe we clicked on the parent <a>.
-        cantaddlink = e.target.firstElementChild.matches('.cantadd');
-    }
-    if (cantaddlink) {
-        e.preventDefault();
-        require(['core/notification'], function(notification) {
-             notification.addNotification({
-                message: M.course.format.fmtMaxsections,
-                type: 'warning'
-            });
-        });
-        document.querySelector("#user-notifications").scrollIntoView({behavior: "smooth", block: "center"});
-    }
-
-    return true;
-};
-
-/**
- * Initialise: Watch for user input.
- * @param {YUI} Y
- * @param {string} max
- */
-M.course.format.fmtInit = function(Y, max) {
-    M.course.format.fmtMaxsections = max;
-
-    // Capture clicks on add section links.
-    document.querySelector(".course-content")
-        .addEventListener('click', M.course.format.fmtWarnMaxsections);
 };

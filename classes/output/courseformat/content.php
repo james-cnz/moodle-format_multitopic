@@ -58,8 +58,6 @@ class content extends content_base {
         // ADDED.
         $course = $format->get_course();
         $sectionsextra = $this->format->fmt_get_sections_extra();
-        $maxsections = $format->get_max_sections();
-        $canaddmore = $maxsections > $format->get_last_section_number();
         $displaysectionextra = $sectionsextra[$this->format->get_sectionid()];
         $activesectionids = [];
         for ($activesectionextra = $displaysectionextra; /* ... */
@@ -108,6 +106,8 @@ class content extends content_base {
         // and /course/format/onetopic/renderer.php function print_single_section_page tabs parts CHANGED.
 
         // Init custom tabs.
+        $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
+                        get_string('addsectionpage', 'format_' . $course->format) : get_string('addsections');
         $tabs = [];
         $inactivetabs = [];
 
@@ -193,8 +193,6 @@ class content extends content_base {
                         $level--) {
 
                     // Make "add" tab.
-                    $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
-                                        get_string('addsectionpage', 'format_' . $course->format) : get_string('addsections');
                     $params = [
                         'courseid' => $course->id,
                         'increase' => true,
@@ -206,9 +204,8 @@ class content extends content_base {
                             "&sectionid={$format->get_sectionid()}" : "")),
                     ];
                     $url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
-                    $attrs = !$canaddmore ? ['class' => 'dimmed_text cantadd'] : null;
-                    $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle', $attrs);
-                    $newtab = new \tabobject("tab_id_{$sectionextraatlevel[$level - 1]->id}_l{($level - 1)}_add",
+                    $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle');
+                    $newtab = new \tabobject("tab_id_{$sectionextraatlevel[$level - 1]->id}_l{$level}_add",
                         $url,
                         $icon,
                         s($straddsection));
@@ -235,12 +232,20 @@ class content extends content_base {
             if (preg_match('/^tab_id_(\d+)_l(\d+)$/', $tabeft->id, $matches)) {
                 $tabeft->sectionid = $matches[1];
                 $tabeft->level = $matches[2];
+            } elseif (preg_match('/^tab_id_(\d+)_l(\d+)_add$/', $tabeft->id, $matches)) {
+                $tabeft->dataaddsections = $straddsection;
+                $tabeft->intoid = $matches[1];
+                $tabeft->level = $matches[2];
             }
         }
         if ($tabseft->secondrow) {
             foreach ($tabseft->secondrow->tabs as $tabeft) {
                 if (preg_match('/^tab_id_(\d+)_l(\d+)$/', $tabeft->id, $matches)) {
                     $tabeft->sectionid = $matches[1];
+                    $tabeft->level = $matches[2];
+                } elseif (preg_match('/^tab_id_(\d+)_l(\d+)_add$/', $tabeft->id, $matches)) {
+                    $tabeft->dataaddsections = $straddsection;
+                    $tabeft->intoid = $matches[1];
                     $tabeft->level = $matches[2];
                 }
             }
@@ -261,6 +266,9 @@ class content extends content_base {
             'initialsection' => $initialsection,
             'sections' => $sectionseft,
             'format' => $format->get_format(),
+            'fmtinsertinto' => true,
+            'fmtpageid' => $displaysectionextra->id,
+            'version' => $CFG->version,
         ];
 
         // INCLUDED from course/format/classes/output/local/content/section/cmlist.php export_for_template() .
