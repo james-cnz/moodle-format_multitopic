@@ -88,6 +88,7 @@ class addsection extends addsection_base {
      * @return \stdClass data context for a mustache template
      */
     protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections): \stdClass {
+        global $CFG;
         $format = $this->format;
         $course = $format->get_course();
         $data = new \stdClass();
@@ -113,6 +114,9 @@ class addsection extends addsection_base {
             'title' => $addstring,
             'newsection' => $maxsections - $lastsection,
             'canaddsection' => $lastsection < $maxsections,
+            'fmtinsertinto' => true,
+            'fmtpageid' => $displaysectionextra->id,
+            'maxsectionswarning' => ($CFG->version >= 2024072600),
         ];
         return $data;
     }

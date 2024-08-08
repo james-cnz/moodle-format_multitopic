@@ -51,10 +51,12 @@ export default class extends SectionBase {
         }
 
         const pageSectionDom = document.querySelector(".course-section[data-id='" + this.section.pageid + "']");
-        const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;
-        if (this.element.dataset.fmtonpage != pageSectionDisplay) {
-            this.element.dataset.fmtonpage = pageSectionDisplay;
-            this.element.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+        if (pageSectionDom) {
+            const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;
+            if (this.element.dataset.fmtonpage != pageSectionDisplay) {
+                this.element.dataset.fmtonpage = pageSectionDisplay;
+                this.element.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+            }
         }
     }
 

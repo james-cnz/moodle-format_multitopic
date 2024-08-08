@@ -83,6 +83,51 @@ export default class Component extends BaseComponent {
      * @param {Object} param.element
      */
     async _refreshCourseSectionTabs({element}) {
+
+        // Add/remove the second-level tabs, if necessary.
+        let tabsSecondRowDom = this.element.querySelector('ul:nth-of-type(2)');
+        const tabsSecondRowShow = (element.firstsectionlist.length > 1) || (element.secondsectionlist.length > 1);
+        if (tabsSecondRowShow && !tabsSecondRowDom) {
+            // Create tab row.
+            this.element.querySelector('ul:first-of-type').insertAdjacentElement(
+                'afterend', tabsSecondRowDom = document.createElement('ul')
+            );
+            tabsSecondRowDom.className = 'nav nav-tabs mb-3';
+            // Create index tab.
+            const activeTab0Dom = this.element.querySelector('ul:first-of-type li:first-of-type');
+            let data = {
+                "sectionid": activeTab0Dom.dataset.id,
+                "level": 1,
+                "active": true,
+                "inactive": true,
+                "title": activeTab0Dom.getAttribute('title'),
+                "text": '<div class="tab_content dimmed" data-itemid="' + activeTab0Dom.dataset.id + '">'
+                        + activeTab0Dom.getAttribute('title') + '</div>',
+            };
+            let item = document.createElement("li");
+            tabsSecondRowDom.insertAdjacentElement('afterstart', item);
+            let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
+            item = Templates.replaceNode(item, html, "")[0];
+            // Create add tab.
+            const addTab0Dom = this.element.querySelector('ul:first-of-type li:last-of-type');
+            data = {
+                "level": 1,
+                "active": false,
+                "inactive": false,
+                "link": [{
+                    "link": addTab0Dom.querySelector('a').getAttribute('href').replace(/\binsertlevel=0\b/, 'insertlevel=1'),
+                }],
+                "title": addTab0Dom.getAttribute('title'),
+                "text": '<i class="icon fa fa-plus fa-fw" title="' + activeTab0Dom.getAttribute('title') + '"></i>',
+            };
+            item = document.createElement("li");
+            tabsSecondRowDom.insertAdjacentElement('beforeend', item);
+            html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
+            item = Templates.replaceNode(item, html, "")[0];
+        } else if (tabsSecondRowDom && !tabsSecondRowShow) {
+            tabsSecondRowDom.remove();
+        }
+
         // Change the active top-level tab, if necessary.
         const activeTab1 = this.reactive.get('section', this.activetab[1]);
         let newActiveTab0id = (activeTab1.levelsan >= 1) ? activeTab1.parentid : activeTab1.id;
@@ -96,7 +141,7 @@ export default class Component extends BaseComponent {
             anchor.classList.add("active");
             anchor.removeAttribute("href");
             const addAnchor = this.element.querySelector('ul:nth-of-type(2) li:last-of-type a');
-            const addLink = addAnchor.href.replace(/&insertparentid=\d+/, "&insertparentid=" + this.activetab[0]);
+            const addLink = addAnchor.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + this.activetab[0]);
             addAnchor.setAttribute("href", addLink);
         }
 

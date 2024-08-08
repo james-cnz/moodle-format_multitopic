@@ -232,7 +232,7 @@ class content extends content_base {
             if (preg_match('/^tab_id_(\d+)_l(\d+)$/', $tabeft->id, $matches)) {
                 $tabeft->sectionid = $matches[1];
                 $tabeft->level = $matches[2];
-            } elseif (preg_match('/^tab_id_(\d+)_l(\d+)_add$/', $tabeft->id, $matches)) {
+            } else if (preg_match('/^tab_id_(\d+)_l(\d+)_add$/', $tabeft->id, $matches)) {
                 $tabeft->dataaddsections = $straddsection;
                 $tabeft->intoid = $matches[1];
                 $tabeft->level = $matches[2];
@@ -243,7 +243,7 @@ class content extends content_base {
                 if (preg_match('/^tab_id_(\d+)_l(\d+)$/', $tabeft->id, $matches)) {
                     $tabeft->sectionid = $matches[1];
                     $tabeft->level = $matches[2];
-                } elseif (preg_match('/^tab_id_(\d+)_l(\d+)_add$/', $tabeft->id, $matches)) {
+                } else if (preg_match('/^tab_id_(\d+)_l(\d+)_add$/', $tabeft->id, $matches)) {
                     $tabeft->dataaddsections = $straddsection;
                     $tabeft->intoid = $matches[1];
                     $tabeft->level = $matches[2];
@@ -266,8 +266,6 @@ class content extends content_base {
             'initialsection' => $initialsection,
             'sections' => $sectionseft,
             'format' => $format->get_format(),
-            'fmtinsertinto' => true,
-            'fmtpageid' => $displaysectionextra->id,
             'version' => $CFG->version,
         ];
 
