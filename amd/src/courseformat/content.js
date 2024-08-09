@@ -307,12 +307,14 @@ export default class Component extends BaseComponent {
             }
             let refreshCms = false;
             const pageSectionDom = this.element.querySelector(".course-section[data-id='" + section.pageid + "']");
-            const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;
-            if (sectionDom.dataset.fmtonpage != pageSectionDisplay) {
-                sectionDom.dataset.fmtonpage = pageSectionDisplay;
-                sectionDom.style.display = (pageSectionDisplay == "1") ? "block" : "none";
-                if (pageSectionDisplay == "1") {
-                    refreshCms = true;
+            if (pageSectionDom) {
+                const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;
+                if (sectionDom.dataset.fmtonpage != pageSectionDisplay) {
+                    sectionDom.dataset.fmtonpage = pageSectionDisplay;
+                    sectionDom.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+                    if (pageSectionDisplay == "1") {
+                        refreshCms = true;
+                    }
                 }
             }
             if (section.visible == sectionDom.classList.contains("hidden")) {

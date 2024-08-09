@@ -76,12 +76,19 @@ export default class Component extends BaseComponent {
     _refreshCourseSectionlist(param) {
         const element = param.state ? param.state.course : param.element;
         const topsectionslist = element.firstsectionlist ?? [];
+        // First check we have all the sections. If not move it here.
+        for (let j = 0; j < topsectionslist.length; j++) {
+            let itemid = topsectionslist[j];
+            if (this.topsections[itemid] === undefined) {
+                this.topsections[itemid] = this.sections[itemid];
+            }
+        }
         this._fixOrder(this.element, topsectionslist, this.topsections);
 
         for (let p in element.secondsectionlist) {
             let secondorder = Array.from(element.secondsectionlist[p]);
             secondorder.shift(); // The first item is the parent to match the tabs.
-            let container = this.getElement("[data-id='" + p + "'] > .collapse > .subsections");
+            let container = this.getElement("[data-id='" + p + "'] > .courseindex-item-content > .subsections");
             let secondsections = container.querySelectorAll(this.selectors.SECONDSECTIONS);
             let secondsectionobj = {};
             secondsections.forEach((section) => {
@@ -99,7 +106,7 @@ export default class Component extends BaseComponent {
 
         for (let p in element.thirdsectionlist) {
             let thirdorder = element.thirdsectionlist[p];
-            let container = this.getElement("[data-id='" + p + "'] > .collapse > .topics");
+            let container = this.getElement("[data-id='" + p + "'] > .courseindex-item-content > .topics");
             let thirdsections = container.querySelectorAll(this.selectors.THIRDSECTIONS);
             let thirdsectionsobj = {};
             thirdsections.forEach((section) => {
@@ -124,9 +131,11 @@ export default class Component extends BaseComponent {
                 continue;
             }
             const linkDom = sectionDom.querySelector("a.courseindex-link");
-            const link = section.sectionurl.replace("&amp;", "&");
-            if (linkDom.href != link) {
-                linkDom.href = link;
+            if (linkDom) {
+                const link = section.sectionurl.replace("&amp;", "&");
+                if (linkDom.href != link) {
+                    linkDom.href = link;
+                }
             }
         }
     }
@@ -141,8 +150,20 @@ export default class Component extends BaseComponent {
     async _createSection({state, element}) {
         // Create a fake node while the component is loading.
         const fakeelement = document.createElement('div');
+        fakeelement.dataset.id = element.id;
+        fakeelement.dataset.for = "section";
+        fakeelement.dataset.indent = element.indent;
         fakeelement.classList.add('bg-pulse-grey', 'w-100');
         fakeelement.innerHTML = '&nbsp;';
+        const fakecontent = document.createElement('div');
+        fakeelement.insertAdjacentElement("beforeend", fakecontent);
+        fakecontent.setAttribute("class", "courseindex-item-content");
+        const faketopics = document.createElement('div');
+        fakecontent.insertAdjacentElement("beforeend", faketopics);
+        faketopics.setAttribute("class", "topics");
+        const fakesubsections = document.createElement('div');
+        fakecontent.insertAdjacentElement("beforeend", fakesubsections);
+        fakesubsections.setAttribute("class", "subsections");
         this.sections[element.id] = fakeelement;
         // Place the fake node on the correct position.
         this._refreshCourseSectionlist({
@@ -159,6 +180,12 @@ export default class Component extends BaseComponent {
         const newelement = newcomponent.getElement();
         this.sections[element.id] = newelement;
         fakeelement.parentNode.replaceChild(newelement, fakeelement);
+        if (faketopics.children.length > 0) {
+            newelement.querySelector(".courseindex-item-content .topics").replaceWith(faketopics);
+        }
+        if (fakesubsections.children.length > 0) {
+            newelement.querySelector(".courseindex-item-content .subsections").replaceWith(fakesubsections);
+        }
     }
 
 }

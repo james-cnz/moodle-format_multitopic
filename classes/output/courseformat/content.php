@@ -266,6 +266,7 @@ class content extends content_base {
             'initialsection' => $initialsection,
             'sections' => $sectionseft,
             'format' => $format->get_format(),
+            'fmtpageid' => $displaysectionextra->id,
             'version' => $CFG->version,
         ];
 

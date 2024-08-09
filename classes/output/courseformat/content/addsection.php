@@ -115,7 +115,6 @@ class addsection extends addsection_base {
             'newsection' => $maxsections - $lastsection,
             'canaddsection' => $lastsection < $maxsections,
             'fmtinsertinto' => true,
-            'fmtpageid' => $displaysectionextra->id,
             'maxsectionswarning' => ($CFG->version >= 2024072600),
         ];
         return $data;

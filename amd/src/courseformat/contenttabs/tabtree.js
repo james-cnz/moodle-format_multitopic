@@ -99,13 +99,13 @@ export default class Component extends BaseComponent {
                 "sectionid": activeTab0Dom.dataset.id,
                 "level": 1,
                 "active": true,
-                "inactive": true,
-                "title": activeTab0Dom.getAttribute('title'),
+                "inactive": false,
+                "title": activeTab0Dom.querySelector('a').getAttribute('title'),
                 "text": '<div class="tab_content dimmed" data-itemid="' + activeTab0Dom.dataset.id + '">'
-                        + activeTab0Dom.getAttribute('title') + '</div>',
+                        + activeTab0Dom.querySelector('a').getAttribute('title') + '</div>',
             };
             let item = document.createElement("li");
-            tabsSecondRowDom.insertAdjacentElement('afterstart', item);
+            tabsSecondRowDom.insertAdjacentElement('afterbegin', item);
             let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
             item = Templates.replaceNode(item, html, "")[0];
             // Create add tab.
