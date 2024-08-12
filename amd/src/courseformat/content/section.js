@@ -50,13 +50,15 @@ export default class extends SectionBase {
             }
         }
 
-        const pageSectionDom = document.querySelector(".course-section[data-id='" + this.section.pageid + "']");
-        if (pageSectionDom) {
-            const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;
-            if (this.element.dataset.fmtonpage != pageSectionDisplay) {
-                this.element.dataset.fmtonpage = pageSectionDisplay;
-                this.element.style.display = (pageSectionDisplay == "1") ? "block" : "none";
-            }
+        const originalSingleSectionId = document.querySelector("ul.sections").dataset.originalsinglesectionid;
+        const originalSingleSection = this.reactive.get("section", originalSingleSectionId);
+        const singleSectionId = originalSingleSection ?
+                                (originalSingleSection.levelsan < 2 ? originalSingleSection.id : originalSingleSection.pageid)
+                                : null;
+        const pageSectionDisplay = (this.section.pageid == singleSectionId);
+        if (this.element.dataset.fmtonpage != pageSectionDisplay) {
+            this.element.dataset.fmtonpage = pageSectionDisplay;
+            this.element.style.display = (pageSectionDisplay == "1") ? "block" : "none";
         }
     }
 

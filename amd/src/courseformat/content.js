@@ -42,6 +42,7 @@ export default class Component extends BaseComponent {
     create(descriptor) {
         super.create(descriptor);
         this.version = descriptor.version;
+        this.originalsinglesectionid = this.element.querySelector("ul.sections").dataset.originalsinglesectionid;
     }
 
     /**
@@ -298,6 +299,10 @@ export default class Component extends BaseComponent {
      */
     _refreshCourseSectionlist(param) {
         super._refreshCourseSectionlist(param);
+        const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
+        const singleSectionId = originalSingleSection ?
+                                (originalSingleSection.levelsan < 2 ? originalSingleSection.id : originalSingleSection.pageid)
+                                : null;
         const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
         for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
             const sectionDom = sectionsDom[sdi];
@@ -306,25 +311,26 @@ export default class Component extends BaseComponent {
                 continue;
             }
             let refreshCms = false;
-            const pageSectionDom = this.element.querySelector(".course-section[data-id='" + section.pageid + "']");
-            if (pageSectionDom) {
-                const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;
-                if (sectionDom.dataset.fmtonpage != pageSectionDisplay) {
-                    sectionDom.dataset.fmtonpage = pageSectionDisplay;
-                    sectionDom.style.display = (pageSectionDisplay == "1") ? "block" : "none";
-                    if (pageSectionDisplay == "1") {
-                        refreshCms = true;
-                    }
+            const pageSectionDisplay = (section.pageid == singleSectionId);
+            if (sectionDom.dataset.fmtonpage != pageSectionDisplay) {
+                sectionDom.dataset.fmtonpage = pageSectionDisplay;
+                sectionDom.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+                if (pageSectionDisplay == "1") {
+                    refreshCms = true;
                 }
             }
             if (section.visible == sectionDom.classList.contains("hidden")) {
                 const badgeDom = sectionDom.querySelector("span.badge[data-type='hiddenfromstudents']");
                 if (section.visible) {
                     sectionDom.classList.remove("hidden");
-                    badgeDom.classList.add("d-none");
+                    if (badgeDom) {
+                        badgeDom.classList.add("d-none");
+                    }
                 } else {
                     sectionDom.classList.add("hidden");
-                    badgeDom.classList.remove("d-none");
+                    if (badgeDom) {
+                        badgeDom.classList.remove("d-none");
+                    }
                 }
                 if (sectionDom.dataset.fmtonpage == "1") {
                     refreshCms = true;
@@ -340,6 +346,14 @@ export default class Component extends BaseComponent {
             });
         }
         this._refreshAllSectionsToggler(this.reactive.stateManager.state);
+
+        // Update Add section button if necessary.
+        const addSectionDom = document.querySelector("div#course-addsection > a");
+        if (addSectionDom.dataset.intoId != singleSectionId) {
+            addSectionDom.dataset.intoId = singleSectionId;
+            addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + singleSectionId);
+        }
+
     }
 
     /**
