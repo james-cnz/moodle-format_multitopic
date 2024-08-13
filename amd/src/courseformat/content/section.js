@@ -55,10 +55,10 @@ export default class extends SectionBase {
         const singleSectionId = originalSingleSection ?
                                 (originalSingleSection.levelsan < 2 ? originalSingleSection.id : originalSingleSection.pageid)
                                 : null;
-        const pageSectionDisplay = (this.section.pageid == singleSectionId);
-        if (this.element.dataset.fmtonpage != pageSectionDisplay) {
-            this.element.dataset.fmtonpage = pageSectionDisplay;
-            this.element.style.display = (pageSectionDisplay == "1") ? "block" : "none";
+        const fmtonpageNew = (this.section.pageid == singleSectionId) ? "1" : "0";
+        if (this.element.dataset.fmtonpage != fmtonpageNew) {
+            this.element.dataset.fmtonpage = fmtonpageNew;
+            this.element.style.display = (fmtonpageNew == "1") ? "block" : "none";
         }
     }
 

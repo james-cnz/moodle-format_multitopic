@@ -311,11 +311,11 @@ export default class Component extends BaseComponent {
                 continue;
             }
             let refreshCms = false;
-            const pageSectionDisplay = (section.pageid == singleSectionId);
-            if (sectionDom.dataset.fmtonpage != pageSectionDisplay) {
-                sectionDom.dataset.fmtonpage = pageSectionDisplay;
-                sectionDom.style.display = (pageSectionDisplay == "1") ? "block" : "none";
-                if (pageSectionDisplay == "1") {
+            const fmtonpageNew = (section.pageid == singleSectionId) ? "1" : "0";
+            if (sectionDom.dataset.fmtonpage != fmtonpageNew) {
+                sectionDom.dataset.fmtonpage = fmtonpageNew;
+                sectionDom.style.display = (fmtonpageNew == "1") ? "block" : "none";
+                if (fmtonpageNew == "1") {
                     refreshCms = true;
                 }
             }
