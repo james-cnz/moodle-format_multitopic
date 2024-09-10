@@ -271,8 +271,8 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
      * @param int[] $ids not used
-     * @param int $targetsectionid target section id
-     * @param int $newlevel the new section level
+     * @param int|null $targetsectionid target section id
+     * @param int|null $newlevel the new section level
      */
     public function fmt_section_add_into(
         \core_courseformat\stateupdates $updates,
