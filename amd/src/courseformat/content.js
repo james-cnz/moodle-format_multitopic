@@ -300,9 +300,12 @@ export default class Component extends BaseComponent {
     _refreshCourseSectionlist(param) {
         super._refreshCourseSectionlist(param);
         const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
-        const singleSectionId = originalSingleSection ?
-                                (originalSingleSection.levelsan < 2 ? originalSingleSection.id : originalSingleSection.pageid)
-                                : null;
+        let singleSectionId;
+        if (originalSingleSection) {
+            singleSectionId = (originalSingleSection.levelsan < 2) ? originalSingleSection.id : originalSingleSection.pageid;
+        } else {
+            singleSectionId = null;
+        }
         const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
         for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
             const sectionDom = sectionsDom[sdi];

@@ -52,9 +52,12 @@ export default class extends SectionBase {
 
         const originalSingleSectionId = document.querySelector("ul.sections").dataset.originalsinglesectionid;
         const originalSingleSection = this.reactive.get("section", originalSingleSectionId);
-        const singleSectionId = originalSingleSection ?
-                                (originalSingleSection.levelsan < 2 ? originalSingleSection.id : originalSingleSection.pageid)
-                                : null;
+        let singleSectionId;
+        if (originalSingleSection) {
+            singleSectionId = (originalSingleSection.levelsan < 2) ? originalSingleSection.id : originalSingleSection.pageid;
+        } else {
+            singleSectionId = null;
+        }
         const fmtonpageNew = (this.section.pageid == singleSectionId) ? "1" : "0";
         if (this.element.dataset.fmtonpage != fmtonpageNew) {
             this.element.dataset.fmtonpage = fmtonpageNew;

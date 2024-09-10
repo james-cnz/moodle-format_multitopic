@@ -81,6 +81,7 @@ class format_multitopic extends core_courseformat\base {
     /** @var int|null the sectionid selected */
     protected $singlesectionid = null;
 
+    /** @var int|null the sectionid as specified */
     public $originalsinglesectionid = null;
     // END ADDED.
 
@@ -519,7 +520,7 @@ class format_multitopic extends core_courseformat\base {
         $sectionextra = $this->fmt_get_section_extra($section);
 
         $this->originalsinglesectionid = $sectionextra->id;
-    
+
         // If display section is a topic, get the page it is on instead.
         if ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $sectionsextra = $this->fmt_get_sections_extra();
