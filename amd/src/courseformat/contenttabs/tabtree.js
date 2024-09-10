@@ -155,7 +155,7 @@ export default class Component extends BaseComponent {
         const toptabslist = element.firstsectionlist ?? [];
         const childtabslist = element.secondsectionlist ?? [];
         let toptabs = this.element.querySelector('ul:first-of-type');
-        await this._fixOrder(toptabs, toptabslist, this.selectors.TAB, 0, childtabslist[toptabslist[0]].length > 1);
+        await this._fixOrder(toptabs, toptabslist, this.selectors.TAB, 0, childtabslist[newActiveTab0id].length > 1);
 
         // And the second row tabs match secondsectionlist.
         if (tabsSecondRowShow) {
