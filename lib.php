@@ -767,10 +767,15 @@ class format_multitopic extends core_courseformat\base {
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
         if ($section !== null) {                                                // CHANGED.
-            $sectionextra = $this->fmt_get_section_extra($section, MUST_EXIST); // ADDED.
-            if (!empty($sectionextra->sectionbase->component) && $sectionextra->sectionbase->component == "mod_subsection") {
+            $sectionextraorig = $this->fmt_get_section_extra($section, MUST_EXIST); // ADDED.
+            if (!empty($sectionextraorig->sectionbase->component)
+                && $sectionextraorig->sectionbase->component == "mod_subsection") {
                 $modinfo = get_fast_modinfo($course);
-                $sectionextra = $this->fmt_get_section_extra((object)['id' => $modinfo->get_instances_of('subsection')[$sectionextra->sectionbase->itemid]->section]);
+                $sectionextra = $this->fmt_get_section_extra(
+                    (object)['id' => $modinfo->get_instances_of('subsection')[$sectionextraorig->sectionbase->itemid]->section]
+                );
+            } else {
+                $sectionextra = $sectionextraorig;
             }
             // CHANGED.
             $pageid = ($sectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
@@ -778,11 +783,11 @@ class format_multitopic extends core_courseformat\base {
             if ($pageid != $this->fmtrootsectionid) {
                 $url->param('sectionid', $pageid);
             }
-            if ($sectionextra->levelsan == FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+            if ($sectionextraorig->id != $pageid) {
                 if (empty($CFG->linkcoursesections) && !empty($options['navigation']) && $CFG->version < 2023120700) {
                     return null;
                 }
-                $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
+                $url->set_anchor('sectionid-' . $sectionextraorig->id . '-title');
             } else if (!empty($sectionextra->sectionbase->component)) {
                 $url = new moodle_url( '/course/section.php', ['id' => $sectionextra->id]);
             }

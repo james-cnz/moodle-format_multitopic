@@ -67,7 +67,7 @@ class section extends section_base {
 
         $data = parent::export_for_template($output);
 
-        $data->sectionreturnid = $section->section;                             //TODO: Unset?
+        $data->sectionreturnid = $section->section;                             // TODO: Maybe unset?
         $data->sectionreturnnum = $section->section;
         unset($data->displayonesection);
         $data->levelsan = $sectionextra->levelsan;
