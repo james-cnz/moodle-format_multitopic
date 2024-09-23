@@ -131,9 +131,12 @@ export default class Component extends BaseComponent {
 
         // CHANGED.
         let sectionlist = [];
-        const sectionlistDom = this.element.querySelectorAll(".course-section.section-topic-collapsible[data-fmtonpage='1']");
-        for (let sectionCount = 0; sectionCount < sectionlistDom.length; sectionCount++) {
-            sectionlist.push(sectionlistDom[sectionCount].dataset.id);
+        const togglerlistDom = this.element.querySelectorAll(
+            ".course-section[data-fmtonpage='1'] " +
+            this.selectors.SECTION_ITEM + " " + this.selectors.COLLAPSE
+        );
+        for (let togglerDom of togglerlistDom) {
+            sectionlist.push(togglerDom.closest(".course-section").dataset.id);
         }
         // END CHANGED.
 
@@ -159,9 +162,12 @@ export default class Component extends BaseComponent {
         let allexpanded = true;
         // ADDED.
         let sectionCollapsible = {};
-        const sectionlistDom = this.element.querySelectorAll(".course-section.section-topic-collapsible[data-fmtonpage='1']");
-        for (let sectionCount = 0; sectionCount < sectionlistDom.length; sectionCount++) {
-            sectionCollapsible[sectionlistDom[sectionCount].dataset.id] = true;
+        const togglerlistDom = this.element.querySelectorAll(
+            ".course-section[data-fmtonpage='1'] " +
+            this.selectors.SECTION_ITEM + " " + this.selectors.COLLAPSE
+        );
+        for (let togglerDom of togglerlistDom) {
+            sectionCollapsible[togglerDom.closest(".course-section").dataset.id] = true;
         }
         // END ADDED.
         state.section.forEach(
@@ -172,7 +178,7 @@ export default class Component extends BaseComponent {
                 }
             }
         );
-        target.style.display = (allexpanded && allcollapsed) ? "none" : "block"; // ADDED.
+        target.style.visibility = (allexpanded && allcollapsed) ? "hidden" : "visible"; // ADDED.
         if (allcollapsed) {
             target.classList.add(this.classes.COLLAPSED);
             target.setAttribute('aria-expanded', false);
