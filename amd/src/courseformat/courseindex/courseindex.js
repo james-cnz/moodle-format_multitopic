@@ -18,7 +18,7 @@
  *
  * @module     format_multitopic/courseformat/courseindex/courseindex
  * @class      format_multitopic/courseformat/courseindex/courseindex
- * @copyright  2022 James Calder and Otago Polytechnic
+ * @copyright  2022 onwards James Calder and Otago Polytechnic
  * @copyright  2022 Jeremy FitzPatrick and Te Wānanga o Aotearoa
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,28 +28,6 @@ import BaseComponent from 'core_courseformat/local/courseindex/courseindex';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 
 export default class Component extends BaseComponent {
-
-    create() {
-        super.create();
-        this.selectors.TOPSECTION = `[data-for='section'][data-indent='0']`;
-        this.selectors.SECONDSECTIONS = `[data-for='section'][data-indent='1']`;
-        this.selectors.THIRDSECTIONS = `[data-for='section'][data-indent='2']`;
-        this.topsections = {};
-    }
-
-    /**
-     * Initial state ready method.
-     *
-     * @param {Object} state the state data
-     */
-    stateReady(state) {
-        super.stateReady(state);
-        // Get cms and sections elements.
-        const topsections = this.getElements(this.selectors.TOPSECTION);
-        topsections.forEach((section) => {
-            this.topsections[section.dataset.id] = section;
-        });
-    }
 
     /**
      * Static method to create a component instance form the mustache template.
@@ -75,58 +53,58 @@ export default class Component extends BaseComponent {
      */
     _refreshCourseSectionlist(param) {
         const element = param.state ? param.state.course : param.element;
-        const topsectionslist = element.firstsectionlist ?? [];
-        this._fixOrder(this.element, topsectionslist, this.topsections);
 
-        for (let p in element.secondsectionlist) {
-            let secondorder = Array.from(element.secondsectionlist[p]);
-            secondorder.shift(); // The first item is the parent to match the tabs.
-            let container = this.getElement("[data-id='" + p + "'] > .collapse > .subsections");
-            let secondsections = container.querySelectorAll(this.selectors.SECONDSECTIONS);
-            let secondsectionobj = {};
-            secondsections.forEach((section) => {
-                secondsectionobj[section.dataset.id] = section;
-            });
-            // First check we have all the subsections. If not move it here.
-            for (let j = 0; j < secondorder.length; j++) {
-                let itemid = secondorder[j];
-                if (secondsectionobj[itemid] === undefined) {
-                    secondsectionobj[itemid] = this.sections[itemid];
-                }
+        let containers = [];
+        let containerlevels = [];
+        const newcontainer = {indent: -1, container: this.element, order: []};
+        containers.push(newcontainer);
+        containerlevels.push(newcontainer);
+
+        for (let sectionid of element.sectionlist) {
+            const section = this.reactive.get("section", sectionid);
+            while (containerlevels[containerlevels.length - 1].indent >= section.indent) {
+                containerlevels.pop();
             }
-            this._fixOrder(container, secondorder, secondsectionobj);
+            containerlevels[containerlevels.length - 1].order.push(section.id);
+            const newcontainer = {
+                indent: section.indent,
+                container: this.sections[section.id].querySelector(":scope > .courseindex-item-content > .subsections"),
+                order: []
+            };
+            containers.push(newcontainer);
+            containerlevels.push(newcontainer);
+        }
+        while (containerlevels.length > 0) {
+            containerlevels.pop();
         }
 
-        for (let p in element.thirdsectionlist) {
-            let thirdorder = element.thirdsectionlist[p];
-            let container = this.getElement("[data-id='" + p + "'] > .collapse > .topics");
-            let thirdsections = container.querySelectorAll(this.selectors.THIRDSECTIONS);
-            let thirdsectionsobj = {};
-            thirdsections.forEach((section) => {
-                thirdsectionsobj[section.dataset.id] = section;
-            });
-            // First check we have all the topics. If not move it here.
-            for (let j = 0; j < thirdorder.length; j++) {
-                let itemid = thirdorder[j];
-                if (thirdsectionsobj[itemid] === undefined) {
-                    thirdsectionsobj[itemid] = this.sections[itemid];
-                }
-            }
-            this._fixOrder(container, thirdorder, thirdsectionsobj);
+        for (let container of containers) {
+            this._fixOrder(container.container, container.order, this.sections);
         }
 
-        // Update URLs.
-        const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
-        for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
-            const sectionDom = sectionsDom[sdi];
-            const section = this.reactive.get("section", sectionDom.dataset.id);
-            if (!section) {
-                continue;
+        // Update indentation and URLs.
+        for (let sectionid of element.sectionlist) {
+            const section = this.reactive.get("section", sectionid);
+            const sectionDom = this.sections[sectionid];
+            if (sectionDom.dataset?.indent != section.indent) {
+                const sectiontitledom = sectionDom.querySelector(":scope > .courseindex-item");
+                if (sectiontitledom) {
+                    sectiontitledom.style = "padding-left: " + section.indent + "em;";
+                }
+                const sectioncontentdom = sectionDom.querySelector(
+                    ":scope > .courseindex-item-content > .courseindex-sectioncontent"
+                );
+                if (sectioncontentdom) {
+                    sectioncontentdom.style = "padding-left: " + section.indent + "em;";
+                }
+                sectionDom.dataset.indent = section.indent;
             }
-            const linkDom = sectionDom.querySelector("a.courseindex-link");
-            const link = section.sectionurl.replace("&amp;", "&");
-            if (linkDom.href != link) {
-                linkDom.href = link;
+            const linkDom = sectionDom.querySelector(":scope > .courseindex-item a.courseindex-link");
+            if (linkDom) {
+                const link = section.sectionurl.replace("&amp;", "&");
+                if (linkDom.href != link) {
+                    linkDom.href = link;
+                }
             }
         }
     }
@@ -141,8 +119,16 @@ export default class Component extends BaseComponent {
     async _createSection({state, element}) {
         // Create a fake node while the component is loading.
         const fakeelement = document.createElement('div');
+        fakeelement.dataset.id = element.id;
+        fakeelement.dataset.for = "section";
         fakeelement.classList.add('bg-pulse-grey', 'w-100');
         fakeelement.innerHTML = '&nbsp;';
+        const fakecontent = document.createElement('div');
+        fakeelement.insertAdjacentElement("beforeend", fakecontent);
+        fakecontent.setAttribute("class", "courseindex-item-content");
+        const fakesubsections = document.createElement('div');
+        fakecontent.insertAdjacentElement("beforeend", fakesubsections);
+        fakesubsections.setAttribute("class", "subsections");
         this.sections[element.id] = fakeelement;
         // Place the fake node on the correct position.
         this._refreshCourseSectionlist({
@@ -159,6 +145,9 @@ export default class Component extends BaseComponent {
         const newelement = newcomponent.getElement();
         this.sections[element.id] = newelement;
         fakeelement.parentNode.replaceChild(newelement, fakeelement);
+        if (fakesubsections.children.length > 0) {
+            newelement.querySelector(".courseindex-item-content .subsections").replaceWith(fakesubsections);
+        }
     }
 
 }

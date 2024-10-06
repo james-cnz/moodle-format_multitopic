@@ -55,29 +55,20 @@ class course extends base_course {
         global $CFG;
         $data = parent::export_for_template($output);
 
-        $data->firstsectionlist = [];
-        $data->secondsectionlist = [];
+        $data->tabsdata = [];
         $data->draganddropsectionmoveafter = $CFG->version >= 2023120100;
 
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();
-        $parentid = null;
-        $lastparentid = null;
 
         foreach ($sectionsextra as $sectionextra) {
             $section = $sectionextra->sectionbase;
             if (empty($section->component) && $format->is_section_visible($section)) {
                 if ($sectionextra->levelsan <= 0) {
-                    $parentid = $section->id;
-                    $lastparentid = $section->id;
                     // Tabs uses first item as parent, Course index might not.
-                    $data->secondsectionlist[$parentid] = [$section->id];
-                    $data->firstsectionlist[] = $section->id;
+                    $data->tabsdata[] = (object)['sectionid' => $section->id, 'subtree' => [(object)['sectionid' => $section->id]]];
                 } else if ($sectionextra->levelsan == 1) {
-                    $lastparentid = $section->id;
-                    $data->secondsectionlist[$parentid][] = $section->id;
-                } else if ($sectionextra->levelsan == 2) {
-                    $data->thirdsectionlist[$lastparentid][] = $section->id;
+                    end($data->tabsdata)->subtree[] = (object)['sectionid' => $section->id];
                 }
             }
         }

@@ -87,7 +87,6 @@ export default class Component extends BaseComponent {
         for (let i = 0; i < sections.length; i++) {
             let section = sections[i];
             section.subsections = [];
-            section.topics = [];
             if (section.indent === 0) {
                 parentSection = section;
                 lastParent = section;
@@ -96,7 +95,7 @@ export default class Component extends BaseComponent {
                 lastParent = section;
                 parentSection.subsections.push(section);
             } else if (section.indent === 2) {
-                lastParent.topics.push(section);
+                lastParent.subsections.push(section);
             }
         }
         return topSections;
