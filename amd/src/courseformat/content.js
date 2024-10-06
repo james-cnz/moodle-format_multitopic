@@ -268,7 +268,7 @@ export default class Component extends BaseComponent {
         for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
             const sectionDom = sectionsDom[sdi];
             const section = this.reactive.get("section", sectionDom.dataset.id);
-            if (!section) {
+            if (!section || section.component) {
                 continue;
             }
             let refreshCms = false;
