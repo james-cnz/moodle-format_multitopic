@@ -221,7 +221,7 @@ class section extends section_base {
         $course = $this->format->get_course();
         $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                     $section->id : $sectionextra->parentid;
-        $onpage = ($pageid == $format->get_sectionid()) || ($format->get_sectionid() === null);
+        $onpage = ($pageid == $format->get_sectionid());
         $sectionstyle = " sectionid-{$section->id}";
         $iscollapsible = false;
         // Determine the section type.

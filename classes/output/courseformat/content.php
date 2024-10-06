@@ -261,6 +261,7 @@ class content extends content_base {
             'initialsection' => $initialsection,
             'sections' => $sectionseft,
             'format' => $format->get_format(),
+            'originalsinglesectionid' => $format->originalsinglesectionid,
         ];
 
         // INCLUDED from course/format/classes/output/local/content/section/cmlist.php export_for_template() .

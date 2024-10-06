@@ -18,7 +18,7 @@
  *
  * @module     format_multitopic/courseformat/content
  * @class      format_multitopic/courseformat/content
- * @copyright  2022 James Calder and Otago Polytechnic
+ * @copyright  2022 onwards James Calder and Otago Polytechnic
  * @copyright  based on work by 2020 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,6 +31,16 @@ import CmItem from 'format_multitopic/courseformat/content/section/cmitem';
 import Templates from 'core/templates';
 
 export default class Component extends BaseComponent {
+
+    /**
+     * Constructor hook.
+     *
+     * @param {Object} descriptor the component descriptor
+     */
+    create(descriptor) {
+        super.create(descriptor);
+        this.originalsinglesectionid = this.element.querySelector("ul.sections").dataset.originalsinglesectionid;
+    }
 
     /**
      * Static method to create a component instance form the mustahce template.
@@ -239,6 +249,15 @@ export default class Component extends BaseComponent {
      */
     _refreshCourseSectionlist(param) {
         super._refreshCourseSectionlist(param);
+
+        const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
+        let singleSectionId;
+        if (originalSingleSection) {
+            singleSectionId = (originalSingleSection.levelsan < 2) ? originalSingleSection.id : originalSingleSection.pageid;
+        } else {
+            singleSectionId = null;
+        }
+
         const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
         for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
             const sectionDom = sectionsDom[sdi];
@@ -247,12 +266,11 @@ export default class Component extends BaseComponent {
                 continue;
             }
             let refreshCms = false;
-            const pageSectionDom = this.element.querySelector(".course-section[data-id='" + section.pageid + "']");
-            const pageSectionDisplay = pageSectionDom.dataset.fmtonpage;
-            if (sectionDom.dataset.fmtonpage != pageSectionDisplay) {
-                sectionDom.dataset.fmtonpage = pageSectionDisplay;
-                sectionDom.style.display = (pageSectionDisplay == "1") ? "block" : "none";
-                if (pageSectionDisplay == "1") {
+            const fmtonpageNew = (section.pageid == singleSectionId) ? "1" : "0";
+            if (sectionDom.dataset.fmtonpage != fmtonpageNew) {
+                sectionDom.dataset.fmtonpage = fmtonpageNew;
+                sectionDom.style.display = (fmtonpageNew == "1") ? "block" : "none";
+                if (fmtonpageNew == "1") {
                     refreshCms = true;
                 }
             }
@@ -260,10 +278,14 @@ export default class Component extends BaseComponent {
                 const badgeDom = sectionDom.querySelector("span.badge[data-type='hiddenfromstudents']");
                 if (section.visible) {
                     sectionDom.classList.remove("hidden");
-                    badgeDom.classList.add("d-none");
+                    if (badgeDom) {
+                        badgeDom.classList.add("d-none");
+                    }
                 } else {
                     sectionDom.classList.add("hidden");
-                    badgeDom.classList.remove("d-none");
+                    if (badgeDom) {
+                        badgeDom.classList.remove("d-none");
+                    }
                 }
                 if (sectionDom.dataset.fmtonpage == "1") {
                     refreshCms = true;
@@ -279,6 +301,11 @@ export default class Component extends BaseComponent {
             });
         }
         this._refreshAllSectionsToggler(this.reactive.stateManager.state);
+
+        // Update Add section button.
+        const addSectionDom = document.querySelector("div#fmtchangenumsections > a");
+        addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + singleSectionId);
+
     }
 
     /**

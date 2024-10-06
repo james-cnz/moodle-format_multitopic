@@ -25,7 +25,7 @@ import Templates from 'core/templates';
  * @module     format_multitopic/courseformat/contenttabs/tabtree
  * @class      format_multitopic/courseformat/contenttabs/tabtree
  * @copyright  2022 Jeremy FitzPatrick and Te Wānanga o Aotearoa
- * @copyright  2023 James Calder and Otago Polytechnic
+ * @copyright  2023 onwards James Calder and Otago Polytechnic
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -52,6 +52,8 @@ export default class Component extends BaseComponent {
         this.tabs = {};
         this.childtabs = {};
         this.activetab = [null, null];
+
+        this.originalsinglesectionid = document.querySelector("ul.sections").dataset.originalsinglesectionid;
     }
 
     static init(target) {
@@ -83,36 +85,131 @@ export default class Component extends BaseComponent {
      * @param {Object} param.element
      */
     async _refreshCourseSectionTabs({element}) {
-        // Change the active top-level tab, if necessary.
-        const activeTab1 = this.reactive.get('section', this.activetab[1]);
-        let newActiveTab0id = (activeTab1.levelsan >= 1) ? activeTab1.parentid : activeTab1.id;
-        if (newActiveTab0id != this.activetab[0]) {
-            let section = this.reactive.get("section", this.activetab[0]);
-            let anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]').parentElement;
-            anchor.classList.remove("active");
-            anchor.href = section.sectionurl.replace("&amp;", "&");
-            this.activetab[0] = newActiveTab0id;
-            anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]').parentElement;
-            anchor.classList.add("active");
-            anchor.removeAttribute("href");
-            const addAnchor = this.element.querySelector('ul:nth-of-type(2) li:last-of-type a');
-            const addLink = addAnchor.href.replace(/&insertparentid=\d+/, "&insertparentid=" + this.activetab[0]);
-            addAnchor.setAttribute("href", addLink);
+
+        const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
+        let singleSectionId;
+        let singleSection;
+        if (originalSingleSection) {
+            singleSectionId = (originalSingleSection.levelsan < 2) ? originalSingleSection.id : originalSingleSection.pageid;
+            singleSection = (singleSectionId == originalSingleSection.id) ?
+                            originalSingleSection : this.reactive.get("section", singleSectionId);
+        } else {
+            singleSectionId = null;
+            singleSection = null;
+        }
+
+        let newActiveTab0id;
+        if (singleSection) {
+            newActiveTab0id = (singleSection.levelsan >= 1) ? singleSection.parentid : singleSection.id;
+        } else {
+            newActiveTab0id = null;
+        }
+
+        // Add/remove the second-level tabs, if necessary.
+        let tabsSecondRowDom = this.element.querySelector('ul:nth-of-type(2)');
+        const tabsSecondRowShow = singleSection
+                            && ((element.tabsdata.length > 1)
+                                || (element.tabsdata[0].subtree.length > 1));
+        if (tabsSecondRowShow && !tabsSecondRowDom) {
+            // Create tab row.
+            this.element.querySelector('ul:first-of-type').insertAdjacentElement(
+                'afterend', tabsSecondRowDom = document.createElement('ul')
+            );
+            tabsSecondRowDom.className = 'nav nav-tabs mb-3';
+            // Create add tab.
+            const addTab0Dom = this.element.querySelector('ul:first-of-type li:last-of-type');
+            let data = {
+                "level": 1,
+                "active": false,
+                "inactive": false,
+                "link": [{
+                    "link": addTab0Dom.querySelector('a').getAttribute('href').replace(/\binsertlevel=0\b/, 'insertlevel=1'),
+                }],
+                "title": addTab0Dom.getAttribute('title'),
+                "text": '<i class="icon fa fa-plus fa-fw" title="' + addTab0Dom.getAttribute('title') + '"></i>',
+            };
+            let item = document.createElement("li");
+            tabsSecondRowDom.insertAdjacentElement('beforeend', item);
+            let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
+            item = Templates.replaceNode(item, html, "")[0];
+        } else if (tabsSecondRowDom && !tabsSecondRowShow) {
+            tabsSecondRowDom.remove();
+        }
+
+        let toptabslist = [];
+        let childtabslist = [];
+        for (let tabdata of element.tabsdata) {
+            toptabslist.push(tabdata.sectionid);
+            if (tabdata.sectionid == newActiveTab0id) {
+                for (let tabdata2 of tabdata.subtree) {
+                    childtabslist.push(tabdata2.sectionid);
+                }
+            }
         }
 
         // Do things that make the first row tabs match firstsectionlist.
-        const toptabslist = element.firstsectionlist ?? [];
-        const childtabslist = element.secondsectionlist ?? [];
         let toptabs = this.element.querySelector('ul:first-of-type');
-        await this._fixOrder(toptabs, toptabslist, this.selectors.TAB, 0, childtabslist[this.activetab[0]].length > 1);
+        await this._fixOrder(toptabs, toptabslist, this.selectors.TAB, 0, element.tabsdata[0].subtree.length > 1);
 
         // And the second row tabs match secondsectionlist.
-        let childtabs = this.element.querySelector('ul:nth-of-type(2)');
-        if (childtabs) {
-            await this._fixOrder(childtabs, childtabslist[this.activetab[0]], this.selectors.CHILDTAB, 1, false);
+        if (tabsSecondRowShow) {
+            let childtabs = this.element.querySelector('ul:nth-of-type(2)');
+            await this._fixOrder(childtabs, childtabslist, this.selectors.CHILDTAB, 1, false);
         }
 
+        this._changeActiveTabs(newActiveTab0id, tabsSecondRowShow ? singleSection.id : null);
+
         this._indexContents();
+    }
+
+    /**
+     * Change active tabs, if necessary.
+     *
+     * @param {int|null} newActiveTab0id
+     * @param {int|null} newActiveTab1id
+     */
+    _changeActiveTabs(newActiveTab0id, newActiveTab1id) {
+
+        // Change the active top-level tab, if necessary.
+        if (newActiveTab0id != this.activetab[0]) {
+            let anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]')?.parentElement;
+            if (anchor) {
+                let section = this.reactive.get("section", this.activetab[0]);
+                anchor.classList.remove("active");
+                anchor.href = section.sectionurl.replace("&amp;", "&");
+            }
+            this.activetab[0] = newActiveTab0id;
+            anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]')?.parentElement;
+            if (anchor) {
+                anchor.classList.add("active");
+                anchor.removeAttribute("href");
+            }
+            // Change the second-level add tab, if necessary.
+            if (newActiveTab1id) {
+                const addAnchor = this.element.querySelector('ul:nth-of-type(2) li:last-of-type a');
+                const addLink = addAnchor.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + this.activetab[0]);
+                addAnchor.setAttribute("href", addLink);
+            }
+        }
+
+        // Change the active second-level tab, if necessary.
+        if (newActiveTab1id && newActiveTab1id != this.activetab[1]) {
+            let anchor = this.element.querySelector('ul:nth-of-type(2) div[data-itemid="' + this.activetab[1] + '"]')
+                            ?.parentElement;
+            if (anchor) {
+                let section = this.reactive.get("section", this.activetab[1]);
+                anchor.classList.remove("active");
+                anchor.href = section.sectionurl.replace("&amp;", "&");
+            }
+            this.activetab[1] = newActiveTab1id;
+            anchor = this.element.querySelector('ul:nth-of-type(2) div[data-itemid="' + this.activetab[1] + '"]')?.parentElement;
+            if (anchor) {
+                anchor.classList.add("active");
+                anchor.removeAttribute("href");
+            }
+        }
+        this.activetab[1] = newActiveTab1id;
+
     }
 
     /**
@@ -168,12 +265,9 @@ export default class Component extends BaseComponent {
                 element: item,
             });
             // Update selected tab
-            let classes = item.querySelector("a").classList.value;
-            if (classes.indexOf(this.classes.ACTIVETAB) !== -1) {
-                if (level <= 0) {
-                    this.activetab[0] = item.dataset.id;
-                }
-                this.activetab[1] = item.dataset.id;
+            let classes = item.querySelector("a").classList;
+            if (classes.contains(this.classes.ACTIVETAB)) {
+                this.activetab[level] = item.dataset.id;
             }
             // Mark as indexed.
             item.dataset.indexed = true;

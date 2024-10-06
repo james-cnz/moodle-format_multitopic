@@ -18,7 +18,7 @@
  *
  * @module     format_multitopic/courseformat/content/section
  * @class      format_multitopic/courseformat/content/section
- * @copyright  2022 James Calder and Otago Polytechnic
+ * @copyright  2022 onwards James Calder and Otago Polytechnic
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -48,6 +48,20 @@ export default class extends SectionBase {
                 });
                 this.configDragDrop(headerComponent);
             }
+        }
+
+        const originalSingleSectionId = document.querySelector("ul.sections").dataset.originalsinglesectionid;
+        const originalSingleSection = this.reactive.get("section", originalSingleSectionId);
+        let singleSectionId;
+        if (originalSingleSection) {
+            singleSectionId = (originalSingleSection.levelsan < 2) ? originalSingleSection.id : originalSingleSection.pageid;
+        } else {
+            singleSectionId = null;
+        }
+        const fmtonpageNew = (this.section.pageid == singleSectionId) ? "1" : "0";
+        if (this.element.dataset.fmtonpage != fmtonpageNew) {
+            this.element.dataset.fmtonpage = fmtonpageNew;
+            this.element.style.display = (fmtonpageNew == "1") ? "block" : "none";
         }
     }
 

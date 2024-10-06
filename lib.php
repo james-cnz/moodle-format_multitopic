@@ -80,6 +80,9 @@ class format_multitopic extends core_courseformat\base {
 
     /** @var int|null the sectionid selected */
     protected $singlesectionid = null;
+
+    /** @var int|null the sectionid as specified */
+    public $originalsinglesectionid = null;
     // END ADDED.
 
     // INCLUDED declaration /course/format/classes/base.php class base function __construct.
@@ -510,10 +513,13 @@ class format_multitopic extends core_courseformat\base {
         if ($section === null) {
             $this->singlesection = null;
             $this->singlesectionid = null;
+            $this->originalsinglesectionid = null;
             return;
         }
 
         $sectionextra = $this->fmt_get_section_extra($section);
+
+        $this->originalsinglesectionid = $sectionextra->id;
 
         // If display section is a topic, get the page it is on instead.
         if ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
