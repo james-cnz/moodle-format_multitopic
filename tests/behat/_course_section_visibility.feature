@@ -13,6 +13,7 @@ Feature: Show/hide course sections (Multitopic format)
       | fullname         | Course 1   |
       | shortname        | C1         |
       | format           | multitopic |
+      | collapsible      | 0          |
       | hiddensections   | 0          |
       | enablecompletion | 1          |
       | initsections     | 1          |
