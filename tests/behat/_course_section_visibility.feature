@@ -159,6 +159,7 @@ Feature: Show/hide course sections (Multitopic format)
     # Check partly restricted and unhidden
     When I am on the "Course 1" course page logged in as student1
     Then I should see "Section 2" in the "region-main" "region"
+    And I should see "Not available unless: The activity Test label is marked complete" in the "region-main" "region"
     And I should not see "Test hidden forum 22 name" in the "region-main" "region"
     And I log out
     # Check partly restricted and partly hidden
@@ -171,6 +172,8 @@ Feature: Show/hide course sections (Multitopic format)
     And I press "Save and display"
     When I am on the "Course 1" course page logged in as student1
     #Then I should see "Section 2" in the "region-main" "region"
+    #And I should see "Not available" in the "region-main" "region"
+    #And I should not see "Not available unless: The activity Test label is marked complete" in the "region-main" "region"
     And I should not see "Test hidden forum 22 name" in the "region-main" "region"
 
   @javascript
@@ -183,6 +186,7 @@ Feature: Show/hide course sections (Multitopic format)
     And I press "Save and display"
     When I am on the "Course 1" course page logged in as student1
     Then I should see "Section 2" in the "region-main" "region"
+    And I should see "Not available" in the "region-main" "region"
     And I should not see "Test hidden forum 22 name" in the "region-main" "region"
 
   @javascript
