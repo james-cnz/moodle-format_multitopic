@@ -80,6 +80,7 @@ Feature: Show/hide course sections (Multitopic format)
     # Check fully restricted and unhidden
     When I am on the "Course 1" course page logged in as student1
     Then I should not see "Section 2" in the "region-main" "region"
+    And I should not see "Not available" in the "region-main" "region"
     And I should not see "Test hidden forum 22 name" in the "region-main" "region"
     And I log out
     # Check fully restricted and partly hidden
@@ -93,6 +94,7 @@ Feature: Show/hide course sections (Multitopic format)
     And I log out
     When I am on the "Course 1" course page logged in as student1
     Then I should not see "Section 2" in the "region-main" "region"
+    And I should not see "Not available" in the "region-main" "region"
     And I should not see "Test hidden forum 22 name" in the "region-main" "region"
     And I log out
     # Check fully restricted and fully hidden
@@ -105,6 +107,7 @@ Feature: Show/hide course sections (Multitopic format)
     And I log out
     When I am on the "Course 1" course page logged in as student1
     Then I should not see "Section 2" in the "region-main" "region"
+    And I should not see "Not available" in the "region-main" "region"
     And I should not see "Test hidden forum 22 name" in the "region-main" "region"
 
   @javascript
@@ -120,6 +123,7 @@ Feature: Show/hide course sections (Multitopic format)
     # Check fully hidden and unrestricted
     When I am on the "Course 1" course page logged in as student1
     Then I should not see "Section 2" in the "region-main" "region"
+    And I should not see "Not available" in the "region-main" "region"
     And I should not see "Test hidden forum 22 name" in the "region-main" "region"
     And I log out
     # Check fully hidden and partly restricted
@@ -139,6 +143,7 @@ Feature: Show/hide course sections (Multitopic format)
     And I log out
     When I am on the "Course 1" course page logged in as student1
     Then I should not see "Section 2" in the "region-main" "region"
+    And I should not see "Not available" in the "region-main" "region"
     And I should not see "Test hidden forum 22 name" in the "region-main" "region"
 
   @javascript
@@ -193,4 +198,5 @@ Feature: Show/hide course sections (Multitopic format)
   Scenario: Students can fully see unrestricted unhidden sections
     When I am on the "Course 1" course page logged in as student1
     Then I should see "Section 2" in the "region-main" "region"
+    And I should not see "Not available" in the "region-main" "region"
     And I should see "Test hidden forum 22 name" in the "region-main" "region"
