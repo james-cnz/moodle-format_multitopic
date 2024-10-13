@@ -193,16 +193,19 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // ADDED.
     // Set properties for moved sections.
     foreach ($movedsections as $id => $movedsection) {
+        if (!empty($sectionsextra[$id]->sectionbase->component)) {
+            continue;
+        }
         // Find differences between original section and moved section, and store as updates.
         $updates = [];
-        if (isset($movedsection->level) && $sectionsextra[$id]->sectionbase->level !== $movedsection->level) {
+        if ($sectionsextra[$id]->sectionbase->level !== $movedsection->level) {
             $updates['level'] = $movedsection->level;
         }
         if ($sectionsextra[$id]->sectionbase->visible != $movedsection->visible) {
             $updates['visible'] = $movedsection->visible;
         }
         // Set page-level sections to untimed.
-        if (isset($movedsection->level) && $movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+        if ($movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
                 && $sectionsextra[$id]->sectionbase->periodduration != '0 day') {
             $updates['periodduration'] = '0 day';
         }

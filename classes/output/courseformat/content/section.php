@@ -152,12 +152,16 @@ class section extends section_base {
     protected function add_editor_data(\stdClass &$data, \renderer_base $output): bool {
         $result = parent::add_editor_data($data, $output);
 
-        if ($result && empty($data->controlmenu) && empty($this->hidecontrols)) {
+        if (!empty($this->section->component) || !$result) {
+            return $result;
+        }
+
+        if (empty($data->controlmenu) && empty($this->hidecontrols)) {
             $controlmenu = new $this->controlmenuclass($this->format, $this->section);
             $data->controlmenu = $controlmenu->export_for_template($output);
         }
 
-        return $result;
+        return true;
     }
 
     /**

@@ -71,16 +71,23 @@ class header extends header_base {
 
         $data->title = $output->section_title_without_link($section, $course);
 
-        if ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && empty($section->component)) {
+        if (!empty($section->component)) {
+            $data->headinglevel = ($format->get_sectionid() != $section->id) ? 4 : 3;
+            return $data;
+        }
+
+        if ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
             $data->title = $output->section_title($section, $course);
         }
 
         $data->fmticon = $sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ?
                             'icon fa fa-folder-o fa-fw' : 'icon fa fa-list fa-fw';
 
-        $data->sectionbulk = ($CFG->version >= 2023021000) && empty($section->component);
-
-        $data->headinglevel = (!empty($section->component) && $format->get_sectionid() != $section->id) ? 4 : 3;
+        if ($CFG->version >= 2023021000) {
+            $data->sectionbulk = true;
+        } else {
+            unset($data->sectionbulk);
+        }
 
         return $data;
     }

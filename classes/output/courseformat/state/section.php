@@ -59,7 +59,7 @@ class section extends base_section {
         $data->levelsan = $sectionextra->levelsan;
         $data->indent = max($sectionextra->levelsan, 0);
         $data->pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $sectionextra->parentid;
-        $data->component = $section->component;
+        $data->component = $section->component ?? null;
         if ($section->component) {
             return $data;
         }
