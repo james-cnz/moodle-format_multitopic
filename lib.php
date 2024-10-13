@@ -772,18 +772,19 @@ class format_multitopic extends core_courseformat\base {
                                 : '/course/view.php', ['id' => $course->id]);   // CHANGED.
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
-        if ($section !== null) {                                                // CHANGED.
-            $sectionextra = $this->fmt_get_section_extra($section);             // ADDED.
-            $pageid = $sectionextra?->id;
-            if ($sectionextra?->sectionbase?->component == 'mod_subsection') {
+        $sectionextra = ($section === null) ? null : $this->fmt_get_section_extra($section); // ADDED.
+        if ($sectionextra !== null) {                                           // CHANGED.
+            $pageid = $sectionextra->id;
+            if (!empty($sectionextra->sectionbase->component)
+                && $sectionextra->sectionbase->component == 'mod_subsection') {
                 $modinfo = get_fast_modinfo($course);
                 $pageid = $modinfo->get_instances_of('subsection')[$sectionextra->sectionbase->itemid]->section;
             }
             // CHANGED.
-            $pageextra = ($pageid == $sectionextra?->id) ?
+            $pageextra = ($pageid == $sectionextra->id) ?
                 $sectionextra : $this->fmt_get_section_extra((object)['id' => $pageid]);
-            $pageid = ($pageextra?->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
-                $pageextra?->id : $pageextra?->parentid;
+            $pageid = ($pageextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+                $pageextra->id : $pageextra->parentid;
             if ($pageid && $pageid != $this->fmtrootsectionid) {
                 if (!empty($pageextra->sectionbase->component)) {
                     $url = new moodle_url( '/course/section.php', ['id' => $pageid]);
@@ -791,7 +792,7 @@ class format_multitopic extends core_courseformat\base {
                     $url->param('sectionid', $pageid);
                 }
             }
-            if ($sectionextra && $sectionextra?->id != $pageid) {
+            if ($sectionextra && $sectionextra->id != $pageid) {
                 if (empty($CFG->linkcoursesections) && !empty($options['navigation']) && $CFG->version < 2023120700) {
                     return null;
                 }

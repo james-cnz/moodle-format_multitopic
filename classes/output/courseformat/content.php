@@ -352,7 +352,7 @@ class content extends content_base {
 
         if (!empty($displaysectionextra->sectionbase->component)) {
             return [
-                $displaysectionextra->sectionbase
+                $displaysectionextra->sectionbase,
             ];
         }
 

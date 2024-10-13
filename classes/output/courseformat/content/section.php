@@ -143,6 +143,24 @@ class section extends section_base {
     }
 
     /**
+     * Add the section editor attributes to the data structure.
+     *
+     * @param \stdClass $data the current cm data reference
+     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @return bool if the cm has name data
+     */
+    protected function add_editor_data(\stdClass &$data, \renderer_base $output): bool {
+        $result = parent::add_editor_data($data, $output);
+
+        if ($result && empty($data->controlmenu) && empty($this->hidecontrols)) {
+            $controlmenu = new $this->controlmenuclass($this->format, $this->section);
+            $data->controlmenu = $controlmenu->export_for_template($output);
+        }
+
+        return $result;
+    }
+
+    /**
      * Add the section format attributes to the data structure.
      *
      * @param \stdClass $data the current cm data reference
