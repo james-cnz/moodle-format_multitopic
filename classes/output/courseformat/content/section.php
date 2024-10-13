@@ -62,13 +62,9 @@ class section extends section_base {
      * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): \stdClass {
-        $section = $this->section;
-        $sectionextra = $this->fmtsectionextra;
-
         $data = parent::export_for_template($output);
 
-        $data->sectionreturnid = $section->section;                             // TODO: Maybe unset?
-        $data->sectionreturnnum = $section->section;
+        $sectionextra = $this->fmtsectionextra;
         unset($data->displayonesection);
         $data->levelsan = $sectionextra->levelsan;
 
@@ -93,7 +89,7 @@ class section extends section_base {
         $header = new $this->headerclass($format, $section);
         $headerdata = $header->export_for_template($output);
 
-        if (!empty($section->component)) {
+        if ($section->id == $format->get_sectionid() && !empty($section->component)) {
             $data->singleheader = $headerdata;
         } else {
             $data->header = $headerdata;
@@ -112,22 +108,27 @@ class section extends section_base {
         $result = false;
 
         $section = $this->section;
+
+        if (!empty($section->component)) {
+            return parent::add_cm_data($data, $output);
+        }
+
         $sectionextra = $this->fmtsectionextra;
         $format = $this->format;
 
         // REMOVED index code.
 
         // ADDED.
-        $pageid = ($sectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+        $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                     $section->id : $sectionextra->parentid;
-        $onpage = ($pageid == $format->get_sectionid()) || ($format->get_sectionid() === null);
+        $onpage = ($pageid == $format->get_sectionid());
         // END ADDED.
         $showcmlist = ($section->uservisible || $section->section == 0);        // CHANGED.
 
         // REMOVED index code.
         // Add the cm list.
         if ($showcmlist) {
-            if ($onpage) {
+            if ($onpage || $format->get_sectionid() == null) {
                 $cmlist = new $this->cmlistclass($format, $section);
                 $data->cmlist = $cmlist->export_for_template($output);
             } else {
@@ -142,31 +143,6 @@ class section extends section_base {
     }
 
     /**
-     * Add the section editor attributes to the data structure.
-     *
-     * @param \stdClass $data the current cm data reference
-     * @param \renderer_base $output typically, the renderer that's calling this function
-     * @return bool if the cm has name data
-     */
-    protected function add_editor_data(\stdClass &$data, \renderer_base $output): bool {
-        if (!$this->format->show_editor()) {
-            return false;
-        }
-
-        $course = $this->format->get_course();
-        if (empty($this->hidecontrols)) {
-            $controlmenu = new $this->controlmenuclass($this->format, $this->section);
-            $data->controlmenu = $controlmenu->export_for_template($output);
-        }
-        // REMOVED stealth section code.
-        $data->cmcontrols = $output->course_section_add_cm_control(
-            $course,
-            $this->section->section
-        ); // REMOVED section return.
-        return true;
-    }
-
-    /**
      * Add the section format attributes to the data structure.
      *
      * @param \stdClass $data the current cm data reference
@@ -176,34 +152,24 @@ class section extends section_base {
      */
     protected function add_format_data(\stdClass &$data, array $haspartials, \renderer_base $output): bool {
         $section = $this->section;
+
+        $result = parent::add_format_data($data, $haspartials, $output);
+        if (!empty($section->component)) {
+            return $result;
+        }
+
         $sectionextra = $this->fmtsectionextra;
         $format = $this->format;
 
-        // REMOVED coursedisplay setting.
-
-        if ($sectionextra->levelsan < 2 && ($section->id == $format->get_sectionid() || $format->get_sectionid() === null)) {
+        if ($section->id == $format->get_sectionid()) {
             $data->collapsemenu = true;
-        }
-
-        $data->contentcollapsed = false;
-        $preferences = $format->get_sections_preferences();
-        if (isset($preferences[$section->id])) {
-            $sectionpreferences = $preferences[$section->id];
-            if (!empty($sectionpreferences->contentcollapsed)) {
-                $data->contentcollapsed = true;
-            }
-        }
-
-        if ($format->is_section_current($section)) {
-            $data->iscurrent = true;
-            $data->currentlink = get_accesshide(
-                get_string('currentsection', 'format_'.$format->get_format())
-            );
+        } else {
+            unset($data->collapsemenu);
         }
 
         // ADDED.
         $course = $this->format->get_course();
-        $pageid = ($sectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
+        $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                     $section->id : $sectionextra->parentid;
         $onpage = ($pageid == $format->get_sectionid());
         $sectionstyle = " sectionid-{$section->id}";

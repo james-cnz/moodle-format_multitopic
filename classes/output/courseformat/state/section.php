@@ -58,7 +58,7 @@ class section extends base_section {
         $sectionextra = $this->fmtsectionextra;
         $data->levelsan = $sectionextra->levelsan;
         $data->indent = max($sectionextra->levelsan, 0);
-        $data->pageid = ($sectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $sectionextra->parentid;
+        $data->pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $sectionextra->parentid;
         $data->component = $section->component;
         if ($section->component) {
             return $data;

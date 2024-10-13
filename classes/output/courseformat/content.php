@@ -349,13 +349,22 @@ class content extends content_base {
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();
         $displaysectionextra = $sectionsextra[$format->get_sectionid()];
+
+        if (!empty($displaysectionextra->sectionbase->component)) {
+            return [
+                $displaysectionextra->sectionbase
+            ];
+        }
+
         $sectionstodisplay = [];
         foreach ($sectionsextra as $thissectionextra) {
+            if (!empty($thissectionextra->sectionbase->component)) {
+                continue;
+            }
             $pageid = ($thissectionextra->levelsan != FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                         $thissectionextra->id : $thissectionextra->parentid;
             $onpage = ($pageid == $format->get_sectionid());
-            if ($onpage || $format->show_editor() && empty($displaysectionextra->sectionbase->component)
-                            && empty($thissectionextra->sectionbase->component)) {
+            if ($onpage || $format->show_editor()) {
                 $sectionstodisplay[] = $thissectionextra->sectionbase;
             }
         }
