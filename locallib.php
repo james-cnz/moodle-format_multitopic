@@ -398,7 +398,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
         $sections[$id]->level = ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
                                         && $sectionextra->levelsan != $originlevel) ?
                                     FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC       // Don't change topic level.
-                                    : $sectionextra->levelsan + $levelchange;
+                                    : max($sectionextra->levelsan + $levelchange, 0);
     }
 
     // Append rest of array.
@@ -407,7 +407,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
             $sections[$id] = new \stdClass;
             $sections[$id]->id = $id;
             $sections[$id]->visible = $sectionextra->visiblesan;
-            $sections[$id]->level = $sectionextra->levelsan;
+            $sections[$id]->level = max($sectionextra->levelsan, 0);
         }
     }
 

@@ -79,20 +79,14 @@ class section extends section_base {
      * @return bool if the cm has name data
      */
     protected function add_header_data(\stdClass &$data, \renderer_base $output): bool {
-        if (!empty($this->hidetitle)) {
-            return false;
+        $result = parent::add_header_data($data, $output);
+        if (!$result || !empty($section->component)) {
+            return $result;
         }
 
-        $section = $this->section;
-        $format = $this->format;
-
-        $header = new $this->headerclass($format, $section);
-        $headerdata = $header->export_for_template($output);
-
-        if ($section->id == $format->get_sectionid() && !empty($section->component)) {
-            $data->singleheader = $headerdata;
-        } else {
-            $data->header = $headerdata;
+        if (isset($data->singleheader) && !isset($data->header)) {
+            $data->header = $data->singleheader;
+            unset($data->singleheader);
         }
         return true;
     }
@@ -160,7 +154,6 @@ class section extends section_base {
             $controlmenu = new $this->controlmenuclass($this->format, $this->section);
             $data->controlmenu = $controlmenu->export_for_template($output);
         }
-
         return true;
     }
 
