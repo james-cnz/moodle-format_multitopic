@@ -309,9 +309,11 @@ class content extends content_base {
      * @return array data context for a mustache template
      */
     protected function export_sections(\renderer_base $output): array {
+
         $format = $this->format;
         $course = $format->get_course();
         $modinfo = $this->format->get_modinfo();
+
         // Generate section list.
         $sectionseft = [];
         // REMOVED stealthsections and numsections.
@@ -322,11 +324,15 @@ class content extends content_base {
                 throw new \moodle_exception('unknowncoursesection', 'error', course_get_url($course),
                     format_string($course->fullname));
             }
+
             $section = new $this->sectionclass($format, $thissection);
+
             // REMOVED: numsections.
+
             if (!$format->is_section_visible($thissection)) {
                 continue;
             }
+
             $sectionseft[] = $section->export_for_template($output);
         }
         // REMOVED stealthsections.
