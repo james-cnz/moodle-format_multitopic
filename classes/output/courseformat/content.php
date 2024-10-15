@@ -303,6 +303,37 @@ class content extends content_base {
     }
 
     /**
+     * Export sections array data.
+     *
+     * @param renderer_base $output typically, the renderer that's calling this function
+     * @return array data context for a mustache template
+     */
+    protected function export_sections(\renderer_base $output): array {
+        $format = $this->format;
+        $course = $format->get_course();
+        $modinfo = $this->format->get_modinfo();
+        // Generate section list.
+        $sectionseft = [];
+        // REMOVED stealthsections and numsections.
+        foreach ($this->get_sections_to_display($modinfo) as $thissection) {
+            // The course/view.php check the section existence but the output can be called
+            // from other parts so we need to check it.
+            if (!$thissection) {
+                throw new \moodle_exception('unknowncoursesection', 'error', course_get_url($course),
+                    format_string($course->fullname));
+            }
+            $section = new $this->sectionclass($format, $thissection);
+            // REMOVED: numsections.
+            if (!$format->is_section_visible($thissection)) {
+                continue;
+            }
+            $sectionseft[] = $section->export_for_template($output);
+        }
+        // REMOVED stealthsections.
+        return $sectionseft;
+    }
+
+    /**
      * Return an array of sections to display.
      *
      * @param \course_modinfo $modinfo the current course modinfo object
