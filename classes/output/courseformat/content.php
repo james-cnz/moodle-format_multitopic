@@ -26,6 +26,7 @@
 
 namespace format_multitopic\output\courseformat;
 
+use core_courseformat\base as course_format;
 use core_courseformat\output\local\content as content_base;
 use renderer_base;
 
@@ -39,6 +40,16 @@ use renderer_base;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content extends content_base {
+
+    /**
+     * Constructor.
+     *
+     * @param course_format $format the coruse format
+     */
+    public function __construct(course_format $format) {
+        parent::__construct($format);
+        $sectionstodisplay = $this->get_sections_to_display($this->format->get_modinfo());  // MDL-72526 test.
+    }
 
     /**
      * Export this data so it can be used as the context for a mustache template (core/inplace_editable).
@@ -317,7 +328,7 @@ class content extends content_base {
         // Generate section list.
         $sectionseft = [];
         // REMOVED stealthsections and numsections.
-        foreach ($this->get_sections_to_display($modinfo) as $thissection) {
+        foreach ($this->fmt_get_sections_to_display($modinfo) as $thissection) {
             // The course/view.php check the section existence but the output can be called
             // from other parts so we need to check it.
             if (!$thissection) {
@@ -345,7 +356,7 @@ class content extends content_base {
      * @param \course_modinfo $modinfo the current course modinfo object
      * @return \section_info[] an array of section_info to display
      */
-    private function get_sections_to_display(\course_modinfo $modinfo): array {
+    private function fmt_get_sections_to_display(\course_modinfo $modinfo): array {
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();
         $displaysectionextra = $sectionsextra[$format->get_sectionid()];

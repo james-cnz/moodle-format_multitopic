@@ -46,7 +46,7 @@ class sectionnavigation extends sectionnavigation_base {
     protected $fmtsectionextra;
 
     /** @var stdClass the calculated data to prevent calculations when rendered several times */
-    private $data = null;
+    private $fmtdata = null;
 
     /**
      * Constructor.
@@ -58,6 +58,7 @@ class sectionnavigation extends sectionnavigation_base {
         parent::__construct($format, $section->section);
         $this->section = $section;
         $this->fmtsectionextra = $format->fmt_get_section_extra($section);
+        $data = $this->data;  // MDL-72526 test.
     }
 
     /**
@@ -68,8 +69,8 @@ class sectionnavigation extends sectionnavigation_base {
      */
     public function export_for_template(\renderer_base $output): stdClass {
 
-        if ($this->data !== null) {
-            return $this->data;
+        if ($this->fmtdata !== null) {
+            return $this->fmtdata;
         }
 
         $format = $this->format;
@@ -111,7 +112,7 @@ class sectionnavigation extends sectionnavigation_base {
             }
         }
 
-        $this->data = $data;
+        $this->fmtdata = $data;
         return $data;
     }
 }

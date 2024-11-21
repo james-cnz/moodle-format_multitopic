@@ -52,6 +52,7 @@ class summary extends summary_base {
     public function __construct(\format_multitopic $format, \section_info $section) {
         parent::__construct($format, $section);
         $this->fmtsection = $section;
+        $summary = $this->section;  // MDL-72526 test.
     }
 
     /**

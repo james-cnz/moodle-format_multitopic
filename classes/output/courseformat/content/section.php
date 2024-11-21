@@ -52,6 +52,7 @@ class section extends section_base {
         parent::__construct($format, $section);
         $this->fmtsectionextra = $format->fmt_get_section_extra($section);
         $this->isstealth = false;
+        $cmsummary = new $this->cmsummaryclass($format, $section);  // MDL-72526 test.
     }
     // END ADDED.
 
