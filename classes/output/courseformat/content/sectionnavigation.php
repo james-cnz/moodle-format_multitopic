@@ -52,9 +52,10 @@ class sectionnavigation extends sectionnavigation_base {
      * Constructor.
      *
      * @param course_format $format the course format
-     * @param \section_info $section section info
+     * @param \section_info|int $section section info or number
      */
     public function __construct(course_format $format, $section) {
+        $section = is_object($section) ? $section : $format->get_section($section);
         parent::__construct($format, $section->section);
         $this->section = $section;
         $this->fmtsectionextra = $format->fmt_get_section_extra($section);
