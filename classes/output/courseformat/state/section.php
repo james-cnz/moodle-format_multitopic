@@ -54,8 +54,11 @@ class section extends base_section {
      */
     public function export_for_template(\renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
+        $format = $this->format;
+        $course = $format->get_course();
         $section = $this->section;
         $sectionextra = $this->fmtsectionextra;
+        $data->sectionurl = course_get_url($course, $section)->out(false);
         $data->levelsan = $sectionextra->levelsan;
         $data->indent = max($sectionextra->levelsan, 0);
         $data->pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $sectionextra->parentid;
