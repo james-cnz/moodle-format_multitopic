@@ -81,8 +81,9 @@ class section extends base_section {
      * @return bool if the section can be edited in bulk
      */
     protected function is_bulk_editable(): bool {
+        global $CFG;
         $section = $this->section;
-        return ($section->section != 0); // Should be levelsan >= 2, this but doesn't work.
+        return ($this->fmtsectionextra->levelsan >= 2) || ($section->section != 0) && ($CFG->version < 2024042200);
     }
 
 }
