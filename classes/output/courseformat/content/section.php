@@ -176,7 +176,7 @@ class section extends section_base {
         $sectionextra = $this->fmtsectionextra;
         $format = $this->format;
 
-        if ($section->id == $format->get_sectionid()) {
+        if (empty($section->component) && $sectionextra->levelsan < 2) {
             $data->collapsemenu = true;
         } else {
             unset($data->collapsemenu);

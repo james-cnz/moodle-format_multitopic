@@ -254,7 +254,7 @@ export default class Component extends BaseComponent {
      * @param {Object} param.state the full state object (Moodle >=4.4).
      */
     _refreshCourseSectionlist(param) {
-        super._refreshCourseSectionlist(param);
+        const state = param.state;
 
         const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
         let singleSectionId;
@@ -262,6 +262,15 @@ export default class Component extends BaseComponent {
             singleSectionId = (originalSingleSection.levelsan < 2) ? originalSingleSection.id : originalSingleSection.pageid;
         } else {
             singleSectionId = null;
+        }
+
+        let sectionlist = this.reactive.getExporter().listedSectionIds(state);
+        sectionlist = sectionlist.filter((sectionId) => this.reactive.get("section", sectionId).pageid == singleSectionId);
+        const listparent = this.getElement(this.selectors.COURSE_SECTIONLIST);
+        // For now section cannot be created at a frontend level.
+        const createSection = this._createSectionItem.bind(this);
+        if (listparent) {
+            this._fixOrder(listparent, sectionlist, this.selectors.SECTION, this.dettachedSections, createSection);
         }
 
         const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
