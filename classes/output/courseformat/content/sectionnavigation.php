@@ -45,8 +45,11 @@ class sectionnavigation extends sectionnavigation_base {
     /** @var \format_multitopic\section_info_extra Multitopic-specific section information */
     protected $fmtsectionextra;
 
-    /** @var stdClass the calculated data to prevent calculations when rendered several times */
-    private $data = null;
+    /**
+     * @var stdClass the calculated data to prevent calculations when rendered several times
+     * TODO: Remove in v6.0.
+     */
+    protected $data = null;
 
     /**
      * Constructor.
