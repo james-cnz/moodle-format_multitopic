@@ -305,6 +305,8 @@ class content extends content_base {
     /**
      * Export sections array data.
      *
+     * Redeclaration deprecated since 5.0, see MDL-72526.
+     *
      * @param renderer_base $output typically, the renderer that's calling this function
      * @return array data context for a mustache template
      */
@@ -345,7 +347,7 @@ class content extends content_base {
      * @param \course_modinfo $modinfo the current course modinfo object
      * @return \section_info[] an array of section_info to display
      */
-    private function get_sections_to_display(\course_modinfo $modinfo): array {
+    protected function get_sections_to_display(\course_modinfo $modinfo): array {
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();
         $displaysectionextra = $sectionsextra[$format->get_sectionid()];
