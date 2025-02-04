@@ -270,13 +270,12 @@ class controlmenu extends controlmenu_base {
         }
 
         if (array_key_exists('edit', $merged)) {
-            $link = $merged['edit'];
             $url = new \moodle_url('/course/format/multitopic/_course_editsection.php',
                     ['id' => $section->id]);                                    // CHANGED.
-            if (is_object($link)) {
-                $link->url = $url;
+            if (is_object($merged['edit'])) {
+                $merged['edit']->url = $url;
             } else {
-                $link['url'] = $url;
+                $merged['edit']['url'] = $url;
             }
         }
 
@@ -284,22 +283,20 @@ class controlmenu extends controlmenu_base {
             if ($onsectionpage) {
                 unset($merged['duplicate']);
             } else {
-                $link = $merged['duplicate'];
                 $url = course_get_url($course);
                 $url->param('sesskey', sesskey());
                 $url->param('sectionid', $section->id);
                 $url->param('duplicatesection', $section->section);
-                if (is_object($link)) {
-                    $link->url = $url;
+                if (is_object($merged['duplicate'])) {
+                    $merged['duplicate']->url = $url;
                 } else {
-                    $link['url'] = $url;
+                    $merged['duplicate']['url'] = $url;
                 }
             }
         }
 
         if (array_key_exists('visiblity', $merged) || array_key_exists('visibility', $merged)) {
             $linkname = array_key_exists('visibility', $merged) ? 'visibility' : 'visiblity';
-            $link = $merged[$linkname];
             $url = clone($baseurl);
             $strhidefromothers = get_string_manager()->string_exists('hidefromothers', 'format_' . $course->format) ?
                                     get_string('hidefromothers', 'format_' . $course->format)
@@ -309,43 +306,43 @@ class controlmenu extends controlmenu_base {
                                     : get_string('show');                       // CHANGED.
             if ($section->visible) { // Show the hide/show eye.
                 $url->param('hideid',  $section->id);                           // CHANGED.
-                if (is_object($link)) {
-                    $link->url = $url;
-                    $link->name = $strhidefromothers;
-                    unset($link->attr['data-sectionreturn']);
+                if (is_object($merged[$linkname])) {
+                    $merged[$linkname]->url = $url;
+                    $merged[$linkname]->name = $strhidefromothers;
+                    unset($merged[$linkname]->attributes['data-sectionreturn']);
                     if ($onsectionpage) {
-                        unset($link->attr['data-action']);
+                        unset($merged[$linkname]->attributes['data-action']);
                     }
-                    $link->attr['data-swapname'] = $strshowfromothers;
+                    $merged[$linkname]->attributes['data-swapname'] = $strshowfromothers;
                 } else {
-                    $link['url'] = $url;
-                    $link['name'] = $strhidefromothers;
-                    unset($link['attr']['data-sectionreturn']);
+                    $merged[$linkname]['url'] = $url;
+                    $merged[$linkname]['name'] = $strhidefromothers;
+                    unset($merged[$linkname]['attr']['data-sectionreturn']);
                     if ($onsectionpage) {
-                        unset($link['attr']['data-action']);
+                        unset($merged[$linkname]['attr']['data-action']);
                     }
-                    $link['attr']['data-swapname'] = $strshowfromothers;
+                    $merged[$linkname]['attr']['data-swapname'] = $strshowfromothers;
                 }
             } else if (!$sectionextra->parentvisiblesan) {
                 unset($merged[$linkname]);
             } else {
                 $url->param('showid',  $section->id);                           // CHANGED.
-                if (is_object($link)) {
-                    $link->url = $url;
-                    $link->name = $strshowfromothers;
-                    unset($link->attr['data-sectionreturn']);
+                if (is_object($merged[$linkname])) {
+                    $merged[$linkname]->url = $url;
+                    $merged[$linkname]->name = $strshowfromothers;
+                    unset($merged[$linkname]->attributes['data-sectionreturn']);
                     if ($onsectionpage) {
-                        unset($link->attr['data-action']);
+                        unset($merged[$linkname]->attributes['data-action']);
                     }
-                    $link->attr['data-swapname'] = $strhidefromothers;
+                    $merged[$linkname]->attributes['data-swapname'] = $strhidefromothers;
                 } else {
-                    $link['url'] = $url;
-                    $link['name'] = $strshowfromothers;
-                    unset($link['attr']['data-sectionreturn']);
+                    $merged[$linkname]['url'] = $url;
+                    $merged[$linkname]['name'] = $strshowfromothers;
+                    unset($merged[$linkname]['attr']['data-sectionreturn']);
                     if ($onsectionpage) {
-                        unset($link['attr']['data-action']);
+                        unset($merged[$linkname]['attr']['data-action']);
                     }
-                    $link['attr']['data-swapname'] = $strhidefromothers;
+                    $merged[$linkname]['attr']['data-swapname'] = $strhidefromothers;
                 }
             }
         }
@@ -364,14 +361,13 @@ class controlmenu extends controlmenu_base {
                     || $onsectionpage || $sectionextra->prevupid == $sectionextra->parentid) {
                 unset($merged['moveup']);
             } else {
-                $link = $merged['moveup'];
                 $url = clone($baseurl);
                 $url->param('sectionid', $section->id);
                 $url->param('destnextupid', $sectionextra->prevupid);
-                if (is_object($link)) {
-                    $link->url = $url;
+                if (is_object($merged['moveup'])) {
+                    $merged['moveup']->url = $url;
                 } else {
-                    $link['url'] = $url;
+                    $merged['moveup']['url'] = $url;
                 }
             }
         }
@@ -382,20 +378,18 @@ class controlmenu extends controlmenu_base {
                     || $onsectionpage || $sectionextra->nextupid == $sectionextra->nextpageid) {
                 unset($merged['movedown']);
             } else {
-                $link = $merged['movedown'];
                 $url = clone($baseurl);
                 $url->param('sectionid', $section->id);
                 $url->param('destprevupid', $sectionextra->nextupid);
-                if (is_object($link)) {
-                    $link->url = $url;
+                if (is_object($merged['movedown'])) {
+                    $merged['movedown']->url = $url;
                 } else {
-                    $link['url'] = $url;
+                    $merged['movedown']['url'] = $url;
                 }
             }
         }
 
         if (array_key_exists('delete', $merged)) {
-            $link = $merged['delete'];
             $url = new \moodle_url(
                 '/course/format/multitopic/_course_editsection.php',
                 [
@@ -405,26 +399,25 @@ class controlmenu extends controlmenu_base {
                     'sesskey' => sesskey(),
                 ]
             );
-            if (is_object($link)) {
-                $link->url = $url;
+            if (is_object($merged['delete'])) {
+                $merged['delete']->url = $url;
                 if ($onsectionpage) {
-                    unset($link->attr['data-action']);
+                    unset($merged['delete']->attributes['data-action']);
                 }
             } else {
-                $link['url'] = $url;
+                $merged['delete']['url'] = $url;
                 if ($onsectionpage) {
-                    unset($link['attr']['data-action']);
+                    unset($merged['delete']['attr']['data-action']);
                 }
             }
         }
 
         if (array_key_exists('permalink', $merged)) {
-            $link = $merged['permalink'];
             $sectionlink = course_get_url($course, $section);
-            if (is_object($link)) {
-                $link->url = $sectionlink;
+            if (is_object($merged['permalink'])) {
+                $merged['permalink']->url = $sectionlink;
             } else {
-                $link['url'] = $sectionlink;
+                $merged['permalink']['url'] = $sectionlink;
             }
         }
 
