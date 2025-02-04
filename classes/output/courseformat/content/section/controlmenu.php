@@ -308,7 +308,7 @@ class controlmenu extends controlmenu_base {
                 $url->param('hideid',  $section->id);                           // CHANGED.
                 if (is_object($merged[$linkname])) {
                     $merged[$linkname]->url = $url;
-                    $merged[$linkname]->name = $strhidefromothers;
+                    $merged[$linkname]->text = $strhidefromothers;
                     unset($merged[$linkname]->attributes['data-sectionreturn']);
                     if ($onsectionpage) {
                         unset($merged[$linkname]->attributes['data-action']);
@@ -329,7 +329,7 @@ class controlmenu extends controlmenu_base {
                 $url->param('showid',  $section->id);                           // CHANGED.
                 if (is_object($merged[$linkname])) {
                     $merged[$linkname]->url = $url;
-                    $merged[$linkname]->name = $strshowfromothers;
+                    $merged[$linkname]->text = $strshowfromothers;
                     unset($merged[$linkname]->attributes['data-sectionreturn']);
                     if ($onsectionpage) {
                         unset($merged[$linkname]->attributes['data-action']);
