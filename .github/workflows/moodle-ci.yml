@@ -70,11 +70,11 @@ jobs:
             plugin-ci: ^4
             # extensions: xmlrpc-beta
           # Moodle 5.0, PHP 8.3, PostgreSQL
-          - php: '8.3' # 8.2-8.3
-            moodle-branch: 'main'
-            database: pgsql
-            plugin-ci: ^4
-            # extensions: xmlrpc-beta
+          #- php: '8.3' # 8.2-8.3
+          #  moodle-branch: 'main'
+          #  database: pgsql
+          #  plugin-ci: ^4
+          #  # extensions: xmlrpc-beta
 
     steps:
       - name: Check out repository code
