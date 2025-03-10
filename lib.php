@@ -499,16 +499,6 @@ class format_multitopic extends core_courseformat\base {
     }
 
     /**
-     * Set which section page the current format instance will show.
-     *
-     * @param int $singlesection a page's section number
-     * @deprecated
-     */
-    public function set_section_number(int $singlesection): void {
-        $this->set_sectionnum($singlesection);
-    }
-
-    /**
      * Set the current page to display.
      *
      * @param \section_info|stdClass|int|null $section null for all pages or a page's section info or number.
@@ -541,20 +531,6 @@ class format_multitopic extends core_courseformat\base {
      * @return int|null the current page's section number or null when there is no single page.
      */
     public function get_sectionnum(): ?int {
-        return $this->singlesection;
-    }
-
-    /**
-     * Get the section number of the page the current format instance will show.
-     *
-     * @return int the page's section number
-     * @deprecated
-     */
-    public function get_section_number(): int {
-        if ($this->singlesection === null) {
-            return 0;
-        }
-
         return $this->singlesection;
     }
 
