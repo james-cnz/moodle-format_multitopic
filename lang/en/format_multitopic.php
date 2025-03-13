@@ -93,9 +93,9 @@ $string['activityclipboard_enable'] = 'Enable activity clipboard';
 $string['activityclipboard_placeholder'] = 'Click the up/down arrows next to an activity to move it to the clipboard.';
 
 // Deprecated since Multitopic v5.0.
-$string['hidefromothers'] = 'Hide'; // Was Hide section.
+$string['hidefromothers'] = 'Hide';
 $string['move_page_next'] = 'Move page right';
 $string['move_page_prev'] = 'Move page left';
 $string['move_to_next_page'] = 'Move to next page';
 $string['move_to_prev_page'] = 'Move to previous page';
-$string['showfromothers'] = 'Show'; // Was Show section.
+$string['showfromothers'] = 'Show';
