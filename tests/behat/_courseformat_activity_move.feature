@@ -24,6 +24,7 @@ Feature: Activities can be moved between sections (Multitopic format)
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
 
+  @javascript
   Scenario: Move activities in a single page course with Javascript disabled
     When I move "Test forum name" activity to section "2"
     Then I should see "Test forum name" in the "Section 2" "section"
