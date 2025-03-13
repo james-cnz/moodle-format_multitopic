@@ -77,7 +77,8 @@ class controlmenu extends controlmenu_base {
         $controls = $this->add_control_after($controls, 'moveleveldown', 'moveprev', $this->get_section_moveprev_item());
         $controls = $this->add_control_after($controls, 'moveprev', 'movenext', $this->get_section_movenext_item());
         $controls = $this->add_control_after($controls, 'movenext', 'movetoprevpage', $this->get_section_movetoprevpage_item());
-        $controls = $this->add_control_after($controls, 'movetoprevpage', 'movetonextpage', $this->get_section_movetonextpage_item());
+        $controls = $this->add_control_after($controls, 'movetoprevpage',
+                                            'movetonextpage', $this->get_section_movetonextpage_item());
         $controls = $this->add_control_after($controls, 'movetonextpage', 'moveup', $this->get_section_moveup_item());
         $controls = $this->add_control_after($controls, 'moveup', 'movedown', $this->get_section_movedown_item());
 
@@ -300,7 +301,7 @@ class controlmenu extends controlmenu_base {
                 text: $strmovepageprev,
                 attributes: [
                     // This tool disappears when the state is ready whilenostate.
-                    'class' => 'fmtmovepageprev whilenostate'
+                    'class' => 'fmtmovepageprev whilenostate',
                 ],
             );
         }
@@ -338,7 +339,7 @@ class controlmenu extends controlmenu_base {
                 text: $strmovepagenext,
                 attributes: [
                     // This tool disappears when the state is ready whilenostate.
-                    'class' => 'fmtmovepagenext whilenostate'
+                    'class' => 'fmtmovepagenext whilenostate',
                 ],
             );
         }
@@ -376,7 +377,7 @@ class controlmenu extends controlmenu_base {
                 text: $strmovetoprevpage,
                 attributes: [
                     // This tool disappears when the state is ready whilenostate.
-                    'class' => 'fmtmovetoprevpage whilenostate'
+                    'class' => 'fmtmovetoprevpage whilenostate',
                 ],
             );
         }
@@ -414,7 +415,7 @@ class controlmenu extends controlmenu_base {
                 text: $strmovetonextpage,
                 attributes: [
                     // This tool disappears when the state is ready whilenostate.
-                    'class' => 'fmtmovetonextpage whilenostate'
+                    'class' => 'fmtmovetonextpage whilenostate',
                 ],
             );
         }
@@ -451,7 +452,7 @@ class controlmenu extends controlmenu_base {
                 text: $strmoveup,
                 attributes: [
                     // This tool disappears when the state is ready whilenostate.
-                    'class' => 'moveup whilenostate'
+                    'class' => 'moveup whilenostate',
                 ],
             );
         }
@@ -488,7 +489,7 @@ class controlmenu extends controlmenu_base {
                 text: $strmovedown,
                 attributes: [
                     // This tool disappears when the state is ready whilenostate.
-                    'class' => 'movedown whilenostate'
+                    'class' => 'movedown whilenostate',
                 ],
             );
         }
