@@ -56,7 +56,6 @@ class course extends base_course {
         $data = parent::export_for_template($output);
 
         $data->tabsdata = [];
-        $data->draganddropsectionmoveafter = $CFG->version >= 2023120100;
 
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();

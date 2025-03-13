@@ -41,7 +41,6 @@ export default class extends DndSection {
         // CSS classes.
         this.classes = {
             LOCKED: 'editinprogress',
-            DROPBEFORE: 'drop-before',
             DROPAFTER: 'drop-after',
         };
 
@@ -91,11 +90,8 @@ export default class extends DndSection {
         if (dropdata?.type === 'section') {
             const sectionzeroid = this.course.sectionlist[0];
             const origin = this.reactive.get("section", dropdata.id);
-            const target = this.section;
             const targettablevel = this.element.className.match(/\btab_level_(\d+)\b/)[1];
             return dropdata?.id != this.id && targettablevel == origin.levelsan
-                    && (target.levelsan == targettablevel || target.number > origin.number
-                        || this.course.draganddropsectionmoveafter)
                     && origin.id != sectionzeroid;
         }
         return false;
@@ -111,14 +107,7 @@ export default class extends DndSection {
             const origin = this.reactive.get("section", dropdata.id);
             const targettablevel = this.element.className.match(/\btab_level_(\d+)\b/)[1];
             if (targettablevel == origin.levelsan) {
-                // The relative move of section depends on the section number.
-                if (this.section.number > dropdata.number || this.course.draganddropsectionmoveafter) {
-                    this.element.classList.remove(this.classes.DROPBEFORE);
-                    this.element.classList.add(this.classes.DROPAFTER);
-                } else {
-                    this.element.classList.add(this.classes.DROPBEFORE);
-                    this.element.classList.remove(this.classes.DROPAFTER);
-                }
+                this.element.classList.add(this.classes.DROPAFTER);
             }
         }
     }
@@ -127,7 +116,6 @@ export default class extends DndSection {
      * Hide the component dropzone.
      */
     hideDropZone() {
-        this.element.classList.remove(this.classes.DROPBEFORE);
         this.element.classList.remove(this.classes.DROPAFTER);
     }
 
@@ -143,8 +131,7 @@ export default class extends DndSection {
             const target = this.section;
             const targettablevel = this.element.className.match(/\btab_level_(\d+)\b/)[1];
             if (targettablevel == origin.levelsan) {
-                this.reactive.dispatch(this.course.draganddropsectionmoveafter ? 'sectionMoveAfter' : 'sectionMove',
-                    [origin.id], target.id);
+                this.reactive.dispatch('sectionMoveAfter', [origin.id], target.id);
             }
         }
     }

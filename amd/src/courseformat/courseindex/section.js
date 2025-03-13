@@ -55,8 +55,7 @@ export default class Component extends ComponentBase {
             const sectionzeroid = this.course.sectionlist[0];
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;
-            return target.indent <= origin.indent && origin.id != sectionzeroid
-                && (target.id != sectionzeroid || this.course.draganddropsectionmoveafter);
+            return target.indent <= origin.indent && origin.id != sectionzeroid;
         } else {
             return super.validateDropData(dropdata);
         }
@@ -75,8 +74,7 @@ export default class Component extends ComponentBase {
             while (target.indent > origin.indent) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
-            const moveDirection = this.course.draganddropsectionmoveafter ?
-                (target.number != origin.number) : Math.sign(target.number - origin.number);
+            const moveDirection = (target.number != origin.number);
             const targetContentDom = this.element.querySelector(".courseindex-item-content");
             let targetShow = target;
             let targetShowBorder = moveDirection;
@@ -117,8 +115,7 @@ export default class Component extends ComponentBase {
             while (target.indent > origin.indent) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
-            const moveDirection = this.course.draganddropsectionmoveafter ?
-                (target.number != origin.number) : Math.sign(target.number - origin.number);
+            const moveDirection = (target.number != origin.number);
             const targetContentDom = this.element.querySelector(".courseindex-item-content");
             let targetShow = target;
             let targetShowBorder = moveDirection;
@@ -160,8 +157,7 @@ export default class Component extends ComponentBase {
             while (target.indent > origin.indent) {
                 target = this.reactive.get("section", this.course.sectionlist[target.number - 1]);
             }
-            const moveDirection = this.course.draganddropsectionmoveafter ?
-                (target.number != origin.number) : Math.sign(target.number - origin.number);
+            const moveDirection = (target.number != origin.number);
             const targetContentDom = this.element.querySelector(".courseindex-item-content");
             let targetCall = target;
             if (moveDirection > 0 && !targetContentDom.classList.contains("show")) {
@@ -174,9 +170,8 @@ export default class Component extends ComponentBase {
                     }
                 }
             }
-            if (moveDirection != 0) {
-                this.reactive.dispatch(this.course.draganddropsectionmoveafter ? 'sectionMoveAfter' : 'sectionMove',
-                    [origin.id], targetCall.id);
+            if (moveDirection > 0) {
+                this.reactive.dispatch('sectionMoveAfter', [origin.id], targetCall.id);
             }
         } else {
             super.drop(dropdata, event);

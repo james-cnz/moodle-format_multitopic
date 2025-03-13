@@ -35,46 +35,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Moodle 4.0, PHP 7.3, PostgreSQL
-          - php: '7.3' # 7.3-8.0
-            moodle-branch: 'MOODLE_400_STABLE'
-            database: pgsql
-            plugin-ci: ^3
-          # Moodle 4.1, PHP 7.4, MariaDB
-          - php: '7.4' # 7.4-8.1
-            moodle-branch: 'MOODLE_401_STABLE'
-            database: mariadb
-            plugin-ci: ^3
-          # Moodle 4.2, PHP 8.0, PostgreSQL
-          - php: '8.0' # 8.0-8.2
-            moodle-branch: 'MOODLE_402_STABLE'
+          # Moodle 5.0, PHP 8.2, PostgreSQL
+          - php: '8.2' # 8.2-8.3
+            moodle-branch: 'main'
             database: pgsql
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 4.3, PHP 8.1, MariaDB
-          - php: '8.1' # 8.0-8.2
-            moodle-branch: 'MOODLE_403_STABLE'
+          # Moodle 5.0, PHP 8.3, MariaDB
+          - php: '8.3' # 8.2-8.3
+            moodle-branch: 'main'
             database: mariadb
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 4.4, PHP 8.2, PostgreSQL
-          - php: '8.2' # 8.1-8.3
-            moodle-branch: 'MOODLE_404_STABLE'
-            database: pgsql
-            plugin-ci: ^4
-            # extensions: xmlrpc-beta
-          # Moodle 4.5, PHP 8.3, MariaDB
-          - php: '8.3' # 8.1-8.3
-            moodle-branch: 'MOODLE_405_STABLE'
-            database: mariadb
-            plugin-ci: ^4
-            # extensions: xmlrpc-beta
-          # Moodle 5.0, PHP 8.3, PostgreSQL
-          #- php: '8.3' # 8.2-8.3
-          #  moodle-branch: 'main'
-          #  database: pgsql
-          #  plugin-ci: ^4
-          #  # extensions: xmlrpc-beta
 
     steps:
       - name: Check out repository code
