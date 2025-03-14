@@ -274,7 +274,8 @@ class controlmenu extends controlmenu_base {
     /**
      * Retrieves the moveprev item for the section control menu.
      *
-     * @deprecated since 5.0
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
     protected function get_section_moveprev_item(): ?link {
@@ -312,7 +313,8 @@ class controlmenu extends controlmenu_base {
     /**
      * Retrieves the movenext item for the section control menu.
      *
-     * @deprecated since 5.0
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
     protected function get_section_movenext_item(): ?link {
@@ -350,7 +352,8 @@ class controlmenu extends controlmenu_base {
     /**
      * Retrieves the movetoprevpage item for the section control menu.
      *
-     * @deprecated since 5.0
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
     protected function get_section_movetoprevpage_item(): ?link {
@@ -388,7 +391,8 @@ class controlmenu extends controlmenu_base {
     /**
      * Retrieves the movetonextpage item for the section control menu.
      *
-     * @deprecated since 5.0
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
     protected function get_section_movetonextpage_item(): ?link {
@@ -426,7 +430,8 @@ class controlmenu extends controlmenu_base {
     /**
      * Retrieves the moveup item for the section control menu.
      *
-     * @deprecated since 5.0
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
     protected function get_section_moveup_item(): ?link {
@@ -463,7 +468,8 @@ class controlmenu extends controlmenu_base {
     /**
      * Retrieves the movedown item for the section control menu.
      *
-     * @deprecated since 5.0
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
     protected function get_section_movedown_item(): ?link {
