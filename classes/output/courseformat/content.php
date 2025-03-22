@@ -49,7 +49,6 @@ class content extends content_base {
     public function export_for_template(\renderer_base $output) {
         global $CFG;
         global $PAGE;
-        global $USER;                               // INCLUDED from course/format/classes/output/local/content/section/cmlist.php .
 
         $sectionsextra = $this->format->fmt_get_sections_extra();
         $displaysectionextra = $sectionsextra[$this->format->get_sectionid()];
@@ -92,8 +91,6 @@ class content extends content_base {
             $format->set_sections_preference('indexcollapsed', $indexcollapsed);
         }
         // END ADDED.
-
-        $user = $USER;                              // INCLUDED from course/format/classes/output/local/content/section/cmlist.php .
 
         // INCLUDED from course/format/classes/output/section_renderer.php print_single_section_page() .
         // Can we view the section in question?
@@ -273,16 +270,6 @@ class content extends content_base {
             'format' => $format->get_format(),
             'originalsinglesectionid' => $format->originalsinglesectionid,
         ];
-
-        // INCLUDED from course/format/classes/output/local/content/section/cmlist.php export_for_template() .
-        $showmovehere = ismoving($course->id);
-
-        if ($showmovehere) {
-            $data->showmovehere = true;
-            $data->movingstr = strip_tags(get_string('activityclipboard', '', $user->activitycopyname));
-            $data->cancelcopyurl = new \moodle_url('/course/mod.php', ['cancelcopy' => 'true', 'sesskey' => sesskey()]);
-        }
-        // END INCLUDED.
 
         // REMOVED navigation.
 
