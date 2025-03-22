@@ -44,7 +44,6 @@ $string['collapsibleoverride_help'] = 'Whether this topic is collapsible.
  (Not applicable to pages.)';
 
 $string['currentsection'] = 'This section';
-$string['hidefromothers'] = 'Hide section';
 
 $string['image'] = 'Image';
 $string['image_by'] = 'by';
@@ -57,10 +56,6 @@ $string['level_help'] = 'Set the section level.
 
 $string['move_level_down'] = 'Lower page level';
 $string['move_level_up'] = 'Raise page level';
-$string['move_page_next'] = 'Move page right';
-$string['move_page_prev'] = 'Move page left';
-$string['move_to_next_page'] = 'Move to next page';
-$string['move_to_prev_page'] = 'Move to previous page';
 
 $string['page-course-view-multitopic'] = 'Any course main page in Multitopic format';
 $string['page-course-view-multitopic-x'] = 'Any course page in Multitopic format';
@@ -86,8 +81,6 @@ $string['sectionname'] = 'Section';
 
 $string['sectionoutline'] = 'Section outline';
 
-$string['showfromothers'] = 'Show section';
-
 $string['weeks_capitalised'] = 'Weeks';
 $string['weeks_mindays'] = 'First week minimum days of year';
 $string['weeks_mindays_desc'] = 'The first week of the year contains a minimum of how many days of the year?';
@@ -98,3 +91,11 @@ $string['weeks_partial_desc'] = 'Whether there are partial weeks at the start an
 $string['activityclipboard_disable'] = 'Disable activity clipboard';
 $string['activityclipboard_enable'] = 'Enable activity clipboard';
 $string['activityclipboard_placeholder'] = 'Click the up/down arrows next to an activity to move it to the clipboard.';
+
+// Deprecated since Multitopic v5.0.
+$string['hidefromothers'] = 'Hide';
+$string['move_page_next'] = 'Move page right';
+$string['move_page_prev'] = 'Move page left';
+$string['move_to_next_page'] = 'Move to next page';
+$string['move_to_prev_page'] = 'Move to previous page';
+$string['showfromothers'] = 'Show';
