@@ -778,43 +778,6 @@ class format_multitopic extends core_courseformat\base {
     }
 
     /**
-     * The URL to update the course format.
-     *
-     * If no section is specified, the update will redirect to the general course page.
-     *
-     * @param string $action action name the reactive action
-     * @param array $ids list of ids to update
-     * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
-     * @param moodle_url|null $returnurl optional custom return url
-     * @return moodle_url
-     * @todo Deprecate when MDL-84979 is integrated.
-     */
-    public function get_update_url(
-        string $action,
-        array $ids = [],
-        ?int $targetsectionid = null,
-        ?int $targetcmid = null,
-        ?moodle_url $returnurl = null
-    ): moodle_url {
-        $url = parent::get_update_url(
-            action: $action,
-            ids: $ids,
-            targetsectionid: $targetsectionid,
-            targetcmid: $targetcmid,
-            returnurl: $returnurl
-        );
-
-        if ($targetsectionid) {
-            $url->param('targetsectionid', $targetsectionid);
-        }
-        if (isset($targetcmid)) {
-            $url->param('targetcmid', $targetcmid);
-        }
-        return $url;
-    }
-
-    /**
      * Returns the information about the ajax support in the given source format.
      *
      * The returned object's property (boolean)capable indicates that
