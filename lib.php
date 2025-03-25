@@ -736,16 +736,14 @@ class format_multitopic extends core_courseformat\base {
      * @param int|stdClass $section Section object from database or just field course_sections.section
      *                      Should specify fmt calculated properties,
      *                      specifically levelsan, and parentid where levelsan is topic level.
-     * @param array $options options for view URL. At the moment core uses:
-     *     'fmtedit' (bool)    if true, return URL for edit page rather than view page
+     * @param array $options options for view URL. At the moment we use:
      *     'navigation' (bool) if true and section has no separate page, the function returns null
      * @return null|moodle_url
      */
     public function get_view_url($section, $options = []) {
         global $CFG;
         $course = $this->get_course();
-        $url = new moodle_url( ($options['fmtedit'] ?? false) ? '/course/format/multitopic/_course_view.php'
-                                : '/course/view.php', ['id' => $course->id]);   // CHANGED.
+        $url = new moodle_url('/course/view.php', ['id' => $course->id]);       // CHANGED.
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
         $sectionextra = ($section === null) ? null : $this->fmt_get_section_extra($section); // ADDED.
@@ -775,6 +773,43 @@ class format_multitopic extends core_courseformat\base {
                 $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
             }
             // END CHANGED.
+        }
+        return $url;
+    }
+
+    /**
+     * The URL to update the course format.
+     *
+     * If no section is specified, the update will redirect to the general course page.
+     *
+     * @param string $action action name the reactive action
+     * @param array $ids list of ids to update
+     * @param int|null $targetsectionid optional target section id
+     * @param int|null $targetcmid optional target cm id
+     * @param moodle_url|null $returnurl optional custom return url
+     * @return moodle_url
+     * @todo Deprecate when MDL-84979 is integrated.
+     */
+    public function get_update_url(
+        string $action,
+        array $ids = [],
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null,
+        ?moodle_url $returnurl = null
+    ): moodle_url {
+        $url = parent::get_update_url(
+            action: $action,
+            ids: $ids,
+            targetsectionid: $targetsectionid,
+            targetcmid: $targetcmid,
+            returnurl: $returnurl
+        );
+
+        if ($targetsectionid) {
+            $url->param('targetsectionid', $targetsectionid);
+        }
+        if (isset($targetcmid)) {
+            $url->param('targetcmid', $targetcmid);
         }
         return $url;
     }

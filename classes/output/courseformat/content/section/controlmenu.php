@@ -47,8 +47,8 @@ class controlmenu extends controlmenu_base {
     /** @var bool Whether we are dealing with a page section */
     protected $fmtonsectionpage;
 
-    /** @var url Base URL */
-    protected $fmtbaseurl;
+    /** @var url Return URL */
+    protected $fmtreturnurl;
 
     /**
      * Constructor.
@@ -60,8 +60,7 @@ class controlmenu extends controlmenu_base {
         parent::__construct($format, $section);
         $this->fmtsectionextra = $format->fmt_get_section_extra($section);
         $this->fmtonsectionpage = ($this->fmtsectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // ADDED.
-        $this->fmtbaseurl = course_get_url($format->get_course(), $section, ['fmtedit' => true]);   // CHANGED.
-        $this->fmtbaseurl->param('sesskey', sesskey());
+        $this->fmtreturnurl = $format->get_view_url($section);
     }
 
     /**
@@ -103,11 +102,7 @@ class controlmenu extends controlmenu_base {
         $link = parent::get_section_edit_item();
 
         if ($link) {
-            $url = new url(
-                '/course/format/multitopic/_course_editsection.php',            // CHANGED.
-                ['id' => $this->section->id]
-            );
-            $link->url = $url;
+            $link->url->remove_params('sr');
         }
 
         return $link;
@@ -142,23 +137,16 @@ class controlmenu extends controlmenu_base {
                 unset($link->attributes['data-action']);
             }
             if ($this->section->visible) {
-                $action = 'hide';
+                $stateaction = 'section_hide';
             } else if (!$this->fmtsectionextra->parentvisiblesan) {
                 $link = null;
             } else {
-                $action = 'show';
+                $stateaction = 'section_show';
             }
         }
 
         if ($link) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    $action . 'id' => $this->section->id,
-                    'sesskey' => sesskey(),
-                ]
-            );
-            $link->url = $url;
+            $link->url->param('returnurl', $this->fmtreturnurl);
         }
 
         return $link;
@@ -177,7 +165,7 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
         ) {
             $url = new url(
-                $this->fmtbaseurl,
+                $this->baseurl,
                 [
                     'movesection' => $this->section->section,
                     'section' => $this->section->section,
@@ -213,14 +201,13 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:update', $this->coursecontext)
             && ($this->fmtsectionextra->levelsan - 1 > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT)
         ) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    'sectionid' => $this->section->id,
-                    'destprevupid' => $this->fmtsectionextra->parentid,
-                    'destlevel' => $this->fmtsectionextra->levelsan - 1,
-                    'sesskey' => sesskey(),
-                ]
+            $stateaction = 'section_move_after';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->parentid,
+                targetcmid: $this->fmtsectionextra->levelsan - 1, // Target level.
+                returnurl: $this->fmtreturnurl,
             );
             $strmovelevelup = get_string_manager()->string_exists('move_level_up', 'format_multitopic') ?
                                 get_string('move_level_up', 'format_multitopic') : get_string('moveup');
@@ -249,14 +236,13 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:update', $this->coursecontext)
             && ($this->fmtsectionextra->pagedepth + 1 <= FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE)
         ) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    'sectionid' => $this->section->id,
-                    'destparentid' => $this->fmtsectionextra->prevupid,
-                    'destlevel' => $this->fmtsectionextra->levelsan + 1,
-                    'sesskey' => sesskey(),
-                ]
+            $stateaction = 'fmt_section_move_into';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->prevupid,
+                targetcmid: $this->fmtsectionextra->levelsan + 1, // Target level.
+                returnurl: $this->fmtreturnurl,
             );
             $strmoveleveldown = get_string_manager()->string_exists('move_level_down', 'format_multitopic') ?
                                 get_string('move_level_down', 'format_multitopic') : get_string('movedown');
@@ -286,13 +272,12 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && isset($this->fmtsectionextra->prevupid) && ($this->fmtsectionextra->prevupid != $this->format->fmtrootsectionid)
         ) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    'sectionid' => $this->section->id,
-                    'destnextupid' => $this->fmtsectionextra->prevupid,
-                    'sesskey' => sesskey(),
-                ]
+            $stateaction = 'fmt_section_move_before';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->prevupid,
+                returnurl: $this->fmtreturnurl,
             );
             $strmovepageprev = get_string_manager()->string_exists('move_page_prev', 'format_multitopic') ?
                                 get_string('move_page_prev', 'format_multitopic') : get_string('moveleft');
@@ -325,13 +310,12 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && isset($this->fmtsectionextra->nextupid)
         ) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    'sectionid' => $this->section->id,
-                    'destprevupid' => $this->fmtsectionextra->nextupid,
-                    'sesskey' => sesskey(),
-                ]
+            $stateaction = 'section_move_after';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->nextupid,
+                returnurl: $this->fmtreturnurl,
             );
             $strmovepagenext = get_string_manager()->string_exists('move_page_next', 'format_multitopic') ?
                                 get_string('move_page_next', 'format_multitopic') : get_string('moveright');
@@ -364,13 +348,17 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && $this->fmtsectionextra->prevpageid
         ) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    'sectionid' => $this->section->id,
-                    'destparentid' => $this->fmtsectionextra->prevpageid,
-                    'sesskey' => sesskey(),
-                ]
+            $stateaction = 'fmt_section_move_into';
+            $returnurl = course_get_url(
+                $this->format->get_course(),
+                $this->format->fmt_get_section_extra((object)['id' => $this->fmtsectionextra->prevpageid])->sectionbase
+            );
+            $returnurl->set_anchor(explode('#', $this->fmtreturnurl)[1]);
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->prevpageid,
+                returnurl: $returnurl,
             );
             $strmovetoprevpage = get_string_manager()->string_exists('move_to_prev_page', 'format_multitopic') ?
                                     get_string('move_to_prev_page', 'format_multitopic') : get_string('moveleft');
@@ -403,13 +391,17 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && $this->fmtsectionextra->nextpageid
         ) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    'sectionid' => $this->section->id,
-                    'destparentid' => $this->fmtsectionextra->nextpageid,
-                    'sesskey' => sesskey(),
-                ]
+            $stateaction = 'fmt_section_move_into';
+            $returnurl = course_get_url(
+                $this->format->get_course(),
+                $this->format->fmt_get_section_extra((object)['id' => $this->fmtsectionextra->nextpageid])->sectionbase
+            );
+            $returnurl->set_anchor(explode('#', $this->fmtreturnurl)[1]);
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->nextpageid,
+                returnurl: $returnurl,
             );
             $strmovetonextpage = get_string_manager()->string_exists('move_to_next_page', 'format_multitopic') ?
                                     get_string('move_to_next_page', 'format_multitopic') : get_string('moveright');
@@ -442,13 +434,12 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && ($this->fmtsectionextra->prevupid != $this->fmtsectionextra->parentid)
         ) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    'sectionid' => $this->section->id,
-                    'destnextupid' => $this->fmtsectionextra->prevupid,
-                    'sesskey' => sesskey(),
-                ]
+            $stateaction = 'fmt_section_move_before';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->prevupid,
+                returnurl: $this->fmtreturnurl,
             );
             $strmoveup = get_string('moveup');
             $link = new link_secondary(
@@ -480,13 +471,12 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && ($this->fmtsectionextra->nextupid != $this->fmtsectionextra->nextpageid)
         ) {
-            $url = new url(
-                $this->fmtbaseurl,
-                [
-                    'sectionid' => $this->section->id,
-                    'destprevupid' => $this->fmtsectionextra->nextupid,
-                    'sesskey' => sesskey(),
-                ]
+            $stateaction = 'section_move_after';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->nextupid,
+                returnurl: $this->fmtreturnurl,
             );
             $strmovedown = get_string('movedown');
             $link = new link_secondary(
@@ -527,16 +517,13 @@ class controlmenu extends controlmenu_base {
         $link = parent::get_section_delete_item();
 
         if ($link) {
-            $url = new url(
-                '/course/format/multitopic/_course_editsection.php',
-                [
-                    'id' => $this->section->id,
-                    // REMOVED: section return.
-                    'delete' => 1,
-                    'sesskey' => sesskey(),
-                ]
+            $link->url->param(
+                'returnurl',
+                course_get_url(
+                    $this->format->get_course(),
+                    $this->format->fmt_get_section_extra((object)['id' => $this->fmtsectionextra->prevupid])->sectionbase
+                )
             );
-            $link->url = $url;
             if ($this->fmtonsectionpage) {
                 unset($link->attributes['data-action']);
             }

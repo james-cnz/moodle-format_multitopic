@@ -27,55 +27,6 @@
 
 
 /**
- * For a given course section, marks it visible or hidden,
- * and does the same for every activity in that section
- *
- * @param int $courseid course id
- * @param stdClass|\section_info $section The section to adjust.  Must specify id
- * @param int $visibility The new visibility.  0 = hidden, 1 = visible
- * @return array A list of resources which were hidden in the section
- */
-function format_multitopic_set_section_visible(int $courseid, $section, int $visibility): array {
-    // CHANGED LINE ABOVE: Use sectioninfo, not section number.
-    global $DB;
-
-    $resourcestotoggle = [];
-    // ADDED.
-    // Fetch section info.
-    $sectionsextra = course_get_format($courseid)->fmt_get_sections_extra();
-    $sectionextra = array_key_exists($section->id, $sectionsextra) ? $sectionsextra[$section->id] : null;
-    // We will recurse if setting visibility to hidden, because hidden sections should not contain visible sections.
-    $recurse = ($visibility == 0);
-    // END ADDED.
-    for ($subsectionextra = $sectionextra; /* ... */
-        $subsectionextra && ($subsectionextra->id == $section->id
-                            || $recurse && $subsectionextra->levelsan > $sectionextra->levelsan); /* ... */
-        $subsectionextra = array_key_exists($subsectionextra->nextanyid, $sectionsextra) ?
-            $sectionsextra[$subsectionextra->nextanyid] : null) {
-        // CHANGED LINES ABOVE: Recurse, if necessary.
-        $subsection = $subsectionextra->sectionbase;
-        course_update_section($courseid, $subsection, ['visible' => $visibility]); // CHANGED: $section -> $subsection .
-
-        // Determine which modules are visible for AJAX update.
-        $modules = !empty($subsection->sequence) ? explode(',', $subsection->sequence) : [];
-        // CHANGED LINE ABOVE: $section -> $subsection.
-        if (!empty($modules)) {
-            list($insql, $params) = $DB->get_in_or_equal($modules);
-            $select = 'id ' . $insql . ' AND visible = ?';
-            array_push($params, $visibility);
-            if (!$visibility) {
-                $select .= ' AND visibleold = 1';
-            }
-            $resourcestotoggle = array_merge($resourcestotoggle,
-                                            $DB->get_fieldset_select('course_modules', 'id', $select, $params));
-            // CHANGED LINE ABOVE: Merge results.
-        }
-    }
-    return $resourcestotoggle;
-}
-
-
-/**
  * Creates a course section and adds it to the specified position
  *
  * @param stdClass $courseorid course id or course object
