@@ -326,7 +326,7 @@ class format_multitopic extends core_courseformat\base {
                     if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                         $parent->pagedepth = max($parent->pagedepth, $thissectionextra->pagedepth);
                         $showsection = $thissection->uservisible || ($thissection->section == 0) ||
-                                ($parent->uservisible || ($parent->section == 0))
+                                ($parent->sectionbase->uservisible || ($parent->section == 0))
                                 && ($thissection->visible || !$course->hiddensections)
                                 && ($thissection->available || !empty($thissection->availableinfo));
                         if ($showsection) {
@@ -1297,7 +1297,7 @@ class format_multitopic extends core_courseformat\base {
         $sectionsextra = $this->fmt_get_sections_extra(false);
         $parentid = $sectionsextra[$section->id]->parentid;
         if (isset($parentid)) {
-            $parent = $sectionsextra[$parentid]->sectionbase;
+            $parent = $section->modinfo->get_section_info_by_id($parentid);
             if (!($parent->visible && $parent->available) && ($parent->id != $this->fmtrootsectionid)) {
                 $available = false;
                 if (!$parent->uservisible) {
