@@ -121,12 +121,11 @@ class content extends content_base {
                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1, null);
         $sectionextraatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
                                      FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT, null);
-        $skipsectionsbelowlevel = PHP_INT_MAX;
 
         foreach ($sectionsextra as $thissectionextra) {
             $thissection = $thissectionextra->sectionbase;
 
-            if (!empty($thissection->component) || $thissectionextra->levelsan > $skipsectionsbelowlevel) {
+            if (!empty($thissection->component)) {
                 continue;
             }
 
@@ -138,7 +137,6 @@ class content extends content_base {
             // but there is some available info text which explains the reason & should display,
             // OR it is hidden but the course has a setting to display hidden sections as unavilable.
             $showsection = $format->is_section_visible($thissection);
-            $skipsectionsbelowlevel = $showsection ? PHP_INT_MAX : $thissectionextra->levelsan;
 
             // Make and add tabs for visible pages.
             if ($thissectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $showsection) {
