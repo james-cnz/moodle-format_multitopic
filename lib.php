@@ -325,10 +325,13 @@ class format_multitopic extends core_courseformat\base {
                     $parent->hassubsections = true;
                     if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                         $parent->pagedepth = max($parent->pagedepth, $thissectionextra->pagedepth);
-                        $showsection = $thissection->uservisible || ($thissection->section == 0) ||
-                                ($parent->sectionbase->uservisible || ($parent->section == 0))
-                                && ($thissection->visible || !$course->hiddensections)
-                                && ($thissection->available || !empty($thissection->availableinfo));
+                        $showsection = (($parent->section == 0) || $parent->sectionbase->uservisible)
+                                && (
+                                    ($thissection->section == 0)
+                                    || $thissection->uservisible
+                                    || ($thissection->visible || !$course->hiddensections)
+                                        && ($thissection->available || !empty($thissection->availableinfo))
+                                );
                         if ($showsection) {
                             $parent->pagedepthdirect = max($parent->pagedepthdirect, $levelsan);
                         }
@@ -1277,12 +1280,18 @@ class format_multitopic extends core_courseformat\base {
         // a "hiddensections" format setting.
         $course = $this->get_course();
         $hidesections = $course->hiddensections ?? true;
+        $parent = ($section->section == 0) ?
+            null
+            : $section->modinfo->get_section_info_by_id($this->fmt_get_sections_extra()[$section->id]->parentid);
         // Show the section if the user is permitted to access it, OR if it's not available
         // but there is some available info text which explains the reason & should display,
         // OR it is hidden but the course has a setting to display hidden sections as unavilable.
-        return $section->uservisible || ($section->section == 0) ||
-            ($section->visible || !$hidesections)
-            && ($section->available || !empty($section->availableinfo));
+        return (!$parent || ($parent->section == 0) || $parent->uservisible)
+            && (
+                ($section->section == 0)
+                || $section->uservisible
+                || ($section->visible || !$hidesections) && ($section->available || !empty($section->availableinfo))
+            );
     }
     // END INCLUDED.
 
@@ -1298,7 +1307,7 @@ class format_multitopic extends core_courseformat\base {
         $parentid = $sectionsextra[$section->id]->parentid;
         if (isset($parentid)) {
             $parent = $section->modinfo->get_section_info_by_id($parentid);
-            if (!($parent->visible && $parent->available) && ($parent->id != $this->fmtrootsectionid)) {
+            if (!($parent->visible && $parent->available) && ($parent->section != 0)) {
                 $available = false;
                 if (!$parent->uservisible) {
                     $availableinfo = '';

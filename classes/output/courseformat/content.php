@@ -136,9 +136,7 @@ class content extends content_base {
             // Show the section if the user is permitted to access it, OR if it's not available
             // but there is some available info text which explains the reason & should display,
             // OR it is hidden but the course has a setting to display hidden sections as unavilable.
-            $showsection = $thissection->uservisible || ($thissection->section == 0) ||
-                    ($thissection->visible || !$course->hiddensections)
-                    && ($thissection->available || !empty($thissection->availableinfo));
+            $showsection = $format->is_section_visible($thissection);
 
             // Make and add tabs for visible pages.
             if ($thissectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC && $showsection) {
