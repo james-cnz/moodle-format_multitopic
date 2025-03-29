@@ -325,13 +325,10 @@ class format_multitopic extends core_courseformat\base {
                     $parent->hassubsections = true;
                     if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                         $parent->pagedepth = max($parent->pagedepth, $thissectionextra->pagedepth);
-                        $showsection = (($parent->section == 0) || $parent->sectionbase->uservisible)
-                                && (
-                                    ($thissection->section == 0)
-                                    || $thissection->uservisible
-                                    || ($thissection->visible || !$course->hiddensections)
-                                        && ($thissection->available || !empty($thissection->availableinfo))
-                                );
+                        $showsection = ($thissection->section == 0) || $thissection->uservisible ||
+                                (($parent->section == 0) || $parent->sectionbase->uservisible)
+                                && ($thissection->visible || !$course->hiddensections)
+                                && ($thissection->available || !empty($thissection->availableinfo));
                         if ($showsection) {
                             $parent->pagedepthdirect = max($parent->pagedepthdirect, $levelsan);
                         }
@@ -1289,12 +1286,10 @@ class format_multitopic extends core_courseformat\base {
         // Show the section if the user is permitted to access it, OR if it's not available
         // but there is some available info text which explains the reason & should display,
         // OR it is hidden but the course has a setting to display hidden sections as unavilable.
-        return (!$parent || ($parent->section == 0) || $parent->uservisible)
-            && (
-                ($section->section == 0)
-                || $section->uservisible
-                || ($section->visible || !$hidesections) && ($section->available || !empty($section->availableinfo))
-            );
+        return ($section->section == 0) || $section->uservisible ||
+            (!$parent || ($parent->section == 0) || $parent->uservisible)
+            && ($section->visible || !$hidesections)
+            && ($section->available || !empty($section->availableinfo));
     }
     // END INCLUDED.
 

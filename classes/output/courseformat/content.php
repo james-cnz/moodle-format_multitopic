@@ -200,7 +200,7 @@ class content extends content_base {
                         $level >= $nextsectionlevel + 1; /* ... */
                         $level--) {
 
-                    if (!$format->is_section_visible($sectionextraatlevel[$level - 1]->sectionbase)) {
+                    if (!$sectionextraatlevel[$level - 1]->sectionbase->uservisible) {
                         continue;
                     }
 
