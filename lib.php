@@ -1278,7 +1278,7 @@ class format_multitopic extends core_courseformat\base {
         // Previous to Moodle 4.0 thas logic was hardcoded. To prevent errors in the contrib plugins
         // the default logic is the same required for topics and weeks format and still uses
         // a "hiddensections" format setting.
-        if ($section->component) {
+        if (!empty($section->component)) {
             return parent::is_section_visible($section);
         }
         $course = $this->get_course();
