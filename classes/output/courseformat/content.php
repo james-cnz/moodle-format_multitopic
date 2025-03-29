@@ -200,6 +200,10 @@ class content extends content_base {
                         $level >= $nextsectionlevel + 1; /* ... */
                         $level--) {
 
+                    if (!$format->is_section_visible($sectionextraatlevel[$level - 1]->sectionbase)) {
+                        continue;
+                    }
+
                     // Make "add" tab.
                     $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
                                         get_string('addsectionpage', 'format_' . $course->format) : get_string('addsections');
