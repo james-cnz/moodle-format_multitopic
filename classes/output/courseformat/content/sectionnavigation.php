@@ -94,7 +94,7 @@ class sectionnavigation extends sectionnavigation_base {
         while (isset($backextra->prevpageid)) {
             $backextra = $sectionsextra[$backextra->prevpageid];
             $back = $backextra->sectionbase;
-            if ($back->uservisible) {
+            if (($back->section == 0) || $back->uservisible && $format->is_section_visible($back)) {
                 $data->previousname = get_section_name($course, $back);
                 $data->previousurl = course_get_url($course, $back);
                 $data->hasprevious = true;
@@ -107,7 +107,7 @@ class sectionnavigation extends sectionnavigation_base {
         while (isset($nextextra->nextpageid)) {
             $nextextra = $sectionsextra[$nextextra->nextpageid];
             $next = $nextextra->sectionbase;
-            if ($next->uservisible) {
+            if (($next->section == 0) || $next->uservisible && $format->is_section_visible($next)) {
                 $data->nextname = get_section_name($course, $next);
                 $data->nexturl = course_get_url($course, $next);
                 $data->hasnext = true;
