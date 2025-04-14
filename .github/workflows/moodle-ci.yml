@@ -69,9 +69,9 @@ jobs:
             database: mariadb
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 5.0, PHP 8.3, PostgreSQL
-          #- php: '8.3' # 8.2-8.3
-          #  moodle-branch: 'main'
+          # Moodle 5.0, PHP 8.4, PostgreSQL
+          #- php: '8.4' # 8.2-8.4
+          #  moodle-branch: 'MOODLE_500_STABLE'
           #  database: pgsql
           #  plugin-ci: ^4
           #  # extensions: xmlrpc-beta
