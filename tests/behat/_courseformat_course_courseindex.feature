@@ -251,7 +251,8 @@ Feature: Course index depending on role (Multitopic format)
     And I am on "Course 1" course homepage with editing mode on
     When I click on "Add topic" "link" in the "fmt-course-addsection" "region"
     # CHANGED line above.
-    Then I should see "New section" in the "courseindex-content" "region"
+    Then I should see "Section 5" in the "courseindex-content" "region"
+    # CHANGED line above.
 
   @javascript
   Scenario: Remove a section should alter the course index
