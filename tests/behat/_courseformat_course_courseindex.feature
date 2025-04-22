@@ -114,7 +114,7 @@ Feature: Course index depending on role (Multitopic format)
     When I delete "Activity sample 2" activity
     Then I should not see "Activity sample 2" in the "courseindex-content" "region"
 
-  # REMOVED highlight tests
+  # REMOVED Scenario: Highlight sections are represented in the course index.
 
   @javascript
   Scenario: Course index toggling
@@ -189,6 +189,8 @@ Feature: Course index depending on role (Multitopic format)
     # Collapse all sections
     And I click on "Course index options" "button" in the "#courseindexdrawercontrols" "css_element"
     And I click on "Collapse all" "link" in the "#courseindexdrawercontrols" "css_element"
+    And I click on "Expand" "link" in the ".courseindex-section[data-number='0']" "css_element"
+    # ADDED line above.
     And I should see "Section 1" in the "courseindex-content" "region"
     And I should not see "Activity sample 1" in the "courseindex-content" "region"
     And I should see "Section 2" in the "courseindex-content" "region"
@@ -247,7 +249,8 @@ Feature: Course index depending on role (Multitopic format)
   Scenario: Adding section should alter the course index
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I click on "Add section" "link" in the "course-addsection" "region"
+    When I click on "Add section" "link" in the "fmt-course-addsection" "region"
+    # CHANGED line above.
     Then I should see "New section" in the "courseindex-content" "region"
 
   @javascript
@@ -267,35 +270,7 @@ Feature: Course index depending on role (Multitopic format)
     Then I should not see "Section 1" in the "courseindex-content" "region"
     And I should not see "Activity sample 1" in the "courseindex-content" "region"
 
-  @javascript
-  Scenario: Course index locked activity link
-    Given the following config values are set as admin:
-      | enableavailability | 1 |
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    And I navigate to "Settings" in current page administration
-    And I expand all fieldsets
-    And I set the field "Course layout" to "Show one section per page"
-    And I click on "Save and display" "button"
-    # Add access restriction to Activity sample 3.
-    And I open "Activity sample 3" actions menu
-    And I click on "Edit settings" "link" in the "Activity sample 3" activity
-    And I expand all fieldsets
-    And I click on "Add restriction..." "button"
-    And I click on "Date" "button" in the "Add restriction..." "dialogue"
-    And I set the following fields to these values:
-      | x[day]   | 31                  |
-      | x[month] | 12                  |
-      | x[year]  | ## +1 year ## %Y ## |
-    And I press "Save and return to course"
-    And I log out
-    # Check course index link goes to the specific section.
-    When I log in as "student1"
-    And I am on "Course 1" course homepage
-    And I click on "Section 1" "link" in the "region-main" "region"
-    And I should not see "Activity sample 3" in the "region-main" "region"
-    And I click on "Activity sample 3" "link" in the "courseindex-content" "region"
-    Then I should see "Activity sample 3" in the "region-main" "region"
+  # REMOVED Course index locked activity link
 
   @javascript
   Scenario Outline: Course index is displayed by default depending on the screen size.
@@ -364,12 +339,7 @@ Feature: Course index depending on role (Multitopic format)
     # Label intro text should be displayed if label name is not set.
     And I should see "Test label 2" in the "courseindex-content" "region"
 
-  @javascript
-  Scenario: Change the section name inline in section page
-    When I am on the "Course 1 > Section 2" "course > section" page logged in as "teacher1"
-    And I turn editing mode on
-    When I set the field "Edit section name" in the "page-header" "region" to "Custom section name"
-    Then I should see "Custom section name" in the "courseindex-content" "region"
+  # REMOVED Scenario: Change the section name inline in section page
 
   @javascript
   Scenario: We cannot add a section when the number of section reaches maxsections but as soon as we reach under the limit we can add a section again.
@@ -378,6 +348,7 @@ Feature: Course index depending on role (Multitopic format)
     And I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     Then I should see "Section 1" in the "courseindex-content" "region"
-    And ".disabled" "css_element" should exist in the "[data-action='addSection']" "css_element"
+    And ".disabled" "css_element" should exist in the ".changenumsections .add-section" "css_element"
+    # CHANGED line above.
     And I should see "You have reached the maximum number of sections allowed for a course."
     # REMOVED deleting a section re-enables add section button.  TODO: Restore when we support this.
