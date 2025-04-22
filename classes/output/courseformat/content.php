@@ -214,8 +214,7 @@ class content extends content_base {
                             "&sectionid={$format->get_sectionid()}" : "")),
                     ];
                     $url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
-                    $attrs = !$canaddmore ? ['class' => 'dimmed_text cantadd'] : null;
-                    $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle', $attrs);
+                    $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle');
                     $newtab = new \tabobject("tab_id_{$sectionextraatlevel[$level - 1]->id}_l{($level - 1)}_add",
                         $url,
                         $icon,
@@ -228,6 +227,11 @@ class content extends content_base {
                         $tabln[$level - 1]->subtree[] = $newtab;
                     }
                     $tabln[$level] = null;
+
+                    // Disable "add" tab if can't add more sections.
+                    if (!$canaddmore) {
+                        $inactivetabs[] = "tab_id_{$sectionextraatlevel[$level - 1]->id}_l{($level - 1)}_add";
+                    }
 
                 }
 

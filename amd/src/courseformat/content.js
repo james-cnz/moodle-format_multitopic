@@ -309,7 +309,7 @@ export default class Component extends BaseComponent {
         this._refreshAllSectionsToggler(this.reactive.stateManager.state);
 
         // Update Add section button.
-        const addSectionDom = document.querySelector("div#fmtchangenumsections > a");
+        const addSectionDom = document.querySelector("div#fmt-course-addsection > a");
         addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + singleSectionId);
 
     }

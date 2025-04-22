@@ -26,9 +26,10 @@
 namespace format_multitopic\output\courseformat\content;
 
 use core_courseformat\output\local\content\addsection as addsection_base;
+use stdClass;
 
 /**
- * Base class to render a course add section buttons.
+ * Class to render a course add section button.
  *
  * @package   format_multitopic
  * @copyright 2019 onwards James Calder and Otago Polytechnic
@@ -36,43 +37,6 @@ use core_courseformat\output\local\content\addsection as addsection_base;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class addsection extends addsection_base {
-
-    /**
-     * Export this data so it can be used as the context for a mustache template.
-     *
-     * @param \renderer_base $output typically, the renderer that's calling this function
-     * @return \stdClass data context for a mustache template
-     */
-    public function export_for_template(\renderer_base $output): \stdClass {
-
-        // If no editor must be displayed, just return an empty structure.
-        if (!$this->format->show_editor()) {
-            return new \stdClass();
-        }
-
-        $format = $this->format;
-        $course = $format->get_course();
-        $options = $format->get_format_options();
-
-        $lastsection = $format->get_last_section_number();
-        $maxsections = $format->get_max_sections();
-
-        // Component based formats handle add section button in the frontend.
-        $show = true;
-
-        $data = new \stdClass();                                                // ADDED.
-
-        // REMOVED numsections.
-        if (course_get_format($course)->uses_sections() && $show) {
-            $data = $this->get_add_section_data($output, $lastsection, $maxsections);
-        }
-
-        if (count((array)$data)) {
-            $data->showaddsection = true;
-        }
-
-        return $data;
-    }
 
     /**
      * Get the add section button data.
@@ -90,7 +54,7 @@ class addsection extends addsection_base {
     protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections): \stdClass {
         $format = $this->format;
         $course = $format->get_course();
-        $data = new \stdClass();
+        $data = parent::get_add_section_data($output, $lastsection, $maxsections);
 
         if (get_string_manager()->string_exists('addsectiontopic', 'format_' . $course->format)) {
             $addstring = get_string('addsectiontopic', 'format_' . $course->format);
@@ -106,14 +70,9 @@ class addsection extends addsection_base {
                         . (($format->get_sectionid() != $format->fmtrootsectionid) ?
                         "&sectionid={$format->get_sectionid()}" : "")), ];
 
-        // REMOVED section return.
+        $data->addsections->url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
+        $data->addsections->title = $addstring;
 
-        $data->addsections = (object) [                                     // CHANGED.
-            'url' => new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params),
-            'title' => $addstring,
-            'newsection' => $maxsections - $lastsection,
-            'canaddmore' => $maxsections > $lastsection,
-        ];
         return $data;
     }
 }

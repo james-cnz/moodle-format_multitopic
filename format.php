@@ -61,8 +61,4 @@ $widget = new $outputclass($format);
 echo $renderer->render($widget);
 
 // Include course format js module.
-$courseformat = course_get_format($course);
-$maxsections = $courseformat->get_max_sections();
-$maxsections = get_string('maxsectionslimit', 'core', $maxsections);
 $PAGE->requires->js('/course/format/multitopic/format.js');
-$PAGE->requires->js_init_call('M.course.format.fmtInit', ['max' => $maxsections], true);
