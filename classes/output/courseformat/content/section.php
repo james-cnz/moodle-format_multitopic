@@ -166,6 +166,7 @@ class section extends section_base {
      * @return bool if the cm has name data
      */
     protected function add_format_data(\stdClass &$data, array $haspartials, \renderer_base $output): bool {
+        global $CFG;
         $section = $this->section;
 
         $result = parent::add_format_data($data, $haspartials, $output);
@@ -176,7 +177,7 @@ class section extends section_base {
         $sectionextra = $this->fmtsectionextra;
         $format = $this->format;
 
-        if ($section->id == $format->get_sectionid()) {
+        if (($section->id == $format->get_sectionid()) && ($CFG->version < 2025042400)) { // TODO: Correct version.
             $data->collapsemenu = true;
         } else {
             unset($data->collapsemenu);

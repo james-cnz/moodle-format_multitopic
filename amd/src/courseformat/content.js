@@ -51,8 +51,9 @@ export default class Component extends BaseComponent {
      * @return {Component}
      */
     static init(target, selectors, sectionReturn) {
+        let element = document.querySelector(target);
         return new this({ // CHANGED.
-            element: document.getElementById(target),
+            element,
             reactive: getCurrentCourseEditor(),
             selectors,
             sectionReturn,
@@ -188,7 +189,7 @@ export default class Component extends BaseComponent {
                 }
             }
         );
-        target.style.visibility = (allexpanded && allcollapsed) ? "hidden" : "visible"; // ADDED.
+        target.classList.toggle('v-hidden', allcollapsed && allexpanded);
         if (allcollapsed) {
             target.classList.add(this.classes.COLLAPSED);
             target.setAttribute('aria-expanded', false);
