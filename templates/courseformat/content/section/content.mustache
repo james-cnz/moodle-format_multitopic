@@ -15,22 +15,21 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/content/section
+    @template format_multitopic/courseformat/content/section/content
 
-    Displays a course section.
-
-    Note: This template is a wrapper around the section/content template to allow course formats and theme designers to
-    modify parts of the wrapper without having to copy/paste the entire template.
+    The internal content of a section.
 
     Example context (json):
     {
         "num": 3,
         "id": 35,
+        "controlmenu": "[tools menu]",
         "header": {
             "name": "Section title",
             "title": "<a href=\"http://moodle/course/view.php?id=5#section-0\">Section title</a>",
             "url": "#",
-            "ishidden": true
+            "ishidden": true,
+            "headinglevel": 3
         },
         "cmlist": {
             "cms": [
@@ -38,8 +37,7 @@
                     "cmitem": {
                         "cmformat": {
                             "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Forum example</span></a>",
-                            "hasname": "true",
-                            "availability": ""
+                            "hasname": "true"
                         },
                         "id": 3,
                         "cmid": 3,
@@ -52,8 +50,7 @@
                     "cmitem": {
                         "cmformat": {
                             "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Assign example</span></a>",
-                            "hasname": "true",
-                            "availability": ""
+                            "hasname": "true"
                         },
                         "id": 4,
                         "cmid": 4,
@@ -69,7 +66,7 @@
         "iscurrent": true,
         "currentlink": "<span class=\"accesshide\">This topic</span>",
         "availability": {
-            "info": "<span class=\"badge badge-info\">Hidden from students</span>",
+            "info": "<span class=\"badge bg-info\">Hidden from students</span>",
             "hasavailability": true
         },
         "summary": {
@@ -80,30 +77,17 @@
             "hasmenu": true
         },
         "cmcontrols": "[Add an activity or resource]",
-        "sectionreturnid": 0,
+        "iscoursedisplaymultipage": false,
         "contentcollapsed": false,
+        "insertafter": false,
         "numsections": 42,
         "sitehome": false,
-        "highlightedlabel" : "Highlighted",
-        "testingsection": true
+        "isstealth": false,
+        "highlightedlabel" : "Highlighted"
     }
 }}
-{{#testingsection}}<ul>{{/testingsection}}
-<li id="section-{{num}}"
-    class="section course-section main {{#onlysummary}} section-summary {{/onlysummary}} clearfix
-            {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
-            {{fmtclasses}}"
-    data-sectionid="{{num}}"
-    data-sectionreturnid="{{sectionreturnid}}"
-    data-for="section"
-    data-id="{{id}}"
-    data-number="{{num}}"
-    data-sectionname="{{sectionname}}"
-    data-fmtonpage="{{fmtonpage}}"
-    {{^fmtonpage}}style="display: none;"{{/fmtonpage}}
->
-    {{$ core_courseformat/local/content/section/content }}
-        {{> format_multitopic/courseformat/content/section/content }}
-    {{/ core_courseformat/local/content/section/content }}
-</li>
-{{#testingsection}}</ul>{{/testingsection}}
+{{< core_courseformat/local/content/section/content}}
+    {{$ core_courseformat/local/content/section/header }}
+        {{> format_multitopic/courseformat/content/section/header }}
+    {{/ core_courseformat/local/content/section/header }}
+{{/ core_courseformat/local/content/section/content}}
