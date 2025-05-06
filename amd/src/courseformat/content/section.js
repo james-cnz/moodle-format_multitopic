@@ -49,6 +49,7 @@ export default class extends SectionBase {
                 this.configDragDrop(headerComponent);
             }
         }
+        this._openSectionIfNecessary();
 
         if (this.section.component) {
             return;
