@@ -15,28 +15,24 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_multitopic/courseformat/contenttabs/tabtree
+    @template format_multitopic/courseformat/contenttabs/tab
 
-    Tab tree.
+    Tab.
 
     Example context (json):
     {
-        "tabs": [{
-            "active": "true",
-            "inactive": "false",
-            "link": [{
-                "link": "http://moodle.org"
-            }],
-            "title": "Moodle.org",
-            "text": "Moodle community"
-        }]
+        "active": "true",
+        "inactive": "false",
+        "link": [{
+            "link": "http://moodle.org"
+        }],
+        "title": "Moodle.org",
+        "text": "Moodle community",
+        "testingtab": true
     }
 }}
-<ul class="nav nav-tabs mb-3">
-  {{#tabs}}
-    {{> format_multitopic/courseformat/contenttabs/tab }}
-  {{/tabs}}
-</ul>
-{{#secondrow}}
-  {{> format_multitopic/courseformat/contenttabs/tabtree }}
-{{/secondrow}}
+{{#testingtab}}<ul>{{/testingtab}}
+<li class="nav-item tab_level_{{level}}" data-id="{{sectionid}}">
+    <a class="nav-link{{#active}} active{{/active}}{{#inactive}} disabled{{/inactive}}" {{#link}}href="{{{link}}}"{{/link}} title="{{title}}">{{{text}}}</a>
+</li>
+{{#testingtab}}</ul>{{/testingtab}}
