@@ -39,7 +39,7 @@ export default class Component extends BaseComponent {
      */
     create(descriptor) {
         super.create(descriptor);
-        this.originalsinglesectionid = this.element.querySelector("ul.sections").dataset.originalsinglesectionid;
+        this.originalsinglesectionid = this.element.querySelector("ul.section-list").dataset.originalsinglesectionid;
     }
 
     /**
@@ -96,7 +96,7 @@ export default class Component extends BaseComponent {
             history.replaceState(history.state, "", anchor);
         }
         const selSectionHeaderDom =
-            document.querySelector(".course-content ul.sections li.section.section-topic .sectionname" + anchor);
+            document.querySelector(".course-content ul.section-list li.section.section-topic .sectionname" + anchor);
 
         // Exit if there is no recognised section.
         if (!selSectionHeaderDom) {

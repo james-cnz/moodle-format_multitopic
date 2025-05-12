@@ -15,13 +15,14 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/content/addsection
+    @template format_multitopic/courseformat/content/addsection
 
     Displays the add section button inside a course.
 
     Example context (json):
     {
         "showaddsection": true,
+
         "addsections": {
             "url": "#",
             "title": "Add section",
@@ -30,16 +31,19 @@
     }
 }}
 {{#showaddsection}}
-<div id="fmtchangenumsections" class="mdl-right">
+<div id="fmtchangenumsections" class="bulk-hidden mt-5">
+
     {{#addsections}}
-    <a
-        href="{{{url}}}"
-        class="fmtadd-sections{{^canaddmore}} cantadd dimmed{{/canaddmore}}"
+    <a href="{{{url}}}"
+        class="w-100 btn add-section justify-content-center align-items-center p-3 {{^canaddmore}}cantadd dimmed{{/canaddmore}}"
         data-add-sections="{{title}}"
         data-new-sections="{{newsection}}"
+
     >
-        {{#pix}} t/add, moodle {{/pix}} {{title}}
+        {{#pix}} t/add, moodle {{/pix}}
+        {{title}}
     </a>
+
     {{/addsections}}
 </div>
 {{/showaddsection}}

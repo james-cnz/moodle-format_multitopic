@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core/tabtree
+    @template format_multitopic/courseformat/contenttabs/tabtree
 
     Tab tree.
 
@@ -32,23 +32,13 @@
         }]
     }
 }}
-<div id="{{uniqid}}-course-tabs" class="course-section-tabs">
 <ul class="nav nav-tabs mb-3">
   {{#tabs}}
-    {{> format_multitopic/courseformat/contenttabs/tab }}
+    <li class="nav-item tab_level_{{level}}" data-id="{{sectionid}}">
+      <a class="nav-link{{#active}} active{{/active}}{{#inactive}} disabled{{/inactive}}" {{#link}}href="{{{link}}}"{{/link}} title="{{title}}">{{{text}}}</a>
+    </li>
   {{/tabs}}
 </ul>
-
 {{#secondrow}}
-  <ul class="nav nav-tabs mb-3">
-    {{#tabs}}
-      {{> format_multitopic/courseformat/contenttabs/tab }}
-    {{/tabs}}
-  </ul>
+  {{> format_multitopic/courseformat/contenttabs/tabtree }}
 {{/secondrow}}
-</div>
-{{#js}}
-require(['format_multitopic/courseformat/contenttabs/tabtree'], function(component) {
-component.init('{{uniqid}}-course-tabs');
-});
-{{/js}}

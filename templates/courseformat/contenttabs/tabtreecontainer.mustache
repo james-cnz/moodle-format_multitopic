@@ -15,15 +15,28 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_multitopic/courseformat/content/section/controlmenu
+    @template format_multitopic/courseformat/contenttabs/tabtreecontainer
 
-    Displays a section control menu (dropdown menu).
+    Tab tree comtainer.
 
     Example context (json):
     {
-        "menu": "<a href=\"#\" class=\"d-inline-block dropdown-toggle icon-no-margin\">Edit<b class=\"caret\"></b></a>",
-        "hasmenu": true
+        "tabs": [{
+            "active": "true",
+            "inactive": "false",
+            "link": [{
+                "link": "http://moodle.org"
+            }],
+            "title": "Moodle.org",
+            "text": "Moodle community"
+        }]
     }
 }}
-{{< core_courseformat/local/content/section/controlmenu}}
-{{/ core_courseformat/local/content/section/controlmenu}}
+<div id="course-tabs-{{uniqid}}" class="course-section-tabs">
+    {{> format_multitopic/courseformat/contenttabs/tabtree}}
+</div>
+{{#js}}
+require(['format_multitopic/courseformat/contenttabs/tabtreecontainer'], function(component) {
+    component.init('course-tabs-{{uniqid}}');
+});
+{{/js}}

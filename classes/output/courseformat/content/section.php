@@ -67,6 +67,7 @@ class section extends section_base {
         $sectionextra = $this->fmtsectionextra;
         unset($data->displayonesection);
         $data->levelsan = $sectionextra->levelsan;
+        $data->fmtispage = ($sectionextra->levelsan < 2);
 
         return $data;
     }

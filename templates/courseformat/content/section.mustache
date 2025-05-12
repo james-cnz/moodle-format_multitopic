@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/content/section
+    @template format_multitopic/courseformat/content/section
 
     Displays a course section.
 
@@ -26,11 +26,14 @@
     {
         "num": 3,
         "id": 35,
+        "sectionname": "Section title",
+        "controlmenu": "[tools menu]",
         "header": {
             "name": "Section title",
             "title": "<a href=\"http://moodle/course/view.php?id=5#section-0\">Section title</a>",
             "url": "#",
-            "ishidden": true
+            "ishidden": true,
+            "headinglevel": 3
         },
         "cmlist": {
             "cms": [
@@ -38,11 +41,9 @@
                     "cmitem": {
                         "cmformat": {
                             "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Forum example</span></a>",
-                            "hasname": "true",
-                            "availability": ""
+                            "hasname": "true"
                         },
                         "id": 3,
-                        "cmid": 3,
                         "module": "forum",
                         "anchor": "activity-3",
                         "extraclasses": "newmessages"
@@ -52,11 +53,9 @@
                     "cmitem": {
                         "cmformat": {
                             "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Assign example</span></a>",
-                            "hasname": "true",
-                            "availability": ""
+                            "hasname": "true"
                         },
                         "id": 4,
-                        "cmid": 4,
                         "anchor": "activity-4",
                         "module": "assign",
                         "extraclasses": ""
@@ -80,8 +79,9 @@
             "hasmenu": true
         },
         "cmcontrols": "[Add an activity or resource]",
-        "sectionreturnid": 0,
+
         "contentcollapsed": false,
+
         "numsections": 42,
         "sitehome": false,
         "highlightedlabel" : "Highlighted",
@@ -94,7 +94,7 @@
             {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
             {{fmtclasses}}"
     data-sectionid="{{num}}"
-    data-sectionreturnid="{{sectionreturnid}}"
+
     data-for="section"
     data-id="{{id}}"
     data-number="{{num}}"
@@ -102,8 +102,11 @@
     data-fmtonpage="{{fmtonpage}}"
     {{^fmtonpage}}style="display: none;"{{/fmtonpage}}
 >
-    {{$ core_courseformat/local/content/section/content }}
-        {{> format_multitopic/courseformat/content/section/content }}
-    {{/ core_courseformat/local/content/section/content }}
+    <div {{^fmtispage}}class="section-item"{{/fmtispage}}>
+        {{$ core_courseformat/local/content/section/content }}
+            {{> format_multitopic/courseformat/content/section/content }}
+        {{/ core_courseformat/local/content/section/content }}
+    </div>
+
 </li>
 {{#testingsection}}</ul>{{/testingsection}}

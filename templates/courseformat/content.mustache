@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/content
+    @template format_multitopic/courseformat/content
 
     Displays the complete course format.
 
@@ -26,7 +26,8 @@
                 "id": 34,
                 "header": {
                     "name": "General",
-                    "url": "#"
+                    "url": "#",
+                    "headinglevel": 3
                 },
                 "cmlist": {
                     "cms": [
@@ -38,9 +39,9 @@
                                 },
                                 "id": 3,
                                 "cmid": 3,
-                                "anchor": "module-3",
                                 "module": "forum",
-                                "extraclasses": "newmessages"
+                                "extraclasses": "newmessages",
+                                "anchor": "module-3"
                             }
                         }
                     ],
@@ -57,7 +58,8 @@
                 "id": 35,
                 "header": {
                     "name": "Section title",
-                    "url": "#"
+                    "url": "#",
+                    "headinglevel": 3
                 },
                 "cmlist": {
                     "cms": [
@@ -69,9 +71,9 @@
                                 },
                                 "id": 4,
                                 "cmid": 4,
-                                "anchor": "module-4",
                                 "module": "forum",
-                                "extraclasses": "newmessages"
+                                "extraclasses": "newmessages",
+                                "anchor": "module-4"
                             }
                         }
                     ],
@@ -87,7 +89,8 @@
                 "id": 36,
                 "header": {
                     "name": "Section 2 title",
-                    "url": "#"
+                    "url": "#",
+                    "headinglevel": 3
                 },
                 "cmlist": {
                     "cms": [
@@ -99,9 +102,9 @@
                                 },
                                 "id": 5,
                                 "cmid": 5,
-                                "anchor": "module-5",
                                 "module": "forum",
-                                "extraclasses": "newmessages"
+                                "extraclasses": "newmessages",
+                                "anchor": "module-5"
                             }
                         }
                     ],
@@ -113,72 +116,18 @@
                 }
             }
         ],
-        "format": "topics",
-        "title": "Course title example",
-            "hasnavigation": true,
-            "sectionnavigation": {
-            "hasprevious": true,
-            "previousurl": "#",
-            "larrow": "&#x25C4;",
-            "previousname": "Section 3",
-            "hasnext": true,
-            "rarrow": "&#x25BA;",
-            "nexturl": "#",
-            "nextname": "Section 5"
-        },
-        "sectionselector": {
-            "hasprevious": true,
-            "previousurl": "#",
-            "larrow": "&#x25C4;",
-            "previousname": "Section 3",
-            "hasnext": true,
-            "rarrow": "&#x25BA;",
-            "nexturl": "#",
-            "nextname": "Section 5",
-            "selector": "<select><option>Section 4</option></select>"
-        },
-        "singlesection": {
-            "num": 5,
-            "id": 37,
-            "header": {
-                "name": "Single Section Example",
-                "url": "#",
-                "headinglevel": 3
-            },
-            "cmlist": {
-                "cms": [
-                    {
-                        "cmitem": {
-                            "cmformat": {
-                                "cmname": "<a class=\"aalink\" href=\"#\"><span class=\"instancename\">Assign example</span></a>",
-                                "hasname": "true"
-                            },
-                            "id": 6,
-                            "cmid": 6,
-                            "anchor": "module-6",
-                            "module": "assign",
-                            "extraclasses": ""
-                        }
-                    }
-                ],
-                "hascms": true
-            },
-            "iscurrent": true,
-            "summary": {
-                "summarytext": "Summary text!"
-            }
-        }
+        "format": "multitopic",
+        "title": "Course title example"
+
     }
 }}
-<div id="{{uniqid}}-course-format">
+<div id="course-format-{{uniqid}}">
     <h2 class="accesshide">{{{title}}}</h2>
-    <div style="clear: both;">
-        {{#tabs}}
-        {{> format_multitopic/courseformat/contenttabs/tabtree}}
-        {{/tabs}}
-    </div>
+    {{#tabs}}
+        {{> format_multitopic/courseformat/contenttabs/tabtreecontainer}}
+    {{/tabs}}
     {{{completionhelp}}}
-    <ul class="sections topics {{format}}" data-for="course_sectionlist" data-originalsinglesectionid="{{originalsinglesectionid}}">
+    <ul class="{{format}} section-list sections topics" data-for="course_sectionlist" data-originalsinglesectionid="{{originalsinglesectionid}}">
         {{#initialsection}}
             {{$ core_courseformat/local/content/section }}
                 {{> format_multitopic/courseformat/content/section }}
@@ -190,21 +139,13 @@
             {{/ core_courseformat/local/content/section }}
         {{/sections}}
     </ul>
-    {{#singlesection}}
-        <div class="single-section">
-            <ul class="sections topics {{format}}">
-                {{$ core_courseformat/local/content/section }}
-                    {{> core_courseformat/local/content/section }}
-                {{/ core_courseformat/local/content/section }}
-            </ul>
-        </div>
-    {{/singlesection}}
+
     {{#numsections}}
-        {{^singlesection}}
+
             {{$ core_courseformat/local/content/addsection}}
                 {{> format_multitopic/courseformat/content/addsection}}
             {{/ core_courseformat/local/content/addsection}}
-        {{/singlesection}}
+
     {{/numsections}}
     {{#bulkedittools}}
         {{$ core_courseformat/local/content/bulkedittools}}
@@ -214,6 +155,6 @@
 </div>
 {{#js}}
 require(['format_multitopic/courseformat/content'], function(component) {
-    component.init('{{uniqid}}-course-format');
+    component.init('page', {});
 });
 {{/js}}

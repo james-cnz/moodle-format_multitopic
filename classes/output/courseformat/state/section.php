@@ -60,6 +60,7 @@ class section extends base_section {
         $sectionextra = $this->fmtsectionextra;
         $data->sectionurl = course_get_url($course, $section)->out(false);
         $data->levelsan = $sectionextra->levelsan;
+        $data->fmtispage = ($sectionextra->levelsan < 2);
         $data->indent = max($sectionextra->levelsan, 0);
         $data->pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $sectionextra->parentid;
         $data->component = $section->component ?? null;

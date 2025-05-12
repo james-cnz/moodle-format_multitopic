@@ -22,8 +22,8 @@ import Templates from 'core/templates';
 /**
  * Course section tabs updater.
  *
- * @module     format_multitopic/courseformat/contenttabs/tabtree
- * @class      format_multitopic/courseformat/contenttabs/tabtree
+ * @module     format_multitopic/courseformat/contenttabs/tabtreecontainer
+ * @class      format_multitopic/courseformat/contenttabs/tabtreecontainer
  * @copyright  2022 Jeremy FitzPatrick and Te Wānanga o Aotearoa
  * @copyright  2023 onwards James Calder and Otago Polytechnic
  * @copyright  based on work by 2021 Ferran Recio <ferran@moodle.com>
@@ -53,7 +53,7 @@ export default class Component extends BaseComponent {
         this.childtabs = {};
         this.activetab = [null, null];
 
-        this.originalsinglesectionid = document.querySelector("ul.sections").dataset.originalsinglesectionid;
+        this.originalsinglesectionid = document.querySelector("ul.section-list").dataset.originalsinglesectionid;
     }
 
     static init(target) {
