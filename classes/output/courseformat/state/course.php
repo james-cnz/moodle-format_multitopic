@@ -46,31 +46,40 @@ class course extends base_course {
     }
 
     /**
-     * Export this data so it can be used as state object in the course editor.
+     * Get tabs data.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
-     * @return stdClass data context for a mustache template
+     * @return array tabs data
      */
-    public function export_for_template(\renderer_base $output): stdClass {
-        global $CFG;
-        $data = parent::export_for_template($output);
-
-        $data->tabsdata = [];
-
+    public function get_tabs_data(): array {
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();
+        $tabsdata = [];
 
         foreach ($sectionsextra as $sectionextra) {
             $section = $sectionextra->sectionbase;
             if (empty($section->component) && $format->is_section_visible($section)) {
                 if ($sectionextra->levelsan <= 0) {
                     // Tabs uses first item as parent, Course index might not.
-                    $data->tabsdata[] = (object)['sectionid' => $section->id, 'subtree' => [(object)['sectionid' => $section->id]]];
+                    $tabsdata[] = (object)['sectionid' => $section->id, 'subtree' => [(object)['sectionid' => $section->id]]];
                 } else if ($sectionextra->levelsan == 1) {
-                    end($data->tabsdata)->subtree[] = (object)['sectionid' => $section->id];
+                    end($tabsdata)->subtree[] = (object)['sectionid' => $section->id];
                 }
             }
         }
+
+        return $tabsdata;
+    }
+
+    /**
+     * Export this data so it can be used as state object in the course editor.
+     *
+     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @return stdClass data context for a mustache template
+     */
+    public function export_for_template(\renderer_base $output): stdClass {
+        $data = parent::export_for_template($output);
+
+        $data->tabsdata = $this->get_tabs_data();
 
         return $data;
     }
