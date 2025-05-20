@@ -174,15 +174,12 @@ export default class Component extends BaseComponent {
         if (newActiveTab0id != this.activetab[0]) {
             let anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]')?.parentElement;
             if (anchor) {
-                let section = this.reactive.get("section", this.activetab[0]);
                 anchor.classList.remove("active");
-                anchor.href = section.sectionurl;
             }
             this.activetab[0] = newActiveTab0id;
             anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]')?.parentElement;
             if (anchor) {
                 anchor.classList.add("active");
-                anchor.removeAttribute("href");
             }
             // Change the second-level add tab, if necessary.
             if (newActiveTab1id) {
@@ -197,15 +194,12 @@ export default class Component extends BaseComponent {
             let anchor = this.element.querySelector('ul:nth-of-type(2) div[data-itemid="' + this.activetab[1] + '"]')
                             ?.parentElement;
             if (anchor) {
-                let section = this.reactive.get("section", this.activetab[1]);
                 anchor.classList.remove("active");
-                anchor.href = section.sectionurl;
             }
             this.activetab[1] = newActiveTab1id;
             anchor = this.element.querySelector('ul:nth-of-type(2) div[data-itemid="' + this.activetab[1] + '"]')?.parentElement;
             if (anchor) {
                 anchor.classList.add("active");
-                anchor.removeAttribute("href");
             }
         }
         this.activetab[1] = newActiveTab1id;

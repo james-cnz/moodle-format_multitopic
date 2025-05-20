@@ -101,7 +101,9 @@ class tabtreecontainer implements named_templatable, renderable {
                      $level++) {
 
                     // Make tab.
-                    $newtab = new \tabobject("tab_id_{$thissection->id}_l{$level}", $url,
+                    $newtab = new tab(
+                        "tab_id_{$thissection->id}_l{$level}",
+                        $url,
                         \html_writer::tag('div', $sectionname, ['class' =>
                             'tab_content'
                             . ($thissectionextra->currentnestedlevel >= $level ? ' marker' : '')
@@ -109,7 +111,9 @@ class tabtreecontainer implements named_templatable, renderable {
                                || $level > $thissectionextra->pagedepthdirect ? ' dimmed' : ''),
                             'data-itemid' => $thissection->id,
                         ]),
-                        $sectionname);
+                        $sectionname,
+                        true
+                    );
                     $newtab->level = $level - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
 
                     if ($thissection->id == $displaysectionextra->id) {
@@ -166,10 +170,12 @@ class tabtreecontainer implements named_templatable, renderable {
                     $url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
                     $attrs = !$canaddmore ? ['class' => 'dimmed_text cantadd'] : null;
                     $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle', $attrs);
-                    $newtab = new \tabobject("tab_id_{$sectionextraatlevel[$level - 1]->id}_l{($level - 1)}_add",
+                    $newtab = new tab(
+                        "tab_id_{$sectionextraatlevel[$level - 1]->id}_l{$level}_add",
                         $url,
                         $icon,
-                        s($straddsection));
+                        s($straddsection)
+                    );
 
                     // Add "add" tab.
                     if ($level <= FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1) {
@@ -199,24 +205,7 @@ class tabtreecontainer implements named_templatable, renderable {
      * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): stdClass {
-
-        $tabseft = (new \tabtree(...$this->get_tabs_data_etc($output)))->export_for_template($output);
-        foreach ($tabseft->tabs as $tabeft) {
-            if (preg_match('/^tab_id_(\d+)_l(\d+)$/', $tabeft->id, $matches)) {
-                $tabeft->sectionid = $matches[1];
-                $tabeft->level = $matches[2];
-            }
-        }
-        if ($tabseft->secondrow) {
-            foreach ($tabseft->secondrow->tabs as $tabeft) {
-                if (preg_match('/^tab_id_(\d+)_l(\d+)$/', $tabeft->id, $matches)) {
-                    $tabeft->sectionid = $matches[1];
-                    $tabeft->level = $matches[2];
-                }
-            }
-        }
-
-        return $tabseft;
+        return (new \tabtree(...$this->get_tabs_data_etc($output)))->export_for_template($output);
     }
 
 }
