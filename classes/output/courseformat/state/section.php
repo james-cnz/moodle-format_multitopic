@@ -58,6 +58,7 @@ class section extends base_section {
         $course = $format->get_course();
         $section = $this->section;
         $sectionextra = $this->fmtsectionextra;
+        $data->shorttitle = $format->get_section_short_name($section);
         $data->sectionurl = course_get_url($course, $section)->out(false);
         $data->levelsan = $sectionextra->levelsan;
         $data->fmtispage = ($sectionextra->levelsan < 2);

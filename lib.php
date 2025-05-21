@@ -456,6 +456,48 @@ class format_multitopic extends core_courseformat\base {
     }
 
     /**
+     * Returns the short display name of the given section that the course prefers.
+     *
+     * Use section name is specified by user. Otherwise use default.
+     *
+     * @param int|stdClass|\section_info $section Section object from database.
+     * @return string Display name that the course format prefers, e.g. "Section 2"
+     */
+    public function get_section_short_name($section): string {
+
+        // ADDED.
+        if (!is_object($section)) {
+            $section = $this->get_section($section);
+        }
+        $sectionextra = $this->fmt_get_section_extra($section);
+
+        $weeksabbr = get_string_manager()->string_exists('weeks_abbreviation', 'format_multitopic') ?
+            get_string('weeks_abbreviation', 'format_multitopic') : get_string('week');
+        // Figure out the string for the week number.
+        $weekstring = '';
+        if ($sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend)) {
+            $datestart = format_multitopic_week_date($sectionextra->datestart + 12 * 60 * 60);
+            $dateend = format_multitopic_week_date($sectionextra->dateend - 12 * 60 * 60);
+            if (($datestart->o == $dateend->o) && ($datestart->W == $dateend->W)) {
+                // Within one week.
+                $weekstring = $weeksabbr . $datestart->W;
+            } else {
+                // Spans weeks.
+                $weekstring = $weeksabbr . $datestart->W . '–' . $dateend->W;
+            }
+            $weekstring = '<span class="section-title-prefix">' . $weekstring . ': ' . '</span>';
+        }
+        // END ADDED.
+
+        if ((string)$section->name !== '') {
+            return $weekstring . format_string($section->name, true,
+                    ['context' => context_course::instance($this->courseid)]);  // CHANGED.
+        } else {
+            return $weekstring . $this->get_default_section_name($section);
+        }
+    }
+
+    /**
      * Returns the default section name for the Multitopic course format.
      *
      * If the section number is 0, it will use the string with key = section0name from the course format's lang file.

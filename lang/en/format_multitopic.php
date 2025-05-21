@@ -81,6 +81,7 @@ $string['sectionname'] = 'Section';
 
 $string['sectionoutline'] = 'Section outline';
 
+$string['weeks_abbreviation'] = 'W';
 $string['weeks_capitalised'] = 'Weeks';
 $string['weeks_mindays'] = 'First week minimum days of year';
 $string['weeks_mindays_desc'] = 'The first week of the year contains a minimum of how many days of the year?';
