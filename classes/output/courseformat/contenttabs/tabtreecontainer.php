@@ -168,8 +168,7 @@ class tabtreecontainer implements named_templatable, renderable {
                             "&sectionid={$format->get_sectionid()}" : "")),
                     ];
                     $url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
-                    $attrs = !$canaddmore ? ['class' => 'dimmed_text cantadd'] : null;
-                    $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle', $attrs);
+                    $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle');
                     $newtab = new tab(
                         "tab_id_{$sectionextraatlevel[$level - 1]->id}_l{$level}_add",
                         $url,
@@ -184,6 +183,11 @@ class tabtreecontainer implements named_templatable, renderable {
                         $tabln[$level - 1]->subtree[] = $newtab;
                     }
                     $tabln[$level] = null;
+
+                    // Disable "add" tab if can't add more sections.
+                    if (!$canaddmore) {
+                        $inactivetabs[] = "tab_id_{$sectionextraatlevel[$level - 1]->id}_l{$level}_add";
+                    }
 
                 }
 

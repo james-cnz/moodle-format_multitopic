@@ -121,9 +121,9 @@ export default class Component extends BaseComponent {
             let data = {
                 "level": 1,
                 "active": false,
-                "inactive": false,
+                "inactive": addTab0Dom.querySelector('a').classList.contains("disabled"),
                 "link": [{
-                    "link": addTab0Dom.querySelector('a').getAttribute('href').replace(/\binsertlevel=0\b/, 'insertlevel=1'),
+                    "link": addTab0Dom.querySelector('a').getAttribute('href')?.replace(/\binsertlevel=0\b/, 'insertlevel=1'),
                 }],
                 "title": addTab0Dom.getAttribute('title'),
                 "text": '<i class="icon fa fa-plus fa-fw" title="' + addTab0Dom.getAttribute('title') + '"></i>',
@@ -184,7 +184,7 @@ export default class Component extends BaseComponent {
             // Change the second-level add tab, if necessary.
             if (newActiveTab1id) {
                 const addAnchor = this.element.querySelector('ul:nth-of-type(2) li:last-of-type a');
-                const addLink = addAnchor.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + this.activetab[0]);
+                const addLink = addAnchor.href?.replace(/\binsertparentid=\d+\b/, "insertparentid=" + this.activetab[0]);
                 addAnchor.setAttribute("href", addLink);
             }
         }
