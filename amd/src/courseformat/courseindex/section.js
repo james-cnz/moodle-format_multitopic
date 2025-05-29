@@ -44,6 +44,19 @@ export default class Component extends ComponentBase {
     }
 
     /**
+     * Update a course index section using the state information.
+     *
+     * @param {Object} param details the update details.
+     * @param {Object} param.element the section element
+     */
+    _refreshSection(param) {
+        super._refreshSection(param);
+        const element = param.element;
+        // Update title.
+        this.getElement(this.selectors.SECTION_TITLE).innerHTML = element.shorttitle;
+    }
+
+    /**
      * Validate if the drop data can be dropped over the component.
      *
      * @param {Object} dropdata the exported drop data.
