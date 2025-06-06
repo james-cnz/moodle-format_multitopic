@@ -74,7 +74,7 @@ export default class Component extends BaseComponent {
     getWatchers() {
         return [
             // Sections sorting.
-            {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionTabs},
+            {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionList},
         ];
     }
 
@@ -84,7 +84,7 @@ export default class Component extends BaseComponent {
      * @param {object} param
      * @param {Object} param.element
      */
-    async _refreshCourseSectionTabs({element}) {
+    async _refreshCourseSectionList({element}) {
 
         const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
         let singleSectionId;
@@ -269,6 +269,40 @@ export default class Component extends BaseComponent {
     }
 
     /**
+     * Create a new section item.
+     *
+     * This method will append a new item in the container.
+     *
+     * @param {Element} container the container element (section)
+     * @param {Number} sectionid the course-module ID
+     * @param {int} level the tab level
+     * @param {boolean} hasothers
+     * @returns {Element} the created element
+     */
+    async _createSectionItem(container, sectionid, level, hasothers) {
+        const section = this.reactive.get("section", sectionid);
+        const visible = (section.visible && section.available || section.section == 0) && hasothers;
+        const current = (section.currentnestedlevel != undefined && section.currentnestedlevel >= level);
+        let data = {
+            "sectionid": section.id,
+            "level": level,
+            "active": 0,
+            "inactive": 0,
+            "link": [{
+                "link": section.sectionurl
+            }],
+            "title": section.name,
+            "text": '<div class="tab_content' + (visible ? '' : ' dimmed') + (current ? ' marker' : '')
+                + '" data-itemid="' + section.id + '">' + section.title + '</div>'
+        };
+        let newItem = document.createElement("li");
+        container.insertBefore(newItem, container.lastElementChild);
+        let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
+        newItem = Templates.replaceNode(newItem, html, "")[0];
+        return newItem;
+    }
+
+    /**
      * Fix/reorder the section or cms order.
      *
      * @param {Element} container the HTML element to reorder.
@@ -291,47 +325,8 @@ export default class Component extends BaseComponent {
 
         // Move the elements in order at the beginning of the list.
         for (const [index, itemid] of Object.entries(neworder)) {
-            const section = this.reactive.get("section", itemid);
-            const visible = (section.visible && section.available || section.section == 0)
-                && (neworder.length > 1 || hassubtree);
-            const current = (section.currentnestedlevel != undefined && section.currentnestedlevel >= level);
-            let item = this.getElement(selector, itemid);
-            if (item === null) {
-                // If we don't have an item, create it.
-                let data = {
-                    "sectionid": itemid,
-                    "level": level,
-                    "active": 0,
-                    "inactive": 0,
-                    "link": [{
-                        "link": section.sectionurl
-                    }],
-                    "title": section.name,
-                    "text": '<div class="tab_content' + (visible ? '' : ' dimmed') + (current ? ' marker' : '')
-                        + '" data-itemid="' + section.id + '">' + section.title + '</div>'
-                };
-                item = document.createElement("li");
-                container.insertBefore(item, container.lastElementChild);
-                let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
-                item = Templates.replaceNode(item, html, "")[0];
-            }
-
-            // Update visibility & current marker
-            const content = item.querySelector("div.tab_content");
-            if (content && content.classList.contains("dimmed") == visible) {
-                if (visible) {
-                    content.classList.remove("dimmed");
-                } else {
-                    content.classList.add("dimmed");
-                }
-            }
-            if (content && content.classList.contains("marker") != current) {
-                if (current) {
-                    content.classList.add("marker");
-                } else {
-                    content.classList.remove("marker");
-                }
-            }
+            let item = this.getElement(selector, itemid)
+                    ?? await this._createSectionItem(container, itemid, level, (neworder.length > 1) || hassubtree);
 
             // Get the current element at that position.
             const currentitem = container.children[index];

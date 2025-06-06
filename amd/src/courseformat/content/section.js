@@ -25,6 +25,7 @@
 
 import Header from 'format_multitopic/courseformat/content/section/header';
 import SectionBase from 'core_courseformat/local/content/section';
+import Templates from 'core/templates';
 
 export default class extends SectionBase {
 
@@ -81,6 +82,18 @@ export default class extends SectionBase {
             return origin.id != this.section.id && origin.levelsan >= 2;
         }
         return super.validateDropData(dropdata);
+    }
+
+    /**
+     * Update a section action menus.
+     *
+     * @param {object} section the section state.
+     */
+    async _updateActionsMenu(section) {
+        const menuDom = this.element.querySelector(".course-section-header .section_action_menu");
+        Templates.render("core_courseformat/local/content/section/controlmenu", section.controlmenu).done(function(html) {
+            Templates.replaceNode(menuDom, html, "");
+        });
     }
 
 }
