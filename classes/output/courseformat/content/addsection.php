@@ -51,7 +51,7 @@ class addsection extends addsection_base {
      * @param int $maxsections the maximum number of sections
      * @return \stdClass data context for a mustache template
      */
-    protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections): \stdClass {
+    protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections = 0): \stdClass {
         $format = $this->format;
         $course = $format->get_course();
         $data = parent::get_add_section_data($output, $lastsection, $maxsections);
