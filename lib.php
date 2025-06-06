@@ -123,6 +123,8 @@ class format_multitopic extends core_courseformat\base {
 
     /**
      * Method used to get the maximum number of sections for this course format.
+     *
+     * @deprecated since Moodle 5.1
      * @return int
      */
     public function get_max_sections(): int {
