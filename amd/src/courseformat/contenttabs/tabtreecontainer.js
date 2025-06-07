@@ -117,6 +117,8 @@ export default class Component extends BaseComponent {
             );
             tabsSecondRowDom.className = 'nav nav-tabs mb-3';
             // Create add tab.
+            const item = document.createElement("li");
+            tabsSecondRowDom.insertAdjacentElement('beforeend', item);
             const addTab0Dom = this.element.querySelector('ul:first-of-type li:last-of-type');
             let data = {
                 "level": 1,
@@ -128,10 +130,9 @@ export default class Component extends BaseComponent {
                 "title": addTab0Dom.getAttribute('title'),
                 "text": '<i class="icon fa fa-plus fa-fw" title="' + addTab0Dom.getAttribute('title') + '"></i>',
             };
-            let item = document.createElement("li");
-            tabsSecondRowDom.insertAdjacentElement('beforeend', item);
-            let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
-            item = Templates.replaceNode(item, html, "")[0];
+            Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html) {
+                Templates.replaceNode(item, html, "");
+            });
         } else if (tabsSecondRowDom && !tabsSecondRowShow) {
             tabsSecondRowDom.remove();
         }
@@ -279,10 +280,14 @@ export default class Component extends BaseComponent {
      * @param {boolean} hasothers
      * @returns {Element} the created element
      */
-    async _createSectionItem(container, sectionid, level, hasothers) {
+    _createSectionItem(container, sectionid, level, hasothers) {
         const section = this.reactive.get("section", sectionid);
-        const visible = (section.visible && section.available || section.section == 0) && hasothers;
-        const current = (section.currentnestedlevel != undefined && section.currentnestedlevel >= level);
+        const newItem = document.createElement("li");
+        newItem.dataset.id = sectionid;
+        newItem.classList.add("tab_level_" + level);
+        container.insertBefore(newItem, container.lastElementChild);
+        const visible = (section.visible && section.available || (section.section == 0)) && hasothers;
+        const current = (section.currentnestedlevel != undefined) && (section.currentnestedlevel >= level);
         let data = {
             "sectionid": section.id,
             "level": level,
@@ -295,10 +300,9 @@ export default class Component extends BaseComponent {
             "text": '<div class="tab_content' + (visible ? '' : ' dimmed') + (current ? ' marker' : '')
                 + '" data-itemid="' + section.id + '">' + section.title + '</div>'
         };
-        let newItem = document.createElement("li");
-        container.insertBefore(newItem, container.lastElementChild);
-        let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
-        newItem = Templates.replaceNode(newItem, html, "")[0];
+        Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html) {
+            Templates.replaceNode(newItem, html, "");
+        });
         return newItem;
     }
 
@@ -326,7 +330,13 @@ export default class Component extends BaseComponent {
         // Move the elements in order at the beginning of the list.
         for (const [index, itemid] of Object.entries(neworder)) {
             let item = this.getElement(selector, itemid)
-                    ?? await this._createSectionItem(container, itemid, level, (neworder.length > 1) || hassubtree);
+                    ?? this._createSectionItem(container, itemid, level, (neworder.length > 1) || hassubtree);
+
+            // Update visibility.
+            const section = this.reactive.get("section", itemid);
+            const visible = (section.visible && section.available || (section.section == 0))
+                    && ((neworder.length > 1) || hassubtree);
+            item.querySelector("div.tab_content")?.classList.toggle("dimmed", !visible);
 
             // Get the current element at that position.
             const currentitem = container.children[index];
