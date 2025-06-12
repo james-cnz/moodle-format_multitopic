@@ -132,7 +132,7 @@ export default class Component extends BaseComponent {
             };
             Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html) {
                 Templates.replaceNode(item, html, "");
-            });
+            }).catch();
         } else if (tabsSecondRowDom && !tabsSecondRowShow) {
             tabsSecondRowDom.remove();
         }
@@ -302,7 +302,7 @@ export default class Component extends BaseComponent {
         };
         Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html) {
             Templates.replaceNode(newItem, html, "");
-        });
+        }).catch();
         return newItem;
     }
 

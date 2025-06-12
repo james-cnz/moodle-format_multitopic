@@ -93,7 +93,7 @@ export default class extends SectionBase {
         const menuDom = this.element.querySelector(".course-section-header .section_action_menu");
         Templates.render("core_courseformat/local/content/section/controlmenu", section.controlmenu).then(function(html) {
             Templates.replaceNode(menuDom, html, "");
-        });
+        }).catch();
     }
 
 }
