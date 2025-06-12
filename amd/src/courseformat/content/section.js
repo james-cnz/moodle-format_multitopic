@@ -26,6 +26,7 @@
 import Header from 'format_multitopic/courseformat/content/section/header';
 import SectionBase from 'core_courseformat/local/content/section';
 import Templates from 'core/templates';
+import Notification from 'core/notification';
 
 export default class extends SectionBase {
 
@@ -94,7 +95,7 @@ export default class extends SectionBase {
         Templates.render("core_courseformat/local/content/section/controlmenu", section.controlmenu).then(function(html, js) {
             Templates.replaceNode(menuDom, html, js);
             return;
-        });
+        }).catch(Notification.exception);
     }
 
 }

@@ -17,6 +17,7 @@ import {BaseComponent} from 'core/reactive';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import Tab from 'format_multitopic/courseformat/contenttabs/tab';
 import Templates from 'core/templates';
+import Notification from 'core/notification';
 
 
 /**
@@ -133,7 +134,7 @@ export default class Component extends BaseComponent {
             Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html, js) {
                 Templates.replaceNode(item, html, js);
                 return;
-            });
+            }).catch(Notification.exception);
         } else if (tabsSecondRowDom && !tabsSecondRowShow) {
             tabsSecondRowDom.remove();
         }
@@ -304,7 +305,7 @@ export default class Component extends BaseComponent {
         Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html, js) {
             Templates.replaceNode(newItem, html, js);
             return;
-        });
+        }).catch(Notification.exception);
         return newItem;
     }
 
