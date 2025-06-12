@@ -341,14 +341,3 @@ Feature: Course index depending on role (Multitopic format)
     And I should see "Test label 2" in the "courseindex-content" "region"
 
   # REMOVED Scenario: Change the section name inline in section page
-
-  @javascript
-  Scenario: We cannot add a section when the number of section reaches maxsections but as soon as we reach under the limit we can add a section again.
-    Given the following config values are set as admin:
-      | maxsections | 4 | moodlecourse|
-    And I log in as "teacher1"
-    And I am on "Course 1" course homepage with editing mode on
-    Then I should see "Section 1" in the "courseindex-content" "region"
-    # REMOVED add section divider disabled.  TODO: Restore when we support this.
-    And I should see "You have reached the maximum number of sections allowed for a course."
-    # REMOVED deleting a section re-enables add section button.  TODO: Restore when we support this.

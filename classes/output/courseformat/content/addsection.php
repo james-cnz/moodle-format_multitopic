@@ -48,10 +48,10 @@ class addsection extends addsection_base {
      *
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @param int $lastsection the last section number
-     * @param int $maxsections the maximum number of sections
+     * @param int $maxsections the maximum number of sections (deprecated since Moodle 5.1)
      * @return \stdClass data context for a mustache template
      */
-    protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections): \stdClass {
+    protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections = 0): \stdClass {
         $format = $this->format;
         $course = $format->get_course();
         $data = parent::get_add_section_data($output, $lastsection, $maxsections);
