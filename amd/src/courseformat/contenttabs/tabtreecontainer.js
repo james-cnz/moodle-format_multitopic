@@ -130,9 +130,10 @@ export default class Component extends BaseComponent {
                 "title": addTab0Dom.getAttribute('title'),
                 "text": '<i class="icon fa fa-plus fa-fw" title="' + addTab0Dom.getAttribute('title') + '"></i>',
             };
-            Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html) {
-                Templates.replaceNode(item, html, "");
-            }).catch();
+            Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html, js) {
+                Templates.replaceNode(item, html, js);
+                return;
+            });
         } else if (tabsSecondRowDom && !tabsSecondRowShow) {
             tabsSecondRowDom.remove();
         }
@@ -300,9 +301,10 @@ export default class Component extends BaseComponent {
             "text": '<div class="tab_content' + (visible ? '' : ' dimmed') + (current ? ' marker' : '')
                 + '" data-itemid="' + section.id + '">' + section.title + '</div>'
         };
-        Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html) {
-            Templates.replaceNode(newItem, html, "");
-        }).catch();
+        Templates.render("format_multitopic/courseformat/contenttabs/tab", data).then(function(html, js) {
+            Templates.replaceNode(newItem, html, js);
+            return;
+        });
         return newItem;
     }
 
