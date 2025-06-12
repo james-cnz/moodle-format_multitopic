@@ -124,6 +124,7 @@ class content extends content_base {
             'sections' => $sectionseft,
             'format' => $format->get_format(),
             'originalsinglesectionid' => $format->originalsinglesectionid,
+            'fmthavemaxsections' => ($CFG->version < 2025060500),
         ];
 
         // REMOVED navigation.

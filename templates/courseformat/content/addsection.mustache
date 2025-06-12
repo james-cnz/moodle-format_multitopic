@@ -43,6 +43,7 @@
             {{#pix}} t/add, core {{/pix}}
             {{title}}
         </a>
+        {{#fmthavemaxsections}}
         <div class="{{#canaddsection}}d-none{{/canaddsection}} p-3 max-section-alert" data-region="max-sections-warning">
             <div class="w-100 text-center">
                 {{#pix}}t/block, moodle{{/pix}}
@@ -51,6 +52,7 @@
                 {{#str}}maxsectionaddmessage, core_courseformat{{/str}}
             </div>
         </div>
+        {{/fmthavemaxsections}}
     {{/addsections}}
 </div>
 {{/showaddsection}}
