@@ -68,6 +68,10 @@ function format_multitopic_course_create_section(\stdClass $courseorid, \stdClas
     }
     $cw->timemodified = time();
     $cw->id = $DB->insert_record("course_sections", $cw);
+    $DB->insert_record(
+        "course_format_options",
+        ['courseid' => $cw->course, 'format' => 'multitopic', 'sectionid' => $cw->id, 'name' => 'level', 'value' => 0]
+    );
 
     // Now move it to the specified position.
     if (true) {                                                                 // CHANGED: We've already checked the parent exists.

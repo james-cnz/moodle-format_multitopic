@@ -122,6 +122,18 @@ class format_multitopic extends core_courseformat\base {
     // END INCLUDED.
 
     /**
+     * Method used to get the maximum number of sections for this course format.
+     *
+     * @deprecated since Moodle 5.1
+     * @todo remove in Multitopic 6.0.
+     * @return int
+     */
+    public function get_max_sections(): int {
+        global $CFG;
+        return ($CFG->version >= 2025060500) ? PHP_INT_MAX : parent::get_max_sections();
+    }
+
+    /**
      * Generate the title for this section page.
      *
      * @return string the page title
