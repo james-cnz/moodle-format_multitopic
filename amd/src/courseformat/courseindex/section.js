@@ -52,8 +52,20 @@ export default class Component extends ComponentBase {
     _refreshSection(param) {
         super._refreshSection(param);
         const element = param.element;
+        // Update URL.
+        this.element.querySelector(":scope > .courseindex-item a.courseindex-link").href = element.sectionurl;
+        if (element.component) {
+            return;
+        }
         // Update title.
         this.getElement(this.selectors.SECTION_TITLE).innerHTML = element.shorttitle;
+        // Update indentation.
+        if (this.element.dataset.indent != element.indent) {
+            this.element.querySelector(":scope > .courseindex-item").style = "padding-left: " + element.indent + "em;";
+            this.element.querySelector(":scope > .courseindex-item-content > .courseindex-sectioncontent")
+                    .style = "padding-left: " + element.indent + "em;";
+            this.element.dataset.indent = element.indent;
+        }
     }
 
     /**

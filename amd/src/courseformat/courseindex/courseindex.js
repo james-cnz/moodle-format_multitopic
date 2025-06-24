@@ -84,35 +84,6 @@ export default class Component extends BaseComponent {
         for (let container of containers) {
             this._fixOrder(container.container, container.order, this.sections);
         }
-
-        // Update indentation and URLs.
-        for (let sectionid of element.sectionlist) {
-            const section = this.reactive.get("section", sectionid);
-            const sectionDom = this.sections[sectionid];
-            const linkDom = sectionDom.querySelector(":scope > .courseindex-item a.courseindex-link");
-            if (linkDom) {
-                const link = section.sectionurl;
-                if (linkDom.href != link) {
-                    linkDom.href = link;
-                }
-            }
-            if (section.component) {
-                continue;
-            }
-            if (sectionDom.dataset?.indent != section.indent) {
-                const sectiontitledom = sectionDom.querySelector(":scope > .courseindex-item");
-                if (sectiontitledom) {
-                    sectiontitledom.style = "padding-left: " + section.indent + "em;";
-                }
-                const sectioncontentdom = sectionDom.querySelector(
-                    ":scope > .courseindex-item-content > .courseindex-sectioncontent"
-                );
-                if (sectioncontentdom) {
-                    sectioncontentdom.style = "padding-left: " + section.indent + "em;";
-                }
-                sectionDom.dataset.indent = section.indent;
-            }
-        }
     }
 
     /**
