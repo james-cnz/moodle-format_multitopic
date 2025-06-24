@@ -28,7 +28,6 @@ import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
 import CmItem from 'format_multitopic/courseformat/content/section/cmitem';
-import Templates from 'core/templates';
 
 export default class Component extends BaseComponent {
 
@@ -271,41 +270,16 @@ export default class Component extends BaseComponent {
             if (!section || section.component) {
                 continue;
             }
-            let refreshCms = false;
             const fmtonpageNew = (section.pageid == singleSectionId) ? "1" : "0";
             if (sectionDom.dataset.fmtonpage != fmtonpageNew) {
                 sectionDom.dataset.fmtonpage = fmtonpageNew;
                 sectionDom.style.display = (fmtonpageNew == "1") ? "block" : "none";
                 if (fmtonpageNew == "1") {
-                    refreshCms = true;
+                    this._refreshSectionCmlist({element: section});
                 }
             }
-            if (section.visible == sectionDom.classList.contains("hidden")) {
-                const badgeDom = sectionDom.querySelector("span.badge[data-type='hiddenfromstudents']");
-                if (section.visible) {
-                    sectionDom.classList.remove("hidden");
-                    if (badgeDom) {
-                        badgeDom.classList.add("d-none");
-                    }
-                } else {
-                    sectionDom.classList.add("hidden");
-                    if (badgeDom) {
-                        badgeDom.classList.remove("d-none");
-                    }
-                }
-                if (sectionDom.dataset.fmtonpage == "1") {
-                    refreshCms = true;
-                }
-            }
-            if (refreshCms) {
-                // Note: Visibility state doesn't get updated for CMs already rendered.
-                this._refreshSectionCmlist({element: section});
-            }
-            const menuDom = sectionDom.querySelector(".course-section-header .section_action_menu");
-            Templates.render("core_courseformat/local/content/section/controlmenu", section.controlmenu).done(function(html) {
-                Templates.replaceNode(menuDom, html, "");
-            });
         }
+
         this._refreshAllSectionsToggler(this.reactive.stateManager.state);
 
         // Update Add section button.

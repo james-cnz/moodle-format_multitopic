@@ -146,6 +146,11 @@ export default class extends DndSection {
         // Update classes.
         this.element.classList.toggle(this.classes.DRAGGING, element.dragging ?? false);
         this.element.classList.toggle(this.classes.LOCKED, element.locked ?? false);
+        const level = this.element.className.match(/\btab_level_(\d+)\b/)[1];
+        const visible = (element.visible && element.available || (element.section == 0)) && (level <= element.pagedepthdirect);
+        this.element.querySelector("div.tab_content").classList.toggle("dimmed", !visible);
+        const current = (element.currentnestedlevel != undefined) && (element.currentnestedlevel >= level);
+        this.element.querySelector("div.tab_content").classList.toggle("marker", current);
         this.locked = element.locked;
         // Update title.
         this.getElement("div.tab_content").innerHTML = element.title;

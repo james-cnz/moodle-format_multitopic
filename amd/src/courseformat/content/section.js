@@ -25,6 +25,7 @@
 
 import Header from 'format_multitopic/courseformat/content/section/header';
 import SectionBase from 'core_courseformat/local/content/section';
+import Templates from 'core/templates';
 
 export default class extends SectionBase {
 
@@ -62,6 +63,7 @@ export default class extends SectionBase {
         } else {
             singleSectionId = null;
         }
+
         const fmtonpageNew = (this.section.pageid == singleSectionId) ? "1" : "0";
         if (this.element.dataset.fmtonpage != fmtonpageNew) {
             this.element.dataset.fmtonpage = fmtonpageNew;
@@ -81,6 +83,21 @@ export default class extends SectionBase {
             return origin.id != this.section.id && origin.levelsan >= 2;
         }
         return super.validateDropData(dropdata);
+    }
+
+    /**
+     * Update a section action menus.
+     *
+     * @param {object} section the section state.
+     */
+    async _updateActionsMenu(section) {
+        if (section.component) {
+            await super._updateActionsMenu(section);
+            return;
+        }
+        const menuDom = this.element.querySelector(".course-section-header .section_action_menu");
+        const {html} = await Templates.renderForPromise("core_courseformat/local/content/section/controlmenu", section.controlmenu);
+        Templates.replaceNode(menuDom, html, "");
     }
 
 }

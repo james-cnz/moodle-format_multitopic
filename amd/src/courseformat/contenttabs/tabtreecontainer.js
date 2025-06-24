@@ -65,7 +65,6 @@ export default class Component extends BaseComponent {
 
     /**
      * Initial state ready method.
-     *
      */
     stateReady() {
         this._indexContents();
@@ -74,8 +73,24 @@ export default class Component extends BaseComponent {
     getWatchers() {
         return [
             // Sections sorting.
-            {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionTabs},
+            {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionlist},
         ];
+    }
+
+    /**
+     * Get the main DOM element of this component or a subelement.
+     *
+     * @param {string|undefined} query optional subelement query
+     * @param {string|undefined} dataId optional data-id value
+     * @returns {element|undefined} the DOM element (if any)
+     */
+    getElement(query, dataId) {
+        if (dataId.match(/^add\d*$/)) {
+            const dataSelector = `:not([data-id])`;
+            const selector = `${query ?? ''}${dataSelector}`;
+            return this.element.querySelector(selector);
+        }
+        return super.getElement(query, dataId);
     }
 
     /**
@@ -84,7 +99,7 @@ export default class Component extends BaseComponent {
      * @param {object} param
      * @param {Object} param.element
      */
-    async _refreshCourseSectionTabs({element}) {
+    async _refreshCourseSectionlist({element}) {
 
         const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
         let singleSectionId;
@@ -98,112 +113,98 @@ export default class Component extends BaseComponent {
             singleSection = null;
         }
 
-        let newActiveTab0id;
+        let newActiveTab = [null, null];
         if (singleSection) {
-            newActiveTab0id = (singleSection.levelsan >= 1) ? singleSection.parentid : singleSection.id;
-        } else {
-            newActiveTab0id = null;
+            newActiveTab[1] = singleSection.id;
+            newActiveTab[0] = (singleSection.levelsan >= 1) ? singleSection.parentid : singleSection.id;
         }
 
-        // Add/remove the second-level tabs, if necessary.
+        const tabsrow = this._getTabRows(element, newActiveTab);
+
+        if (!tabsrow[1].length) {
+            newActiveTab[1] = null;
+        }
+
+        // Remove second-level tabs, if necessary.
         let tabsSecondRowDom = this.element.querySelector('ul:nth-of-type(2)');
-        const tabsSecondRowShow = singleSection
-                            && ((element.tabsdata.length > 1)
-                                || (element.tabsdata[0].subtree.length > 1));
-        if (tabsSecondRowShow && !tabsSecondRowDom) {
-            // Create tab row.
-            this.element.querySelector('ul:first-of-type').insertAdjacentElement(
-                'afterend', tabsSecondRowDom = document.createElement('ul')
-            );
-            tabsSecondRowDom.className = 'nav nav-tabs mb-3';
-            // Create add tab.
-            const addTab0Dom = this.element.querySelector('ul:first-of-type li:last-of-type');
-            let data = {
-                "level": 1,
-                "active": false,
-                "inactive": addTab0Dom.querySelector('a').classList.contains("disabled"),
-                "link": [{
-                    "link": addTab0Dom.querySelector('a').getAttribute('href')?.replace(/\binsertlevel=0\b/, 'insertlevel=1'),
-                }],
-                "title": addTab0Dom.getAttribute('title'),
-                "text": '<i class="icon fa fa-plus fa-fw" title="' + addTab0Dom.getAttribute('title') + '"></i>',
-            };
-            let item = document.createElement("li");
-            tabsSecondRowDom.insertAdjacentElement('beforeend', item);
-            let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
-            item = Templates.replaceNode(item, html, "")[0];
-        } else if (tabsSecondRowDom && !tabsSecondRowShow) {
+        if (tabsSecondRowDom && (!tabsrow[1].length || (newActiveTab[0] != this.activetab[0]))) {
             tabsSecondRowDom.remove();
+            tabsSecondRowDom = null;
+            this.activetab[1] = null;
         }
 
-        let toptabslist = [];
-        let childtabslist = [];
-        for (let tabdata of element.tabsdata) {
-            toptabslist.push(tabdata.sectionid);
-            if (tabdata.sectionid == newActiveTab0id) {
-                for (let tabdata2 of tabdata.subtree) {
-                    childtabslist.push(tabdata2.sectionid);
+        // Update the tabs.
+        for (let level = 0; level < 2; level++) {
+            if (tabsrow[level].length) {
+                let tabsDom = this.element.querySelector('ul:nth-of-type(' + (level + 1) + ')');
+                // Create tab row if necessary.
+                if (!tabsDom) {
+                    tabsDom = document.createElement('ul');
+                    this.element.append(tabsDom);
+                    tabsDom.className = 'nav nav-tabs mb-3';
+                }
+                // Unselect old tab.
+                if (this.activetab[level] && (newActiveTab[level] != this.activetab[level])) {
+                    tabsDom.querySelector('div[data-itemid="' + this.activetab[level] + '"]')
+                            ?.parentElement.classList.remove("active");
+                    this.activetab[level] = null;
+                }
+                // Update tabs order.
+                await this._fixOrder(tabsDom, tabsrow[level], level ? this.selectors.CHILDTAB : this.selectors.TAB, level);
+                // Select new tab.
+                if (newActiveTab[level]) {
+                    this.activetab[level] = newActiveTab[level];
+                    tabsDom.querySelector('div[data-itemid="' + this.activetab[level] + '"]')
+                            ?.parentElement.classList.add("active");
                 }
             }
+            this.activetab[level] = newActiveTab[level];
         }
-
-        // Do things that make the first row tabs match firstsectionlist.
-        let toptabs = this.element.querySelector('ul:first-of-type');
-        await this._fixOrder(toptabs, toptabslist, this.selectors.TAB, 0, element.tabsdata[0].subtree.length > 1);
-
-        // And the second row tabs match secondsectionlist.
-        if (tabsSecondRowShow) {
-            let childtabs = this.element.querySelector('ul:nth-of-type(2)');
-            await this._fixOrder(childtabs, childtabslist, this.selectors.CHILDTAB, 1, false);
-        }
-
-        this._changeActiveTabs(newActiveTab0id, tabsSecondRowShow ? singleSection.id : null);
 
         this._indexContents();
     }
 
     /**
-     * Change active tabs, if necessary.
+     * Get tab rows.
      *
-     * @param {int|null} newActiveTab0id
-     * @param {int|null} newActiveTab1id
+     * @param {Object} element
+     * @param {Array} newActiveTab
+     * @returns {Array}
      */
-    _changeActiveTabs(newActiveTab0id, newActiveTab1id) {
+    _getTabRows(element, newActiveTab) {
+        let tabsrow = [[], []];
+        let depthmax = -1;
+        let depthactive = -1;
 
-        // Change the active top-level tab, if necessary.
-        if (newActiveTab0id != this.activetab[0]) {
-            let anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]')?.parentElement;
-            if (anchor) {
-                anchor.classList.remove("active");
+        for (let sectionid of element.sectionlist) {
+            const section = this.reactive.get("section", sectionid);
+            if (section.component || (section.levelsan >= 2)) {
+                continue;
             }
-            this.activetab[0] = newActiveTab0id;
-            anchor = this.element.querySelector('ul:first-of-type div[data-itemid="' + this.activetab[0] + '"]')?.parentElement;
-            if (anchor) {
-                anchor.classList.add("active");
+            if ((section.levelsan < 0) || (section.id == newActiveTab[section.levelsan])) {
+                for (
+                    let level = section.levelsan;
+                    (level < 2) && ((level < 0) || (section.id == newActiveTab[level]));
+                    level++
+                ) {
+                    depthactive = level;
+                }
+            } else {
+                depthactive = Math.min(depthactive, section.levelsan - 1);
             }
-            // Change the second-level add tab, if necessary.
-            if (newActiveTab1id) {
-                const addAnchor = this.element.querySelector('ul:nth-of-type(2) li:last-of-type a');
-                const addLink = addAnchor.href?.replace(/\binsertparentid=\d+\b/, "insertparentid=" + this.activetab[0]);
-                addAnchor.setAttribute("href", addLink);
+            if ((section.levelsan >= 0) && (section.levelsan <= depthactive + 1)) {
+                tabsrow[section.levelsan].push(section.id);
+                depthmax = Math.max(depthmax, section.levelsan);
             }
         }
 
-        // Change the active second-level tab, if necessary.
-        if (newActiveTab1id && newActiveTab1id != this.activetab[1]) {
-            let anchor = this.element.querySelector('ul:nth-of-type(2) div[data-itemid="' + this.activetab[1] + '"]')
-                            ?.parentElement;
-            if (anchor) {
-                anchor.classList.remove("active");
-            }
-            this.activetab[1] = newActiveTab1id;
-            anchor = this.element.querySelector('ul:nth-of-type(2) div[data-itemid="' + this.activetab[1] + '"]')?.parentElement;
-            if (anchor) {
-                anchor.classList.add("active");
-            }
+        for (let level = 0; level <= Math.min(depthmax + 1, 1); level++) {
+            const parentid = (level == 0) ? element.sectionlist[0] : newActiveTab[level - 1];
+            tabsrow[level].unshift(parentid);
+            tabsrow[level].push("add" + parentid);
         }
-        this.activetab[1] = newActiveTab1id;
 
+        return tabsrow;
     }
 
     /**
@@ -269,15 +270,64 @@ export default class Component extends BaseComponent {
     }
 
     /**
+     * Create a new section item.
+     *
+     * This method will append a new item in the container.
+     *
+     * @param {Element} container the container element (section)
+     * @param {Number} sectionid the course-module ID
+     * @param {int} level the tab level
+     * @returns {Element} the created element
+     */
+    async _createSectionItem(container, sectionid, level) {
+        let data;
+        if (!isNaN(parseInt(sectionid))) {
+            const section = this.reactive.get("section", sectionid);
+            const visible = (section.visible && section.available || (section.section == 0)) && (level <= section.pagedepthdirect);
+            const current = (section.currentnestedlevel != undefined) && (section.currentnestedlevel >= level);
+            data = {
+                "sectionid": section.id,
+                "level": level,
+                "active": 0,
+                "inactive": 0,
+                "link": [{
+                    "link": section.sectionurl
+                }],
+                "title": section.name,
+                "text": '<div class="tab_content' + (visible ? '' : ' dimmed') + (current ? ' marker' : '')
+                    + '" data-itemid="' + section.id + '">' + section.title + '</div>'
+            };
+        } else {
+            const addTab0Dom = this.element.querySelector('ul:first-of-type li:last-of-type');
+            data = {
+                "level": level,
+                "active": false,
+                "inactive": addTab0Dom.querySelector('a').classList.contains("disabled"),
+                "link": [{
+                    "link": addTab0Dom.querySelector('a').getAttribute('href')
+                        ?.replace(/\binsertparentid=\d+\b/, "insertparentid=" + sectionid.match(/^add(\d+)$/)[1])
+                        .replace(/\binsertlevel=0\b/, 'insertlevel=' + level),
+                }],
+                "title": addTab0Dom.querySelector('a').getAttribute('title'),
+                "text": '<i class="icon fa fa-plus fa-fw" title="' + addTab0Dom.querySelector('a').getAttribute('title') + '"></i>',
+            };
+        }
+        let newItem = document.createElement("li");
+        container.append(newItem);
+        const {html} = await Templates.renderForPromise("format_multitopic/courseformat/contenttabs/tab", data);
+        newItem = Templates.replaceNode(newItem, html, "")[0];
+        return newItem;
+    }
+
+    /**
      * Fix/reorder the section or cms order.
      *
      * @param {Element} container the HTML element to reorder.
      * @param {Array} neworder an array with the ids order
      * @param {string} selector the element selector
      * @param {int} level the tab level
-     * @param {boolean} hassubtree
      */
-    async _fixOrder(container, neworder, selector, level, hassubtree) {
+    async _fixOrder(container, neworder, selector, level) {
 
         // Empty lists should not be visible.
         if (!neworder.length) {
@@ -291,47 +341,7 @@ export default class Component extends BaseComponent {
 
         // Move the elements in order at the beginning of the list.
         for (const [index, itemid] of Object.entries(neworder)) {
-            const section = this.reactive.get("section", itemid);
-            const visible = (section.visible && section.available || section.section == 0)
-                && (neworder.length > 1 || hassubtree);
-            const current = (section.currentnestedlevel != undefined && section.currentnestedlevel >= level);
-            let item = this.getElement(selector, itemid);
-            if (item === null) {
-                // If we don't have an item, create it.
-                let data = {
-                    "sectionid": itemid,
-                    "level": level,
-                    "active": 0,
-                    "inactive": 0,
-                    "link": [{
-                        "link": section.sectionurl
-                    }],
-                    "title": section.name,
-                    "text": '<div class="tab_content' + (visible ? '' : ' dimmed') + (current ? ' marker' : '')
-                        + '" data-itemid="' + section.id + '">' + section.title + '</div>'
-                };
-                item = document.createElement("li");
-                container.insertBefore(item, container.lastElementChild);
-                let html = await Templates.render("format_multitopic/courseformat/contenttabs/tab", data);
-                item = Templates.replaceNode(item, html, "")[0];
-            }
-
-            // Update visibility & current marker
-            const content = item.querySelector("div.tab_content");
-            if (content && content.classList.contains("dimmed") == visible) {
-                if (visible) {
-                    content.classList.remove("dimmed");
-                } else {
-                    content.classList.add("dimmed");
-                }
-            }
-            if (content && content.classList.contains("marker") != current) {
-                if (current) {
-                    content.classList.add("marker");
-                } else {
-                    content.classList.remove("marker");
-                }
-            }
+            let item = this.getElement(selector, itemid) ?? await this._createSectionItem(container, itemid, level);
 
             // Get the current element at that position.
             const currentitem = container.children[index];
@@ -343,10 +353,10 @@ export default class Component extends BaseComponent {
                 container.insertBefore(item, currentitem);
             }
         }
+
         // Remove the remaining elements.
-        // But we don't want the "Add" blown away.
-        while (container.children.length > neworder.length + 1) {
-                container.removeChild(container.lastElementChild.previousSibling);
+        while (container.children.length > neworder.length) {
+            container.removeChild(container.lastChild);
         }
 
     }
