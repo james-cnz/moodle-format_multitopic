@@ -312,7 +312,9 @@ class stateactions extends \core_courseformat\stateactions {
         if (count($delegatedids) > 0) {
             parent::set_section_visibility($updates, $course, $delegatedids, $visible);
         }
-        $this->section_state($updates, $course, $subids);
+        if (count($subids) > 0) {
+            $this->section_state($updates, $course, $subids);
+        }
     }
 
 }
