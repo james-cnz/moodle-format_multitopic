@@ -156,6 +156,17 @@ export default class Component extends BaseComponent {
         );
     }
 
+/**
+     * Return the component watchers.
+     *
+     * @returns {Array} of watchers
+     */
+    getWatchers() {
+        return super.getWatchers().concat([
+            {watch: `section.parentvisiblesan:updated`, handler: this._reloadSection},
+        ]);
+    }
+
     /**
      * Refresh the collapse/expand all sections element.
      *
