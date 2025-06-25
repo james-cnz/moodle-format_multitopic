@@ -299,10 +299,10 @@ class stateactions extends \core_courseformat\stateactions {
             }
             if (!$visible && $sectionextra->section || $visible && $sectionextra->parentvisiblesan) {
                 for ($subsectionextra = $sectionextra; /* ... */
-                        $subsectionextra && ($subsectionextra->id == $sectionextra->id
-                                            || $subsectionextra->levelsan > $sectionextra->levelsan); /* ... */
+                        $subsectionextra && (($subsectionextra->id == $sectionextra->id)
+                                            || ($subsectionextra->levelsan > $sectionextra->levelsan)); /* ... */
                         $subsectionextra = $subsectionextra->nextanyid ? $allsectionsextra[$subsectionextra->nextanyid] : null) {
-                    if ($subsectionextra->id == $sectionextra->id || !$visible) {
+                    if (($subsectionextra->id == $sectionextra->id) || !$visible) {
                         course_update_section($course, $subsectionextra->sectionbase, ['visible' => $visible]);
                     }
                     $subids[] = $subsectionextra->id;
