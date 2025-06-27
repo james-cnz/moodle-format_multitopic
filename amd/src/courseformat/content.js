@@ -157,6 +157,19 @@ export default class Component extends BaseComponent {
     }
 
     /**
+     * Return the component watchers.
+     *
+     * @returns {Array} of watchers
+     */
+    getWatchers() {
+        return super.getWatchers().concat([
+            {watch: `section.fmtispage:updated`, handler: this._reloadSection},
+            {watch: `section.collapsible:updated`, handler: this._reloadSection},
+            {watch: `section.subtitle:updated`, handler: this._refreshSectionNumber},
+        ]);
+    }
+
+    /**
      * Refresh the collapse/expand all sections element.
      *
      * @param {Object} state The state data
@@ -243,6 +256,7 @@ export default class Component extends BaseComponent {
                 }
             }
         }
+        target.querySelector(".section_subtitle").textContent = element.subtitle;
     }
 
     /**
