@@ -530,6 +530,35 @@ class format_multitopic extends core_courseformat\base {
         }
     }
 
+    // ADDED.
+    /**
+     * Returns the subtitle of the given section.
+     *
+     * @param int|stdClass|\section_info $section Section object from database.
+     * @return string
+     */
+    public function get_section_subtitle($section): string {
+        $sectionextra = $this->fmt_get_section_extra($section);
+
+        // Date range for the topic, to be placed under the title.
+        $datestring = '';
+        if (isset($sectionextra->dateend) && ($sectionextra->datestart < $sectionextra->dateend)) {
+
+            $dateformat = get_string('strftimedateshort');
+            $startday = userdate($sectionextra->datestart + 12 * 60 * 60, $dateformat);
+            $endday = userdate($sectionextra->dateend - 12 * 60 * 60, $dateformat);
+
+            if ($startday == $endday) {
+                $datestring = "({$startday})";
+            } else {
+                $datestring = "({$startday}–{$endday})";
+            }
+
+        }
+        return $datestring;
+    }
+    // END ADDED.
+
     /**
      * Set if the current format instance will show all pages or an individual one.
      *
