@@ -290,6 +290,7 @@ class stateactions extends \core_courseformat\stateactions {
         $allsectionsextra = $format->fmt_get_sections_extra();
 
         $delegatedids = [];
+        $subids = [];
         foreach ($ids as $sectionid) {
             $sectionextra = $allsectionsextra[$sectionid];
             if (!empty($sectionextra->sectionbase->component)) {
@@ -298,17 +299,22 @@ class stateactions extends \core_courseformat\stateactions {
             }
             if (!$visible && $sectionextra->section || $visible && $sectionextra->parentvisiblesan) {
                 for ($subsectionextra = $sectionextra; /* ... */
-                        $subsectionextra && ($subsectionextra->id == $sectionextra->id
-                                            || !$visible && $subsectionextra->levelsan > $sectionextra->levelsan); /* ... */
+                        $subsectionextra && (($subsectionextra->id == $sectionextra->id)
+                                            || ($subsectionextra->levelsan > $sectionextra->levelsan)); /* ... */
                         $subsectionextra = $subsectionextra->nextanyid ? $allsectionsextra[$subsectionextra->nextanyid] : null) {
-                    course_update_section($course, $subsectionextra->sectionbase, ['visible' => $visible]);
+                    if (($subsectionextra->id == $sectionextra->id) || !$visible) {
+                        course_update_section($course, $subsectionextra->sectionbase, ['visible' => $visible]);
+                    }
+                    $subids[] = $subsectionextra->id;
                 }
             }
         }
         if (count($delegatedids) > 0) {
             parent::set_section_visibility($updates, $course, $delegatedids, $visible);
         }
-        $this->section_state($updates, $course, $ids);
+        if (count($subids) > 0) {
+            $this->section_state($updates, $course, $subids);
+        }
     }
 
 }

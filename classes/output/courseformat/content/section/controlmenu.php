@@ -133,9 +133,6 @@ class controlmenu extends controlmenu_base {
 
         if ($link) {
             unset($link->attributes['data-sectionreturn']);
-            if ($this->fmtonsectionpage) {
-                unset($link->attributes['data-action']);
-            }
             if ($this->section->visible) {
                 $stateaction = 'section_hide';
             } else if (!$this->fmtsectionextra->parentvisiblesan) {
