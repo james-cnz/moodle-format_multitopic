@@ -87,31 +87,24 @@ class renderer extends section_renderer {
     public function render(\renderable $widget) {
         global $CFG;
         $fullpath = str_replace('\\', '/', get_class($widget));
-        $classparts = explode('/', $fullpath);
-        // Strip namespaces.
-        $classname = array_pop($classparts);
-        // Remove _renderable suffixes.
-        $classname = preg_replace('/_renderable$/', '', $classname);
 
-        $rendermethod = 'render_' . $classname;
-        if (method_exists($this, $rendermethod)) {
-            return $this->$rendermethod($widget);
-        }
         // Check for special course format templatables.
         if ($widget instanceof \templatable) {
-            // Templatables from both core_courseformat\output\xxx_format\* and format_xxx\output\xxx_format\*
-            // use core_crouseformat/local/xxx_format templates by default.
+            // Templatables from both core_courseformat\output\local\* and format_xxx\output\courseformat\*
+            // use format_multitopic/courseformat templates, if they exist.
             $corepath = 'core_courseformat\/output\/local';
-            $pluginpath = 'format_.+\/output\/courseformat';
-            $specialrenderers = '/^(?<componentpath>' /*. $corepath . '|'*/ . $pluginpath . ')\/(?<template>.+)$/'; // CHANGED.
+            $pluginpath = 'format_\w+\/output\/courseformat';
+            $specialrenderers = '/^(?<componentpath>' . $corepath . '|' . $pluginpath . ')\/(?<template>.+)$/';
             $matches = null;
 
-            if (preg_match($specialrenderers, $fullpath, $matches)) {
+            if (preg_match($specialrenderers, $fullpath, $matches)
+                && file_exists($CFG->dirroot . '/course/format/multitopic/templates/courseformat/' . $matches['template'])) {
                 $data = $widget->export_for_template($this);
                 return $this->render_from_template('format_multitopic/courseformat/' . $matches['template'], $data);    // CHANGED.
             }
         }
-        // If nothing works, let the parent class decide.
+
+        // If it doesn't work, let the parent class decide.
         return parent::render($widget);
     }
 
