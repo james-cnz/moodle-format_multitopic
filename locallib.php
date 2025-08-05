@@ -27,80 +27,15 @@
 
 
 /**
- * Creates a course section and adds it to the specified position
- *
- * @param stdClass $courseorid course id or course object
- * @param stdClass $section position to insert at.  Must specify parentid.  May specify level.
- * @return stdClass created section object.  Has database properties plus parentid and levelsan.
- */
-function format_multitopic_course_create_section(\stdClass $courseorid, \stdClass $section): \stdClass {
-    // CHANGED LINE ABOVE: Use section info, specifying parentid and level, instead of section number.
-    global $CFG, $DB;
-    $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
-
-    // ADDED: Require that the parent exists.
-    $parent = $DB->get_record('course_sections', ['id' => $section->parentid, 'course' => $courseid]);
-    if (!$parent) {
-        throw new \moodle_exception('sectionnotexist');
-    }
-    // END ADDED.
-
-    // Find the last sectionnum among existing sections.
-    if (false) {                                                                // CHANGED: Don't skip check.
-        $lastsection = $section->section - 1;                                   // CHANGED: Extract from section info.
-    } else {
-        $lastsection = (int)$DB->get_field_sql('SELECT max(section) from {course_sections} WHERE course = ?', [$courseid]);
-    }
-
-    // First add section to the end.
-    $cw = new \stdClass();
-    $cw->course = $courseid;
-    $cw->section = $lastsection + 1;
-    $cw->summary = '';
-    $cw->summaryformat = FORMAT_HTML;
-    $cw->sequence = '';
-    $cw->name = null;
-    $cw->visible = 1;
-    $cw->availability = null;
-    if ($CFG->version >= 2023122100.01) {
-        $cw->component = null;
-        $cw->itemid = null;
-    }
-    $cw->timemodified = time();
-    $cw->id = $DB->insert_record("course_sections", $cw);
-    $DB->insert_record(
-        "course_format_options",
-        ['courseid' => $cw->course, 'format' => 'multitopic', 'sectionid' => $cw->id, 'name' => 'level', 'value' => 0]
-    );
-
-    // Now move it to the specified position.
-    if (true) {                                                                 // CHANGED: We've already checked the parent exists.
-        $course = is_object($courseorid) ? $courseorid : get_course($courseorid);
-        rebuild_course_cache($courseid, true);                                  // ADDED.
-        format_multitopic_move_section_to($course, $cw, $section);              // CHANGED: Use section info instead of position.
-        // END CHANGED.
-        $cw->section = (int)$DB->get_field_sql('SELECT section from {course_sections} WHERE course = ? AND id = ?',
-                                                [$courseid, $cw->id]);          // CHANGED.
-        $cw->parentid = $section->parentid;                                     // ADDED.
-        $cw->levelsan = $section->level ?? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; // ADDED.
-    }
-
-    \core\event\course_section_created::create_from_section($cw)->trigger();
-
-    rebuild_course_cache($courseid, true);
-    return $cw;
-}
-
-
-/**
  * Moves sections within a course, from a position to another.
  *
  * @param \stdClass $course
  * @param \stdClass|\section_info|array $origins The section(s) to be moved.  Must specify id.
  * @param \stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
  * @param int $include 0 = regular only, 1 = also orphan, 2 = also delegated.
+ * @return object[]  objects containing section numbers for the moved section(s), indexed by id
  */
-function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClass $destination, int $include = 1): void {
+function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClass $destination, int $include = 1): array {
     // CHANGED LINE ABOVE: Use section info instead of number.  Removed $ignorenumsections param.  No return value (use exceptions).
     // Moves course sections within the course.
     // CHANGES THROUGHOUT: Use section info instead of number.
@@ -114,6 +49,7 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // REMOVED.
 
     // Get all sections for this course and re-order them.
+    rebuild_course_cache($course->id, true);
     if (!$sectionsextra = course_get_format($course)->fmt_get_sections_extra()) { // CHANGED.
         throw new \moodle_exception('cannotcreateorfindstructs');               // CHANGED.
     }
@@ -171,7 +107,23 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     }
     // END ADDED.
 
-    return;                                                                     // CHANGED.
+    // Provide new section numbers for moved sections.
+    $movedorigins = [];
+    foreach ($origins as $origin) {
+        if (isset($origin->id)) {
+            $originid = $origin->id;
+        } else {
+            foreach ($sectionsextra as $sectionextra) {
+                if ($sectionextra->section == $origin->section) {
+                    $originid = $sectionextra->id;
+                    break;
+                }
+            }
+        }
+        $movedorigins[$originid] = (object)['id' => $originid, 'section' => $movedsections[$originid]->section];
+    }
+
+    return $movedorigins;                                                       // CHANGED.
 }
 
 
@@ -283,6 +235,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
     $prevextra = null;
     $found = false;
     $appendextraarray = [];
+    $newposition = 0;
     foreach ($sectionsextra as $id => $sectionextra) {
         if ($found) {
             // Target position already found, extract remaining sections.
@@ -305,7 +258,8 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
         } else if (isset($parentextra)
                         && ($sectionextra->levelsan < $target->level || $sectionextra->levelsan <= $parentextra->levelsan)
                     || isset($prevextra) && ($sectionextra->levelsan <= $target->level)
-                    || isset($target->nextupid) && $sectionextra->id == $target->nextupid) {
+                    || isset($target->nextupid) && ($sectionextra->id == $target->nextupid)
+                    || isset($target->section) && ($newposition == $target->section)) {
             // Reached the last position in a specified parent in which the moved section would be a (direct) child,
             // or the appropriate position after a specified previous section,
             // or the position before a specified next section.
@@ -317,8 +271,11 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
             unset($sectionsextra[$id]);
             $found = true;
         }
+        $newposition++;
     }
-    if (isset($parentextra) || isset($prevextra)) {
+    if (isset($parentextra) || isset($prevextra)
+        || property_exists($target, 'nextupid') && ($target->nextupid == null)
+        || isset($target->section) && ($newposition == $target->section)) {
         // If a specified parent or previous was found, but no position within the section list was appropriate,
         // the appropriate position must be the end of the section list.
         $found = true;
