@@ -69,6 +69,32 @@ Feature: Sections can be edited and deleted in Multitopic format
   @javascript
   Scenario: Adding sections at the end of a Multitopic format
     Given I am on "Course 1" course homepage with editing mode on
-    When I follow "Add topic"
+    When I click on "Add topic" "link" in the "fmt-course-addsection" "region"
     Then I should see "Section 6" in the "Section 6" "section"
     And I should see "Test choice name" in the "Section 5" "section"
+
+  @javascript
+  Scenario: Adding topics between topics in Multitopic format
+    Given I am on "Course 1" course homepage with editing mode on
+    When I hover over the "Add topic" "link" in the "Section 4" "section"
+    When I click on "Add topic" "link" in the "Section 4" "section"
+    Then I should see "Section 6" in the "Section 6" "section"
+    And I should not see "Test choice name" in the "Section 5" "section"
+    And I should see "Test choice name" in the "Section 6" "section"
+
+  @javascript
+  Scenario: Add a topic and then add an activity in it
+    Given I am on "Course 1" course homepage with editing mode on
+    When I click on "Add topic" "link" in the "fmt-course-addsection" "region"
+    And I add an assign activity to course "Course 1" section "6" and I fill the form with:
+      | Assignment name | Very new activity |
+      | Description     | Test              |
+    Then I should see "Very new activity" in the "Section 6" "section"
+
+  @javascript
+  Scenario: Copy section permalink URL to clipboard
+    Given I am on "Course 1" course homepage with editing mode on
+    When I open section "1" edit menu
+    And I click on "Permalink" "link" in the "Section 1" "section"
+    And I click on "Copy to clipboard" "link" in the "Permalink" "dialogue"
+    Then I should see "Text copied to clipboard"

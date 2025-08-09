@@ -37,6 +37,7 @@ require_once($CFG->dirroot.'/course/lib.php');
 $courseid = required_param('courseid', PARAM_INT);
 $increase = optional_param('increase', null, PARAM_BOOL);
 $insertparentid = optional_param('insertparentid', null, PARAM_INT);            // CHANGED: Insert nested in section with ID.
+$insertprevupid = optional_param('insertprevupid', null, PARAM_INT);
 $insertlevel = optional_param('insertlevel', null, PARAM_INT);                  // ADDED: Level for inserted section.
 $numsections = optional_param('numsections', 1, PARAM_INT);        // Number of sections to insert.
 $returnurl = optional_param('returnurl', null, PARAM_LOCALURL);    // Where to return to after the action.
@@ -44,9 +45,14 @@ $returnurl = optional_param('returnurl', null, PARAM_LOCALURL);    // Where to r
 
 // ADDED: Create section info object.
 $insertsection = null;
-if (isset($insertparentid)) {
+if (isset($insertparentid) || isset($insertprevupid)) {
     $insertsection = new \stdClass();
-    $insertsection->parentid = $insertparentid;
+    if (isset($insertparentid)) {
+        $insertsection->parentid = $insertparentid;
+    }
+    if (isset($insertprevupid)) {
+        $insertsection->prevupid = $insertprevupid;
+    }
     $insertsection->level = $insertlevel ?? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC;
 }
 // END ADDED.
