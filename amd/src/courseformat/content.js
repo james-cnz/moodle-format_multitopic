@@ -165,6 +165,7 @@ export default class Component extends BaseComponent {
         return super.getWatchers().concat([
             {watch: `section.fmtispage:updated`, handler: this._reloadSection},
             {watch: `section.collapsible:updated`, handler: this._reloadSection},
+            {watch: `section.parentvisiblesan:updated`, handler: this._reloadSection},
         ]);
     }
 
