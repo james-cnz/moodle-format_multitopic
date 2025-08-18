@@ -76,10 +76,6 @@ class header extends header_base {
             return $data;
         }
 
-        if ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
-            $data->title = $output->section_title($section, $course);
-        }
-
         $data->fmticon = $sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ?
                             'icon fa fa-folder-o fa-fw' : 'icon fa fa-list fa-fw';
 

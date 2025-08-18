@@ -58,8 +58,12 @@ class section extends base_section {
         $course = $format->get_course();
         $section = $this->section;
         $sectionextra = $this->fmtsectionextra;
+        $data->collapsible = $section->collapsible;
+        $data->shorttitle = $format->get_section_short_name($section);
+        $data->subtitle = $format->get_section_subtitle($section);
         $data->sectionurl = course_get_url($course, $section)->out(false);
         $data->levelsan = $sectionextra->levelsan;
+        $data->fmtispage = ($sectionextra->levelsan < 2);
         $data->indent = max($sectionextra->levelsan, 0);
         $data->pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $sectionextra->parentid;
         $data->component = $section->component ?? null;
@@ -69,6 +73,8 @@ class section extends base_section {
         $data->timed = $sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend);
         $data->parentid = $sectionextra->parentid;
         $data->available = $section->available;
+        $data->pagedepthdirect = $sectionextra->pagedepthdirect;
+        $data->parentvisiblesan = $sectionextra->parentvisiblesan;
         $data->currentnestedlevel = $sectionextra->currentnestedlevel;
         $controlmenuclass = $this->format->get_output_classname('content\\section\\controlmenu');
         $controlmenu = new $controlmenuclass($this->format, $section);

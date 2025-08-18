@@ -67,6 +67,7 @@ class section extends section_base {
         $sectionextra = $this->fmtsectionextra;
         unset($data->displayonesection);
         $data->levelsan = $sectionextra->levelsan;
+        $data->fmtispage = ($sectionextra->levelsan < 2);
 
         return $data;
     }
@@ -117,7 +118,7 @@ class section extends section_base {
                     $section->id : $sectionextra->parentid;
         $onpage = ($pageid == $format->get_sectionid());
         // END ADDED.
-        $showcmlist = ($section->uservisible || $section->section == 0);        // CHANGED.
+        $showcmlist = ($section->section == 0) || $section->uservisible;        // CHANGED.
 
         // REMOVED index code.
         // Add the cm list.

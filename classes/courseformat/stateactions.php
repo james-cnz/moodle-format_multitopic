@@ -39,15 +39,17 @@ use format_multitopic;
 class stateactions extends \core_courseformat\stateactions {
 
     /**
-     * Move course sections to another location in the same course.
+     * Move course sections before another location in the same course.
      *
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @param \core_courseformat\stateupdates $updates the affected course elements track
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
      * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
+     * @param int|null $targetcmid optional reused as target level
      */
-    public function section_move(
+    public function fmt_section_move_before(
         \core_courseformat\stateupdates $updates,
         \stdClass $course,
         array $ids,
@@ -56,7 +58,7 @@ class stateactions extends \core_courseformat\stateactions {
     ): void {
         // Validate target elements.
         if (!$targetsectionid) {
-            throw new \moodle_exception("Action section_move requires targetsectionid");
+            throw new \moodle_exception("Action fmt_section_move_before requires targetsectionid");
         }
 
         $this->validate_sections($course, $ids, __FUNCTION__);
@@ -69,7 +71,6 @@ class stateactions extends \core_courseformat\stateactions {
 
         $format = course_get_format($course->id);
         $allsectionsextra = $format->fmt_get_sections_extra();
-        $draggedoriginsection = $allsectionsextra[$ids[0]];
         if (method_exists($this, 'sort_section_ids_by_section_number')) {
             $ids = $this->sort_section_ids_by_section_number($course, $ids, false);
         }
@@ -87,11 +88,9 @@ class stateactions extends \core_courseformat\stateactions {
                 $subids[] = $originsubextra->id;
             }
         }
-        $targetsection = $allsectionsextra[$targetsectionid];
-        if ($targetsection->section > $draggedoriginsection->section) {
-            $destination = (object)['prevupid' => $targetsectionid];
-        } else {
-            $destination = (object)['nextupid' => $targetsectionid];
+        $destination = (object)['nextupid' => $targetsectionid];
+        if (isset($targetcmid)) {
+            $destination->level = $targetcmid;
         }
         // END ADDED.
 
@@ -124,7 +123,7 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
      * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
+     * @param int|null $targetcmid optional reused as target level
      */
     public function section_move_after(
         \core_courseformat\stateupdates $updates,
@@ -166,6 +165,9 @@ class stateactions extends \core_courseformat\stateactions {
             }
         }
         $destination = (object)['prevupid' => $targetsectionid];
+        if (isset($targetcmid)) {
+            $destination->level = $targetcmid;
+        }
         // END ADDED.
 
         $affectedsections = [$targetsectionid => true];
@@ -197,7 +199,7 @@ class stateactions extends \core_courseformat\stateactions {
      * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
      * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
+     * @param int|null $targetcmid optional reused as target level
      */
     public function fmt_section_move_into(
         \core_courseformat\stateupdates $updates,
@@ -239,6 +241,9 @@ class stateactions extends \core_courseformat\stateactions {
             }
         }
         $destination = (object)['parentid' => $targetsectionid];
+        if (isset($targetcmid)) {
+            $destination->level = $targetcmid;
+        }
         // END ADDED.
 
         $affectedsections = [$targetsectionid => true];
@@ -285,6 +290,7 @@ class stateactions extends \core_courseformat\stateactions {
         $allsectionsextra = $format->fmt_get_sections_extra();
 
         $delegatedids = [];
+        $subids = [];
         foreach ($ids as $sectionid) {
             $sectionextra = $allsectionsextra[$sectionid];
             if (!empty($sectionextra->sectionbase->component)) {
@@ -292,13 +298,23 @@ class stateactions extends \core_courseformat\stateactions {
                 continue;
             }
             if (!$visible && $sectionextra->section || $visible && $sectionextra->parentvisiblesan) {
-                course_update_section($course, $sectionextra->sectionbase, ['visible' => $visible]);
+                for ($subsectionextra = $sectionextra; /* ... */
+                        $subsectionextra && (($subsectionextra->id == $sectionextra->id)
+                                            || ($subsectionextra->levelsan > $sectionextra->levelsan)); /* ... */
+                        $subsectionextra = $subsectionextra->nextanyid ? $allsectionsextra[$subsectionextra->nextanyid] : null) {
+                    if (($subsectionextra->id == $sectionextra->id) || !$visible) {
+                        course_update_section($course, $subsectionextra->sectionbase, ['visible' => $visible]);
+                    }
+                    $subids[] = $subsectionextra->id;
+                }
             }
         }
         if (count($delegatedids) > 0) {
             parent::set_section_visibility($updates, $course, $delegatedids, $visible);
         }
-        $this->section_state($updates, $course, $ids);
+        if (count($subids) > 0) {
+            $this->section_state($updates, $course, $subids);
+        }
     }
 
 }

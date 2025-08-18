@@ -153,6 +153,7 @@ class global_navigation_wrapper {
     public function load_generic_course_sections(\stdClass $course, \navigation_node $coursenode): array {
         global $CFG, $SITE;                                                     // CHANGED: Removed $DB and $USER.
         require_once($CFG->dirroot . '/course/lib.php');
+        $format = course_get_format($course);
 
         list($sections, $activities) = $this->generate_sections_and_activities($course);
 
@@ -177,7 +178,8 @@ class global_navigation_wrapper {
             if ($course->id == $SITE->id) {
                 $this->load_section_activities($coursenode, $section, $activities); // CHANGED: Pass section info rather than num.
             } else {
-                if ((!$section->uservisible && $section->section != 0) || (!$this->innershowemptysections &&
+                if (!(($section->section == 0) || $section->uservisible && course_get_format($course)->is_section_visible($section))
+                    || (!$this->innershowemptysections &&
                         !$section->hasactivites && !$sectionextra->hassubsections
                         && $this->inner->includesectionnum !== $section->section    // TODO: Remove?
                         && $this->innerincludesectionid !== $section->id)) {
@@ -186,7 +188,7 @@ class global_navigation_wrapper {
                 }
 
                 // CHANGED.
-                $sectionname = get_section_name($course, $section);
+                $sectionname = $format->get_section_short_name($section);
                 $url = course_get_url($course, $section, ['navigation' => true]); // CHANGED: Custom call.
 
                 // Add multiple nodes per section, one per level as required.

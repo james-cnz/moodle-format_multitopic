@@ -122,6 +122,18 @@ class format_multitopic extends core_courseformat\base {
     // END INCLUDED.
 
     /**
+     * Method used to get the maximum number of sections for this course format.
+     *
+     * @deprecated since Moodle 5.1
+     * @todo remove in Multitopic 6.0.
+     * @return int
+     */
+    public function get_max_sections(): int {
+        global $CFG;
+        return ($CFG->version >= 2025060500) ? PHP_INT_MAX : parent::get_max_sections();
+    }
+
+    /**
      * Generate the title for this section page.
      *
      * @return string the page title
@@ -325,11 +337,7 @@ class format_multitopic extends core_courseformat\base {
                     $parent->hassubsections = true;
                     if ($levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
                         $parent->pagedepth = max($parent->pagedepth, $thissectionextra->pagedepth);
-                        $showsection = $thissection->uservisible || ($thissection->section == 0) ||
-                                ($parent->uservisible || ($parent->section == 0))
-                                && ($thissection->visible || !$course->hiddensections)
-                                && ($thissection->available || !empty($thissection->availableinfo));
-                        if ($showsection) {
+                        if ($this->is_section_visible($thissection)) {
                             $parent->pagedepthdirect = max($parent->pagedepthdirect, $levelsan);
                         }
                     }
@@ -460,6 +468,48 @@ class format_multitopic extends core_courseformat\base {
     }
 
     /**
+     * Returns the short display name of the given section that the course prefers.
+     *
+     * Use section name is specified by user. Otherwise use default.
+     *
+     * @param int|stdClass|\section_info $section Section object from database.
+     * @return string Display name that the course format prefers, e.g. "Section 2"
+     */
+    public function get_section_short_name($section): string {
+
+        // ADDED.
+        if (!is_object($section)) {
+            $section = $this->get_section($section);
+        }
+        $sectionextra = $this->fmt_get_section_extra($section);
+
+        $weeksabbr = get_string_manager()->string_exists('weeks_abbreviation', 'format_multitopic') ?
+            get_string('weeks_abbreviation', 'format_multitopic') : get_string('week');
+        // Figure out the string for the week number.
+        $weekstring = '';
+        if ($sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend)) {
+            $datestart = format_multitopic_week_date($sectionextra->datestart + 12 * 60 * 60);
+            $dateend = format_multitopic_week_date($sectionextra->dateend - 12 * 60 * 60);
+            if (($datestart->o == $dateend->o) && ($datestart->W == $dateend->W)) {
+                // Within one week.
+                $weekstring = $weeksabbr . $datestart->W;
+            } else {
+                // Spans weeks.
+                $weekstring = $weeksabbr . $datestart->W . '–' . $dateend->W;
+            }
+            $weekstring = '<span class="section-title-prefix">' . $weekstring . ': ' . '</span>';
+        }
+        // END ADDED.
+
+        if ((string)$section->name !== '') {
+            return $weekstring . format_string($section->name, true,
+                    ['context' => context_course::instance($this->courseid)]);  // CHANGED.
+        } else {
+            return $weekstring . $this->get_default_section_name($section);
+        }
+    }
+
+    /**
      * Returns the default section name for the Multitopic course format.
      *
      * If the section number is 0, it will use the string with key = section0name from the course format's lang file.
@@ -480,6 +530,35 @@ class format_multitopic extends core_courseformat\base {
         }
     }
 
+    // ADDED.
+    /**
+     * Returns the subtitle of the given section.
+     *
+     * @param int|stdClass|\section_info $section Section object from database.
+     * @return string
+     */
+    public function get_section_subtitle($section): string {
+        $sectionextra = $this->fmt_get_section_extra($section);
+
+        // Date range for the topic, to be placed under the title.
+        $datestring = '';
+        if (isset($sectionextra->dateend) && ($sectionextra->datestart < $sectionextra->dateend)) {
+
+            $dateformat = get_string('strftimedateshort');
+            $startday = userdate($sectionextra->datestart + 12 * 60 * 60, $dateformat);
+            $endday = userdate($sectionextra->dateend - 12 * 60 * 60, $dateformat);
+
+            if ($startday == $endday) {
+                $datestring = "({$startday})";
+            } else {
+                $datestring = "({$startday}–{$endday})";
+            }
+
+        }
+        return $datestring;
+    }
+    // END ADDED.
+
     /**
      * Set if the current format instance will show all pages or an individual one.
      *
@@ -496,16 +575,6 @@ class format_multitopic extends core_courseformat\base {
      */
     public function get_sectionid(): ?int {
         return $this->singlesectionid;
-    }
-
-    /**
-     * Set which section page the current format instance will show.
-     *
-     * @param int $singlesection a page's section number
-     * @deprecated
-     */
-    public function set_section_number(int $singlesection): void {
-        $this->set_sectionnum($singlesection);
     }
 
     /**
@@ -541,20 +610,6 @@ class format_multitopic extends core_courseformat\base {
      * @return int|null the current page's section number or null when there is no single page.
      */
     public function get_sectionnum(): ?int {
-        return $this->singlesection;
-    }
-
-    /**
-     * Get the section number of the page the current format instance will show.
-     *
-     * @return int the page's section number
-     * @deprecated
-     */
-    public function get_section_number(): int {
-        if ($this->singlesection === null) {
-            return 0;
-        }
-
         return $this->singlesection;
     }
 
@@ -760,16 +815,14 @@ class format_multitopic extends core_courseformat\base {
      * @param int|stdClass $section Section object from database or just field course_sections.section
      *                      Should specify fmt calculated properties,
      *                      specifically levelsan, and parentid where levelsan is topic level.
-     * @param array $options options for view URL. At the moment core uses:
-     *     'fmtedit' (bool)    if true, return URL for edit page rather than view page
+     * @param array $options options for view URL. At the moment we use:
      *     'navigation' (bool) if true and section has no separate page, the function returns null
      * @return null|moodle_url
      */
     public function get_view_url($section, $options = []) {
         global $CFG;
         $course = $this->get_course();
-        $url = new moodle_url( ($options['fmtedit'] ?? false) ? '/course/format/multitopic/_course_view.php'
-                                : '/course/view.php', ['id' => $course->id]);   // CHANGED.
+        $url = new moodle_url('/course/view.php', ['id' => $course->id]);       // CHANGED.
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
         $sectionextra = ($section === null) ? null : $this->fmt_get_section_extra($section); // ADDED.
@@ -799,6 +852,43 @@ class format_multitopic extends core_courseformat\base {
                 $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
             }
             // END CHANGED.
+        }
+        return $url;
+    }
+
+    /**
+     * The URL to update the course format.
+     *
+     * If no section is specified, the update will redirect to the general course page.
+     *
+     * @param string $action action name the reactive action
+     * @param array $ids list of ids to update
+     * @param int|null $targetsectionid optional target section id
+     * @param int|null $targetcmid optional target cm id
+     * @param moodle_url|null $returnurl optional custom return url
+     * @return moodle_url
+     * @todo Deprecate when MDL-84979 is integrated.
+     */
+    public function get_update_url(
+        string $action,
+        array $ids = [],
+        ?int $targetsectionid = null,
+        ?int $targetcmid = null,
+        ?moodle_url $returnurl = null
+    ): moodle_url {
+        $url = parent::get_update_url(
+            action: $action,
+            ids: $ids,
+            targetsectionid: $targetsectionid,
+            targetcmid: $targetcmid,
+            returnurl: $returnurl
+        );
+
+        if ($targetsectionid) {
+            $url->param('targetsectionid', $targetsectionid);
+        }
+        if (isset($targetcmid)) {
+            $url->param('targetcmid', $targetcmid);
         }
         return $url;
     }
@@ -1275,14 +1365,28 @@ class format_multitopic extends core_courseformat\base {
         // Previous to Moodle 4.0 thas logic was hardcoded. To prevent errors in the contrib plugins
         // the default logic is the same required for topics and weeks format and still uses
         // a "hiddensections" format setting.
+        if (!empty($section->component)) {
+            return parent::is_section_visible($section);
+        }
         $course = $this->get_course();
         $hidesections = $course->hiddensections ?? true;
+        $sectionextra = $this->fmt_get_sections_extra(false)[$section->id];
+        $parent = ($section->section == 0) ? null : $section->modinfo->get_section_info_by_id($sectionextra->parentid);
         // Show the section if the user is permitted to access it, OR if it's not available
         // but there is some available info text which explains the reason & should display,
         // OR it is hidden but the course has a setting to display hidden sections as unavilable.
-        return $section->uservisible || ($section->section == 0) ||
-            ($section->visible || !$hidesections)
-            && ($section->available || !empty($section->availableinfo));
+        return (!$parent || ($parent->section == 0) || $parent->uservisible)
+            && ($sectionextra->parentvisiblesan || has_capability(
+                        'moodle/course:viewhiddensections',
+                        context_course::instance($course->id),
+                        $section->modinfo->userid
+                    )
+                )
+            && (
+                ($section->section == 0) || $section->uservisible
+                || ($section->visible || !$hidesections)
+                    && ($section->available || !empty($section->availableinfo))
+            );
     }
     // END INCLUDED.
 
@@ -1294,14 +1398,19 @@ class format_multitopic extends core_courseformat\base {
      * @param string $availableinfo the 'availableinfo' propery of the section_info as it was evaluated by conditional availability.
      */
     public function section_get_available_hook(section_info $section, &$available, &$availableinfo): void {
-        $sectionsextra = $this->fmt_get_sections_extra(false);
-        $parentid = $sectionsextra[$section->id]->parentid;
+        $sectionextra = $this->fmt_get_sections_extra(false)[$section->id];
+        $parentid = $sectionextra->parentid;
         if (isset($parentid)) {
-            $parent = $sectionsextra[$parentid]->sectionbase;
-            if (!($parent->visible && $parent->available) && ($parent->id != $this->fmtrootsectionid)) {
+            $parent = $section->modinfo->get_section_info_by_id($parentid);
+            if (!(
+                ($parent->section == 0)
+                || $parent->uservisible && ($parent->available || $sectionextra->levelsan >= 2)
+            )) {
                 $available = false;
                 if (!$parent->uservisible) {
                     $availableinfo = '';
+                } else {
+                    $availableinfo = get_string('notavailable');
                 }
             }
         }

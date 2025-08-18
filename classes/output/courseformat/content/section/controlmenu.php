@@ -19,22 +19,23 @@
  *
  * @package   format_multitopic
  * @copyright 2019 onwards James Calder and Otago Polytechnic
- * @copyright based on work by 2012 Dan Poltawski
  * @copyright based on work by 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace format_multitopic\output\courseformat\content\section;
 
-use context_course;
+use core\output\action_menu\link;
+use core\output\action_menu\link_secondary;
+use core\output\pix_icon;
 use core_courseformat\output\local\content\section\controlmenu as controlmenu_base;
+use core\url;
 
 /**
  * Base class to render a course section menu.
  *
  * @package   format_multitopic
  * @copyright 2019 onwards James Calder and Otago Polytechnic
- * @copyright based on work by 2012 Dan Poltawski
  * @copyright based on work by 2020 Ferran Recio <ferran@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -42,6 +43,12 @@ class controlmenu extends controlmenu_base {
 
     /** @var \format_multitopic\section_info_extra Multitopic-specific section information */
     protected $fmtsectionextra;
+
+    /** @var bool Whether we are dealing with a page section */
+    protected $fmtonsectionpage;
+
+    /** @var url Return URL */
+    protected $fmtreturnurl;
 
     /**
      * Constructor.
@@ -52,327 +59,473 @@ class controlmenu extends controlmenu_base {
     public function __construct(\format_multitopic $format, \section_info $section) {
         parent::__construct($format, $section);
         $this->fmtsectionextra = $format->fmt_get_section_extra($section);
+        $this->fmtonsectionpage = ($this->fmtsectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // ADDED.
+        $this->fmtreturnurl = $format->get_view_url($section);
     }
 
     /**
      * Generate the edit control items of a section.
      *
-     * This method must remain public until the final deprecation of section_edit_control_items.
-     *
      * @return array of edit control items
      */
     public function section_control_items() {
-        global $USER, $CFG;
+        $controls = parent::section_control_items();
 
-        $format = $this->format;
-        $section = $this->section;
-        $sectionextra = $this->fmtsectionextra;                                 // ADDED.
-        $onsectionpage = $sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; // ADDED.
-        $course = $format->get_course();
-        $user = $USER;
-        $usecomponents = $format->supports_components();
-        $coursecontext = context_course::instance($course->id);
+        $controls = $this->add_control_after($controls, 'movesection', 'movelevelup', $this->get_section_movelevelup_item());
+        $controls = $this->add_control_after($controls, 'movelevelup', 'moveleveldown', $this->get_section_moveleveldown_item());
+        $controls = $this->add_control_after($controls, 'moveleveldown', 'moveprev', $this->get_section_moveprev_item());
+        $controls = $this->add_control_after($controls, 'moveprev', 'movenext', $this->get_section_movenext_item());
+        $controls = $this->add_control_after($controls, 'movenext', 'movetoprevpage', $this->get_section_movetoprevpage_item());
+        $controls = $this->add_control_after($controls, 'movetoprevpage',
+                                            'movetonextpage', $this->get_section_movetonextpage_item());
+        $controls = $this->add_control_after($controls, 'movetonextpage', 'moveup', $this->get_section_moveup_item());
+        $controls = $this->add_control_after($controls, 'moveup', 'movedown', $this->get_section_movedown_item());
 
-        $baseurl = course_get_url($course, $section, ['fmtedit' => true]);      // CHANGED.
-        $baseurl->param('sesskey', sesskey());
+        return $controls;
+    }
 
-        $parentcontrols = parent::section_control_items();
+    /**
+     * Retrieves the view item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_view_item(): ?link {
+        return null;
+    }
 
-        $movecontrols = [];
-        if ($section->section
-                && has_capability('moodle/course:movesections', $coursecontext, $user)
-                && has_capability('moodle/course:sectionvisibility', $coursecontext, $user)) {
+    /**
+     * Retrieves the edit item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_edit_item(): ?link {
+        $link = parent::get_section_edit_item();
 
-            // INCLUDED funct section_control_items if (!$sectionreturn) .
-            if ($onsectionpage) {                                               // CHANGED.
-                if (has_capability('moodle/course:update', $coursecontext, $user)) {
-                    $url = clone($baseurl);
-                    if ($sectionextra->levelsan - 1 > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT) { // Raise section. // CHANGED.
-                        // CHANGED.
-                        $url->param('sectionid', $section->id);
-                        $url->param('destprevupid', $sectionextra->parentid);
-                        $url->param('destlevel', $sectionextra->levelsan - 1);
-                        $strmovelevelup = get_string_manager()->string_exists('move_level_up', 'format_multitopic') ?
-                                            get_string('move_level_up', 'format_multitopic') : get_string('moveup');
-                        // END CHANGED.
-                        $movecontrols['movelevelup'] = [                        // CHANGED.
-                            'url' => $url,
-                            'icon' => 'i/up',
-                            'name' => $strmovelevelup,
-                            'pixattr' => ['class' => ''],
-                            'attr' => ['class' => 'icon fmtmovelevelup'],       // CHANGED.
-                        ];
-                    }
-
-                    $url = clone($baseurl);
-                    if ($sectionextra->pagedepth + 1 <= FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE) { // Lower section. CHANGED.
-                        // CHANGED.
-                        $url->param('sectionid', $section->id);
-                        $url->param('destparentid', $sectionextra->prevupid);
-                        $url->param('destlevel', $sectionextra->levelsan + 1);
-                        $strmoveleveldown = get_string_manager()->string_exists('move_level_down', 'format_multitopic') ?
-                                            get_string('move_level_down', 'format_multitopic') : get_string('movedown');
-                        // END CHANGED.
-                        $movecontrols['moveleveldown'] = [                      // CHANGED.
-                            'url' => $url,
-                            'icon' => 'i/down',
-                            'name' => $strmoveleveldown,
-                            'pixattr' => ['class' => ''],
-                            'attr' => ['class' => 'icon fmtmoveleveldown'],     // CHANGED.
-                        ];
-                    }
-                }
-
-                $url = clone($baseurl);
-                // CHANGED: Replaced up with previous.
-                if (isset($sectionextra->prevupid) && $sectionextra->prevupid != course_get_format($course)->fmtrootsectionid) {
-                        // Add a arrow to move section back.
-                    $url->param('sectionid', $section->id);
-                    $url->param('destnextupid', $sectionextra->prevupid);
-                    $strmovepageprev = get_string_manager()->string_exists('move_page_prev', 'format_multitopic') ?
-                                        get_string('move_page_prev', 'format_multitopic') : get_string('moveleft');
-                    $movecontrols['moveprev'] = [
-                        'url' => $url,
-                        'icon' => 't/left',
-                        'name' => $strmovepageprev,
-                        'pixattr' => ['class' => ''],
-                        'attr' => ['class' => 'icon fmtmovepageprev'],
-                    ];
-                }
-                // END CHANGED.
-
-                $url = clone($baseurl);
-                // CHANGED: Replaced down with next.
-                if (isset($sectionextra->nextupid)) { // Add a arrow to move section forward.
-                    $url->param('sectionid', $section->id);
-                    $url->param('destprevupid', $sectionextra->nextupid);
-                    $strmovepagenext = get_string_manager()->string_exists('move_page_next', 'format_multitopic') ?
-                                        get_string('move_page_next', 'format_multitopic') : get_string('moveright');
-                    $movecontrols['movenext'] = [
-                        'url' => $url,
-                        'icon' => 't/right',
-                        'name' => $strmovepagenext,
-                        'pixattr' => ['class' => ''],
-                        'attr' => ['class' => 'icon fmtmovepagenext'],
-                    ];
-                }
-                // END CHANGED.
-
-            } else { // END INCLUDED.
-
-                // Move sections left and right.
-
-                $url = clone($baseurl);
-                // CHANGED: Replaced up with to previous page.
-                if ($sectionextra->prevpageid) { // Add a arrow to move section to previous page.
-                    $url->param('sectionid', $section->id);
-                    $url->param('destparentid', $sectionextra->prevpageid);
-                    $strmovetoprevpage = get_string_manager()->string_exists('move_to_prev_page', 'format_multitopic') ?
-                                            get_string('move_to_prev_page', 'format_multitopic') : get_string('moveleft');
-                    $movecontrols['movetoprevpage'] = [
-                        'url' => $url,
-                        'icon' => 't/left',
-                        'name' => $strmovetoprevpage,
-                        'pixattr' => ['class' => ''],
-                        'attr' => ['class' => 'icon fmtmovetoprevpage'],
-                    ];
-                }
-                // END CHANGED.
-
-                $url = clone($baseurl);
-                // CHANGED: Replaced down with to next page.
-                if ($sectionextra->nextpageid) { // Add a arrow to move section to next page.
-                    $url->param('sectionid', $section->id);
-                    $url->param('destparentid', $sectionextra->nextpageid);
-                    $strmovetonextpage = get_string_manager()->string_exists('move_to_next_page', 'format_multitopic') ?
-                                            get_string('move_to_next_page', 'format_multitopic') : get_string('moveright');
-                    $movecontrols['movetonextpage'] = [
-                        'url' => $url,
-                        'icon' => 't/right',
-                        'name' => $strmovetonextpage,
-                        'pixattr' => ['class' => ''],
-                        'attr' => ['class' => 'icon fmtmovetonextpage'],
-                    ];
-                }
-                // END CHANGED.
-
-                if ($usecomponents && $CFG->version >= 2023042400 && !array_key_exists('movesection', $parentcontrols)) {
-                    // This tool will appear only when the state is ready.
-                    $url = clone ($baseurl);
-                    $url->param('movesection', $section->section);
-                    $url->param('section', $section->section);
-                    $movecontrols['movesection'] = [
-                        'url' => $url,
-                        'icon' => 'i/dragdrop',
-                        'name' => get_string('move', 'moodle'),
-                        'pixattr' => ['class' => ''],
-                        'attr' => [
-                            'class' => 'icon move waitstate',
-                            'data-action' => 'moveSection',
-                            'data-id' => $section->id,
-                        ],
-                    ];
-                }
-
-                $url = clone($baseurl);
-                if ($sectionextra->prevupid != $sectionextra->parentid
-                        && !array_key_exists('moveup', $parentcontrols)) { // Add a arrow to move section up.
-                    $url->param('sectionid', $section->id);
-                    $url->param('destnextupid', $sectionextra->prevupid);
-                    $strmoveup = get_string('moveup');
-                    $movecontrols['moveup'] = [
-                        'url' => $url,
-                        'icon' => 'i/up',
-                        'name' => $strmoveup,
-                        'pixattr' => ['class' => ''],
-                        'attr' => ['class' => 'icon moveup whilenostate'],
-                    ];
-                }
-
-                $url = clone($baseurl);
-                if ($sectionextra->nextupid != $sectionextra->nextpageid
-                        && !array_key_exists('movedown', $parentcontrols)) { // Add a arrow to move section down.
-                    $url->param('sectionid', $section->id);
-                    $url->param('destprevupid', $sectionextra->nextupid);
-                    $strmovedown = get_string('movedown');
-                    $movecontrols['movedown'] = [
-                        'url' => $url,
-                        'icon' => 'i/down',
-                        'name' => $strmovedown,
-                        'pixattr' => ['class' => ''],
-                        'attr' => ['class' => 'icon movedown whilenostate'],
-                    ];
-                }
-
-            }
-
-        }
-        $addedmovecontrols = false;
-
-        $merged = [];
-        // We can't use splice because we are using associative arrays.
-        // Step through the array and merge the arrays.
-        foreach ($parentcontrols as $key => $action) {
-            if (!$addedmovecontrols && (substr($key, 0, 4) == 'move' || $key == 'delete' || $key == 'permalink')) {
-                // If we have come to a move key, merge these controls here.
-                $merged = array_merge($merged, $movecontrols);
-                $addedmovecontrols = true;
-            }
-            $merged[$key] = $action;
-        }
-        if (!$addedmovecontrols) {
-            $merged = array_merge($merged, $movecontrols);
-            $addedmovecontrols = true;
+        if ($link) {
+            $link->url->remove_params('sr');
         }
 
-        if (array_key_exists('view', $merged)) {
-            unset($merged['view']);
+        return $link;
+    }
+
+    /**
+     * Retrieves the duplicate item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_duplicate_item(): ?link {
+        $link = null;
+
+        if (!$this->fmtonsectionpage) {
+            $link = parent::get_section_duplicate_item();
         }
 
-        if (array_key_exists('edit', $merged)) {
-            $merged['edit']['url'] = new \moodle_url('/course/format/multitopic/_course_editsection.php',
-                                            ['id' => $section->id]);            // CHANGED.
-        }
+        return $link;
+    }
 
-        if (array_key_exists('duplicate', $merged)) {
-            if ($onsectionpage) {
-                unset($merged['duplicate']);
+    /**
+     * Retrieves the visibility item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_visibility_item(): ?link {
+        $link = parent::get_section_visibility_item();
+
+        if ($link) {
+            unset($link->attributes['data-sectionreturn']);
+            if ($this->section->visible) {
+                $stateaction = 'section_hide';
+            } else if (!$this->fmtsectionextra->parentvisiblesan) {
+                $link = null;
             } else {
-                $url = course_get_url($course);
-                $url->param('sesskey', sesskey());
-                $url->param('sectionid', $section->id);
-                $url->param('duplicatesection', $section->section);
-                $merged['duplicate']['url'] = $url;
+                $stateaction = 'section_show';
             }
         }
 
-        if (array_key_exists('visiblity', $merged) || array_key_exists('visibility', $merged)) {
-            $url = clone($baseurl);
-            $strhidefromothers = get_string_manager()->string_exists('hidefromothers', 'format_' . $course->format) ?
-                                    get_string('hidefromothers', 'format_' . $course->format)
-                                    : get_string('hide');                       // CHANGED.
-            $strshowfromothers = get_string_manager()->string_exists('showfromothers', 'format_' . $course->format) ?
-                                    get_string('showfromothers', 'format_' . $course->format)
-                                    : get_string('show');                       // CHANGED.
-            $visibilitystr = array_key_exists('visibility', $merged) ? 'visibility' : 'visiblity';
-            if ($section->visible) { // Show the hide/show eye.
-                $url->param('hideid',  $section->id);                           // CHANGED.
-                $merged[$visibilitystr]['url'] = $url;
-                $merged[$visibilitystr]['name'] = $strhidefromothers;
-                unset($merged[$visibilitystr]['attr']['data-sectionreturn']);
-                if ($onsectionpage) {
-                    unset($merged[$visibilitystr]['attr']['data-action']);
-                }
-                $merged[$visibilitystr]['attr']['data-swapname'] = $strshowfromothers;
-            } else if (!$sectionextra->parentvisiblesan) {
-                unset($merged[$visibilitystr]);
-            } else {
-                $url->param('showid',  $section->id);                           // CHANGED.
-                $merged[$visibilitystr]['url'] = $url;
-                $merged[$visibilitystr]['name'] = $strshowfromothers;
-                unset($merged[$visibilitystr]['attr']['data-sectionreturn']);
-                if ($onsectionpage) {
-                    unset($merged[$visibilitystr]['attr']['data-action']);
-                }
-                $merged[$visibilitystr]['attr']['data-swapname'] = $strhidefromothers;
-            }
+        if ($link) {
+            $link->url->param('returnurl', $this->fmtreturnurl);
         }
 
-        if (array_key_exists('movesection', $merged)) {
-            if (!has_capability('moodle/course:movesections', $coursecontext, $user)
-                    || !has_capability('moodle/course:sectionvisibility', $coursecontext, $user)
-                    || $onsectionpage || !$usecomponents || $CFG->version < 2023042400) {
-                unset($merged['movesection']);
-            }
-        }
+        return $link;
+    }
 
-        if (array_key_exists('moveup', $merged)) {
-            if (!has_capability('moodle/course:movesections', $coursecontext, $user)
-                    || !has_capability('moodle/course:sectionvisibility', $coursecontext, $user)
-                    || $onsectionpage || $sectionextra->prevupid == $sectionextra->parentid) {
-                unset($merged['moveup']);
-            } else {
-                $url = clone($baseurl);
-                $url->param('sectionid', $section->id);
-                $url->param('destnextupid', $sectionextra->prevupid);
-                $merged['moveup']['url'] = $url;
-            }
-        }
+    /**
+     * Retrieves the movesection item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_movesection_item(): ?link {
+        $link = null;
 
-        if (array_key_exists('movedown', $merged)) {
-            if (!has_capability('moodle/course:movesections', $coursecontext, $user)
-                    || !has_capability('moodle/course:sectionvisibility', $coursecontext, $user)
-                    || $onsectionpage || $sectionextra->nextupid == $sectionextra->nextpageid) {
-                unset($merged['movedown']);
-            } else {
-                $url = clone($baseurl);
-                $url->param('sectionid', $section->id);
-                $url->param('destprevupid', $sectionextra->nextupid);
-                $merged['movedown']['url'] = $url;
-            }
-        }
-
-        if (array_key_exists('delete', $merged)) {
-            $url = new \moodle_url(
-                '/course/format/multitopic/_course_editsection.php',
+        if ($this->section->section && !$this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+        ) {
+            $url = new url(
+                $this->baseurl,
                 [
-                    'id' => $section->id,
-                    // REMOVED: section return.
-                    'delete' => 1,
-                    'sesskey' => sesskey(),
+                    'movesection' => $this->section->section,
+                    'section' => $this->section->section,
                 ]
             );
-            $merged['delete']['url'] = $url;
-            if ($onsectionpage) {
-                unset($merged['delete']['attr']['data-action']);
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('i/dragdrop', ''),
+                text: get_string('move'),
+                attributes: [
+                    // This tool requires ajax and will appear only when the frontend state is ready.
+                    'class' => 'move waitstate',
+                    'data-action' => 'moveSection',
+                    'data-id' => $this->section->id,
+                ],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the movelevelup item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_movelevelup_item(): ?link {
+        $link = null;
+
+        if ($this->section->section && $this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+            && has_capability('moodle/course:update', $this->coursecontext)
+            && ($this->fmtsectionextra->levelsan - 1 > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT)
+        ) {
+            $stateaction = 'section_move_after';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->parentid,
+                targetcmid: $this->fmtsectionextra->levelsan - 1, // Target level.
+                returnurl: $this->fmtreturnurl,
+            );
+            $strmovelevelup = get_string_manager()->string_exists('move_level_up', 'format_multitopic') ?
+                                get_string('move_level_up', 'format_multitopic') : get_string('moveup');
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('i/up', ''),
+                text: $strmovelevelup,
+                attributes: ['class' => 'fmtmovelevelup'],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the moveleveldown item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_moveleveldown_item(): ?link {
+        $link = null;
+
+        if ($this->section->section && $this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+            && has_capability('moodle/course:update', $this->coursecontext)
+            && ($this->fmtsectionextra->pagedepth + 1 <= FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE)
+        ) {
+            $stateaction = 'fmt_section_move_into';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->prevupid,
+                targetcmid: $this->fmtsectionextra->levelsan + 1, // Target level.
+                returnurl: $this->fmtreturnurl,
+            );
+            $strmoveleveldown = get_string_manager()->string_exists('move_level_down', 'format_multitopic') ?
+                                get_string('move_level_down', 'format_multitopic') : get_string('movedown');
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('i/down', ''),
+                text: $strmoveleveldown,
+                attributes: ['class' => 'fmtmoveleveldown'],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the moveprev item for the section control menu.
+     *
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_moveprev_item(): ?link {
+        $link = null;
+
+        if ($this->section->section && $this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+            && isset($this->fmtsectionextra->prevupid) && ($this->fmtsectionextra->prevupid != $this->format->fmtrootsectionid)
+        ) {
+            $stateaction = 'fmt_section_move_before';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->prevupid,
+                returnurl: $this->fmtreturnurl,
+            );
+            $strmovepageprev = get_string_manager()->string_exists('move_page_prev', 'format_multitopic') ?
+                                get_string('move_page_prev', 'format_multitopic') : get_string('moveleft');
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('t/left', ''),
+                text: $strmovepageprev,
+                attributes: [
+                    // This tool disappears when the state is ready whilenostate.
+                    'class' => 'fmtmovepageprev whilenostate',
+                ],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the movenext item for the section control menu.
+     *
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_movenext_item(): ?link {
+        $link = null;
+
+        if ($this->section->section && $this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+            && isset($this->fmtsectionextra->nextupid)
+        ) {
+            $stateaction = 'section_move_after';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->nextupid,
+                returnurl: $this->fmtreturnurl,
+            );
+            $strmovepagenext = get_string_manager()->string_exists('move_page_next', 'format_multitopic') ?
+                                get_string('move_page_next', 'format_multitopic') : get_string('moveright');
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('t/right', ''),
+                text: $strmovepagenext,
+                attributes: [
+                    // This tool disappears when the state is ready whilenostate.
+                    'class' => 'fmtmovepagenext whilenostate',
+                ],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the movetoprevpage item for the section control menu.
+     *
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_movetoprevpage_item(): ?link {
+        $link = null;
+
+        if ($this->section->section && !$this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+            && $this->fmtsectionextra->prevpageid
+        ) {
+            $stateaction = 'fmt_section_move_into';
+            $returnurl = course_get_url(
+                $this->format->get_course(),
+                $this->format->fmt_get_section_extra((object)['id' => $this->fmtsectionextra->prevpageid])->sectionbase
+            );
+            $returnurl->set_anchor(explode('#', $this->fmtreturnurl)[1]);
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->prevpageid,
+                returnurl: $returnurl,
+            );
+            $strmovetoprevpage = get_string_manager()->string_exists('move_to_prev_page', 'format_multitopic') ?
+                                    get_string('move_to_prev_page', 'format_multitopic') : get_string('moveleft');
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('t/left', ''),
+                text: $strmovetoprevpage,
+                attributes: [
+                    // This tool disappears when the state is ready whilenostate.
+                    'class' => 'fmtmovetoprevpage whilenostate',
+                ],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the movetonextpage item for the section control menu.
+     *
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_movetonextpage_item(): ?link {
+        $link = null;
+
+        if ($this->section->section && !$this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+            && $this->fmtsectionextra->nextpageid
+        ) {
+            $stateaction = 'fmt_section_move_into';
+            $returnurl = course_get_url(
+                $this->format->get_course(),
+                $this->format->fmt_get_section_extra((object)['id' => $this->fmtsectionextra->nextpageid])->sectionbase
+            );
+            $returnurl->set_anchor(explode('#', $this->fmtreturnurl)[1]);
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->nextpageid,
+                returnurl: $returnurl,
+            );
+            $strmovetonextpage = get_string_manager()->string_exists('move_to_next_page', 'format_multitopic') ?
+                                    get_string('move_to_next_page', 'format_multitopic') : get_string('moveright');
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('t/right', ''),
+                text: $strmovetonextpage,
+                attributes: [
+                    // This tool disappears when the state is ready whilenostate.
+                    'class' => 'fmtmovetonextpage whilenostate',
+                ],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the moveup item for the section control menu.
+     *
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_moveup_item(): ?link {
+        $link = null;
+
+        if ($this->section->section && !$this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+            && ($this->fmtsectionextra->prevupid != $this->fmtsectionextra->parentid)
+        ) {
+            $stateaction = 'fmt_section_move_before';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->prevupid,
+                returnurl: $this->fmtreturnurl,
+            );
+            $strmoveup = get_string('moveup');
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('i/up', ''),
+                text: $strmoveup,
+                attributes: [
+                    // This tool disappears when the state is ready whilenostate.
+                    'class' => 'moveup whilenostate',
+                ],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the movedown item for the section control menu.
+     *
+     * @deprecated since Moodle 5.0 MDL-83527
+     * @todo Final deprecation in Moodle 6.0 MDL-83530
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_movedown_item(): ?link {
+        $link = null;
+
+        if ($this->section->section && !$this->fmtonsectionpage
+            && has_capability('moodle/course:movesections', $this->coursecontext)
+            && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
+            && ($this->fmtsectionextra->nextupid != $this->fmtsectionextra->nextpageid)
+        ) {
+            $stateaction = 'section_move_after';
+            $url = $this->format->get_update_url(
+                action: $stateaction,
+                ids: [$this->section->id],
+                targetsectionid: $this->fmtsectionextra->nextupid,
+                returnurl: $this->fmtreturnurl,
+            );
+            $strmovedown = get_string('movedown');
+            $link = new link_secondary(
+                url: $url,
+                icon: new pix_icon('i/down', ''),
+                text: $strmovedown,
+                attributes: [
+                    // This tool disappears when the state is ready whilenostate.
+                    'class' => 'movedown whilenostate',
+                ],
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the permalink item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_permalink_item(): ?link {
+        $link = parent::get_section_permalink_item();
+
+        if ($link) {
+            $link->url = course_get_url($this->format->get_course(), $this->section);
+        }
+
+        return $link;
+    }
+
+    /**
+     * Retrieves the delete item for the section control menu.
+     *
+     * @return link|null The menu item if applicable, otherwise null.
+     */
+    protected function get_section_delete_item(): ?link {
+        $link = parent::get_section_delete_item();
+
+        if ($link) {
+            $link->url->param(
+                'returnurl',
+                course_get_url(
+                    $this->format->get_course(),
+                    $this->format->fmt_get_section_extra((object)['id' => $this->fmtsectionextra->prevupid])->sectionbase
+                )
+            );
+            if ($this->fmtonsectionpage) {
+                unset($link->attributes['data-action']);
             }
         }
 
-        if (array_key_exists('permalink', $merged)) {
-            $sectionlink = course_get_url($course, $section);
-            $merged['permalink']['url'] = $sectionlink;
-        }
-
-        return $merged;
+        return $link;
     }
 }

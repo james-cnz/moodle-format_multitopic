@@ -28,7 +28,6 @@ import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
 import CmItem from 'format_multitopic/courseformat/content/section/cmitem';
-import Templates from 'core/templates';
 
 export default class Component extends BaseComponent {
 
@@ -39,7 +38,7 @@ export default class Component extends BaseComponent {
      */
     create(descriptor) {
         super.create(descriptor);
-        this.originalsinglesectionid = this.element.querySelector("ul.sections").dataset.originalsinglesectionid;
+        this.originalsinglesectionid = this.element.querySelector("ul.section-list").dataset.originalsinglesectionid;
     }
 
     /**
@@ -96,7 +95,7 @@ export default class Component extends BaseComponent {
             history.replaceState(history.state, "", anchor);
         }
         const selSectionHeaderDom =
-            document.querySelector(".course-content ul.sections li.section.section-topic .sectionname" + anchor);
+            document.querySelector(".course-content ul.section-list li.section.section-topic .sectionname" + anchor);
 
         // Exit if there is no recognised section.
         if (!selSectionHeaderDom) {
@@ -158,6 +157,19 @@ export default class Component extends BaseComponent {
     }
 
     /**
+     * Return the component watchers.
+     *
+     * @returns {Array} of watchers
+     */
+    getWatchers() {
+        return super.getWatchers().concat([
+            {watch: `section.fmtispage:updated`, handler: this._reloadSection},
+            {watch: `section.collapsible:updated`, handler: this._reloadSection},
+            {watch: `section.parentvisiblesan:updated`, handler: this._reloadSection},
+        ]);
+    }
+
+    /**
      * Refresh the collapse/expand all sections element.
      *
      * @param {Object} state The state data
@@ -200,50 +212,35 @@ export default class Component extends BaseComponent {
     }
 
     /**
-     * Update a course section when the section number changes.
+     * Update a course section name on the whole page.
      *
-     * The courseActions module used for most course section tools still depends on css classes and
-     * section numbers (not id). To prevent inconsistencies when a section is moved, we need to refresh
-     * the
-     *
-     * Course formats can override the section title rendering so the frontend depends heavily on backend
-     * rendering. Luckily in edit mode we can trigger a title update using the inplace_editable module.
-     *
-     * @param {Object} param
+     * @param {object} param
      * @param {Object} param.element details the update details.
      */
-    _refreshSectionNumber({element}) {
+    _refreshSectionTitle(param) {
+        super._refreshSectionTitle(param);
+        const element = param.element;
+
         // Find the element.
         const target = this.getElement(this.selectors.SECTION, element.id);
         if (!target) {
             // Job done. Nothing to refresh.
             return;
         }
-        // Update section numbers in all data, css and YUI attributes.
-        target.id = `section-${element.number}`;
-        // YUI uses section number as section id in data-sectionid, in principle if a format use components
-        // don't need this sectionid attribute anymore, but we keep the compatibility in case some plugin
-        // use it for legacy purposes.
-        target.dataset.sectionid = element.number;
-        // The data-number is the attribute used by components to store the section number.
-        target.dataset.number = element.number;
 
         // Update title and title inplace editable, if any.
         const inplace = inplaceeditable.getInplaceEditable(target.querySelector(this.selectors.SECTION_ITEM));
         if (inplace) {
             // The course content HTML can be modified at any moment, so the function need to do some checkings
             // to make sure the inplace editable still represents the same itemid.
-            const currentvalue = inplace.getValue();
             const currentitemid = inplace.getItemId();
-            // Unnamed sections must be recalculated.
-            if (inplace.getValue() === '' || element.timed) { // CHANGED.
-                // The value to send can be an empty value if it is a default name.
-                if (currentitemid == element.id
-                    && (currentvalue != element.rawtitle || element.rawtitle == '' || element.timed)) { // CHANGED.
-                    inplace.setValue(element.rawtitle);
-                }
+            if (currentitemid == element.id) { // CHANGED.
+                inplace.setValue(element.rawtitle);
             }
         }
+
+        // Update subtitle.
+        target.querySelector(".section_subtitle").textContent = element.subtitle;
     }
 
     /**
@@ -280,45 +277,20 @@ export default class Component extends BaseComponent {
             if (!section || section.component) {
                 continue;
             }
-            let refreshCms = false;
             const fmtonpageNew = (section.pageid == singleSectionId) ? "1" : "0";
             if (sectionDom.dataset.fmtonpage != fmtonpageNew) {
                 sectionDom.dataset.fmtonpage = fmtonpageNew;
                 sectionDom.style.display = (fmtonpageNew == "1") ? "block" : "none";
                 if (fmtonpageNew == "1") {
-                    refreshCms = true;
+                    this._refreshSectionCmlist({element: section});
                 }
             }
-            if (section.visible == sectionDom.classList.contains("hidden")) {
-                const badgeDom = sectionDom.querySelector("span.badge[data-type='hiddenfromstudents']");
-                if (section.visible) {
-                    sectionDom.classList.remove("hidden");
-                    if (badgeDom) {
-                        badgeDom.classList.add("d-none");
-                    }
-                } else {
-                    sectionDom.classList.add("hidden");
-                    if (badgeDom) {
-                        badgeDom.classList.remove("d-none");
-                    }
-                }
-                if (sectionDom.dataset.fmtonpage == "1") {
-                    refreshCms = true;
-                }
-            }
-            if (refreshCms) {
-                // Note: Visibility state doesn't get updated for CMs already rendered.
-                this._refreshSectionCmlist({element: section});
-            }
-            const menuDom = sectionDom.querySelector(".course-section-header .section_action_menu");
-            Templates.render("core_courseformat/local/content/section/controlmenu", section.controlmenu).done(function(html) {
-                Templates.replaceNode(menuDom, html, "");
-            });
         }
+
         this._refreshAllSectionsToggler(this.reactive.stateManager.state);
 
         // Update Add section button.
-        const addSectionDom = document.querySelector("div#fmtchangenumsections > a");
+        const addSectionDom = document.querySelector("div#fmt-course-addsection > a");
         addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + singleSectionId);
 
     }

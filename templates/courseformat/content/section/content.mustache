@@ -15,18 +15,14 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template format_multitopic/courseformat/content/section
+    @template format_multitopic/courseformat/content/section/content
 
-    Displays a course section.
-
-    Note: This template is a wrapper around the section/content template to allow course formats and theme designers to
-    modify parts of the wrapper without having to copy/paste the entire template.
+    The internal content of a section.
 
     Example context (json):
     {
         "num": 3,
         "id": 35,
-        "sectionname": "Section title",
         "controlmenu": "[tools menu]",
         "header": {
             "name": "Section title",
@@ -44,6 +40,7 @@
                             "hasname": "true"
                         },
                         "id": 3,
+                        "cmid": 3,
                         "module": "forum",
                         "anchor": "activity-3",
                         "extraclasses": "newmessages"
@@ -56,6 +53,7 @@
                             "hasname": "true"
                         },
                         "id": 4,
+                        "cmid": 4,
                         "anchor": "activity-4",
                         "module": "assign",
                         "extraclasses": ""
@@ -68,7 +66,7 @@
         "iscurrent": true,
         "currentlink": "<span class=\"accesshide\">This topic</span>",
         "availability": {
-            "info": "<span class=\"badge badge-info\">Hidden from students</span>",
+            "info": "<span class=\"badge bg-info\">Hidden from students</span>",
             "hasavailability": true
         },
         "summary": {
@@ -84,29 +82,12 @@
 
         "numsections": 42,
         "sitehome": false,
-        "highlightedlabel" : "Highlighted",
-        "testingsection": true
+
+        "highlightedlabel" : "Highlighted"
     }
 }}
-{{#testingsection}}<ul>{{/testingsection}}
-<li id="section-{{num}}"
-    class="section course-section main {{#onlysummary}} section-summary {{/onlysummary}} clearfix
-            {{#ishidden}} hidden {{/ishidden}} {{#iscurrent}} current {{/iscurrent}}
-            {{fmtclasses}}"
-    data-sectionid="{{num}}"
-
-    data-for="section"
-    data-id="{{id}}"
-    data-number="{{num}}"
-    data-sectionname="{{sectionname}}"
-    data-fmtonpage="{{fmtonpage}}"
-    {{^fmtonpage}}style="display: none;"{{/fmtonpage}}
->
-    <div {{^fmtispage}}class="section-item"{{/fmtispage}}>
-        {{$ core_courseformat/local/content/section/content }}
-            {{> format_multitopic/courseformat/content/section/content }}
-        {{/ core_courseformat/local/content/section/content }}
-    </div>
-
-</li>
-{{#testingsection}}</ul>{{/testingsection}}
+{{< core_courseformat/local/content/section/content}}
+    {{$ core_courseformat/local/content/section/header }}
+        {{> format_multitopic/courseformat/content/section/header }}
+    {{/ core_courseformat/local/content/section/header }}
+{{/ core_courseformat/local/content/section/content}}

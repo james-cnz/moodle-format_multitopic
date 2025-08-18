@@ -15,13 +15,14 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template core_courseformat/local/content/addsection
+    @template format_multitopic/courseformat/content/addsection
 
     Displays the add section button inside a course.
 
     Example context (json):
     {
         "showaddsection": true,
+
         "addsections": {
             "url": "#",
             "title": "Add section",
@@ -30,16 +31,28 @@
     }
 }}
 {{#showaddsection}}
-<div id="fmtchangenumsections" class="mdl-right">
+<div id="fmt-course-addsection" class="changenumsections bulk-hidden mt-5">
+
     {{#addsections}}
-    <a
-        href="{{{url}}}"
-        class="fmtadd-sections{{^canaddmore}} cantadd dimmed{{/canaddmore}}"
-        data-add-sections="{{title}}"
-        data-new-sections="{{newsection}}"
-    >
-        {{#pix}} t/add, moodle {{/pix}} {{title}}
-    </a>
+        <a href="{{{url}}}"
+            class="{{^canaddsection}}d-none{{/canaddsection}} w-100 btn add-section justify-content-center align-items-center p-3"
+            data-add-sections="{{title}}"
+            data-new-sections="{{newsection}}"
+
+        >
+            {{#pix}} t/add, core {{/pix}}
+            {{title}}
+        </a>
+        {{#fmthavemaxsections}}
+        <div class="{{#canaddsection}}d-none{{/canaddsection}} p-3 max-section-alert" data-region="max-sections-warning">
+            <div class="w-100 text-center">
+                {{#pix}}t/block, moodle{{/pix}}
+            </div>
+            <div class="w-100 fst-italic text-center">
+                {{#str}}maxsectionaddmessage, core_courseformat{{/str}}
+            </div>
+        </div>
+        {{/fmthavemaxsections}}
     {{/addsections}}
 </div>
 {{/showaddsection}}

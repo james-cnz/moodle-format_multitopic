@@ -27,125 +27,15 @@
 
 
 /**
- * For a given course section, marks it visible or hidden,
- * and does the same for every activity in that section
- *
- * @param int $courseid course id
- * @param stdClass|\section_info $section The section to adjust.  Must specify id
- * @param int $visibility The new visibility.  0 = hidden, 1 = visible
- * @return array A list of resources which were hidden in the section
- */
-function format_multitopic_set_section_visible(int $courseid, $section, int $visibility): array {
-    // CHANGED LINE ABOVE: Use sectioninfo, not section number.
-    global $DB;
-
-    $resourcestotoggle = [];
-    // ADDED.
-    // Fetch section info.
-    $sectionsextra = course_get_format($courseid)->fmt_get_sections_extra();
-    $sectionextra = array_key_exists($section->id, $sectionsextra) ? $sectionsextra[$section->id] : null;
-    // We will recurse if setting visibility to hidden, because hidden sections should not contain visible sections.
-    $recurse = ($visibility == 0);
-    // END ADDED.
-    for ($subsectionextra = $sectionextra; /* ... */
-        $subsectionextra && ($subsectionextra->id == $section->id
-                            || $recurse && $subsectionextra->levelsan > $sectionextra->levelsan); /* ... */
-        $subsectionextra = array_key_exists($subsectionextra->nextanyid, $sectionsextra) ?
-            $sectionsextra[$subsectionextra->nextanyid] : null) {
-        // CHANGED LINES ABOVE: Recurse, if necessary.
-        $subsection = $subsectionextra->sectionbase;
-        course_update_section($courseid, $subsection, ['visible' => $visibility]); // CHANGED: $section -> $subsection .
-
-        // Determine which modules are visible for AJAX update.
-        $modules = !empty($subsection->sequence) ? explode(',', $subsection->sequence) : [];
-        // CHANGED LINE ABOVE: $section -> $subsection.
-        if (!empty($modules)) {
-            list($insql, $params) = $DB->get_in_or_equal($modules);
-            $select = 'id ' . $insql . ' AND visible = ?';
-            array_push($params, $visibility);
-            if (!$visibility) {
-                $select .= ' AND visibleold = 1';
-            }
-            $resourcestotoggle = array_merge($resourcestotoggle,
-                                            $DB->get_fieldset_select('course_modules', 'id', $select, $params));
-            // CHANGED LINE ABOVE: Merge results.
-        }
-    }
-    return $resourcestotoggle;
-}
-
-
-/**
- * Creates a course section and adds it to the specified position
- *
- * @param stdClass $courseorid course id or course object
- * @param stdClass $section position to insert at.  Must specify parentid.  May specify level.
- * @return stdClass created section object.  Has database properties plus parentid and levelsan.
- */
-function format_multitopic_course_create_section(\stdClass $courseorid, \stdClass $section): \stdClass {
-    // CHANGED LINE ABOVE: Use section info, specifying parentid and level, instead of section number.
-    global $CFG, $DB;
-    $courseid = is_object($courseorid) ? $courseorid->id : $courseorid;
-
-    // ADDED: Require that the parent exists.
-    $parent = $DB->get_record('course_sections', ['id' => $section->parentid, 'course' => $courseid]);
-    if (!$parent) {
-        throw new \moodle_exception('sectionnotexist');
-    }
-    // END ADDED.
-
-    // Find the last sectionnum among existing sections.
-    if (false) {                                                                // CHANGED: Don't skip check.
-        $lastsection = $section->section - 1;                                   // CHANGED: Extract from section info.
-    } else {
-        $lastsection = (int)$DB->get_field_sql('SELECT max(section) from {course_sections} WHERE course = ?', [$courseid]);
-    }
-
-    // First add section to the end.
-    $cw = new \stdClass();
-    $cw->course = $courseid;
-    $cw->section = $lastsection + 1;
-    $cw->summary = '';
-    $cw->summaryformat = FORMAT_HTML;
-    $cw->sequence = '';
-    $cw->name = null;
-    $cw->visible = 1;
-    $cw->availability = null;
-    if ($CFG->version >= 2023122100.01) {
-        $cw->component = null;
-        $cw->itemid = null;
-    }
-    $cw->timemodified = time();
-    $cw->id = $DB->insert_record("course_sections", $cw);
-
-    // Now move it to the specified position.
-    if (true) {                                                                 // CHANGED: We've already checked the parent exists.
-        $course = is_object($courseorid) ? $courseorid : get_course($courseorid);
-        rebuild_course_cache($courseid, true);                                  // ADDED.
-        format_multitopic_move_section_to($course, $cw, $section);              // CHANGED: Use section info instead of position.
-        // END CHANGED.
-        $cw->section = (int)$DB->get_field_sql('SELECT section from {course_sections} WHERE course = ? AND id = ?',
-                                                [$courseid, $cw->id]);          // CHANGED.
-        $cw->parentid = $section->parentid;                                     // ADDED.
-        $cw->levelsan = $section->level ?? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC; // ADDED.
-    }
-
-    \core\event\course_section_created::create_from_section($cw)->trigger();
-
-    rebuild_course_cache($courseid, true);
-    return $cw;
-}
-
-
-/**
  * Moves sections within a course, from a position to another.
  *
  * @param \stdClass $course
  * @param \stdClass|\section_info|array $origins The section(s) to be moved.  Must specify id.
  * @param \stdClass $destination Where to move it to.  Must specify parentid, prevupid, or nextupid.  May specify level.
  * @param int $include 0 = regular only, 1 = also orphan, 2 = also delegated.
+ * @return object[]  objects containing section numbers for the moved section(s), indexed by id
  */
-function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClass $destination, int $include = 1): void {
+function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClass $destination, int $include = 1): array {
     // CHANGED LINE ABOVE: Use section info instead of number.  Removed $ignorenumsections param.  No return value (use exceptions).
     // Moves course sections within the course.
     // CHANGES THROUGHOUT: Use section info instead of number.
@@ -159,6 +49,7 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // REMOVED.
 
     // Get all sections for this course and re-order them.
+    rebuild_course_cache($course->id, true);
     if (!$sectionsextra = course_get_format($course)->fmt_get_sections_extra()) { // CHANGED.
         throw new \moodle_exception('cannotcreateorfindstructs');               // CHANGED.
     }
@@ -216,7 +107,23 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     }
     // END ADDED.
 
-    return;                                                                     // CHANGED.
+    // Provide new section numbers for moved sections.
+    $movedorigins = [];
+    foreach ($origins as $origin) {
+        if (isset($origin->id)) {
+            $originid = $origin->id;
+        } else {
+            foreach ($sectionsextra as $sectionextra) {
+                if ($sectionextra->section == $origin->section) {
+                    $originid = $sectionextra->id;
+                    break;
+                }
+            }
+        }
+        $movedorigins[$originid] = (object)['id' => $originid, 'section' => $movedsections[$originid]->section];
+    }
+
+    return $movedorigins;                                                       // CHANGED.
 }
 
 
@@ -328,6 +235,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
     $prevextra = null;
     $found = false;
     $appendextraarray = [];
+    $newposition = 0;
     foreach ($sectionsextra as $id => $sectionextra) {
         if ($found) {
             // Target position already found, extract remaining sections.
@@ -350,7 +258,8 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
         } else if (isset($parentextra)
                         && ($sectionextra->levelsan < $target->level || $sectionextra->levelsan <= $parentextra->levelsan)
                     || isset($prevextra) && ($sectionextra->levelsan <= $target->level)
-                    || isset($target->nextupid) && $sectionextra->id == $target->nextupid) {
+                    || isset($target->nextupid) && ($sectionextra->id == $target->nextupid)
+                    || isset($target->section) && ($newposition == $target->section)) {
             // Reached the last position in a specified parent in which the moved section would be a (direct) child,
             // or the appropriate position after a specified previous section,
             // or the position before a specified next section.
@@ -362,8 +271,11 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
             unset($sectionsextra[$id]);
             $found = true;
         }
+        $newposition++;
     }
-    if (isset($parentextra) || isset($prevextra)) {
+    if (isset($parentextra) || isset($prevextra)
+        || property_exists($target, 'nextupid') && ($target->nextupid == null)
+        || isset($target->section) && ($newposition == $target->section)) {
         // If a specified parent or previous was found, but no position within the section list was appropriate,
         // the appropriate position must be the end of the section list.
         $found = true;
@@ -442,6 +354,9 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
  * @return string
  */
 function format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode): string {
+    global $CFG;
+    require_once($CFG->libdir . '/licenselib.php');
+
     $o = '';
     $authorwithurlarray = explode('|', $authorwithurl ?? '');
     $authorhtml = $authorwithurlarray[0];
@@ -449,10 +364,10 @@ function format_multitopic_image_attribution($imagename, $authorwithurl, $licenc
         $authorurl = $authorwithurlarray[1];
         $authorhtml = \html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
     }
-    $licencehtml = ($licencecode && $licencecode != 'unknown') ? get_string($licencecode, 'license') : '';
-    if ($licencehtml && substr($licencecode, 0 , 3) == 'cc-') { // TODO: Links to other licences? Make this into a list?
-        $licenceurl = 'https://creativecommons.org/licenses/by-' . substr($licencecode, 3, 5) . '/4.0';
-        $licencehtml = \html_writer::tag('a', $licencehtml, ['href' => $licenceurl, 'target' => '_blank']);
+    $licence = license_manager::get_licenses()[$licencecode] ?? null;
+    $licencehtml = ($licencecode && ($licencecode != 'unknown' && $licence)) ? $licence->fullname : '';
+    if ($licencehtml && $licence->source) {
+        $licencehtml = \html_writer::tag('a', $licencehtml, ['href' => $licence->source, 'target' => '_blank']);
     }
     $o .= \html_writer::tag('span', get_string('image', 'format_multitopic') . ": {$imagename}"
                             . (($authorhtml || $licencehtml) ? ',' : ''),

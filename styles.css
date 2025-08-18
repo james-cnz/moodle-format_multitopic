@@ -32,40 +32,38 @@ body.format-multitopic .course-content ul.nav-tabs li a div.tab_content.dimmed {
 body.format-multitopic .course-content ul.nav-tabs li a.draggable {
     cursor: move;
 }
-body.format-multitopic.dragging.dir-ltr .course-content ul.nav-tabs li.drop-before,
 body.format-multitopic.dragging.dir-rtl .course-content ul.nav-tabs li.drop-after {
     border-left: 1px solid #212529;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
-body.format-multitopic.dragging.dir-ltr .course-content ul.nav-tabs li.drop-after,
-body.format-multitopic.dragging.dir-rtl .course-content ul.nav-tabs li.drop-before {
+body.format-multitopic.dragging.dir-ltr .course-content ul.nav-tabs li.drop-after {
     border-right: 1px solid #212529;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
 /* Section */
-body.format-multitopic ul.sections li.section .sectionname .inplaceeditable {
+body.format-multitopic ul.section-list li.section .sectionname .inplaceeditable {
     display: inline;
 }
-body.format-multitopic ul.sections li.section .course-section-header .section_subtitle {
+body.format-multitopic ul.section-list li.section .course-section-header .section_subtitle {
     font-size: small;
 }
-body.format-multitopic ul.sections li.section .summarytext .section_image_holder {
+body.format-multitopic ul.section-list li.section .summarytext .section_image_holder {
     float: right;
     width: 240px;
     text-align: right;
     font-size: xx-small;
 }
-body.format-multitopic ul.sections li.section .summarytext .section_image_holder img {
+body.format-multitopic ul.section-list li.section .summarytext .section_image_holder img {
     width: 240px;
     height: 180px;
     object-fit: cover;
 }
 
 /* Section Anchor Jump Fix */
-body.format-multitopic ul.sections li.section .course-section-header .sectionname {
+body.format-multitopic ul.section-list li.section .course-section-header .sectionname {
     scroll-margin-top: 70px;
 }
 

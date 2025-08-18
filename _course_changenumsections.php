@@ -29,10 +29,10 @@
  * @since     Moodle 2.3
  */
 
+use core_courseformat\formatactions;                                            // ADDED.
+
 require_once(__DIR__.'/../../../config.php');                                   // CHANGED.
 require_once($CFG->dirroot.'/course/lib.php');
-require_once(__DIR__.'/locallib.php');
-// ADDED LINE ABOVE: For function format_multitopic_course_create_section .
 
 $courseid = required_param('courseid', PARAM_INT);
 $increase = optional_param('increase', null, PARAM_BOOL);
@@ -114,7 +114,7 @@ if (false) {                                                                    
     }
     $sections = [];
     for ($i = 0; $i < max($numsections, 1); $i ++) {
-        $sections[] = format_multitopic_course_create_section($course, $insertsection);
+        $sections[] = formatactions::section($course)->fmt_create_from_object($insertsection);
         // CHANGED LINE ABOVE: Use custom method, and send section info, not section number.
     }
     $returnurl = course_get_url($course, $sections[0], []);
