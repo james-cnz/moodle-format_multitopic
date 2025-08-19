@@ -27,7 +27,7 @@ import BaseComponent from 'core_courseformat/local/content';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
-import CmItem from 'format_multitopic/courseformat/content/section/cmitem';
+import CmItem from 'core_courseformat/local/content/section/cmitem';
 
 export default class Component extends BaseComponent {
 
@@ -141,7 +141,7 @@ export default class Component extends BaseComponent {
         // CHANGED.
         let sectionlist = [];
         const togglerlistDom = this.element.querySelectorAll(
-            ".course-section[data-fmtonpage='1'] " +
+            ".course-section " +
             this.selectors.SECTION_ITEM + " " + this.selectors.COLLAPSE
         );
         for (let togglerDom of togglerlistDom) {
@@ -185,7 +185,7 @@ export default class Component extends BaseComponent {
         // ADDED.
         let sectionCollapsible = {};
         const togglerlistDom = this.element.querySelectorAll(
-            ".course-section[data-fmtonpage='1'] " +
+            ".course-section " +
             this.selectors.SECTION_ITEM + " " + this.selectors.COLLAPSE
         );
         for (let togglerDom of togglerlistDom) {
@@ -270,23 +270,6 @@ export default class Component extends BaseComponent {
             this._fixOrder(listparent, sectionlist, this.selectors.SECTION, this.dettachedSections, createSection);
         }
 
-        const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
-        for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
-            const sectionDom = sectionsDom[sdi];
-            const section = this.reactive.get("section", sectionDom.dataset.id);
-            if (!section || section.component) {
-                continue;
-            }
-            const fmtonpageNew = (section.pageid == singleSectionId) ? "1" : "0";
-            if (sectionDom.dataset.fmtonpage != fmtonpageNew) {
-                sectionDom.dataset.fmtonpage = fmtonpageNew;
-                sectionDom.style.display = (fmtonpageNew == "1") ? "block" : "none";
-                if (fmtonpageNew == "1") {
-                    this._refreshSectionCmlist({element: section});
-                }
-            }
-        }
-
         this._refreshAllSectionsToggler(this.reactive.stateManager.state);
 
         // Update Add section button.
@@ -315,7 +298,7 @@ export default class Component extends BaseComponent {
             this.selectors.CM,
             this.cms,
             (item) => {
-                return new CmItem(item); // CHANGED.
+                return new CmItem(item);
             }
         );
     }
