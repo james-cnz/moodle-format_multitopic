@@ -302,7 +302,7 @@ export default class Component extends BaseComponent {
             }
         );
 
-        this._refreshAllSectionsToggler(this.reactive.stateManager.state);      // ADDED.
+        this._refreshAllSectionsToggler(this.reactive.stateManager.state); // ADDED.
     }
 
 }
