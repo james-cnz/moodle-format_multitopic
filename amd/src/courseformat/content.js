@@ -301,6 +301,8 @@ export default class Component extends BaseComponent {
                 return new CmItem(item);
             }
         );
+
+        this._refreshAllSectionsToggler(this.reactive.stateManager.state);      // ADDED.
     }
 
 }
