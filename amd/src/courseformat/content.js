@@ -262,7 +262,8 @@ export default class Component extends BaseComponent {
         }
 
         let sectionlist = this.reactive.getExporter().listedSectionIds(state);
-        sectionlist = sectionlist.filter((sectionId) => this.reactive.get("section", sectionId).pageid == singleSectionId);
+        sectionlist = sectionlist.filter((sectionId) => (this.reactive.get("section", sectionId).pageid == singleSectionId));
+        // ADDED LINE ABOVE.
         const listparent = this.getElement(this.selectors.COURSE_SECTIONLIST);
         // For now section cannot be created at a frontend level.
         const createSection = this._createSectionItem.bind(this);
