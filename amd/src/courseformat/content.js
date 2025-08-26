@@ -314,4 +314,21 @@ export default class Component extends BaseComponent {
         );
     }
 
+    /**
+     * Reload a course section contents.
+     *
+     * Section HTML is still strongly backend dependant.
+     * Some changes require to get a new version of the section.
+     *
+     * @param {details} param0 the watcher details
+     */
+    _reloadSection(param0) {
+        const sectionDom = this.getElement(this.selectors.SECTION, param0.element.id);
+        if (!sectionDom || sectionDom.dataset?.fmtReloading) {
+            return;
+        }
+        sectionDom.dataset.fmtReloading = 1;
+        super._reloadSection(param0);
+    }
+
 }
