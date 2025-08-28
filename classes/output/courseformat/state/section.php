@@ -74,6 +74,7 @@ class section extends base_section {
         $data->parentid = $sectionextra->parentid;
         $data->available = $section->available;
         $data->pagedepthdirect = $sectionextra->pagedepthdirect;
+        $data->parentvisiblesan = $sectionextra->parentvisiblesan;
         $data->currentnestedlevel = $sectionextra->currentnestedlevel;
         $controlmenuclass = $this->format->get_output_classname('content\\section\\controlmenu');
         $controlmenu = new $controlmenuclass($this->format, $section);

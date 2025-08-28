@@ -48,30 +48,6 @@ require_once(__DIR__ . '/../../classes/coursecontentheaderfooter.php');
 class renderer extends section_renderer {
 
     /**
-     * Constructor method, calls the parent constructor.
-     *
-     * @param moodle_page $page
-     * @param string $target one of rendering target constants
-     */
-    public function __construct(\moodle_page $page, string $target) {
-        parent::__construct($page, $target);
-
-        // REMOVED: Marker stuff.
-
-        // ADDED.
-        // If we're on the view page, patch the URL to use the section ID instead of section number.
-        if ($this->page->has_set_url()
-                && ($url = $this->page->url)->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)
-                &&  $url->get_param('section')
-                && ($sectionid = optional_param('sectionid', null, PARAM_INT))) {
-            $url->remove_params(['section']);
-            $this->page->set_url($url, ['sectionid' => $sectionid]);
-        }
-        // END ADDED.
-
-    }
-
-    /**
      * Renders the provided widget and returns the HTML to display it.
      *
      * Course format templates uses a similar subfolder structure to the renderable classes.

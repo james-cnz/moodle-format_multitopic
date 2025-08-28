@@ -50,17 +50,18 @@ class content extends content_base {
         global $CFG;
         global $PAGE;
 
+        $format = $this->format;
+
         $sectionsextra = $this->format->fmt_get_sections_extra();
         $displaysectionextra = $sectionsextra[$this->format->get_sectionid()];
         if (!empty($displaysectionextra->sectionbase->component)) {
             $data = parent::export_for_template($output);
             $data->displayonesection = true;
+            $data->originalsinglesectionid = $format->originalsinglesectionid;
             return $data;
         }
 
         $PAGE->requires->js_call_amd('format_multitopic/courseformat/courseeditor/mutations', 'init');
-
-        $format = $this->format;
 
         // ADDED.
         $course = $format->get_course();
@@ -209,7 +210,7 @@ class content extends content_base {
             $pageid = ($thissectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                         $thissectionextra->id : $thissectionextra->parentid;
             $onpage = ($pageid == $format->get_sectionid());
-            if ($onpage || $format->show_editor()) {
+            if ($onpage) {
                 $sectionstodisplay[] = $thissectionextra->sectionbase;
             }
         }

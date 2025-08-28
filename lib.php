@@ -96,11 +96,21 @@ class format_multitopic extends core_courseformat\base {
      * @return format_multitopic
      */
     protected function __construct($format, $courseid) {
-        global $DB;
+        global $DB, $PAGE;
         parent::__construct($format, $courseid);
+
         if ($courseid) {
             $this->fmtrootsectionid = $DB->get_field('course_sections', 'id', ['section' => 0, 'course' => $courseid]);
             // TODO: Check if this is set correctly for new courses?
+
+            // If we're on the view page, patch the URL to use the section ID instead of section number.
+            if ($PAGE->has_set_url()
+                    && ($url = $PAGE->url)->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)
+                    &&  $url->get_param('section')
+                    && ($sectionid = optional_param('sectionid', null, PARAM_INT))) {
+                $url->remove_params(['section']);
+                $PAGE->set_url($url, ['sectionid' => $sectionid]);
+            }
         }
     }
     // END INCLUDED.
