@@ -27,7 +27,7 @@ import BaseComponent from 'core_courseformat/local/content';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
-import CmItem from 'format_multitopic/courseformat/content/section/cmitem';
+import CmItem from 'core_courseformat/local/content/section/cmitem';
 
 export default class Component extends BaseComponent {
 
@@ -141,7 +141,7 @@ export default class Component extends BaseComponent {
         // CHANGED.
         let sectionlist = [];
         const togglerlistDom = this.element.querySelectorAll(
-            ".course-section[data-fmtonpage='1'] " +
+            ".course-section " +
             this.selectors.SECTION_ITEM + " " + this.selectors.COLLAPSE
         );
         for (let togglerDom of togglerlistDom) {
@@ -185,7 +185,7 @@ export default class Component extends BaseComponent {
         // ADDED.
         let sectionCollapsible = {};
         const togglerlistDom = this.element.querySelectorAll(
-            ".course-section[data-fmtonpage='1'] " +
+            ".course-section " +
             this.selectors.SECTION_ITEM + " " + this.selectors.COLLAPSE
         );
         for (let togglerDom of togglerlistDom) {
@@ -251,7 +251,7 @@ export default class Component extends BaseComponent {
      * @param {Object} param.state the full state object (Moodle >=4.4).
      */
     _refreshCourseSectionlist(param) {
-        super._refreshCourseSectionlist(param);
+        const state = param.state;
 
         const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
         if (originalSingleSection && originalSingleSection.component) {
@@ -264,21 +264,14 @@ export default class Component extends BaseComponent {
             singleSectionId = null;
         }
 
-        const sectionsDom = this.element.querySelectorAll(this.selectors.SECTION);
-        for (let sdi = 0; sdi < sectionsDom.length; sdi++) {
-            const sectionDom = sectionsDom[sdi];
-            const section = this.reactive.get("section", sectionDom.dataset.id);
-            if (!section || section.component) {
-                continue;
-            }
-            const fmtonpageNew = (section.pageid == singleSectionId) ? "1" : "0";
-            if (sectionDom.dataset.fmtonpage != fmtonpageNew) {
-                sectionDom.dataset.fmtonpage = fmtonpageNew;
-                sectionDom.style.display = (fmtonpageNew == "1") ? "block" : "none";
-                if (fmtonpageNew == "1") {
-                    this._refreshSectionCmlist({element: section});
-                }
-            }
+        let sectionlist = this.reactive.getExporter().listedSectionIds(state);
+        sectionlist = sectionlist.filter((sectionId) => (this.reactive.get("section", sectionId).pageid == singleSectionId));
+        // ADDED LINE ABOVE.
+        const listparent = this.getElement(this.selectors.COURSE_SECTIONLIST);
+        // For now section cannot be created at a frontend level.
+        const createSection = this._createSectionItem.bind(this);
+        if (listparent) {
+            this._fixOrder(listparent, sectionlist, this.selectors.SECTION, this.dettachedSections, createSection);
         }
 
         this._refreshAllSectionsToggler(this.reactive.stateManager.state);
@@ -309,9 +302,11 @@ export default class Component extends BaseComponent {
             this.selectors.CM,
             this.cms,
             (item) => {
-                return new CmItem(item); // CHANGED.
+                return new CmItem(item);
             }
         );
+
+        this._refreshAllSectionsToggler(this.reactive.stateManager.state); // ADDED.
     }
 
     /**

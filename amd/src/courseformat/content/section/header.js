@@ -35,11 +35,8 @@ export default class extends HeaderBase {
      * @returns {Boolean}
      */
     _isSectionBulkEnabled(bulk) {
-        if (!bulk.enabled) {
-            return false;
-        }
-        return (bulk.selectedType === '' || bulk.selectedType === 'section')
-            && (this.section.levelsan >= 2) && (this.fullregion.dataset.fmtonpage == '1'); // ADDED.
+        return super._isSectionBulkEnabled(bulk)
+            && (this.section.levelsan >= 2); // ADDED.
     }
 
 }

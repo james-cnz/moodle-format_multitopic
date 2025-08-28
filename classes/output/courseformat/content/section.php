@@ -103,37 +103,23 @@ class section extends section_base {
         $result = false;
 
         $section = $this->section;
+        $format = $this->format;
 
         if (!empty($section->component)) {
             return parent::add_cm_data($data, $output);
         }
 
-        $sectionextra = $this->fmtsectionextra;
-        $format = $this->format;
+        // REMOVED summary code.
 
-        // REMOVED index code.
-
-        // ADDED.
-        $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
-                    $section->id : $sectionextra->parentid;
-        $onpage = ($pageid == $format->get_sectionid());
-        // END ADDED.
         $showcmlist = ($section->section == 0) || $section->uservisible;        // CHANGED.
 
-        // REMOVED index code.
+        // REMOVED activities summary.
         // Add the cm list.
         if ($showcmlist) {
-            if ($onpage || $format->get_sectionid() == null) {
-                $cmlist = new $this->cmlistclass($format, $section);
-                $data->cmlist = $cmlist->export_for_template($output);
-            } else {
-                $cmlisteft = new \stdClass();
-                $cmlisteft->cms = [];
-                $data->cmlist = $cmlisteft;
-            }
+            $cmlist = new $this->cmlistclass($format, $section);
+            $data->cmlist = $cmlist->export_for_template($output);
             $result = true;
         }
-
         return $result;
     }
 
@@ -177,7 +163,7 @@ class section extends section_base {
         $sectionextra = $this->fmtsectionextra;
         $format = $this->format;
 
-        if ($section->id == $format->get_sectionid()) {
+        if (empty($section->component) && ($sectionextra->levelsan < 2)) {
             $data->collapsemenu = true;
         } else {
             unset($data->collapsemenu);
@@ -187,7 +173,6 @@ class section extends section_base {
         $course = $this->format->get_course();
         $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                     $section->id : $sectionextra->parentid;
-        $onpage = ($pageid == $format->get_sectionid());
         $sectionstyle = " sectionid-{$section->id}";
         $iscollapsible = false;
         // Determine the section type.
@@ -209,7 +194,6 @@ class section extends section_base {
         }
         $data->fmtclasses = $sectionstyle;
         $data->iscollapsible = $iscollapsible;
-        $data->fmtonpage = $onpage;
         // END ADDED.
 
         return true;
