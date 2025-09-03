@@ -1018,6 +1018,7 @@ class format_multitopic extends core_courseformat\base {
      * @return array of options
      */
     public function course_format_options($foreditform = false): array {
+        global $CFG;                                                            // ADDED.
         static $courseformatoptions = false;
         if ($courseformatoptions === false) {
             $courseconfig = get_config('moodlecourse');
@@ -1048,6 +1049,25 @@ class format_multitopic extends core_courseformat\base {
             ];
         }
         if ($foreditform && !isset($courseformatoptions['hiddensections']['label'])) { // CHANGED.
+            if ($CFG->version >= 2025082900) {
+                $hiddensectionslist = new core\output\choicelist();
+                $hiddensectionslist->set_allow_empty(false);
+                $hiddensectionslist->add_option(
+                    1,
+                    new lang_string('hiddensectionsinvisible'),
+                    [
+                        'description' => new lang_string('hiddensectionsinvisible_description'),
+                    ],
+                );
+                $hiddensectionslist->add_option(
+                    0,
+                    new lang_string('hiddensectionscollapsed'),
+                    [
+                        'description' => new lang_string('hiddensectionscollapsed_description'),
+                    ],
+                );
+            }
+
             $courseformatoptionsedit = [
                 // INCLUDED /course/format/periods/lib.php function course_format_options $foreditform 'periodduration' .
                 'periodduration' => [
@@ -1079,7 +1099,7 @@ class format_multitopic extends core_courseformat\base {
                     'help_component' => 'format_multitopic',
                 ],
                 // END ADDED.
-                'hiddensections' => [
+                'hiddensections' => ($CFG->version < 2025082900) ? [
                     'label' => new lang_string('hiddensections'),
                     'help' => 'hiddensections',
                     'help_component' => 'moodle',
@@ -1089,6 +1109,12 @@ class format_multitopic extends core_courseformat\base {
                             0 => new lang_string('hiddensectionscollapsed'),
                             1 => new lang_string('hiddensectionsinvisible'),
                         ],
+                    ],
+                ] : [
+                    'label' => new lang_string('hiddensections'),
+                    'element_type' => 'choicedropdown',
+                    'element_attributes' => [
+                        $hiddensectionslist,
                     ],
                 ],
                 // REMOVED: coursedisplay .
