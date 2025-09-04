@@ -15,15 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This script allows the number of sections in a course to be increased or decreased, redirecting to the course page.
+ * This script allows the number of sections in a course to be increased,
+ * redirecting to the course page.
  *
  * CHANGES:
  *  - Use section info instead of section number.
- *  - Specify the insertion location as the new section's parent ID, rather than the new section's section number.
+ *  - Specify the insertion location as the new section's parent or previous ID,
+ *    rather than the new section's section number.
  *  - Specify the new section's level.
  *
  * @package   format_multitopic
- * @copyright 2019 James Calder and Otago Polytechnic
+ * @copyright 2019 onwards James Calder and Otago Polytechnic
  * @copyright based on work by 2012 Dan Poltawski
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since     Moodle 2.3
@@ -37,6 +39,7 @@ require_once($CFG->dirroot.'/course/lib.php');
 $courseid = required_param('courseid', PARAM_INT);
 $increase = optional_param('increase', null, PARAM_BOOL);
 $insertparentid = optional_param('insertparentid', null, PARAM_INT);            // CHANGED: Insert nested in section with ID.
+$insertprevupid = optional_param('insertprevupid', null, PARAM_INT);
 $insertlevel = optional_param('insertlevel', null, PARAM_INT);                  // ADDED: Level for inserted section.
 $numsections = optional_param('numsections', 1, PARAM_INT);        // Number of sections to insert.
 $returnurl = optional_param('returnurl', null, PARAM_LOCALURL);    // Where to return to after the action.
@@ -44,9 +47,14 @@ $returnurl = optional_param('returnurl', null, PARAM_LOCALURL);    // Where to r
 
 // ADDED: Create section info object.
 $insertsection = null;
-if (isset($insertparentid)) {
+if (isset($insertparentid) || isset($insertprevupid)) {
     $insertsection = new \stdClass();
-    $insertsection->parentid = $insertparentid;
+    if (isset($insertparentid)) {
+        $insertsection->parentid = $insertparentid;
+    }
+    if (isset($insertprevupid)) {
+        $insertsection->prevupid = $insertprevupid;
+    }
     $insertsection->level = $insertlevel ?? FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC;
 }
 // END ADDED.

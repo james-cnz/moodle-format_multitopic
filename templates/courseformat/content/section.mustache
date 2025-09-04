@@ -107,5 +107,12 @@
         {{/ core_courseformat/local/content/section/content }}
     </div>
 
+    {{#insertafter}}
+        {{#numsections}}
+            {{$ core_courseformat/local/content/addsection}}
+                {{> format_multitopic/courseformat/content/section/addsectiondivider }}
+            {{/ core_courseformat/local/content/addsection}}
+        {{/numsections}}
+    {{/insertafter}}
 </li>
 {{#testingsection}}</ul>{{/testingsection}}

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Contains the default section course format output class.
+ * Contains the section course format output class.
  *
  * @package   format_multitopic
  * @copyright 2019 onwards James Calder and Otago Polytechnic
@@ -26,6 +26,8 @@
 namespace format_multitopic\output\courseformat\content;
 
 use core_courseformat\output\local\content\addsection as addsection_base;
+use core_courseformat\base as course_format;
+use section_info;
 use stdClass;
 
 /**
@@ -39,6 +41,25 @@ use stdClass;
 class addsection extends addsection_base {
 
     /**
+     * @var section_info|null the target section information
+     * Redeclaration deprecated since Moodle 5.1, see MDL-85284.
+     */
+    protected ?section_info $targetsection;
+
+    /**
+     * Constructor.
+     *
+     * Redeclaration deprecated since Moodle 5.1, see MDL-85284.
+     *
+     * @param course_format $format the course format
+     * @param section_info|null $targetsection the target targetsection information
+     */
+    public function __construct(course_format $format, ?section_info $targetsection = null) {
+        parent::__construct($format);
+        $this->targetsection = $targetsection;
+    }
+
+    /**
      * Get the add section button data.
      *
      * Current course format does not have 'numsections' option but it has multiple sections suppport.
@@ -49,9 +70,9 @@ class addsection extends addsection_base {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @param int $lastsection the last section number
      * @param int $maxsections the maximum number of sections (deprecated since Moodle 5.1)
-     * @return \stdClass data context for a mustache template
+     * @return stdClass data context for a mustache template
      */
-    protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections = 0): \stdClass {
+    protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections = 0): stdClass {
         $format = $this->format;
         $course = $format->get_course();
         $data = parent::get_add_section_data($output, $lastsection, $maxsections);
@@ -62,13 +83,21 @@ class addsection extends addsection_base {
             $addstring = get_string('addsections');
         }
 
-        $params = ['courseid' => $course->id,                               // CHANGED.
-                    'insertparentid' => $format->get_sectionid(),
-                    'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
-                    'sesskey' => sesskey(),
-                    'returnurl' => new \moodle_url("/course/view.php?id={$course->id}"
-                        . (($format->get_sectionid() != $format->fmtrootsectionid) ?
-                        "&sectionid={$format->get_sectionid()}" : "")), ];
+        $params = [
+            'courseid' => $course->id,                                          // CHANGED.
+            'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
+            'sesskey' => sesskey(),
+            'returnurl' => new \moodle_url(
+                "/course/view.php?id={$course->id}"
+                . (($format->get_sectionid() != $format->fmtrootsectionid) ?
+                    "&sectionid={$format->get_sectionid()}" : "")
+            ),
+        ];
+        if ($this->targetsection) {
+            $params['insertprevupid'] = $this->targetsection->id;
+        } else {
+            $params['insertparentid'] = $format->get_sectionid();
+        }
 
         $data->addsections->url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
         $data->addsections->title = $addstring;

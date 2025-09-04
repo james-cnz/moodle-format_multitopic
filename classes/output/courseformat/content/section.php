@@ -62,12 +62,21 @@ class section extends section_base {
      * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): \stdClass {
+        $format = $this->format;
+
         $data = parent::export_for_template($output);
 
         $sectionextra = $this->fmtsectionextra;
         unset($data->displayonesection);
         $data->levelsan = $sectionextra->levelsan;
         $data->fmtispage = ($sectionextra->levelsan < 2);
+
+        if (!$this->section->get_component_instance()) {
+            $addsectionclass = $format->get_output_classname('content\\addsection');
+            $addsection = new $addsectionclass($format, $this->section);
+            $data->numsections = $addsection->export_for_template($output);
+            $data->insertafter = true;
+        }
 
         return $data;
     }
