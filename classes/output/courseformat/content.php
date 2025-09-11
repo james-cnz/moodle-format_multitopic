@@ -143,55 +143,12 @@ class content extends content_base {
         );
         $data->sectionnavigation = $sectionnav->export_for_template($output);
 
-        if ($CFG->version >= 2023021000 && $format->show_editor()) {
+        if ($format->show_editor()) {
             $bulkedittools = new $this->bulkedittoolsclass($format);
             $data->bulkedittools = $bulkedittools->export_for_template($output);
         }
 
         return $data;
-    }
-
-    /**
-     * Export sections array data.
-     *
-     * Redeclaration deprecated since 5.0, see MDL-72526.
-     *
-     * @param renderer_base $output typically, the renderer that's calling this function
-     * @return array data context for a mustache template
-     */
-    protected function export_sections(\renderer_base $output): array {
-
-        $format = $this->format;
-        $course = $format->get_course();
-        $modinfo = $this->format->get_modinfo();
-
-        // Generate section list.
-        $sectionseft = [];
-        // REMOVED stealthsections and numsections.
-        foreach ($this->get_sections_to_display($modinfo) as $thissection) {
-            // The course/view.php check the section existence but the output can be called
-            // from other parts so we need to check it.
-            if (!$thissection) {
-                throw new \moodle_exception(
-                    'unknowncoursesection',
-                    'error',
-                    course_get_url($course),
-                    format_string($course->fullname)
-                );
-            }
-
-            $section = new $this->sectionclass($format, $thissection);
-
-            // REMOVED: numsections.
-
-            if (!$format->is_section_visible($thissection)) {
-                continue;
-            }
-
-            $sectionseft[] = $section->export_for_template($output);
-        }
-        // REMOVED stealthsections.
-        return $sectionseft;
     }
 
     /**

@@ -45,12 +45,6 @@ class sectionnavigation extends sectionnavigation_base {
     protected $fmtsectionextra;
 
     /**
-     * @var stdClass the calculated data to prevent calculations when rendered several times
-     * Redeclaration deprecated since 5.0, see MDL-72526.
-     */
-    protected $data = null;
-
-    /**
      * Constructor.
      *
      * @param course_format $format the course format

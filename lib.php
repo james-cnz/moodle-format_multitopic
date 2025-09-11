@@ -182,10 +182,7 @@ class format_multitopic extends core_courseformat\base {
      */
     public function uses_indentation(): bool {
         global $CFG;
-        return (($CFG->version >= 2022041907.09 && $CFG->version < 2022042000
-              || $CFG->version >= 2022112802.09 && $CFG->version < 2022112900
-              || $CFG->version >= 2023031400)
-            && get_config('format_multitopic', 'indentation')) ? true : false;
+        return get_config('format_multitopic', 'indentation') ? true : false;
     }
 
     // ADDED.
@@ -866,49 +863,9 @@ class format_multitopic extends core_courseformat\base {
                 }
             }
             if ($sectionextra && $sectionextra->id != $pageid) {
-                if (empty($CFG->linkcoursesections) && !empty($options['navigation']) && $CFG->version < 2023120700) {
-                    return null;
-                }
                 $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
             }
             // END CHANGED.
-        }
-        return $url;
-    }
-
-    /**
-     * The URL to update the course format.
-     *
-     * If no section is specified, the update will redirect to the general course page.
-     *
-     * @param string $action action name the reactive action
-     * @param array $ids list of ids to update
-     * @param int|null $targetsectionid optional target section id
-     * @param int|null $targetcmid optional target cm id
-     * @param moodle_url|null $returnurl optional custom return url
-     * @return moodle_url
-     * @todo Deprecate when MDL-84979 is integrated.
-     */
-    public function get_update_url(
-        string $action,
-        array $ids = [],
-        ?int $targetsectionid = null,
-        ?int $targetcmid = null,
-        ?moodle_url $returnurl = null
-    ): moodle_url {
-        $url = parent::get_update_url(
-            action: $action,
-            ids: $ids,
-            targetsectionid: $targetsectionid,
-            targetcmid: $targetcmid,
-            returnurl: $returnurl
-        );
-
-        if ($targetsectionid) {
-            $url->param('targetsectionid', $targetsectionid);
-        }
-        if (isset($targetcmid)) {
-            $url->param('targetcmid', $targetcmid);
         }
         return $url;
     }

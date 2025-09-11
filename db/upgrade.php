@@ -63,12 +63,7 @@ function xmldb_format_multitopic_upgrade($oldversion) {
     if ($oldversion < 2023072900) {
         // For sites migrating from 4.0.x or 4.1.x where the indentation was removed,
         // we are disabling 'indentation' value by default.
-        if (
-            $oldversion >= 2022061400
-            || !($CFG->version >= 2022041907.09 && $CFG->version < 2022042000
-              || $CFG->version >= 2022112802.09 && $CFG->version < 2022112900
-              || $CFG->version >= 2023031400)
-        ) {
+        if ($oldversion >= 2022061400) {
             set_config('indentation', 0, 'format_multitopic');
         } else {
             set_config('indentation', 1, 'format_multitopic');

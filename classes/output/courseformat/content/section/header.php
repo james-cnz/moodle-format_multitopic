@@ -78,11 +78,7 @@ class header extends header_base {
         $data->fmticon = $sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ?
                             'icon fa fa-folder-o fa-fw' : 'icon fa fa-list fa-fw';
 
-        if ($CFG->version >= 2023021000) {
-            $data->sectionbulk = true;
-        } else {
-            unset($data->sectionbulk);
-        }
+        $data->sectionbulk = true;
 
         return $data;
     }

@@ -87,6 +87,6 @@ class section extends base_section {
     protected function is_bulk_editable(): bool {
         global $CFG;
         $section = $this->section;
-        return ($this->fmtsectionextra->levelsan >= 2) || ($section->section != 0) && ($CFG->version < 2024042200);
+        return ($this->fmtsectionextra->levelsan >= 2);
     }
 }
