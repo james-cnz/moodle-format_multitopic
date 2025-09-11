@@ -40,7 +40,6 @@ use core\url;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class controlmenu extends controlmenu_base {
-
     /** @var \format_multitopic\section_info_extra Multitopic-specific section information */
     protected $fmtsectionextra;
 
@@ -76,8 +75,12 @@ class controlmenu extends controlmenu_base {
         $controls = $this->add_control_after($controls, 'moveleveldown', 'moveprev', $this->get_section_moveprev_item());
         $controls = $this->add_control_after($controls, 'moveprev', 'movenext', $this->get_section_movenext_item());
         $controls = $this->add_control_after($controls, 'movenext', 'movetoprevpage', $this->get_section_movetoprevpage_item());
-        $controls = $this->add_control_after($controls, 'movetoprevpage',
-                                            'movetonextpage', $this->get_section_movetonextpage_item());
+        $controls = $this->add_control_after(
+            $controls,
+            'movetoprevpage',
+            'movetonextpage',
+            $this->get_section_movetonextpage_item()
+        );
         $controls = $this->add_control_after($controls, 'movetonextpage', 'moveup', $this->get_section_moveup_item());
         $controls = $this->add_control_after($controls, 'moveup', 'movedown', $this->get_section_movedown_item());
 
@@ -157,7 +160,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_movesection_item(): ?link {
         $link = null;
 
-        if ($this->section->section && !$this->fmtonsectionpage
+        if (
+            $this->section->section && !$this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
         ) {
@@ -192,7 +196,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_movelevelup_item(): ?link {
         $link = null;
 
-        if ($this->section->section && $this->fmtonsectionpage
+        if (
+            $this->section->section && $this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && has_capability('moodle/course:update', $this->coursecontext)
@@ -227,7 +232,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_moveleveldown_item(): ?link {
         $link = null;
 
-        if ($this->section->section && $this->fmtonsectionpage
+        if (
+            $this->section->section && $this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && has_capability('moodle/course:update', $this->coursecontext)
@@ -264,7 +270,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_moveprev_item(): ?link {
         $link = null;
 
-        if ($this->section->section && $this->fmtonsectionpage
+        if (
+            $this->section->section && $this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && isset($this->fmtsectionextra->prevupid) && ($this->fmtsectionextra->prevupid != $this->format->fmtrootsectionid)
@@ -302,7 +309,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_movenext_item(): ?link {
         $link = null;
 
-        if ($this->section->section && $this->fmtonsectionpage
+        if (
+            $this->section->section && $this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && isset($this->fmtsectionextra->nextupid)
@@ -340,7 +348,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_movetoprevpage_item(): ?link {
         $link = null;
 
-        if ($this->section->section && !$this->fmtonsectionpage
+        if (
+            $this->section->section && !$this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && $this->fmtsectionextra->prevpageid
@@ -383,7 +392,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_movetonextpage_item(): ?link {
         $link = null;
 
-        if ($this->section->section && !$this->fmtonsectionpage
+        if (
+            $this->section->section && !$this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && $this->fmtsectionextra->nextpageid
@@ -426,7 +436,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_moveup_item(): ?link {
         $link = null;
 
-        if ($this->section->section && !$this->fmtonsectionpage
+        if (
+            $this->section->section && !$this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && ($this->fmtsectionextra->prevupid != $this->fmtsectionextra->parentid)
@@ -463,7 +474,8 @@ class controlmenu extends controlmenu_base {
     protected function get_section_movedown_item(): ?link {
         $link = null;
 
-        if ($this->section->section && !$this->fmtonsectionpage
+        if (
+            $this->section->section && !$this->fmtonsectionpage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && ($this->fmtsectionextra->nextupid != $this->fmtsectionextra->nextpageid)

@@ -39,7 +39,6 @@ use stdClass;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class addsection extends addsection_base {
-
     /**
      * @var section_info|null the target section information
      * Redeclaration deprecated since Moodle 5.1, see MDL-85284.
@@ -84,7 +83,7 @@ class addsection extends addsection_base {
         }
 
         $params = [
-            'courseid' => $course->id,                                          // CHANGED.
+            'courseid' => $course->id, // CHANGED.
             'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
             'sesskey' => sesskey(),
             'returnurl' => new \moodle_url(

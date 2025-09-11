@@ -33,8 +33,8 @@
 
 use core_courseformat\formatactions;                                            // ADDED.
 
-require_once(__DIR__.'/../../../config.php');                                   // CHANGED.
-require_once($CFG->dirroot.'/course/lib.php');
+require_once(__DIR__ . '/../../../config.php');                                 // CHANGED.
+require_once($CFG->dirroot . '/course/lib.php');
 
 $courseid = required_param('courseid', PARAM_INT);
 $increase = optional_param('increase', null, PARAM_BOOL);
@@ -113,7 +113,6 @@ if (false) {                                                                    
     // Overwriting returnurl to be consistent with block below even though we never get here.
     $returnurl = course_get_url($course);
     $returnurl->set_anchor('changenumsections');
-
 } else if (course_get_format($course)->uses_sections() && $insertsection !== null) {
     if (true) {
         // CHANGED: Usually Moodle would not check for the capability to move sections when adding a section to the end.
@@ -121,7 +120,7 @@ if (false) {                                                                    
         require_capability('moodle/course:movesections', \context_course::instance($course->id));
     }
     $sections = [];
-    for ($i = 0; $i < max($numsections, 1); $i ++) {
+    for ($i = 0; $i < max($numsections, 1); $i++) {
         $sections[] = formatactions::section($course)->fmt_create_from_object($insertsection);
         // CHANGED LINE ABOVE: Use custom method, and send section info, not section number.
     }

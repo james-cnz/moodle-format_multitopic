@@ -66,10 +66,16 @@ class tabtreecontainer implements named_templatable, renderable {
         $tabs = [];
         $inactivetabs = [];
 
-        $tabln = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1,
-                            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1, null);
-        $sectionextraatlevel = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
-                                     FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT, null);
+        $tabln = array_fill(
+            FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1,
+            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT - 1,
+            null
+        );
+        $sectionextraatlevel = array_fill(
+            FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+            null
+        );
 
         foreach ($sectionsextra as $thissectionextra) {
             $thissection = $thissectionextra->sectionbase;
@@ -83,9 +89,10 @@ class tabtreecontainer implements named_templatable, renderable {
             }
 
             // Make and add tabs for visible pages.
-            if ($thissectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
-                && $format->is_section_visible($thissection)) {
-
+            if (
+                $thissectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
+                && $format->is_section_visible($thissection)
+            ) {
                 $sectionname = get_section_name($course, $thissection);
 
                 $url = course_get_url($course, $thissection);
@@ -93,13 +100,14 @@ class tabtreecontainer implements named_templatable, renderable {
                 // REMOVED: marker.
 
                 // Include main tab, and index tabs for pages with sub-pages.
-                for ($level = max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $thissectionextra->levelsan); /* ... */
-                     $level <= $thissectionextra->pagedepthdirect
+                for (/* ... */
+                    $level = max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $thissectionextra->levelsan); /* ... */
+                    $level <= $thissectionextra->pagedepthdirect
                                 + ($format->show_editor()
                                     && $thissectionextra->pagedepthdirect < FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE ?
                                         1 : 0); /* ... */
-                     $level++) {
-
+                    $level++
+                /* ... */) {
                     // Make tab.
                     $newtab = new tab(
                         "tab_id_{$thissection->id}_l{$level}",
@@ -127,28 +135,30 @@ class tabtreecontainer implements named_templatable, renderable {
                         $tabln[$level - 1]->subtree[] = $newtab;
                     }
                     $tabln[$level] = $newtab;
-
                 }
 
                 // Disable tabs for hidden sections.
                 if (!(($thissection->section == 0) || $thissection->uservisible)) {
                     $inactivetabs[] = "tab_id_{$thissection->id}_l{$thissectionextra->levelsan}";
                 }
-
             }
 
             // Include "add" sub-tabs if editing.
-            if ($thissectionextra->nextanyid == $thissectionextra->nextpageid
-                && $format->show_editor()) {
-
+            if (
+                $thissectionextra->nextanyid == $thissectionextra->nextpageid
+                && $format->show_editor()
+            ) {
                 // Include "add" sub-tabs for each level of page finished.
                 $nextsectionlevel = $thissectionextra->nextpageid ?
                                     $sectionsextra[$thissectionextra->nextpageid]->levelsan : FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
-                for ($level = min($sectionextraatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->pagedepthdirect + 1,
-                                    FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE); /* ... */
-                        $level >= $nextsectionlevel + 1; /* ... */
-                        $level--) {
-
+                for (/* ... */
+                    $level = min(
+                        $sectionextraatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->pagedepthdirect + 1,
+                        FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE
+                    ); /* ... */
+                    $level >= $nextsectionlevel + 1; /* ... */
+                    $level--
+                /* ... */) {
                     $parent = $sectionextraatlevel[$level - 1]->sectionbase;
                     if (!(($parent->section == 0) || $parent->uservisible && $format->is_section_visible($parent))) {
                         continue;
@@ -188,11 +198,8 @@ class tabtreecontainer implements named_templatable, renderable {
                     if (!$canaddmore) {
                         $inactivetabs[] = "tab_id_{$sectionextraatlevel[$level - 1]->id}_l{$level}_add";
                     }
-
                 }
-
             }
-
         }
 
         $selectedtab = "tab_id_{$displaysectionextra->id}_l{$displaysectionextra->pagedepthdirect}";
@@ -211,5 +218,4 @@ class tabtreecontainer implements named_templatable, renderable {
     public function export_for_template(\renderer_base $output): stdClass {
         return (new \tabtree(...$this->get_tabs_data_etc($output)))->export_for_template($output);
     }
-
 }

@@ -111,7 +111,7 @@ class global_navigation_wrapper {
             }
             foreach ($modinfo->sections[$section->section] as $cmid) {
                 $cm = $modinfo->cms[$cmid];
-                $activity = new \stdClass;
+                $activity = new \stdClass();
                 $activity->id = $cm->id;
                 $activity->course = $course->id;
                 $activity->sectionid = $section->id;                            // CHANGED: Use section ID instead of number.
@@ -155,15 +155,18 @@ class global_navigation_wrapper {
         require_once($CFG->dirroot . '/course/lib.php');
         $format = course_get_format($course);
 
-        list($sections, $activities) = $this->generate_sections_and_activities($course);
+        [$sections, $activities] = $this->generate_sections_and_activities($course);
 
         $navigationsections = [];
         // ADDED.
         // Navigation node at level n.
         // This is a list of the navigation nodes currently at each level,
         // from the node for the course, down to the node we're currently working on.
-        $nodeln = array_fill(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
-                             FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $coursenode);
+        $nodeln = array_fill(
+            FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT,
+            FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1,
+            $coursenode
+        );
         // The navigation node we're currently working on.
         $sectionnode = $coursenode;
         // Extra navigation node ID counter.
@@ -178,11 +181,13 @@ class global_navigation_wrapper {
             if ($course->id == $SITE->id) {
                 $this->load_section_activities($coursenode, $section, $activities); // CHANGED: Pass section info rather than num.
             } else {
-                if (!(($section->section == 0) || $section->uservisible && course_get_format($course)->is_section_visible($section))
-                    || (!$this->innershowemptysections &&
-                        !$section->hasactivites && !$sectionextra->hassubsections
+                if (
+                    !(($section->section == 0) || $section->uservisible && course_get_format($course)->is_section_visible($section))
+                    || (!$this->innershowemptysections
+                        && !$section->hasactivites && !$sectionextra->hassubsections
                         && $this->inner->includesectionnum !== $section->section    // TODO: Remove?
-                        && $this->innerincludesectionid !== $section->id)) {
+                        && $this->innerincludesectionid !== $section->id)
+                ) {
                             // CHANGED ABOVE: Use sanitised visibility, check for subsections, and use section ID.
                     continue;
                 }
@@ -202,10 +207,17 @@ class global_navigation_wrapper {
                 for ($level = $firstlevel; $level <= $lastlevel; $level++) {
                     $parentnode = $nodeln[$level - 1];                          // ADDED.
                     $nodeid = ($level == $lastlevel) ? $sectionid : $extraid--; // ADDED.
-                    $sectionnode = $parentnode->add($sectionname, $url, \navigation_node::TYPE_SECTION,
-                        null, $nodeid,
-                        new \pix_icon($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'i/section'
-                                                                                                 : 'e/bullet_list', ''));
+                    $sectionnode = $parentnode->add(
+                        $sectionname,
+                        $url,
+                        \navigation_node::TYPE_SECTION,
+                        null,
+                        $nodeid,
+                        new \pix_icon(
+                            $sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'i/section' : 'e/bullet_list',
+                            ''
+                        )
+                    );
                     // CHANGED ABOVE: Attach to parentnode with nodeid as defined above, and use a list icon for topic sections.
                     $sectionnode->nodetype = \navigation_node::NODETYPE_BRANCH;
                     $sectionnode->hidden = (!$section->visible || !$section->available) && ($section->section != 0);
@@ -218,16 +230,17 @@ class global_navigation_wrapper {
                     $nodeln[$level] = $sectionnode;
                 }
 
-                if ($this->inner->includesectionnum !== false && $this->inner->includesectionnum == $section->section
-                        || isset($this->innerincludesectionid) && $this->innerincludesectionid == $section->id
-                        || $sectionextra->hassubsections) {
-                            // CHANGED ABOVE: Use section ID.
-                            // Also check for subsections, because activities might not get loaded otherwise.
+                if (
+                    $this->inner->includesectionnum !== false && $this->inner->includesectionnum == $section->section
+                    || isset($this->innerincludesectionid) && $this->innerincludesectionid == $section->id
+                    || $sectionextra->hassubsections
+                    // CHANGED ABOVE: Use section ID.
+                    // Also check for subsections, because activities might not get loaded otherwise.
+                ) {
                     $this->load_section_activities($sectionnode, $section, $activities);
                 }
                 $navigationsections[$sectionid] = $section;
                 // END CHANGED.
-
             }
         }
         return $navigationsections;
@@ -242,8 +255,12 @@ class global_navigation_wrapper {
      * @param \stdClass|null $course The course object the section and activities relate to.
      * @return array Array of activity nodes
      */
-    protected function load_section_activities(\navigation_node $sectionnode, \section_info $section, array $activities,
-                                                ?\stdClass $course = null): array {
+    protected function load_section_activities(
+        \navigation_node $sectionnode,
+        \section_info $section,
+        array $activities,
+        ?\stdClass $course = null
+    ): array {
         // CHANGED ABOVE: Use section info instead of number.
         global $CFG, $SITE;
         // A static counter for JS function naming.
@@ -310,7 +327,6 @@ class global_navigation_wrapper {
     }
 
     // REMOVED function load_stealth_activity - class end .
-
 }
 
 // REMOVED class global_navigation_for_ajax - end .

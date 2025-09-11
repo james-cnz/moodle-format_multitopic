@@ -27,7 +27,6 @@ use core\output\tabobject as tab_base;
  * @copyright based on work by Marina Glancy
  */
 class tab extends tab_base {
-
     /**
      * Export for template.
      *
@@ -52,5 +51,4 @@ class tab extends tab_base {
         $eft->sectionid = $sectionid;
         return $eft;
     }
-
 }

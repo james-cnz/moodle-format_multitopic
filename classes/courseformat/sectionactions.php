@@ -28,7 +28,6 @@ use core_courseformat\local\sectionactions as base_sectionactions;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class sectionactions extends base_sectionactions {
-
     /**
      * Create a course section using a record object.
      *
@@ -40,7 +39,7 @@ class sectionactions extends base_sectionactions {
      */
     public function fmt_create_from_object(stdClass $fields, bool $skipcheck = false): stdClass {
         global $DB;
-        require_once(__DIR__.'/../../locallib.php');
+        require_once(__DIR__ . '/../../locallib.php');
 
         $skipcheck = $skipcheck && isset($fields->section);
 
@@ -90,8 +89,11 @@ class sectionactions extends base_sectionactions {
         if (!$skipmove) {
             try {
                 $movednews = format_multitopic_move_section_to(
-                                $this->course, [$sectionrecord], $fields, !empty($fields->component) ? 2 : 1
-                            );
+                    $this->course,
+                    [$sectionrecord],
+                    $fields,
+                    !empty($fields->component) ? 2 : 1
+                );
                 $sectionrecord->section = $movednews[$sectionrecord->id]->section;
             } catch (\moodle_exception $e) {
                 $DB->delete_records('course_sections', ['id' => $sectionrecord->id]);
@@ -104,5 +106,4 @@ class sectionactions extends base_sectionactions {
         rebuild_course_cache($this->course->id, true);
         return $sectionrecord;
     }
-
 }

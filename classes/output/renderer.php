@@ -46,7 +46,6 @@ require_once(__DIR__ . '/../../classes/coursecontentheaderfooter.php');
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class renderer extends section_renderer {
-
     /**
      * Renders the provided widget and returns the HTML to display it.
      *
@@ -73,8 +72,10 @@ class renderer extends section_renderer {
             $specialrenderers = '/^(?<componentpath>' . $corepath . '|' . $pluginpath . ')\/(?<template>.+)$/';
             $matches = null;
 
-            if (preg_match($specialrenderers, $fullpath, $matches)
-                && file_exists($CFG->dirroot . '/course/format/multitopic/templates/courseformat/' . $matches['template'])) {
+            if (
+                preg_match($specialrenderers, $fullpath, $matches)
+                && file_exists($CFG->dirroot . '/course/format/multitopic/templates/courseformat/' . $matches['template'])
+            ) {
                 $data = $widget->export_for_template($this);
                 return $this->render_from_template('format_multitopic/courseformat/' . $matches['template'], $data);    // CHANGED.
             }
@@ -157,9 +158,9 @@ class renderer extends section_renderer {
      * @return string HTML to output.
      */
     protected function render_coursecontentheaderfooter(
-                            \format_multitopic\coursecontentheaderfooter $headerfooter): string {
+        \format_multitopic\coursecontentheaderfooter $headerfooter
+    ): string {
         return $headerfooter->output();
     }
     // END ADDED.
-
 }

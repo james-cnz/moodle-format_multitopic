@@ -28,7 +28,6 @@ use section_info;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class visibility extends visibility_base {
-
     /** @var \format_multitopic\section_info_extra Multitopic-specific section information */
     protected $fmtsectionextra;
 
@@ -55,5 +54,4 @@ class visibility extends visibility_base {
         }
         return $this->fmtsectionextra->parentvisiblesan && $result;
     }
-
 }

@@ -39,7 +39,6 @@ use renderer_base;
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class content extends content_base {
-
     /**
      * Export this data so it can be used as the context for a mustache template (core/inplace_editable).
      *
@@ -66,12 +65,14 @@ class content extends content_base {
         // ADDED.
         $course = $format->get_course();
         $activesectionids = [];
-        for ($activesectionextra = $displaysectionextra; /* ... */
-                $activesectionextra; /* ... */
-                $activesectionextra = (($activesectionextra->parentid
-                    && ($activesectionextra->levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1
-                        || $activesectionextra->parentid != $format->fmtrootsectionid))
-                    ? $sectionsextra[$activesectionextra->parentid] : null)) {
+        for (/* ... */
+            $activesectionextra = $displaysectionextra; /* ... */
+            $activesectionextra; /* ... */
+            $activesectionextra = (($activesectionextra->parentid
+                && ($activesectionextra->levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1
+                    || $activesectionextra->parentid != $format->fmtrootsectionid))
+                ? $sectionsextra[$activesectionextra->parentid] : null)
+        /* ... */) {
             $activesectionids[$activesectionextra->id] = true;
         }
         $sectionpreferencesarray = $format->get_sections_preferences();
@@ -93,10 +94,12 @@ class content extends content_base {
 
         // INCLUDED from course/format/classes/output/section_renderer.php print_single_section_page() .
         // Can we view the section in question?
-        if (!(
-            ($sectioninfo = $displaysectionextra->sectionbase)
-            && ($sectioninfo->section == 0 || $sectioninfo->uservisible && $format->is_section_visible($sectioninfo))
-        )) {
+        if (
+            !(
+                ($sectioninfo = $displaysectionextra->sectionbase)
+                && ($sectioninfo->section == 0 || $sectioninfo->uservisible && $format->is_section_visible($sectioninfo))
+            )
+        ) {
             // This section doesn't exist or is not available for the user.
             // We actually already check this in course/view.php but just in case exit from this function as well.
             throw new \moodle_exception(
@@ -120,7 +123,7 @@ class content extends content_base {
 
         $data = (object)[
             'title' => $format->page_title(), // This method should be in the course_format class.
-            'tabs' => $tabseft,                                                 // ADDED.
+            'tabs' => $tabseft, // ADDED.
             'initialsection' => $initialsection,
             'sections' => $sectionseft,
             'format' => $format->get_format(),
@@ -134,8 +137,10 @@ class content extends content_base {
         $data->numsections = $addsection->export_for_template($output);
 
         // Allow next and back navigation between pages.
-        $sectionnav = new \format_multitopic\output\courseformat\content\sectionnavigation($format,
-                                                                                            $displaysectionextra->sectionbase);
+        $sectionnav = new \format_multitopic\output\courseformat\content\sectionnavigation(
+            $format,
+            $displaysectionextra->sectionbase
+        );
         $data->sectionnavigation = $sectionnav->export_for_template($output);
 
         if ($CFG->version >= 2023021000 && $format->show_editor()) {
@@ -167,8 +172,12 @@ class content extends content_base {
             // The course/view.php check the section existence but the output can be called
             // from other parts so we need to check it.
             if (!$thissection) {
-                throw new \moodle_exception('unknowncoursesection', 'error', course_get_url($course),
-                    format_string($course->fullname));
+                throw new \moodle_exception(
+                    'unknowncoursesection',
+                    'error',
+                    course_get_url($course),
+                    format_string($course->fullname)
+                );
             }
 
             $section = new $this->sectionclass($format, $thissection);
@@ -216,5 +225,4 @@ class content extends content_base {
         }
         return $sectionstodisplay;
     }
-
 }
