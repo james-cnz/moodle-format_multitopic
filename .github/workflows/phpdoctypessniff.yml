@@ -1,0 +1,26 @@
+name: PHPDoc types sniff
+
+on: [push, pull_request]
+
+jobs:
+  phpdoctypessniff:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Install PHPCS and PHPDoc types sniff globally
+        run: |
+          composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          composer global require --no-interaction --no-progress jamescnz/phpdoctypessniff
+          echo "${HOME}/.composer/vendor/bin" >> $GITHUB_PATH
+
+      - name: PHPDoc types sniff
+        run: phpcs --standard=JamesCNZMoodle --ignore=vendor/,node_modules/ .
