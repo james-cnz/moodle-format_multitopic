@@ -75,8 +75,12 @@ export default class Component extends ComponentBase {
      * @returns {boolean}
      */
     validateDropData(dropdata) {
-        // We accept a section that fits
         if (dropdata?.type === 'section') {
+            // Sections controlled by a plugin cannot accept sections.
+            if (this.section.component !== null) {
+                return false;
+            }
+            // We accept sections that fit beside or inside this one.
             const sectionzeroid = this.course.sectionlist[0];
             const origin = this.reactive.get("section", dropdata.id);
             let target = this.section;

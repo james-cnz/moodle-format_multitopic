@@ -60,6 +60,11 @@ export default class extends SectionBase {
      */
     validateDropData(dropdata) {
         if (dropdata?.type === 'section') {
+            // Sections controlled by a plugin cannot accept sections.
+            if (this.section.component !== null) {
+                return false;
+            }
+            // We accept sections that fit on this one's page.
             const origin = this.reactive.get("section", dropdata.id);
             return origin.id != this.section.id && origin.levelsan >= 2;
         }
