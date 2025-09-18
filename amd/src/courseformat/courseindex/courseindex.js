@@ -37,8 +37,9 @@ export default class Component extends BaseComponent {
      * @return {Component}
      */
      static init(target, selectors) {
+        let element = document.querySelector(target);
         return new this({
-            element: document.getElementById(target),
+            element,
             reactive: getCurrentCourseEditor(),
             selectors,
         });

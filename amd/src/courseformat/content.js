@@ -50,8 +50,9 @@ export default class Component extends BaseComponent {
      * @return {Component}
      */
     static init(target, selectors, sectionReturn) {
+        let element = document.querySelector(target);
         return new this({ // CHANGED.
-            element: document.getElementById(target),
+            element,
             reactive: getCurrentCourseEditor(),
             selectors,
             sectionReturn,
