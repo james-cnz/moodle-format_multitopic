@@ -1188,6 +1188,10 @@ class format_multitopic extends core_courseformat\base {
         // Include code to preview the banner (and attribution, to an extent), if we're on the course edit page.
         if (!$forsection) {
             $PAGE->requires->js('/course/format/multitopic/_course_edit.js');
+        } else {
+            $mform->hideIf('level', 'component', 'ne', '');
+            $mform->hideIf('periodduration', 'component', 'ne', '');
+            $mform->hideIf('collapsible', 'component', 'ne', '');
         }
         // END ADDED.
 
