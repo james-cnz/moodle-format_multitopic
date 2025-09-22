@@ -52,8 +52,6 @@ export default class Component extends BaseComponent {
         this.tabs = {};
         this.childtabs = {};
         this.activetab = [null, null];
-
-        this.originalsinglesectionid = document.querySelector("ul.section-list").dataset.originalsinglesectionid;
     }
 
     static init(target) {
@@ -102,22 +100,25 @@ export default class Component extends BaseComponent {
      */
     async _refreshCourseSectionlist({element}) {
 
-        const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
-        let singleSectionId;
-        let singleSection;
-        if (originalSingleSection) {
-            singleSectionId = (originalSingleSection.levelsan < 2) ? originalSingleSection.id : originalSingleSection.pageid;
-            singleSection = (singleSectionId == originalSingleSection.id) ?
-                            originalSingleSection : this.reactive.get("section", singleSectionId);
+        const originalPageSectionid = this.reactive?.pageSectionId
+                                        ?? document.querySelector("ul.section-list").dataset.originalsinglesectionid;
+                                        // Fallback deprecated since Moodle 5.1 MDL-83857.
+        const originalPageSection = this.reactive.get("section", originalPageSectionid);
+        let pageSectionId;
+        let pageSection;
+        if (originalPageSection) {
+            pageSectionId = (originalPageSection.levelsan < 2) ? originalPageSection.id : originalPageSection.pageid;
+            pageSection = (pageSectionId == originalPageSection.id) ?
+                            originalPageSection : this.reactive.get("section", pageSectionId);
         } else {
-            singleSectionId = null;
-            singleSection = null;
+            pageSectionId = null;
+            pageSection = null;
         }
 
         let newActiveTab = [null, null];
-        if (singleSection) {
-            newActiveTab[1] = singleSection.id;
-            newActiveTab[0] = (singleSection.levelsan >= 1) ? singleSection.parentid : singleSection.id;
+        if (pageSection) {
+            newActiveTab[1] = pageSection.id;
+            newActiveTab[0] = (pageSection.levelsan >= 1) ? pageSection.parentid : pageSection.id;
         }
 
         const tabsrow = this._getTabRows(element, newActiveTab);

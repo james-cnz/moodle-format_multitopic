@@ -56,7 +56,8 @@ class content extends content_base {
         if (!empty($displaysectionextra->sectionbase->component)) {
             $data = parent::export_for_template($output);
             $data->displayonesection = true;
-            $data->originalsinglesectionid = $format->originalsinglesectionid;
+            $data->pagesectionid = $this->format->originalsinglesectionid ?? 'null'; // Pass a string value if NULL.
+            $data->originalsinglesectionid = $format->originalsinglesectionid; // Deprecated since Moodle 5.1 MDL-83857.
             return $data;
         }
 
@@ -127,7 +128,8 @@ class content extends content_base {
             'initialsection' => $initialsection,
             'sections' => $sectionseft,
             'format' => $format->get_format(),
-            'originalsinglesectionid' => $format->originalsinglesectionid,
+            'pagesectionid' => $this->format->originalsinglesectionid ?? 'null', // Pass a string value if NULL.
+            'originalsinglesectionid' => $format->originalsinglesectionid, // Deprecated since Moodle 5.1 MDL-83857.
             'fmthavemaxsections' => ($CFG->version < 2025060500),
         ];
 
