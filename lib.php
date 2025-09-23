@@ -701,8 +701,11 @@ class format_multitopic extends core_courseformat\base {
             $section = $sectionextra->sectionbase;
             if (
                 ($sectionid > $collapsedsetold)
-                && ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
-                && ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0')
+                && (
+                    $section->component
+                    || ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
+                    && ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0')
+                )
                 && !isset($contentcollapsedindexed[$sectionid])
             ) {
                 if (!isset($sectionpreferences['contentcollapsed'])) {
