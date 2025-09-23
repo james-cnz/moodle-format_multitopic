@@ -240,6 +240,10 @@ export default class Component extends BaseComponent {
             }
         }
 
+        if (element.component) {
+            return;
+        }
+
         // Update subtitle.
         target.querySelector(".section_subtitle").textContent = element.subtitle;
     }

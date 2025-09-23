@@ -422,7 +422,7 @@ class format_multitopic extends core_courseformat\base {
             get_string('weeks_capitalised', 'format_multitopic') : get_string('weeks');
         // Figure out the string for the week number.
         $daystring = '';
-        if ($sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend)) {
+        if (!$section->component && $sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend)) {
             $currentyear = format_multitopic_week_date(time())->o;
             $datestart = format_multitopic_week_date($sectionextra->datestart + 12 * 60 * 60);
             $dateend = format_multitopic_week_date($sectionextra->dateend - 12 * 60 * 60);
@@ -499,7 +499,7 @@ class format_multitopic extends core_courseformat\base {
             get_string('weeks_abbreviation', 'format_multitopic') : get_string('week');
         // Figure out the string for the week number.
         $weekstring = '';
-        if ($sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend)) {
+        if (!$section->component && $sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend)) {
             $datestart = format_multitopic_week_date($sectionextra->datestart + 12 * 60 * 60);
             $dateend = format_multitopic_week_date($sectionextra->dateend - 12 * 60 * 60);
             if (($datestart->o == $dateend->o) && ($datestart->W == $dateend->W)) {
@@ -1288,7 +1288,15 @@ class format_multitopic extends core_courseformat\base {
      * @return bool
      */
     public function is_section_current($section): bool {
-        $sectionextra = $this->fmt_get_section_extra($section);                 // ADDED.
+        // ADDED.
+        if (!is_object($section)) {
+            $section = $this->get_section($section);
+        }
+        if ($section->component) {
+            return false;
+        }
+        $sectionextra = $this->fmt_get_section_extra($section);
+        // END ADDED.
         return ($sectionextra->section && $sectionextra->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // CHANGED.
     }
     // END INCLUDED.
@@ -1340,6 +1348,10 @@ class format_multitopic extends core_courseformat\base {
      * @param string $availableinfo the 'availableinfo' propery of the section_info as it was evaluated by conditional availability.
      */
     public function section_get_available_hook(section_info $section, &$available, &$availableinfo): void {
+        if ($section->component) {
+            parent::section_get_available_hook($section, $available, $availableinfo);
+            return;
+        }
         $sectionextra = $this->fmt_get_sections_extra(false)[$section->id];
         $parentid = $sectionextra->parentid;
         if (isset($parentid)) {
