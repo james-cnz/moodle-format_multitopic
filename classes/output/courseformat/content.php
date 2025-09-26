@@ -65,14 +65,14 @@ class content extends content_base {
         // ADDED.
         $course = $format->get_course();
         $activesectionids = [];
-        for (/* ... */
+        for (
             $activesectionextra = $displaysectionextra; /* ... */
             $activesectionextra; /* ... */
             $activesectionextra = (($activesectionextra->parentid
                 && ($activesectionextra->levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1
                     || $activesectionextra->parentid != $format->fmtrootsectionid))
                 ? $sectionsextra[$activesectionextra->parentid] : null)
-        /* ... */) {
+        ) {
             $activesectionids[$activesectionextra->id] = true;
         }
         $sectionpreferencesarray = $format->get_sections_preferences();

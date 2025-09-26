@@ -176,7 +176,6 @@ class global_navigation_wrapper {
         $extraid = -1;
         // END ADDED.
         foreach ($sections as $sectionid => $section) {
-
             // Delegated sections should be added from the activity node.
             if ($section->component) {
                 continue;
