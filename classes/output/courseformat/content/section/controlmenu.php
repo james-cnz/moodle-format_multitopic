@@ -70,6 +70,11 @@ class controlmenu extends controlmenu_base {
     public function section_control_items() {
         $controls = parent::section_control_items();
 
+        // There's a separate class for delegated control menus, so we probably don't need this, but just in case.
+        if ($this->section->component) {
+            return $controls;
+        }
+
         $controls = $this->add_control_after($controls, 'movesection', 'movelevelup', $this->get_section_movelevelup_item());
         $controls = $this->add_control_after($controls, 'movelevelup', 'moveleveldown', $this->get_section_moveleveldown_item());
         $controls = $this->add_control_after($controls, 'moveleveldown', 'moveprev', $this->get_section_moveprev_item());

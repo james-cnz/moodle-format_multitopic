@@ -36,7 +36,7 @@ export default class extends HeaderBase {
      */
     _isSectionBulkEnabled(bulk) {
         return super._isSectionBulkEnabled(bulk)
-            && (this.section.levelsan >= 2); // ADDED.
+            && (this.section.component || this.section.levelsan >= 2); // ADDED.
     }
 
 }

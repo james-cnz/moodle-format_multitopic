@@ -220,12 +220,12 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
         }
 
         // Extract origin sections.
-        for (/* ... */
+        for (
             $originsubkey = $originextra->id; /* ... */
             $originsubkey == $originextra->id
                 || $originsubkey && $sectionsextra[$originsubkey]->levelsan > $originextra->levelsan; /* ... */
             $originsubkey = $originextraarray[$originsubkey]->nextanyid
-        /* ... */) {
+        ) {
             $originextraarray[$originsubkey] = $sectionsextra[$originsubkey];
             unset($sectionsextra[$originsubkey]);
         }

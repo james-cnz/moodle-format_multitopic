@@ -97,7 +97,9 @@ class renderer extends section_renderer {
         // CHANGED LINE ABOVE.
 
         // ADDED.
-        $datestring = course_get_format($course)->get_section_subtitle($section);
+        $datestring = $section->component ?
+                        ''
+                        : course_get_format($course)->get_section_subtitle($section);
         // END ADDED.
 
         return  '<div>'

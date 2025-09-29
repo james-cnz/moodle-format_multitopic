@@ -100,14 +100,14 @@ class tabtreecontainer implements named_templatable, renderable {
                 // REMOVED: marker.
 
                 // Include main tab, and index tabs for pages with sub-pages.
-                for (/* ... */
+                for (
                     $level = max(FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1, $thissectionextra->levelsan); /* ... */
                     $level <= $thissectionextra->pagedepthdirect
                                 + ($format->show_editor()
                                     && $thissectionextra->pagedepthdirect < FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE ?
                                         1 : 0); /* ... */
                     $level++
-                /* ... */) {
+                ) {
                     // Make tab.
                     $newtab = new tab(
                         "tab_id_{$thissection->id}_l{$level}",
@@ -151,14 +151,14 @@ class tabtreecontainer implements named_templatable, renderable {
                 // Include "add" sub-tabs for each level of page finished.
                 $nextsectionlevel = $thissectionextra->nextpageid ?
                                     $sectionsextra[$thissectionextra->nextpageid]->levelsan : FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT;
-                for (/* ... */
+                for (
                     $level = min(
                         $sectionextraatlevel[FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC - 1]->pagedepthdirect + 1,
                         FORMAT_MULTITOPIC_SECTION_LEVEL_PAGE_USE
                     ); /* ... */
                     $level >= $nextsectionlevel + 1; /* ... */
                     $level--
-                /* ... */) {
+                ) {
                     $parent = $sectionextraatlevel[$level - 1]->sectionbase;
                     if (!(($parent->section == 0) || $parent->uservisible && $format->is_section_visible($parent))) {
                         continue;
