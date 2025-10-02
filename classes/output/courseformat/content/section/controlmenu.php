@@ -59,6 +59,10 @@ class controlmenu extends controlmenu_base {
         parent::__construct($format, $section);
         $this->fmtsectionextra = $format->fmt_get_section_extra($section);
         $this->fmtonsectionpage = ($this->fmtsectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // ADDED.
+        $pagesection = $this->fmtonsectionpage ?
+                        $section
+                        : $format->get_modinfo()->get_section_info_by_id($this->fmtsectionextra->parentid);
+        $this->baseurl = $format->get_view_url($pagesection);
         $this->fmtreturnurl = $format->get_view_url($section);
     }
 
@@ -122,10 +126,14 @@ class controlmenu extends controlmenu_base {
      * @return link|null The menu item if applicable, otherwise null.
      */
     protected function get_section_duplicate_item(): ?link {
+        global $CFG;
         $link = null;
 
         if (!$this->fmtonsectionpage) {
             $link = parent::get_section_duplicate_item();
+            if ($link && $CFG->version >= 2025053000) {
+                $link->url->param('returnurl', $this->fmtreturnurl);
+            }
         }
 
         return $link;
