@@ -206,4 +206,18 @@ class section extends section_base {
 
         return true;
     }
+
+    /**
+     * Returns true if the current section should be shown collapsed.
+     *
+     * @return bool
+     */
+    protected function is_section_collapsed(): bool {
+        $course = $this->format->get_course();
+        $section = $this->section;
+        $sectionextra = $this->fmtsectionextra;
+        return ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
+            && ((($section->collapsible != '') ? $section->collapsible : $course->collapsible) != '0')
+            && parent::is_section_collapsed();
+    }
 }
