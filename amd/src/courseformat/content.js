@@ -34,11 +34,13 @@ export default class Component extends BaseComponent {
     /**
      * Constructor hook.
      *
+     * @deprecated redeclaration since Moodle 5.1 MDL-83857
      * @param {Object} descriptor the component descriptor
      */
     create(descriptor) {
         super.create(descriptor);
-        this.originalsinglesectionid = this.element.querySelector("ul.section-list").dataset.originalsinglesectionid;
+        this.pageSectionId = descriptor?.pageSectionId
+                            ?? this.element.querySelector("ul.section-list").dataset.originalsinglesectionid;
     }
 
     /**
@@ -46,15 +48,18 @@ export default class Component extends BaseComponent {
      *
      * @param {string} target the DOM main element or its ID
      * @param {object} selectors optional css selector overrides
-     * @param {number} sectionReturn the content section return
+     * @param {number} sectionReturn the section number of the displayed page
+     * @param {number} pageSectionId the section ID of the displayed page
      * @return {Component}
      */
-    static init(target, selectors, sectionReturn) {
+    static init(target, selectors, sectionReturn, pageSectionId) {
+        let element = document.querySelector(target);
         return new this({ // CHANGED.
-            element: document.getElementById(target),
+            element,
             reactive: getCurrentCourseEditor(),
             selectors,
             sectionReturn,
+            pageSectionId,
         });
     }
 
@@ -239,6 +244,10 @@ export default class Component extends BaseComponent {
             }
         }
 
+        if (element.component) {
+            return;
+        }
+
         // Update subtitle.
         target.querySelector(".section_subtitle").textContent = element.subtitle;
     }
@@ -253,19 +262,19 @@ export default class Component extends BaseComponent {
     _refreshCourseSectionlist(param) {
         const state = param.state;
 
-        const originalSingleSection = this.reactive.get("section", this.originalsinglesectionid);
-        if (originalSingleSection && originalSingleSection.component) {
+        const originalPageSection = this.reactive.get("section", this.pageSectionId);
+        if (originalPageSection && originalPageSection.component) {
             return;
         }
-        let singleSectionId;
-        if (originalSingleSection) {
-            singleSectionId = (originalSingleSection.levelsan < 2) ? originalSingleSection.id : originalSingleSection.pageid;
+        let pageSectionId;
+        if (originalPageSection) {
+            pageSectionId = (originalPageSection.levelsan < 2) ? originalPageSection.id : originalPageSection.pageid;
         } else {
-            singleSectionId = null;
+            pageSectionId = null;
         }
 
         let sectionlist = this.reactive.getExporter().listedSectionIds(state);
-        sectionlist = sectionlist.filter((sectionId) => (this.reactive.get("section", sectionId).pageid == singleSectionId));
+        sectionlist = sectionlist.filter((sectionId) => (this.reactive.get("section", sectionId).pageid == pageSectionId));
         // ADDED LINE ABOVE.
         const listparent = this.getElement(this.selectors.COURSE_SECTIONLIST);
         // For now section cannot be created at a frontend level.
@@ -278,7 +287,7 @@ export default class Component extends BaseComponent {
 
         // Update Add section button.
         const addSectionDom = document.querySelector("div#fmt-course-addsection > a");
-        addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + singleSectionId);
+        addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + pageSectionId);
 
     }
 

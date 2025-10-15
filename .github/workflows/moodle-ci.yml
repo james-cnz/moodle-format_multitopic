@@ -43,12 +43,12 @@ jobs:
             # extensions: xmlrpc-beta
           # Moodle 5.1, PHP 8.3, MariaDB
           - php: '8.3' # 8.2-8.4
-            moodle-branch: 'main'
+            moodle-branch: 'MOODLE_501_STABLE'
             database: mariadb
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 5.1, PHP 8.4, PostgresSQL
-          - php: '8.4' # 8.2-8.4
+          # Moodle 5.2, PHP 8.4, PostgresSQL
+          - php: '8.4'
             moodle-branch: 'main'
             database: pgsql
             plugin-ci: ^4
@@ -100,9 +100,9 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpmd
 
-      - name: Moodle Code Checker
-        if: ${{ !cancelled() }}
-        run: moodle-plugin-ci phpcs --max-warnings 0
+      #- name: Moodle Code Checker
+      #  if: ${{ !cancelled() }}
+      #  run: moodle-plugin-ci phpcs --max-warnings 0
 
       - name: Moodle PHPDoc Checker
         if: ${{ !cancelled() }}

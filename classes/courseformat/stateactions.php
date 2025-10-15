@@ -80,12 +80,12 @@ class stateactions extends \core_courseformat\stateactions {
         foreach ($ids as $id) {
             $originextra = $allsectionsextra[$id];
             $origins[] = $originextra;
-            for (/* ... */
+            for (
                 $originsubextra = $originextra; /* ... */
                 $originsubextra && ($originsubextra->id == $originextra->id
                                     || $originsubextra->levelsan > $originextra->levelsan); /* ... */
                 $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null
-            /* ... */) {
+            ) {
                 $subids[] = $originsubextra->id;
             }
         }
@@ -158,12 +158,12 @@ class stateactions extends \core_courseformat\stateactions {
         foreach ($ids as $id) {
             $originextra = $allsectionsextra[$id];
             $origins[] = $originextra;
-            for (/* ... */
+            for (
                 $originsubextra = $originextra; /* ... */
                 $originsubextra && ($originsubextra->id == $originextra->id
                                     || $originsubextra->levelsan > $originextra->levelsan); /* ... */
                 $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null
-            /* ... */) {
+            ) {
                 $subids[] = $originsubextra->id;
             }
         }
@@ -236,12 +236,12 @@ class stateactions extends \core_courseformat\stateactions {
         foreach ($ids as $id) {
             $originextra = $allsectionsextra[$id];
             $origins[] = $originextra;
-            for (/* ... */
+            for (
                 $originsubextra = $originextra; /* ... */
                 $originsubextra && ($originsubextra->id == $originextra->id
                                     || $originsubextra->levelsan > $originextra->levelsan); /* ... */
                 $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null
-            /* ... */) {
+            ) {
                 $subids[] = $originsubextra->id;
             }
         }
@@ -303,12 +303,12 @@ class stateactions extends \core_courseformat\stateactions {
                 continue;
             }
             if (!$visible && $sectionextra->section || $visible && $sectionextra->parentvisiblesan) {
-                for (/* ... */
+                for (
                     $subsectionextra = $sectionextra; /* ... */
                     $subsectionextra && (($subsectionextra->id == $sectionextra->id)
                                         || ($subsectionextra->levelsan > $sectionextra->levelsan)); /* ... */
                     $subsectionextra = $subsectionextra->nextanyid ? $allsectionsextra[$subsectionextra->nextanyid] : null
-                /* ... */) {
+                ) {
                     if (($subsectionextra->id == $sectionextra->id) || !$visible) {
                         course_update_section($course, $subsectionextra->sectionbase, ['visible' => $visible]);
                     }

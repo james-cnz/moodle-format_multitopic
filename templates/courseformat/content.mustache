@@ -117,7 +117,8 @@
             }
         ],
         "format": "multitopic",
-        "title": "Course title example"
+        "title": "Course title example",
+        "pagesectionid": 34
 
     }
 }}
@@ -165,6 +166,6 @@
 </div>
 {{#js}}
 require(['format_multitopic/courseformat/content'], function(component) {
-    component.init('page', {});
+    component.init('#page', {}, null, {{pagesectionid}});
 });
 {{/js}}
