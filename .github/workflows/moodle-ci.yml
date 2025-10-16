@@ -35,6 +35,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Moodle 5.0.0, PHP 8.2, PostgreSQL
+          - php: '8.2' # 8.2-8.4
+            moodle-branch: 'v5.0.0'
+            database: pgsql
+            plugin-ci: ^4
+            # extensions: xmlrpc-beta
           # Moodle 5.0, PHP 8.2, PostgreSQL
           - php: '8.2' # 8.2-8.4
             moodle-branch: 'MOODLE_500_STABLE'
@@ -100,9 +106,9 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpmd
 
-      #- name: Moodle Code Checker
-      #  if: ${{ !cancelled() }}
-      #  run: moodle-plugin-ci phpcs --max-warnings 0
+      - name: Moodle Code Checker
+        if: ${{ !cancelled() }}
+        run: moodle-plugin-ci phpcs --max-warnings 0
 
       - name: Moodle PHPDoc Checker
         if: ${{ !cancelled() }}
