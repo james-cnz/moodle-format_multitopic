@@ -35,6 +35,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Moodle 4.0.0, PHP 7.3, PostgreSQL
+          - php: '7.3' # 7.3-8.0
+            moodle-branch: 'v4.0.0'
+            database: pgsql
+            plugin-ci: ^3
           # Moodle 4.0, PHP 7.3, PostgreSQL
           - php: '7.3' # 7.3-8.0
             moodle-branch: 'MOODLE_400_STABLE'
@@ -69,12 +74,6 @@ jobs:
             database: mariadb
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 5.0, PHP 8.4, PostgreSQL
-          #- php: '8.4' # 8.2-8.4
-          #  moodle-branch: 'MOODLE_500_STABLE'
-          #  database: pgsql
-          #  plugin-ci: ^4
-          #  # extensions: xmlrpc-beta
 
     steps:
       - name: Check out repository code
@@ -122,9 +121,9 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpmd
 
-      #- name: Moodle Code Checker
-      #  if: ${{ !cancelled() }}
-      #  run: moodle-plugin-ci phpcs --max-warnings 0
+      - name: Moodle Code Checker
+        if: ${{ !cancelled() && matrix.plugin-ci != '^3' }}
+        run: moodle-plugin-ci phpcs --max-warnings 0
 
       - name: Moodle PHPDoc Checker
         if: ${{ !cancelled() }}
