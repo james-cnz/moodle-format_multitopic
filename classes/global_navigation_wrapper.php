@@ -25,8 +25,8 @@ use core\output\pix_icon;
 use core\url;
 use moodle_page;
 use stdClass;
-use core\navigation\global_navigation;
-use core\navigation\navigation_node;
+use global_navigation;
+use navigation_node;
 
 
 /**
