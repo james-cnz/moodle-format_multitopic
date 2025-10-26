@@ -165,6 +165,7 @@ class tabtreecontainer implements named_templatable, renderable {
         bool $canaddmore,
         renderer_base $output
     ): stdClass {
+        global $CFG;
         $format = $this->format;
         $course = $format->get_course();
 
@@ -200,17 +201,28 @@ class tabtreecontainer implements named_templatable, renderable {
             $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
                                 get_string('addsectionpage', 'format_' . $course->format)
                                 : get_string('addsection', 'core_courseformat');
-            $params = [
-                'courseid' => $course->id,
-                'increase' => true,
-                'sesskey' => sesskey(),
-                'insertparentid' => $parentid,
-                'insertlevel' => $level,
-                'returnurl' => new url("/course/view.php?id={$course->id}"
-                    . (($format->get_sectionid() != $format->fmtrootsectionid) ?
-                    "&sectionid={$format->get_sectionid()}" : "")),
-            ];
-            $url = new url('/course/format/multitopic/_course_changenumsections.php', $params);
+            if ($CFG->version < 2025082900) {
+                $params = [
+                    'courseid' => $course->id,
+                    'increase' => true,
+                    'sesskey' => sesskey(),
+                    'insertparentid' => $parentid,
+                    'insertlevel' => $level,
+                    'returnurl' => new url("/course/view.php?id={$course->id}"
+                        . (($format->get_sectionid() != $format->fmtrootsectionid) ?
+                        "&sectionid={$format->get_sectionid()}" : "")),
+                ];
+                $url = new url('/course/format/multitopic/_course_changenumsections.php', $params);
+            } else {
+                $url = $format->get_update_url(
+                    action: 'fmt_section_add_into',
+                    targetsectionid: $parentid,
+                    targetcmid: $level,
+                    returnurl: new url("/course/view.php?id={$course->id}"
+                        . (($format->get_sectionid() != $format->fmtrootsectionid) ?
+                        "&sectionid={$format->get_sectionid()}" : "")),
+                );
+            }
             $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle');
             $inactive = !$canaddmore;
             if ($inactive) {

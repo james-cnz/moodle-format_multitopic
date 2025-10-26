@@ -29,6 +29,7 @@
  * @copyright based on work by 2012 Dan Poltawski
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since     Moodle 2.3
+ * @deprecated since Moodle 5.1
  */
 
 use core_courseformat\formatactions;                                            // ADDED.
