@@ -124,7 +124,7 @@ class addsection extends addsection_base {
                         break;
                     }
                     if ($foundparent) {
-                        $lastchildid = $sectionextra->id;   
+                        $lastchildid = $sectionextra->id;
                     }
                 }
                 $returnsection = $format->get_modinfo()->get_section_info_by_id($lastchildid);
