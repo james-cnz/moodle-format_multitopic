@@ -55,14 +55,14 @@ Feature: Validate some section editing has a non-ajax alternative (Multitopic fo
   Scenario: Adding a section at the end of the course can be done without ajax
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I click on "Add section" "link" in the "course-addsection" "region"
+    When I click on "Add topic" "link" in the "fmt-course-addsection" "region"
     Then I should see "Section 4" in the "Section 4" "section"
     And "Section 3" "text" should appear before "Section 4" "text"
 
   Scenario: Adding a section between sections can be done without ajax
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    When I click on "Add section" "link" in the "Section 2" "section"
+    When I click on "Add topic" "link" in the "Section 2" "section"
     Then I should see "Section 3" in the "Section 3" "section"
     And "Section 2" "text" should appear before "Section 3" "text"
     And "Section 3" "text" should appear before "Section 3" "text"
