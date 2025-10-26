@@ -61,7 +61,7 @@ class addsection extends addsection_base {
     /**
      * Get the add section button data.
      *
-     * Current course format does not have 'numsections' option but it has multiple sections suppport.
+     * Current course format does not have 'numsections' option but it has multiple sections support.
      * Display the "Add section" link that will insert a section in the end.
      * Note to course format developers: inserting sections in the other positions should check both
      * capabilities 'moodle/course:update' and 'moodle/course:movesections'.
@@ -72,9 +72,14 @@ class addsection extends addsection_base {
      * @return stdClass data context for a mustache template
      */
     protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections = 0): stdClass {
+        global $CFG;
         $format = $this->format;
         $course = $format->get_course();
-        $data = parent::get_add_section_data($output, $lastsection, $maxsections);
+        if ($CFG->version < 2025082900) {
+            $data = parent::get_add_section_data($output, $lastsection, $maxsections);
+        } else {
+            $data = new stdClass();
+        }
 
         if (get_string_manager()->string_exists('addsectiontopic', 'format_' . $course->format)) {
             $addstring = get_string('addsectiontopic', 'format_' . $course->format);
@@ -82,24 +87,60 @@ class addsection extends addsection_base {
             $addstring = get_string('addsections');
         }
 
-        $params = [
-            'courseid' => $course->id, // CHANGED.
-            'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
-            'sesskey' => sesskey(),
-            'returnurl' => new \moodle_url(
-                "/course/view.php?id={$course->id}"
-                . (($format->get_sectionid() != $format->fmtrootsectionid) ?
-                    "&sectionid={$format->get_sectionid()}" : "")
-            ),
-        ];
-        if ($this->targetsection) {
-            $params['insertprevupid'] = $this->targetsection->id;
-        } else {
-            $params['insertparentid'] = $format->get_sectionid();
-        }
+        if ($CFG->version < 2025082900) {
+            $params = [
+                'courseid' => $course->id, // CHANGED.
+                'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
+                'sesskey' => sesskey(),
+                'returnurl' => new \moodle_url(
+                    "/course/view.php?id={$course->id}"
+                    . (($format->get_sectionid() != $format->fmtrootsectionid) ?
+                        "&sectionid={$format->get_sectionid()}" : "")
+                ),
+            ];
+            if ($this->targetsection) {
+                $params['insertprevupid'] = $this->targetsection->id;
+            } else {
+                $params['insertparentid'] = $format->get_sectionid();
+            }
 
-        $data->addsections->url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
-        $data->addsections->title = $addstring;
+            $data->addsections->url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
+            $data->addsections->title = $addstring;
+        } else {
+            if ($this->targetsection) {
+                $action = 'section_add';
+                $targetsectionid = $this->targetsection->id;
+                $returnsection = $this->targetsection;
+            } else {
+                $action = 'fmt_section_add_into';
+                $targetsectionid = $format->get_sectionid();
+                $sectionsextra = $format->fmt_get_sections_extra();
+                $foundparent = false;
+                $lastchildid = null;
+                foreach ($sectionsextra as $sectionextra) {
+                    if ($sectionextra->id == $targetsectionid) {
+                        $foundparent = true;
+                    } else if ($foundparent && $sectionextra->levelsan < 2) {
+                        break;
+                    }
+                    if ($foundparent) {
+                        $lastchildid = $sectionextra->id;   
+                    }
+                }
+                $returnsection = $format->get_modinfo()->get_section_info_by_id($lastchildid);
+            }
+            $data->addsections = (object) [
+                'url' => $this->format->get_update_url(
+                    action: $action,
+                    targetsectionid: $targetsectionid,
+                    targetcmid: 2, // Level.
+                    returnurl: $format->get_view_url($returnsection),
+                ),
+                'title' => $addstring,
+                'newsection' => $lastsection + 1,
+                'canaddsection' => true,
+            ];
+        }
 
         return $data;
     }

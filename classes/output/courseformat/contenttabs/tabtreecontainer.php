@@ -52,6 +52,7 @@ class tabtreecontainer implements named_templatable, renderable {
      * @return array tabs data, selected tab, and inactive tabs
      */
     public function get_tabs_data_etc(\renderer_base $output): array {
+        global $CFG;
         $sectionsextra = $this->format->fmt_get_sections_extra();
         $displaysectionextra = $sectionsextra[$this->format->get_sectionid()];
         $format = $this->format;
@@ -167,17 +168,28 @@ class tabtreecontainer implements named_templatable, renderable {
                     // Make "add" tab.
                     $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
                                         get_string('addsectionpage', 'format_' . $course->format) : get_string('addsections');
-                    $params = [
-                        'courseid' => $course->id,
-                        'increase' => true,
-                        'sesskey' => sesskey(),
-                        'insertparentid' => $sectionextraatlevel[$level - 1]->id,
-                        'insertlevel' => $level,
-                        'returnurl' => new \moodle_url("/course/view.php?id={$course->id}"
-                            . (($format->get_sectionid() != $format->fmtrootsectionid) ?
-                            "&sectionid={$format->get_sectionid()}" : "")),
-                    ];
-                    $url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
+                    if ($CFG->version < 2025082900) {
+                        $params = [
+                            'courseid' => $course->id,
+                            'increase' => true,
+                            'sesskey' => sesskey(),
+                            'insertparentid' => $sectionextraatlevel[$level - 1]->id,
+                            'insertlevel' => $level,
+                            'returnurl' => new \moodle_url("/course/view.php?id={$course->id}"
+                                . (($format->get_sectionid() != $format->fmtrootsectionid) ?
+                                "&sectionid={$format->get_sectionid()}" : "")),
+                        ];
+                        $url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
+                    } else {
+                        $url = $format->get_update_url(
+                            action: 'fmt_section_add_into',
+                            targetsectionid: $sectionextraatlevel[$level - 1]->id,
+                            targetcmid: $level,
+                            returnurl: new \moodle_url("/course/view.php?id={$course->id}"
+                                . (($format->get_sectionid() != $format->fmtrootsectionid) ?
+                                "&sectionid={$format->get_sectionid()}" : "")),
+                        );
+                    }
                     $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle');
                     $newtab = new tab(
                         "tab_id_{$sectionextraatlevel[$level - 1]->id}_l{$level}_add",

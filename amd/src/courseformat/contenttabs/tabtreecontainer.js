@@ -301,14 +301,23 @@ export default class Component extends BaseComponent {
             };
         } else {
             const addTab0Dom = this.element.querySelector('ul:first-of-type li:last-of-type');
+            let link = addTab0Dom.querySelector('a').getAttribute('href');
+            if (link.match(/\/_course_changenumsections.php\?/)) {
+                // Deprecated since Moodle 5.1.
+                link = link
+                        ?.replace(/\binsertparentid=\d+\b/, "insertparentid=" + sectionid.match(/^add(\d+)$/)[1])
+                        .replace(/\binsertlevel=0\b/, 'insertlevel=' + level);
+            } else {
+                link = link
+                        ?.replace(/\btargetsectionid=\d+\b/, "targetsectionid=" + sectionid.match(/^add(\d+)$/)[1])
+                        .replace(/\btargetcmid=0\b/, 'targetcmid=' + level);
+            }
             data = {
                 "level": level,
                 "active": false,
                 "inactive": addTab0Dom.querySelector('a').classList.contains("disabled"),
                 "link": [{
-                    "link": addTab0Dom.querySelector('a').getAttribute('href')
-                        ?.replace(/\binsertparentid=\d+\b/, "insertparentid=" + sectionid.match(/^add(\d+)$/)[1])
-                        .replace(/\binsertlevel=0\b/, 'insertlevel=' + level),
+                    "link": link,
                 }],
                 "title": addTab0Dom.querySelector('a').getAttribute('title'),
                 "text": '<i class="icon fa fa-plus fa-fw" title="' + addTab0Dom.querySelector('a').getAttribute('title') + '"></i>',
