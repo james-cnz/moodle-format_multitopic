@@ -150,8 +150,7 @@ class format_multitopic extends core_courseformat\base {
      * @return string the page title
      */
     public function page_title(): string {
-        return get_string_manager()->string_exists('sectionoutline', 'format_multitopic') ?
-                get_string('sectionoutline', 'format_multitopic') : get_string('topicoutline');
+        return get_string('sectionoutline');
     }
 
     /**
@@ -1407,16 +1406,7 @@ class format_multitopic extends core_courseformat\base {
         $edithint = null,
         $editlabel = null
     ): \core\output\inplace_editable {
-        if (empty($edithint)) {
-            $edithint = new lang_string('editsectionname');                     // CHANGED.
-        }
-        if (empty($editlabel)) {
-            $title = get_section_name($section->course, $section);
-            $editlabel = new lang_string('newsectionname', '', $title);         // CHANGED.
-        }
-
-        // REMOVED function call.
-        // INCLUDED instead /course/format/classes/base.php function inplace_editable_render_section_name body.
+        // INCLUDED /course/format/classes/base.php function inplace_editable_render_section_name body.
         global $USER, $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
 

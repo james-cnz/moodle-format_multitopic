@@ -79,7 +79,7 @@ class addsection extends addsection_base {
         if (get_string_manager()->string_exists('addsectiontopic', 'format_' . $course->format)) {
             $addstring = get_string('addsectiontopic', 'format_' . $course->format);
         } else {
-            $addstring = get_string('addsections');
+            $addstring = get_string('addsection');
         }
 
         $params = [
