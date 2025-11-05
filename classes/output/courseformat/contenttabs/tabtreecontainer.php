@@ -166,7 +166,8 @@ class tabtreecontainer implements named_templatable, renderable {
 
                     // Make "add" tab.
                     $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
-                                        get_string('addsectionpage', 'format_' . $course->format) : get_string('addsection');
+                                        get_string('addsectionpage', 'format_' . $course->format)
+                                        : get_string('addsection', 'core_courseformat');
                     $params = [
                         'courseid' => $course->id,
                         'increase' => true,
