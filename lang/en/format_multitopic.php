@@ -79,7 +79,6 @@ $string['plugin_description'] = 'Topics are displayed in tabbed pages,
  with multiple collapsible topics available on each page.';
 $string['pluginname'] = 'Multitopic';
 $string['privacy:metadata'] = 'The Multitopic format plugin does not store any personal data.';
-$string['section0name'] = 'General';
 $string['sectionname'] = 'Section';
 
 $string['weeks_abbreviation'] = 'W';
@@ -103,4 +102,5 @@ $string['move_to_prev_page'] = 'Move to previous page';
 $string['showfromothers'] = 'Show';
 
 // Deprecated since Multitopic v5.1.
+$string['section0name'] = 'General';
 $string['sectionoutline'] = 'Section outline';

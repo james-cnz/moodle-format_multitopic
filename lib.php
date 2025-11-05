@@ -536,7 +536,7 @@ class format_multitopic extends core_courseformat\base {
     public function get_default_section_name($section): string {
         if ($section->section == 0) {
             // Return the general section.
-            return get_string('section0name', 'format_multitopic');
+            return get_string('section0name', 'format_topics');
         } else {
             // Use course_format::get_default_section_name implementation which
             // will display the section name in "Section n" format.
