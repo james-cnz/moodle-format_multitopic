@@ -572,6 +572,15 @@ class format_multitopic extends core_courseformat\base {
     // END ADDED.
 
     /**
+     * Returns the name for the highlighted section.
+     *
+     * @return string The name for the highlighted section based on the given course format.
+     */
+    public function get_section_highlighted_name(): string {
+        return get_string('currentsection', 'format_multitopic');
+    }
+
+    /**
      * Set if the current format instance will show all pages or an individual one.
      *
      * @param int|null $sectionid null for all pages, or a page's sectionid.
