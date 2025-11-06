@@ -24,10 +24,8 @@
  */
 
 import BaseComponent from 'core_courseformat/local/content';
-import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import inplaceeditable from 'core/inplace_editable';
 import Section from 'format_multitopic/courseformat/content/section';
-import CmItem from 'core_courseformat/local/content/section/cmitem';
 
 export default class Component extends BaseComponent {
 
@@ -41,26 +39,6 @@ export default class Component extends BaseComponent {
         super.create(descriptor);
         this.pageSectionId = descriptor?.pageSectionId
                             ?? this.element.querySelector("ul.section-list").dataset.originalsinglesectionid;
-    }
-
-    /**
-     * Static method to create a component instance form the mustahce template.
-     *
-     * @param {string} target the DOM main element or its ID
-     * @param {object} selectors optional css selector overrides
-     * @param {number} sectionReturn the section number of the displayed page
-     * @param {number} pageSectionId the section ID of the displayed page
-     * @return {Component}
-     */
-    static init(target, selectors, sectionReturn, pageSectionId) {
-        let element = document.querySelector(target);
-        return new this({ // CHANGED.
-            element,
-            reactive: getCurrentCourseEditor(),
-            selectors,
-            sectionReturn,
-            pageSectionId,
-        });
     }
 
     /**
@@ -297,25 +275,19 @@ export default class Component extends BaseComponent {
      * This method is used when a legacy action refresh some content element.
      */
     _indexContents() {
-        // Find unindexed sections.
-        this._scanIndex(
-            this.selectors.SECTION,
-            this.sections,
-            (item) => {
-                return new Section(item); // CHANGED.
-            }
-        );
-
-        // Find unindexed cms.
-        this._scanIndex(
-            this.selectors.CM,
-            this.cms,
-            (item) => {
-                return new CmItem(item);
-            }
-        );
+        super._indexContents();
 
         this._refreshAllSectionsToggler(this.reactive.stateManager.state); // ADDED.
+    }
+
+    /**
+     * Create a new Section object.
+     *
+     * @param {Object} item the constructor data
+     * @return {Section} the new object
+     */
+    _newSection(item) {
+        return new Section(item);
     }
 
     /**

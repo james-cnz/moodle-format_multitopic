@@ -47,30 +47,17 @@ export default class Component extends BaseComponent {
     }
 
     /**
-     * Load the course index template.
+     * Render the course index template.
      *
-     * @param {Object} state the initial state
+     * @param {Object} data the render data
+     * @return {Promise<{html: string, js: string}>} the new HTML and JS
      */
-    async loadTemplateContent(state) {
-        // Collect section information from the state.
-        const exporter = this.reactive.getExporter();
-        const data = exporter.course(state);
+    _renderCourseIndex(data) {
         data.sectionsnested = this._nestSections(data.sections);
-        try {
-            // To render an HTML into our component we just use the regular Templates module.
-            const {html, js} = await Templates.renderForPromise(
-                'format_multitopic/courseformat/courseindex/courseindex', // CHANGED.
-                data,
-            );
-            Templates.replaceNode(this.element, html, js);
-            this.pendingContent.resolve();
-
-            // Save the rendered template into the session cache.
-            this.reactive.setStorageValue(`courseIndex`, {html, js});
-        } catch (error) {
-            this.pendingContent.resolve(error);
-            throw error;
-        }
+        return Templates.renderForPromise(
+            'format_multitopic/courseformat/courseindex/courseindex',
+            data,
+        );
     }
 
     /**

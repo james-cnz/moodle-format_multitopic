@@ -122,50 +122,21 @@
 
     }
 }}
-<div id="course-format-{{uniqid}}">
-    <h2 class="accesshide">{{{title}}}</h2>
-    {{#tabs}}
-        {{> format_multitopic/courseformat/contenttabs/tabtreecontainer}}
-    {{/tabs}}
-    {{{completionhelp}}}
-    <ul class="{{format}} section-list sections topics" data-for="course_sectionlist" data-originalsinglesectionid="{{originalsinglesectionid}}">
-        {{#initialsection}}
-            {{$ core_courseformat/local/content/section }}
-                {{> format_multitopic/courseformat/content/section }}
-            {{/ core_courseformat/local/content/section }}
-        {{/initialsection}}
-        {{#sections}}
-            {{$ core_courseformat/local/content/section }}
-                {{> format_multitopic/courseformat/content/section }}
-            {{/ core_courseformat/local/content/section }}
-        {{/sections}}
-    </ul>
-    {{#singlesection}}
-    <div class="single-section">
-
-        <ul class="{{format}} section-list sections topics">
-            {{$ core_courseformat/local/content/section }}
-                {{> core_courseformat/local/content/section }}
-            {{/ core_courseformat/local/content/section }}
-        </ul>
-
-    </div>
-    {{/singlesection}}
-    {{#numsections}}
-        {{^singlesection}}
-            {{$ core_courseformat/local/content/addsection}}
-                {{> format_multitopic/courseformat/content/addsection}}
-            {{/ core_courseformat/local/content/addsection}}
-        {{/singlesection}}
-    {{/numsections}}
-    {{#bulkedittools}}
-        {{$ core_courseformat/local/content/bulkedittools}}
-            {{> core_courseformat/local/content/bulkedittools}}
-        {{/ core_courseformat/local/content/bulkedittools}}
-    {{/bulkedittools}}
-</div>
+{{#tabs}}
+    {{> format_multitopic/courseformat/contenttabs/tabtreecontainer}}
+{{/tabs}}
+{{< core_courseformat/local/content}}
+{{$ core_courseformat/local/content/section }}
+    {{> format_multitopic/courseformat/content/section }}
+{{/ core_courseformat/local/content/section }}
+{{$ core_courseformat/local/content/addsection}}
+    {{> format_multitopic/courseformat/content/addsection}}
+{{/ core_courseformat/local/content/addsection}}
+{{$ core_courseformat/local/content-js }}
 {{#js}}
 require(['format_multitopic/courseformat/content'], function(component) {
     component.init('#page', {}, null, {{pagesectionid}});
 });
 {{/js}}
+{{/ core_courseformat/local/content-js }}
+{{/ core_courseformat/local/content}}

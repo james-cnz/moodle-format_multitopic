@@ -22,36 +22,12 @@
     Example context (json):
     {}
 }}
-<div data-region="loading-placeholder-content" aria-hidden="true" id="course-index-placeholder">
-    <ul class="placeholders list-unstyled px-5">
-        <li>
-            <div class="col-md-6 p-0 d-flex align-items-center">
-                <div class="bg-pulse-grey rounded-circle me-2"></div>
-                <div class="bg-pulse-grey w-100"></div>
-            </div>
-        </li>
-        <li>
-            <div class="col-md-6 p-0 d-flex align-items-center">
-                <div class="bg-pulse-grey rounded-circle me-2"></div>
-                <div class="bg-pulse-grey w-100"></div>
-            </div>
-        </li>
-        <li>
-            <div class="col-md-6 p-0 d-flex align-items-center">
-                <div class="bg-pulse-grey rounded-circle me-2"></div>
-                <div class="bg-pulse-grey w-100"></div>
-            </div>
-        </li>
-        <li>
-            <div class="col-md-6 p-0 d-flex align-items-center">
-                <div class="bg-pulse-grey rounded-circle me-2"></div>
-                <div class="bg-pulse-grey w-100"></div>
-            </div>
-        </li>
-    </ul>
-</div>
+{{< core_courseformat/local/courseindex/placeholders}}
+{{$ core_courseformat/local/courseindex/placeholders-js }}
 {{#js}}
 require(['format_multitopic/courseformat/courseindex/placeholder'], function(component) {
     component.init('#course-index-placeholder');
 });
 {{/js}}
+{{/ core_courseformat/local/courseindex/placeholders-js }}
+{{/ core_courseformat/local/courseindex/placeholders}}
