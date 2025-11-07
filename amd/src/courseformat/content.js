@@ -171,6 +171,7 @@ export default class Component extends BaseComponent {
             {watch: `section.fmtispage:updated`, handler: this._reloadSection},
             {watch: `section.collapsible:updated`, handler: this._reloadSection},
             {watch: `section.parentvisiblesan:updated`, handler: this._reloadSection},
+            {watch: `course.sectionlevellist:updated`, handler: this._refreshCourseSectionlist},
         ]);
     }
 

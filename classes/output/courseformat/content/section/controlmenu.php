@@ -230,7 +230,11 @@ class controlmenu extends controlmenu_base {
                 url: $url,
                 icon: new pix_icon('i/up', ''),
                 text: $strmovelevelup,
-                attributes: ['class' => 'fmtmovelevelup'],
+                attributes: [
+                    'class' => 'fmtmovelevelup',
+                    'data-action' => 'fmtPageRaise',
+                    'data-id' => $this->section->id,
+                ],
             );
         }
 
@@ -266,7 +270,11 @@ class controlmenu extends controlmenu_base {
                 url: $url,
                 icon: new pix_icon('i/down', ''),
                 text: $strmoveleveldown,
-                attributes: ['class' => 'fmtmoveleveldown'],
+                attributes: [
+                    'class' => 'fmtmoveleveldown',
+                    'data-action' => 'fmtPageLower',
+                    'data-id' => $this->section->id,
+                ],
             );
         }
 
