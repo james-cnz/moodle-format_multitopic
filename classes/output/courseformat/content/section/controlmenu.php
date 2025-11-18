@@ -115,6 +115,7 @@ class controlmenu extends controlmenu_base {
 
         if ($link) {
             $link->url->remove_params('sr');
+            $link->url->remove_params('returnurl');
         }
 
         return $link;
