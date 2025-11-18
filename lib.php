@@ -181,7 +181,6 @@ class format_multitopic extends core_courseformat\base {
      * @return bool if the course format uses indentation.
      */
     public function uses_indentation(): bool {
-        global $CFG;
         return get_config('format_multitopic', 'indentation') ? true : false;
     }
 
@@ -776,7 +775,6 @@ class format_multitopic extends core_courseformat\base {
      * @return null|moodle_url
      */
     public function get_view_url($section, $options = []) {
-        global $CFG;
         $course = $this->get_course();
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);       // CHANGED.
         // REMOVED section return.

@@ -57,8 +57,6 @@ class header extends header_base {
      * @return \stdClass data context for a mustache template
      */
     public function export_for_template(\renderer_base $output): \stdClass {
-        global $CFG; // ADDED.
-
         $format = $this->format;
         $section = $this->section;
         $sectionextra = $this->fmtsectionextra;

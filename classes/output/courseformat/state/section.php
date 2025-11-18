@@ -85,7 +85,6 @@ class section extends base_section {
      * @return bool if the section can be edited in bulk
      */
     protected function is_bulk_editable(): bool {
-        global $CFG;
         $section = $this->section;
         if ($section->component) {
             return parent::is_bulk_editable();

@@ -30,7 +30,7 @@
  * @return bool result
  */
 function xmldb_format_multitopic_upgrade($oldversion) {
-    global $CFG, $DB;
+    global $DB;
 
     if ($oldversion < 2020090400) {
         // Change periodduration "0 days" to "0 day".

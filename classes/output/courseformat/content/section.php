@@ -89,7 +89,7 @@ class section extends section_base {
      */
     protected function add_header_data(\stdClass &$data, \renderer_base $output): bool {
         $result = parent::add_header_data($data, $output);
-        if (!$result || !empty($section->component)) {
+        if (!$result || !empty($this->section->component)) {
             return $result;
         }
 
@@ -178,9 +178,7 @@ class section extends section_base {
         }
 
         // ADDED.
-        $course = $this->format->get_course();
-        $pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
-                    $section->id : $sectionextra->parentid;
+        $course = $format->get_course();
         $sectionstyle = " sectionid-{$section->id}";
         $iscollapsible = false;
         // Determine the section type.
