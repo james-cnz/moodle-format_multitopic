@@ -40,8 +40,8 @@ export default class Component extends BaseComponent {
         this.name = 'contenttabs';
         // Default query selectors.
         this.selectors = {
-            TAB: `ul:first-of-type li`,
-            CHILDTAB: `ul:nth-child(2) li`,
+            SECTIONL0: `ul:first-of-type li`,
+            SECTIONL1: `ul:nth-child(2) li`,
             SECTION_ITEM: `a.nav-link`,
         };
         // Default classes
@@ -49,8 +49,8 @@ export default class Component extends BaseComponent {
             ACTIVETAB: 'active'
         };
         // Objects to keep tabs on the tabs
-        this.tabs = {};
-        this.childtabs = {};
+        this.sectionsl0 = {};
+        this.sectionsl1 = {};
         this.activetab = [null, null];
     }
 
@@ -152,7 +152,7 @@ export default class Component extends BaseComponent {
                     this.activetab[level] = null;
                 }
                 // Update tabs order.
-                await this._fixOrder(tabsDom, tabsrow[level], level ? this.selectors.CHILDTAB : this.selectors.TAB, level);
+                await this._fixOrder(tabsDom, tabsrow[level], level ? this.selectors.SECTIONL1 : this.selectors.SECTIONL0, level);
                 // Select new tab.
                 if (newActiveTab[level]) {
                     this.activetab[level] = newActiveTab[level];
@@ -217,8 +217,8 @@ export default class Component extends BaseComponent {
     _indexContents() {
         // Find unindexed tabs.
         this._scanIndex(
-            this.selectors.TAB,
-            this.tabs,
+            this.selectors.SECTIONL0,
+            this.sectionsl0,
             (item) => {
                 return new Tab(item);
             },
@@ -227,8 +227,8 @@ export default class Component extends BaseComponent {
 
         // Find unindexed child tabs.
         this._scanIndex(
-            this.selectors.CHILDTAB,
-            this.childtabs,
+            this.selectors.SECTIONL1,
+            this.sectionsl1,
             (item) => {
                 return new Tab(item);
             },

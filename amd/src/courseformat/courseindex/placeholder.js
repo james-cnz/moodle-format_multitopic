@@ -80,25 +80,25 @@ export default class Component extends BaseComponent {
      * @return {Array}
      */
     _nestSections(sections) {
-        let topSections = [];
-        let parentSection = {};
-        let lastParent = {};
+        let sectionsListL0 = [];
+        let sectionL0 = {};
+        let sectionL1 = {};
 
         // Let's re-organise our sections.
         for (let i = 0; i < sections.length; i++) {
             let section = sections[i];
             section.subsections = [];
             if (section.indent === 0) {
-                parentSection = section;
-                lastParent = section;
-                topSections.push(section);
+                sectionL0 = section;
+                sectionL1 = section;
+                sectionsListL0.push(section);
             } else if (section.indent === 1) {
-                lastParent = section;
-                parentSection.subsections.push(section);
+                sectionL1 = section;
+                sectionL0.subsections.push(section);
             } else if (section.indent === 2) {
-                lastParent.subsections.push(section);
+                sectionL1.subsections.push(section);
             }
         }
-        return topSections;
+        return sectionsListL0;
     }
 }

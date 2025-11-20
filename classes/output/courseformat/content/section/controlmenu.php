@@ -44,7 +44,7 @@ class controlmenu extends controlmenu_base {
     protected $fmtsectionextra;
 
     /** @var bool Whether we are dealing with a page section */
-    protected $fmtonsectionpage;
+    protected $fmtispage;
 
     /** @var url Return URL */
     protected $fmtreturnurl;
@@ -58,8 +58,8 @@ class controlmenu extends controlmenu_base {
     public function __construct(\format_multitopic $format, \section_info $section) {
         parent::__construct($format, $section);
         $this->fmtsectionextra = $format->fmt_get_section_extra($section);
-        $this->fmtonsectionpage = ($this->fmtsectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // ADDED.
-        $pagesection = $this->fmtonsectionpage ?
+        $this->fmtispage = ($this->fmtsectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // ADDED.
+        $pagesection = $this->fmtispage ?
                         $section
                         : $format->get_modinfo()->get_section_info_by_id($this->fmtsectionextra->parentid);
         $this->baseurl = $format->get_view_url($pagesection);
@@ -130,7 +130,7 @@ class controlmenu extends controlmenu_base {
         global $CFG;
         $link = null;
 
-        if (!$this->fmtonsectionpage) {
+        if (!$this->fmtispage) {
             $link = parent::get_section_duplicate_item();
             if ($link && $CFG->version >= 2025053000) {
                 $link->url->param('returnurl', $this->fmtreturnurl);
@@ -175,7 +175,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && !$this->fmtonsectionpage
+            $this->section->section && !$this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
         ) {
@@ -211,7 +211,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && $this->fmtonsectionpage
+            $this->section->section && $this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && has_capability('moodle/course:update', $this->coursecontext)
@@ -247,7 +247,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && $this->fmtonsectionpage
+            $this->section->section && $this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && has_capability('moodle/course:update', $this->coursecontext)
@@ -285,7 +285,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && $this->fmtonsectionpage
+            $this->section->section && $this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && isset($this->fmtsectionextra->prevupid) && ($this->fmtsectionextra->prevupid != $this->format->fmtrootsectionid)
@@ -324,7 +324,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && $this->fmtonsectionpage
+            $this->section->section && $this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && isset($this->fmtsectionextra->nextupid)
@@ -363,7 +363,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && !$this->fmtonsectionpage
+            $this->section->section && !$this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && $this->fmtsectionextra->prevpageid
@@ -407,7 +407,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && !$this->fmtonsectionpage
+            $this->section->section && !$this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && $this->fmtsectionextra->nextpageid
@@ -451,7 +451,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && !$this->fmtonsectionpage
+            $this->section->section && !$this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && ($this->fmtsectionextra->prevupid != $this->fmtsectionextra->parentid)
@@ -489,7 +489,7 @@ class controlmenu extends controlmenu_base {
         $link = null;
 
         if (
-            $this->section->section && !$this->fmtonsectionpage
+            $this->section->section && !$this->fmtispage
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
             && ($this->fmtsectionextra->nextupid != $this->fmtsectionextra->nextpageid)
@@ -547,7 +547,7 @@ class controlmenu extends controlmenu_base {
                     $this->format->fmt_get_section_extra((object)['id' => $this->fmtsectionextra->prevupid])->sectionbase
                 )
             );
-            if ($this->fmtonsectionpage) {
+            if ($this->fmtispage) {
                 unset($link->attributes['data-action']);
             }
         }
