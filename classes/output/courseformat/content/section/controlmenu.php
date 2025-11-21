@@ -132,7 +132,7 @@ class controlmenu extends controlmenu_base {
 
         if (!$this->fmtispage) {
             $link = parent::get_section_duplicate_item();
-            if ($link && $CFG->version >= 2025053000) {
+            if ($link && ($CFG->version >= 2025053000)) {
                 $link->url->param('returnurl', $this->fmtreturnurl);
             }
         }

@@ -50,8 +50,8 @@ class coursecontentheaderfooter implements \renderable {
 
         // First we should check if we want to add navigation.
         if (
-            ($page->pagelayout == 'incourse' || $page->pagelayout == 'frametop')
-            && $page->context->contextlevel == CONTEXT_MODULE
+            (($page->pagelayout == 'incourse') || ($page->pagelayout == 'frametop'))
+            && ($page->context->contextlevel == CONTEXT_MODULE)
             && !$page->cm->is_stealth()
         ) {
             $course = $page->cm->get_course();

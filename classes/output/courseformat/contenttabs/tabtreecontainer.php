@@ -57,10 +57,10 @@ class tabtreecontainer implements named_templatable, renderable {
         $sectionsextra = $format->fmt_get_sections_extra();
         $displaysectionextra = $sectionsextra[$format->get_sectionid()];
         $maxsections = $format->get_max_sections();
-        $canaddmore = $maxsections > $format->get_last_section_number();
+        $canaddmore = ($maxsections > $format->get_last_section_number());
 
         $activetab = [
-            $displaysectionextra->levelsan <= 0 ? $displaysectionextra->id : $displaysectionextra->parentid,
+            ($displaysectionextra->levelsan <= 0) ? $displaysectionextra->id : $displaysectionextra->parentid,
             $displaysectionextra->id,
         ];
         $tabrows = $this->get_tab_rows($sectionsextra, $activetab, $format->show_editor());
@@ -179,9 +179,9 @@ class tabtreecontainer implements named_templatable, renderable {
                 'link' => $url?->out(false),
                 'text' => \html_writer::tag('div', $sectionname, ['class' =>
                     'tab_content'
-                    . ($sectionextra->currentnestedlevel >= $level ? ' marker' : '')
+                    . (($sectionextra->currentnestedlevel >= $level) ? ' marker' : '')
                     . ((!$thissection->visible || !$thissection->available) && ($thissection->section != 0)
-                        || $level > $sectionextra->pagedepthdirect ? ' dimmed' : ''),
+                        || ($level > $sectionextra->pagedepthdirect) ? ' dimmed' : ''),
                     'data-itemid' => $thissection->id,
                 ]),
                 'title' => $sectionname,

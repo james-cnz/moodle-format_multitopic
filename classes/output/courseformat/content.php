@@ -68,8 +68,8 @@ class content extends content_base {
             $activesectionextra = $displaysectionextra; /* ... */
             $activesectionextra; /* ... */
             $activesectionextra = (($activesectionextra->parentid
-                && ($activesectionextra->levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1
-                    || $activesectionextra->parentid != $format->fmtrootsectionid))
+                && (($activesectionextra->levelsan > FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1)
+                    || ($activesectionextra->parentid != $format->fmtrootsectionid)))
                 ? $sectionsextra[$activesectionextra->parentid] : null)
         ) {
             $activesectionids[$activesectionextra->id] = true;
@@ -96,7 +96,7 @@ class content extends content_base {
         if (
             !(
                 ($sectioninfo = $displaysectionextra->sectionbase)
-                && ($sectioninfo->section == 0 || $sectioninfo->uservisible && $format->is_section_visible($sectioninfo))
+                && (($sectioninfo->section == 0) || $sectioninfo->uservisible && $format->is_section_visible($sectioninfo))
             )
         ) {
             // This section doesn't exist or is not available for the user.
