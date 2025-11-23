@@ -190,8 +190,8 @@ class global_navigation_wrapper {
                     !(($section->section == 0) || $section->uservisible && course_get_format($course)->is_section_visible($section))
                     || (!$this->innershowemptysections
                         && !$section->hasactivites && !$sectionextra->hassubsections
-                        && $this->inner->includesectionnum !== $section->section    // TODO: Remove?
-                        && $this->innerincludesectionid !== $section->id)
+                        && ($this->inner->includesectionnum !== $section->section)    // TODO: Remove?
+                        && ($this->innerincludesectionid !== $section->id))
                 ) {
                             // CHANGED ABOVE: Use sanitised visibility, check for subsections, and use section ID.
                     continue;
@@ -219,7 +219,7 @@ class global_navigation_wrapper {
                         null,
                         $nodeid,
                         new \pix_icon(
-                            $sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC ? 'i/section' : 'e/bullet_list',
+                            ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? 'i/section' : 'e/bullet_list',
                             ''
                         )
                     );
@@ -236,8 +236,8 @@ class global_navigation_wrapper {
                 }
 
                 if (
-                    $this->inner->includesectionnum !== false && $this->inner->includesectionnum == $section->section
-                    || isset($this->innerincludesectionid) && $this->innerincludesectionid == $section->id
+                    ($this->inner->includesectionnum !== false) && ($this->inner->includesectionnum == $section->section)
+                    || isset($this->innerincludesectionid) && ($this->innerincludesectionid == $section->id)
                     || $sectionextra->hassubsections
                     // CHANGED ABOVE: Use section ID.
                     // Also check for subsections, because activities might not get loaded otherwise.
@@ -282,7 +282,7 @@ class global_navigation_wrapper {
         } else {
             $courseid = $course->id;
         }
-        $showactivities = ($courseid != $SITE->id || !empty($CFG->navshowfrontpagemods));
+        $showactivities = ($courseid != $SITE->id) || !empty($CFG->navshowfrontpagemods);
 
         foreach ($activities as $activity) {
             if ($activity->sectionid != $section->id) {                         // CHANGED: Use section ID.

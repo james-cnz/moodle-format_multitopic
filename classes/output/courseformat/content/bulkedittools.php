@@ -70,7 +70,7 @@ class bulkedittools extends bulkedittools_base {
 
         $merged = [];
         foreach ($parentcontrols as $key => $action) {
-            if (!$addedcontrols && $key == 'move' || $key == 'delete') {
+            if (!$addedcontrols && ($key == 'move') || ($key == 'delete')) {
                 $merged = array_merge($merged, $additionalcontrols);
                 $addedcontrols = true;
             }

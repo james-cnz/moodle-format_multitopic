@@ -196,7 +196,7 @@ class format_multitopic extends core_courseformat\base {
         $course = $this->get_course();
         $modinfo = $course ? $this->get_modinfo() : null;
 
-        if (isset($this->fmtsectionsextra) && $this->fmtmodinfo == $modinfo) {
+        if (isset($this->fmtsectionsextra) && ($this->fmtmodinfo == $modinfo)) {
             $fmtsectionsextra = $this->fmtsectionsextra;
         } else {
             $this->fmtsectionsextracomplete = false;
@@ -427,7 +427,7 @@ class format_multitopic extends core_courseformat\base {
             $dateend = format_multitopic_week_date($sectionextra->dateend - 12 * 60 * 60);
             if ($datestart->o == $dateend->o) {
                 // Within one year.
-                $yearstring = $datestart->o != $currentyear ? ($datestart->o . ' ') : '';
+                $yearstring = ($datestart->o != $currentyear) ? ($datestart->o . ' ') : '';
                 if ($datestart->W == $dateend->W) {
                     // Within one week.
                     $weekstring = $yearstring . $weekword . ' ' . $datestart->W;
@@ -451,8 +451,8 @@ class format_multitopic extends core_courseformat\base {
                 }
             } else {
                 // Spans years.
-                $yearstartstring = $datestart->o != $currentyear ? ($datestart->o . ' ') : '';
-                $yearendstring = $dateend->o != $currentyear ? ($dateend->o . ' ') : '';
+                $yearstartstring = ($datestart->o != $currentyear) ? ($datestart->o . ' ') : '';
+                $yearendstring = ($dateend->o != $currentyear) ? ($dateend->o . ' ') : '';
                 if (($datestart->N == 1) && ($dateend->N == 7)) {
                     // Spans whole weeks.
                     $daystring = $yearstartstring . $weekword . ' ' . $datestart->W
@@ -639,8 +639,8 @@ class format_multitopic extends core_courseformat\base {
         $coursesectionscache = cache::make('core', 'coursesectionspreferences');
 
         $coursesections = $coursesectionscache->get($course->id);
-        $collapsedset = ($coursesections && count($coursesections) > 0) ? max(array_keys($coursesections)) : 0;
-        $collapsedset = ($collapsedset > 0 && isset($coursesections[$collapsedset]->fmtcollapsedset)) ?
+        $collapsedset = ($coursesections && (count($coursesections) > 0)) ? max(array_keys($coursesections)) : 0;
+        $collapsedset = (($collapsedset > 0) && isset($coursesections[$collapsedset]->fmtcollapsedset)) ?
                         $collapsedset : 0;
         if ($collapsedset >= max(array_keys($sectionsextra))) {
             return $coursesections;
@@ -784,7 +784,7 @@ class format_multitopic extends core_courseformat\base {
             $pageid = $sectionextra->id;
             if (
                 !empty($sectionextra->sectionbase->component)
-                && $sectionextra->sectionbase->component == 'mod_subsection'
+                && ($sectionextra->sectionbase->component == 'mod_subsection')
             ) {
                 $modinfo = get_fast_modinfo($course);
                 $pageid = $modinfo->get_instances_of('subsection')[$sectionextra->sectionbase->itemid]->section;
@@ -794,14 +794,14 @@ class format_multitopic extends core_courseformat\base {
                 $sectionextra : $this->fmt_get_section_extra((object)['id' => $pageid]);
             $pageid = ($pageextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
                 $pageextra->id : $pageextra->parentid;
-            if ($pageid && $pageid != $this->fmtrootsectionid) {
+            if ($pageid && ($pageid != $this->fmtrootsectionid)) {
                 if (!empty($pageextra->sectionbase->component)) {
                     $url = new moodle_url('/course/section.php', ['id' => $pageid]);
                 } else {
                     $url->param('sectionid', $pageid);
                 }
             }
-            if ($sectionextra && $sectionextra->id != $pageid) {
+            if ($sectionextra && ($sectionextra->id != $pageid)) {
                 $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
             }
             // END CHANGED.
@@ -854,7 +854,7 @@ class format_multitopic extends core_courseformat\base {
             // CHANGED.
             $selectedsectionid = optional_param('sectionid', null, PARAM_INT);
             if (
-                $selectedsectionid !== null && (!defined('AJAX_SCRIPT') || AJAX_SCRIPT == '0')
+                ($selectedsectionid !== null) && (!defined('AJAX_SCRIPT') || (AJAX_SCRIPT == '0'))
                 && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
             ) {
                 $navigationwrapper->innerincludesectionid = $selectedsectionid;
@@ -1219,11 +1219,11 @@ class format_multitopic extends core_courseformat\base {
                 }
             }
             if (!array_key_exists('periodduration', $data) && array_key_exists('layoutstructure', $oldcourse)) {
-                if ($oldcourse['layoutstructure'] == 1 || $oldcourse['layoutstructure'] == 4) {
+                if (($oldcourse['layoutstructure'] == 1) || ($oldcourse['layoutstructure'] == 4)) {
                     $data['periodduration'] = null;
                 } else if ($oldcourse['layoutstructure'] == 5) {
                     $data['periodduration'] = '1 day';
-                } else if ($oldcourse['layoutstructure'] == 2 || $oldcourse['layoutstructure'] == 3) {
+                } else if (($oldcourse['layoutstructure'] == 2) || ($oldcourse['layoutstructure'] == 3)) {
                     $data['periodduration'] = '1 week';
                 }
             }
@@ -1298,7 +1298,7 @@ class format_multitopic extends core_courseformat\base {
         }
         $sectionextra = $this->fmt_get_section_extra($section);
         // END ADDED.
-        return ($sectionextra->section && $sectionextra->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // CHANGED.
+        return $sectionextra->section && ($sectionextra->currentnestedlevel >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC); // CHANGED.
     }
     // END INCLUDED.
 
@@ -1360,7 +1360,7 @@ class format_multitopic extends core_courseformat\base {
             if (
                 !(
                     ($parent->section == 0)
-                    || $parent->uservisible && ($parent->available || $sectionextra->levelsan >= 2)
+                    || $parent->uservisible && ($parent->available || ($sectionextra->levelsan >= 2))
                 )
             ) {
                 $available = false;
@@ -1538,7 +1538,7 @@ function format_multitopic_inplace_editable(string $itemtype, int $itemid, $newv
     // CHANGED LINE ABOVE.
     global $DB, $CFG;
     require_once($CFG->dirroot . '/course/lib.php');
-    if ($itemtype === 'sectionname' || $itemtype === 'sectionnamenl') {
+    if (($itemtype === 'sectionname') || ($itemtype === 'sectionnamenl')) {
         $section = $DB->get_record_sql(
             'SELECT s.* FROM {course_sections} s JOIN {course} c ON s.course = c.id WHERE s.id = ? AND c.format = ?',
             [$itemid, 'multitopic'],

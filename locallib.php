@@ -97,8 +97,8 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
         }
         // Set page-level sections to untimed.
         if (
-            $movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
-            && $sectionsextra[$id]->sectionbase->periodduration != '0 day'
+            ($movedsection->level < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
+            && ($sectionsextra[$id]->sectionbase->periodduration != '0 day')
         ) {
             $updates['periodduration'] = '0 day';
         }
@@ -207,7 +207,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
         }
 
         // We can't move section position 0.
-        if (isset($originextra->section) && $originextra->section < 1) {
+        if (isset($originextra->section) && ($originextra->section < 1)) {
             throw new \moodle_exception('cannotcreateorfindstructs');
         }
 
@@ -222,8 +222,8 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
         // Extract origin sections.
         for (
             $originsubkey = $originextra->id; /* ... */
-            $originsubkey == $originextra->id
-                || $originsubkey && $sectionsextra[$originsubkey]->levelsan > $originextra->levelsan; /* ... */
+            ($originsubkey == $originextra->id)
+                || $originsubkey && ($sectionsextra[$originsubkey]->levelsan > $originextra->levelsan); /* ... */
             $originsubkey = $originextraarray[$originsubkey]->nextanyid
         ) {
             $originextraarray[$originsubkey] = $sectionsextra[$originsubkey];
@@ -243,14 +243,14 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
             // Target position already found, extract remaining sections.
             $appendextraarray[$id] = $sectionextra;
             unset($sectionsextra[$id]);
-        } else if (isset($target->parentid) && $sectionextra->id == $target->parentid) {
+        } else if (isset($target->parentid) && ($sectionextra->id == $target->parentid)) {
             // Reached the target parent section, remember it.
             $parentextra = $sectionextra;
             if ($target->level <= $parentextra->levelsan) {
                 // The moved section can not be a child of the specified parent.
                 throw new \moodle_exception('cannotcreateorfindstructs');
             }
-        } else if (isset($target->prevupid) && $sectionextra->id == $target->prevupid) {
+        } else if (isset($target->prevupid) && ($sectionextra->id == $target->prevupid)) {
             // Reached the target previous section, remember it.
             $prevextra = $sectionextra;
             if ($target->level < $prevextra->levelsan) {
@@ -259,7 +259,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
             }
         } else if (
             isset($parentextra)
-                && ($sectionextra->levelsan < $target->level || $sectionextra->levelsan <= $parentextra->levelsan)
+                && (($sectionextra->levelsan < $target->level) || ($sectionextra->levelsan <= $parentextra->levelsan))
             || isset($prevextra) && ($sectionextra->levelsan <= $target->level)
             || isset($target->nextupid) && ($sectionextra->id == $target->nextupid)
             || isset($target->section) && ($newposition == $target->section)
@@ -313,8 +313,8 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
         $sections[$id] = new \stdClass();
         $sections[$id]->id = $id;
         $sections[$id]->visible = $sectionextra->visiblesan && $parentvisible;
-        $sections[$id]->level = ($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC
-                                        && $sectionextra->levelsan != $originlevel) ?
+        $sections[$id]->level = (($sectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC)
+                                        && ($sectionextra->levelsan != $originlevel)) ?
                                     FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC       // Don't change topic level.
                                     : max($sectionextra->levelsan + $levelchange, 0);
     }
@@ -370,7 +370,7 @@ function format_multitopic_image_attribution($imagename, $authorwithurl, $licenc
         $authorhtml = \html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
     }
     $licence = license_manager::get_licenses()[$licencecode] ?? null;
-    $licencehtml = ($licencecode && ($licencecode != 'unknown' && $licence)) ? $licence->fullname : '';
+    $licencehtml = ($licencecode && ($licencecode != 'unknown') && $licence) ? $licence->fullname : '';
     if ($licencehtml && $licence->source) {
         $licencehtml = \html_writer::tag('a', $licencehtml, ['href' => $licence->source, 'target' => '_blank']);
     }

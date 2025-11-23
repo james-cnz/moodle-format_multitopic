@@ -82,8 +82,8 @@ class stateactions extends \core_courseformat\stateactions {
             $origins[] = $originextra;
             for (
                 $originsubextra = $originextra; /* ... */
-                $originsubextra && ($originsubextra->id == $originextra->id
-                                    || $originsubextra->levelsan > $originextra->levelsan); /* ... */
+                $originsubextra && (($originsubextra->id == $originextra->id)
+                                    || ($originsubextra->levelsan > $originextra->levelsan)); /* ... */
                 $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null
             ) {
                 $subids[] = $originsubextra->id;
@@ -160,8 +160,8 @@ class stateactions extends \core_courseformat\stateactions {
             $origins[] = $originextra;
             for (
                 $originsubextra = $originextra; /* ... */
-                $originsubextra && ($originsubextra->id == $originextra->id
-                                    || $originsubextra->levelsan > $originextra->levelsan); /* ... */
+                $originsubextra && (($originsubextra->id == $originextra->id)
+                                    || ($originsubextra->levelsan > $originextra->levelsan)); /* ... */
                 $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null
             ) {
                 $subids[] = $originsubextra->id;
@@ -238,8 +238,8 @@ class stateactions extends \core_courseformat\stateactions {
             $origins[] = $originextra;
             for (
                 $originsubextra = $originextra; /* ... */
-                $originsubextra && ($originsubextra->id == $originextra->id
-                                    || $originsubextra->levelsan > $originextra->levelsan); /* ... */
+                $originsubextra && (($originsubextra->id == $originextra->id)
+                                    || ($originsubextra->levelsan > $originextra->levelsan)); /* ... */
                 $originsubextra = $originsubextra->nextanyid ? $allsectionsextra[$originsubextra->nextanyid] : null
             ) {
                 $subids[] = $originsubextra->id;

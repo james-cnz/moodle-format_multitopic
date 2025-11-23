@@ -77,7 +77,7 @@ $maxsections = $courseformat->get_max_sections();
 
 if (false) {                                                                    // CHANGED: Don't use numsections.
     $desirednumsections = $courseformatoptions['numsections'] + 1;
-} else if (course_get_format($course)->uses_sections() && $insertsection !== null) {
+} else if (course_get_format($course)->uses_sections() && ($insertsection !== null)) {
     // Count the sections in the course.
     $desirednumsections = $lastsectionnumber + $numsections;
 }
@@ -113,7 +113,7 @@ if (false) {                                                                    
     // Overwriting returnurl to be consistent with block below even though we never get here.
     $returnurl = course_get_url($course);
     $returnurl->set_anchor('changenumsections');
-} else if (course_get_format($course)->uses_sections() && $insertsection !== null) {
+} else if (course_get_format($course)->uses_sections() && ($insertsection !== null)) {
     if (true) {
         // CHANGED: Usually Moodle would not check for the capability to move sections when adding a section to the end.
         // Since "the end" seems a less meaningful distinction for a heirarchy than for a list, this special case is omitted.
