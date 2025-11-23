@@ -315,7 +315,6 @@ export default class Component extends BaseComponent {
             };
         }
         let newItem = document.createElement("li");
-        container.append(newItem);
         const {html} = await Templates.renderForPromise("format_multitopic/courseformat/contenttabs/tab", data);
         newItem = Templates.replaceNode(newItem, html, "")[0];
         return newItem;
@@ -349,9 +348,7 @@ export default class Component extends BaseComponent {
             const currentitem = container.children[index];
             if (currentitem === undefined) {
                 container.append(item);
-                return;
-            }
-            if (currentitem !== item) {
+            } else if (currentitem !== item) {
                 container.insertBefore(item, currentitem);
             }
         }
