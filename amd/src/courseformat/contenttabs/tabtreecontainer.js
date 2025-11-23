@@ -73,6 +73,7 @@ export default class Component extends BaseComponent {
         return [
             // Sections sorting.
             {watch: `course.sectionlist:updated`, handler: this._refreshCourseSectionlist},
+            {watch: `course.sectionlevellist:updated`, handler: this._refreshCourseSectionlist},
         ];
     }
 

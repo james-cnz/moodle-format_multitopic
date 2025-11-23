@@ -168,6 +168,7 @@ export default class Component extends BaseComponent {
      */
     getWatchers() {
         return super.getWatchers().concat([
+            {watch: `course.sectionlevellist:updated`, handler: this._refreshCourseSectionlist},
             {watch: `section.fmtispage:updated`, handler: this._reloadSection},
             {watch: `section.collapsible:updated`, handler: this._reloadSection},
             {watch: `section.parentvisiblesan:updated`, handler: this._reloadSection},

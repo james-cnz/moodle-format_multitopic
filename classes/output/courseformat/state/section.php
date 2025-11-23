@@ -70,6 +70,7 @@ class section extends base_section {
         $data->pageid = ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ? $section->id : $sectionextra->parentid;
         $data->timed = $sectionextra->dateend && ($sectionextra->datestart < $sectionextra->dateend);
         $data->parentid = $sectionextra->parentid;
+        $data->prevupid = $sectionextra->prevupid;
         $data->available = $section->available;
         $data->pagedepthdirect = $sectionextra->pagedepthdirect;
         $data->parentvisiblesan = $sectionextra->parentvisiblesan;

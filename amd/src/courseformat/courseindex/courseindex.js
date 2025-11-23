@@ -46,6 +46,17 @@ export default class Component extends BaseComponent {
     }
 
     /**
+     * Return the component watchers.
+     *
+     * @returns {Array} of watchers
+     */
+    getWatchers() {
+        return super.getWatchers().concat([
+            {watch: `course.sectionlevellist:updated`, handler: this._refreshCourseSectionlist},
+        ]);
+    }
+
+    /**
      * Refresh the section list.
      *
      * @param {object} param

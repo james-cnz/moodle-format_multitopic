@@ -27,10 +27,41 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+import ajax from 'core/ajax';
 import {getCurrentCourseEditor} from 'core_courseformat/courseeditor';
 import DefaultMutations from 'core_courseformat/local/courseeditor/mutations';
+import CourseActions from 'core_courseformat/local/content/actions';
 
 class MultitopicMutations extends DefaultMutations {
+
+    /**
+     * Private method to call core_courseformat_update_course webservice.
+     *
+     * @method _callEditWebservice
+     * @param {string} action
+     * @param {number} courseId
+     * @param {array} ids
+     * @param {number} targetSectionId optional target section id (for moving actions)
+     * @param {number} targetCmId optional target cm id (for moving actions)
+     */
+    async _callEditWebservice(action, courseId, ids, targetSectionId, targetCmId) {
+        const args = {
+            action,
+            courseid: courseId,
+            ids,
+        };
+        if (targetSectionId) {
+            args.targetsectionid = targetSectionId;
+        }
+        if (targetCmId !== undefined) { // CHANGED.
+            args.targetcmid = targetCmId;
+        }
+        let ajaxresult = await ajax.call([{
+            methodname: 'core_courseformat_update_course',
+            args,
+        }])[0];
+        return JSON.parse(ajaxresult);
+    }
 
     /**
      * Move course sections after a specific course location.
@@ -98,6 +129,80 @@ class MultitopicMutations extends DefaultMutations {
         this.sectionLock(stateManager, subsectionIds, false);
     };
 
+    /**
+     * Raise page level.
+     *
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} sectionIds the list of section ids to move
+     */
+    fmtPageRaise = async function(stateManager, sectionIds) {
+        if (sectionIds.length != 1) {
+            throw new Error(`Mutation fmtPageRaise requires exactly one section ID.`);
+        }
+        const course = stateManager.get('course');
+        const section = stateManager.get("section", sectionIds[0]);
+        if (section.levelsan != 1) {
+            throw new Error(`Mutation fmtPageRaise requires section level 1.`);
+        }
+        const targetSectionId = section.parentid;
+        // ADDED.
+        let subsectionIds = [];
+        for (const sectionId of sectionIds) {
+            const section = stateManager.get("section", sectionId);
+            for (let subsection = section;
+                    subsection && (subsection.id == section.id || subsection.levelsan > section.levelsan);
+                    subsection = (course.sectionlist.length > subsection.number + 1) ?
+                        stateManager.get("section", course.sectionlist[subsection.number + 1]) : null) {
+                subsectionIds.push(subsection.id);
+            }
+        }
+        // END ADDED.
+        this.sectionLock(stateManager, subsectionIds, true);
+        const updates = await this._callEditWebservice(
+            'section_move_after', course.id, sectionIds, targetSectionId, section.levelsan - 1
+        );
+        this.bulkReset(stateManager);
+        stateManager.processUpdates(updates);
+        this.sectionLock(stateManager, subsectionIds, false);
+    };
+
+    /**
+     * Lower page level.
+     *
+     * @param {StateManager} stateManager the current state manager
+     * @param {array} sectionIds the list of section ids to move
+     */
+    fmtPageLower = async function(stateManager, sectionIds) {
+        if (sectionIds.length != 1) {
+            throw new Error(`Mutation fmtPageLower requires exactly one section ID.`);
+        }
+        const course = stateManager.get('course');
+        const section = stateManager.get("section", sectionIds[0]);
+        if (section.levelsan != 0) {
+            throw new Error(`Mutation fmtPageLower requires section level 0.`);
+        }
+        const targetSectionId = section.prevupid;
+        // ADDED.
+        let subsectionIds = [];
+        for (const sectionId of sectionIds) {
+            const section = stateManager.get("section", sectionId);
+            for (let subsection = section;
+                    subsection && (subsection.id == section.id || subsection.levelsan > section.levelsan);
+                    subsection = (course.sectionlist.length > subsection.number + 1) ?
+                        stateManager.get("section", course.sectionlist[subsection.number + 1]) : null) {
+                subsectionIds.push(subsection.id);
+            }
+        }
+        // END ADDED.
+        this.sectionLock(stateManager, subsectionIds, true);
+        const updates = await this._callEditWebservice(
+            'fmt_section_move_into', course.id, sectionIds, targetSectionId, section.levelsan + 1
+        );
+        this.bulkReset(stateManager);
+        stateManager.processUpdates(updates);
+        this.sectionLock(stateManager, subsectionIds, false);
+    };
+
 }
 
 export const init = () => {
@@ -105,4 +210,9 @@ export const init = () => {
     // Some plugin (activity or block) may have their own mutations already registered.
     // This is why we use addMutations instead of setMutations here.
     courseEditor.addMutations(new MultitopicMutations());
+    // Add direct mutation content actions.
+    CourseActions.addActions({
+        fmtPageRaise: 'fmtPageRaise',
+        fmtPageLower: 'fmtPageLower',
+    });
 };
