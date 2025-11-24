@@ -76,11 +76,9 @@ class addsection extends addsection_base {
         $course = $format->get_course();
         $data = parent::get_add_section_data($output, $lastsection, $maxsections);
 
-        if (get_string_manager()->string_exists('addsectiontopic', 'format_' . $course->format)) {
-            $addstring = get_string('addsectiontopic', 'format_' . $course->format);
-        } else {
-            $addstring = get_string('addsections');
-        }
+        $addstring = get_string_manager()->string_exists('addsectiontopic', 'format_' . $course->format) ?
+                    get_string('addsectiontopic', 'format_' . $course->format)
+                    : get_string('addsection', 'core_courseformat');
 
         $params = [
             'courseid' => $course->id, // CHANGED.

@@ -150,8 +150,7 @@ class format_multitopic extends core_courseformat\base {
      * @return string the page title
      */
     public function page_title(): string {
-        return get_string_manager()->string_exists('sectionoutline', 'format_multitopic') ?
-                get_string('sectionoutline', 'format_multitopic') : get_string('topicoutline');
+        return get_string('sectionoutline');
     }
 
     /**
@@ -536,7 +535,7 @@ class format_multitopic extends core_courseformat\base {
     public function get_default_section_name($section): string {
         if ($section->section == 0) {
             // Return the general section.
-            return get_string('section0name', 'format_multitopic');
+            return get_string('section0name', 'format_topics');
         } else {
             // Use course_format::get_default_section_name implementation which
             // will display the section name in "Section n" format.
@@ -570,6 +569,15 @@ class format_multitopic extends core_courseformat\base {
         return $datestring;
     }
     // END ADDED.
+
+    /**
+     * Returns the name for the highlighted section.
+     *
+     * @return string The name for the highlighted section based on the given course format.
+     */
+    public function get_section_highlighted_name(): string {
+        return get_string('currentsection', 'format_multitopic');
+    }
 
     /**
      * Set if the current format instance will show all pages or an individual one.
@@ -1405,16 +1413,7 @@ class format_multitopic extends core_courseformat\base {
         $edithint = null,
         $editlabel = null
     ): \core\output\inplace_editable {
-        if (empty($edithint)) {
-            $edithint = new lang_string('editsectionname');                     // CHANGED.
-        }
-        if (empty($editlabel)) {
-            $title = get_section_name($section->course, $section);
-            $editlabel = new lang_string('newsectionname', '', $title);         // CHANGED.
-        }
-
-        // REMOVED function call.
-        // INCLUDED instead /course/format/classes/base.php function inplace_editable_render_section_name body.
+        // INCLUDED /course/format/classes/base.php function inplace_editable_render_section_name body.
         global $USER, $CFG;
         require_once($CFG->dirroot . '/course/lib.php');
 

@@ -25,6 +25,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// The following language strings are used from core, which need consistent translations here:
+// editsectionname, hiddensections, newsectionname, sectionoutline, topic, numweeks, week.
+
 $string['addsectionpage'] = 'Add page';
 $string['addsectiontopic'] = 'Add topic';
 
@@ -43,7 +46,7 @@ $string['collapsibleoverride'] = 'Collapsible topic override';
 $string['collapsibleoverride_help'] = 'Whether this topic is collapsible.
  (Not applicable to pages.)';
 
-$string['currentsection'] = 'This section';
+$string['currentsection'] = 'Current section';
 
 $string['image'] = 'Image';
 $string['image_by'] = 'by';
@@ -74,12 +77,9 @@ $string['perioddurationoverride_help'] = 'The duration of this topic.
 
 $string['plugin_description'] = 'Topics are displayed in tabbed pages,
  with multiple collapsible topics available on each page.';
-$string['pluginname'] = 'Multitopic format';
+$string['pluginname'] = 'Multitopic';
 $string['privacy:metadata'] = 'The Multitopic format plugin does not store any personal data.';
-$string['section0name'] = 'General';
 $string['sectionname'] = 'Section';
-
-$string['sectionoutline'] = 'Section outline';
 
 $string['weeks_abbreviation'] = 'W';
 $string['weeks_capitalised'] = 'Weeks';
@@ -100,3 +100,7 @@ $string['move_page_prev'] = 'Move page left';
 $string['move_to_next_page'] = 'Move to next page';
 $string['move_to_prev_page'] = 'Move to previous page';
 $string['showfromothers'] = 'Show';
+
+// Deprecated since Multitopic v5.1.
+$string['section0name'] = 'General';
+$string['sectionoutline'] = 'Section outline';
