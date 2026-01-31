@@ -855,17 +855,22 @@ class format_multitopic extends core_courseformat\base {
     public function extend_course_navigation($navigation, navigation_node $node) {
         global $PAGE;
 
-        $navigationwrapper = new \format_multitopic\global_navigation_wrapper($navigation); // ADDED.
+        $navigationwrapper = new \format_multitopic\global_navigation_wrapper($navigation, $PAGE); // ADDED.
 
         // If section is specified in course/view.php, make sure it is expanded in navigation.
         if ($navigation->includesectionnum === false) {
             // CHANGED.
-            $selectedsectionid = optional_param('sectionid', null, PARAM_INT);
+            $selectedsectionid = $this->get_sectionid() ?? optional_param('sectionid', null, PARAM_INT);
+            $selectedsection = $this->get_sectionnum() ?? optional_param('section', null, PARAM_INT);
             if (
-                ($selectedsectionid !== null) && (!defined('AJAX_SCRIPT') || (AJAX_SCRIPT == '0'))
-                && $PAGE->url->compare(new moodle_url('/course/view.php'), URL_MATCH_BASE)
+                (($selectedsectionid !== null) || ($selectedsection !== null)) && (!defined('AJAX_SCRIPT') || (AJAX_SCRIPT == '0'))
+                && ($PAGE->context->contextlevel == CONTEXT_COURSE)
             ) {
-                $navigationwrapper->innerincludesectionid = $selectedsectionid;
+                if ($selectedsectionid !== null) {
+                    $navigationwrapper->innerincludesectionid = $selectedsectionid;
+                } else if ($selectedsection !== null) {
+                    $navigation->includesectionnum = $selectedsection;
+                }
             }
             // END CHANGED.
         }
