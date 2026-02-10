@@ -84,7 +84,7 @@ class global_navigation_wrapper {
         require_once($CFG->dirroot . '/course/lib.php');
 
         $modinfo = get_fast_modinfo($course);
-        $sectionsorig = $modinfo->get_listed_section_info_all();                // CHANGED.
+        $sectionsorig = $modinfo->get_section_info_all();                       // CHANGED.
         $format = course_get_format($course);
 
         // For course formats using 'numsections' trim the sections list.
