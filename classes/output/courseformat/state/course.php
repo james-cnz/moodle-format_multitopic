@@ -33,7 +33,6 @@ require_once(__DIR__ . '/../../../../lib.php');
  */
 class course extends base_course {
     /** @var course_format the course format class */
-    #[\Override]
     protected $format;
 
     /**

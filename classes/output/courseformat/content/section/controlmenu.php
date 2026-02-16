@@ -461,7 +461,6 @@ class controlmenu extends controlmenu_base {
      * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
-    #[\Override]
     protected function get_section_moveup_item(): ?link {
         $link = null;
 
@@ -500,7 +499,6 @@ class controlmenu extends controlmenu_base {
      * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
-    #[\Override]
     protected function get_section_movedown_item(): ?link {
         $link = null;
 

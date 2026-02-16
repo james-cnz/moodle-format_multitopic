@@ -78,7 +78,6 @@ class format_multitopic extends core_courseformat\base {
     private $fmtsectionsextracomplete = false;
 
     /** @var int|null the sectionid selected */
-    #[\Override]
     protected $singlesectionid = null;
 
     /** @var int|null the sectionid as specified */
@@ -141,7 +140,6 @@ class format_multitopic extends core_courseformat\base {
      * @todo remove in Multitopic 6.0.
      * @return int
      */
-    #[\Override]
     public function get_max_sections(): int {
         global $CFG;
         return ($CFG->version >= 2025060500) ? PHP_INT_MAX : parent::get_max_sections();
