@@ -775,7 +775,6 @@ class format_multitopic extends core_courseformat\base {
      *
      * @param array $sectionpreferences the section preferences
      */
-    #[\Override]
     protected function persist_to_user_preference(
         array $sectionpreferences,
     ): void {
