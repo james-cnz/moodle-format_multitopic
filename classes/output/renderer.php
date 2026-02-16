@@ -59,6 +59,7 @@ class renderer extends section_renderer {
      * @param \renderable $widget instance with renderable interface
      * @return string the widget HTML
      */
+    #[\Override]
     public function render(\renderable $widget) {
         global $CFG;
         $fullpath = str_replace('\\', '/', get_class($widget));
@@ -93,6 +94,7 @@ class renderer extends section_renderer {
      * @param bool $linkifneeded Whether to add link
      * @return string HTML to output.
      */
+    #[\Override]
     public function section_title($section, $course, bool $linkifneeded = true): string {
         // CHANGED LINE ABOVE.
 
@@ -116,6 +118,7 @@ class renderer extends section_renderer {
      * @param int|\stdClass $course The course entry from DB
      * @return string HTML to output.
      */
+    #[\Override]
     public function section_title_without_link($section, $course): string {
         return $this->section_title($section, $course, false);                  // CHANGED.
     }
@@ -132,6 +135,7 @@ class renderer extends section_renderer {
      * @param \core_courseformat\base $format the course format
      * @return string the course index HTML.
      */
+    #[\Override]
     public function course_index_drawer(\core_courseformat\base $format): string {
         if ($format->uses_course_index()) {
             include_course_editor($format);

@@ -71,6 +71,7 @@ class controlmenu extends controlmenu_base {
      *
      * @return array of edit control items
      */
+    #[\Override]
     public function section_control_items() {
         $controls = parent::section_control_items();
 
@@ -101,6 +102,7 @@ class controlmenu extends controlmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_view_item(): ?link {
         return null;
     }
@@ -110,6 +112,7 @@ class controlmenu extends controlmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_edit_item(): ?link {
         $link = parent::get_section_edit_item();
 
@@ -126,6 +129,7 @@ class controlmenu extends controlmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_duplicate_item(): ?link {
         global $CFG;
         $link = null;
@@ -145,6 +149,7 @@ class controlmenu extends controlmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_visibility_item(): ?link {
         $link = parent::get_section_visibility_item();
 
@@ -171,6 +176,7 @@ class controlmenu extends controlmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_movesection_item(): ?link {
         $link = null;
 
@@ -455,6 +461,7 @@ class controlmenu extends controlmenu_base {
      * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_moveup_item(): ?link {
         $link = null;
 
@@ -493,6 +500,7 @@ class controlmenu extends controlmenu_base {
      * @todo Final deprecation in Moodle 6.0 MDL-83530
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_movedown_item(): ?link {
         $link = null;
 
@@ -529,6 +537,7 @@ class controlmenu extends controlmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_permalink_item(): ?link {
         $link = parent::get_section_permalink_item();
 
@@ -544,6 +553,7 @@ class controlmenu extends controlmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_delete_item(): ?link {
         $link = parent::get_section_delete_item();
 

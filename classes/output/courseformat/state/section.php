@@ -50,6 +50,7 @@ class section extends base_section {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return stdClass data context for a mustache template
      */
+    #[\Override]
     public function export_for_template(\renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
         $format = $this->format;
@@ -85,6 +86,7 @@ class section extends base_section {
      * Return if the section can be selected for bulk editing.
      * @return bool if the section can be edited in bulk
      */
+    #[\Override]
     protected function is_bulk_editable(): bool {
         $section = $this->section;
         if ($section->component) {

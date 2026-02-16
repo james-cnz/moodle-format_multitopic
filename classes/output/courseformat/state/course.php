@@ -33,6 +33,7 @@ require_once(__DIR__ . '/../../../../lib.php');
  */
 class course extends base_course {
     /** @var course_format the course format class */
+    #[\Override]
     protected $format;
 
     /**
@@ -50,6 +51,7 @@ class course extends base_course {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return stdClass data context for a mustache template
      */
+    #[\Override]
     public function export_for_template(\renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
         $format = $this->format;

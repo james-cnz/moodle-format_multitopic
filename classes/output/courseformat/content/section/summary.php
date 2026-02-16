@@ -44,6 +44,7 @@ class summary extends summary_base {
      *
      * @return string HTML to output.
      */
+    #[\Override]
     public function format_summary_text(): string {
         $section = $this->section;
 

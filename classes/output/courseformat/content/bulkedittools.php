@@ -35,6 +35,7 @@ class bulkedittools extends bulkedittools_base {
      *
      * @return array of edit control items
      */
+    #[\Override]
     protected function section_control_items(): array {
         global $USER;
         $format = $this->format;

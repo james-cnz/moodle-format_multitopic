@@ -33,6 +33,7 @@ class delegatedcontrolmenu extends delegatedcontrolmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_view_item(): ?link {
         return null;
     }
@@ -42,6 +43,7 @@ class delegatedcontrolmenu extends delegatedcontrolmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_edit_item(): ?link {
         $link = parent::get_section_edit_item();
 
@@ -58,6 +60,7 @@ class delegatedcontrolmenu extends delegatedcontrolmenu_base {
      *
      * @return link|null The menu item if applicable, otherwise null.
      */
+    #[\Override]
     protected function get_section_permalink_item(): ?link {
         $link = parent::get_section_permalink_item();
 

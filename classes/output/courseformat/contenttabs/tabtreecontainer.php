@@ -51,6 +51,7 @@ class tabtreecontainer implements named_templatable, renderable {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
+    #[\Override]
     public function export_for_template(\renderer_base $output): stdClass {
         $format = $this->format;
         $course = $format->get_course();

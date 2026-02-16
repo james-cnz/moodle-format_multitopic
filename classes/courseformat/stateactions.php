@@ -126,6 +126,7 @@ class stateactions extends \core_courseformat\stateactions {
      * @param int|null $targetsectionid optional target section id
      * @param int|null $targetcmid optional reused as target level
      */
+    #[\Override]
     public function section_move_after(
         \core_courseformat\stateupdates $updates,
         \stdClass $course,
@@ -281,6 +282,7 @@ class stateactions extends \core_courseformat\stateactions {
      * @param int[] $ids section ids
      * @param int $visible the new visible value
      */
+    #[\Override]
     protected function set_section_visibility(
         \core_courseformat\stateupdates $updates,
         \stdClass $course,
