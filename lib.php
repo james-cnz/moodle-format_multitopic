@@ -855,7 +855,7 @@ class format_multitopic extends core_courseformat\base {
     public function extend_course_navigation($navigation, navigation_node $node) {
         global $PAGE;
 
-        $navigationwrapper = new \format_multitopic\global_navigation_wrapper($navigation, $PAGE); // ADDED.
+        // $navigationwrapper = new \format_multitopic\global_navigation_wrapper($navigation, $PAGE); // ADDED.
 
         // If section is specified in course/view.php, make sure it is expanded in navigation.
         if ($navigation->includesectionnum === false) {
@@ -866,25 +866,52 @@ class format_multitopic extends core_courseformat\base {
                 (($selectedsectionid !== null) || ($selectedsection !== null)) && (!defined('AJAX_SCRIPT') || (AJAX_SCRIPT == '0'))
                 && ($PAGE->context->contextlevel == CONTEXT_COURSE)
             ) {
-                if ($selectedsectionid !== null) {
-                    $navigationwrapper->innerincludesectionid = $selectedsectionid;
-                } else if ($selectedsection !== null) {
-                    $navigation->includesectionnum = $selectedsection;
-                }
+                $navigation->includesectionnum = $selectedsection ?? $this->get_modinfo()->get_section_info_by_id($selectedsectionid)?->section
             }
             // END CHANGED.
         }
 
         // Check if there are callbacks to extend course navigation.
-        // REMOVED function call.
-        // INCLUDED instead /course/format/classes/base.php function extend_course_navigation body.
-        if ($course = $this->get_course()) {
-            $navigationwrapper->load_generic_course_sections($course, $node);   // CHANGED: Wrapped navigation object.
-        }
-        // END INCLUDED.
+        parent::extend_course_navigation($navigation, $node);
 
         // We want to remove the general section if it is empty.
         // REMOVED.
+
+        // Wrap navigation nodes.
+        $modinfo = $this->get_modinfo();
+        $sections = $modinfo->get_listed_section_info();
+        $wrappedkey = -1;
+        $nodeatlevel = [-1: $node, 0: $node, 1: $node];
+        foreach ($sections as $section) {
+            $sectionextra = $this->fmt_get_section_extra($section);
+            $unwrappednode = $node->get($section->id, $node::TYPE_SECTION);
+            if ($unwrappednode) {
+                $unwrappednode->remove();
+            }
+            $firstlevel = max($sectionextra->levelsan, FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1);
+            $lastlevel = max($sectionextra->pagedepthdirect, $firstlevel);
+            // END ADDED.
+            for ($level = $firstlevel; $level <= $lastlevel; $level++) {
+                $parentnode = $nodeatlevel[$level - 1];                          // ADDED.
+                if ($level < $lastlevel) {
+                    $sectionnode = $parentnode->create(
+                        text: $sectionname,
+                        action: $url,
+                        type: navigation_node::TYPE_SECTION,
+                        key: $wrappedkey--,
+                        icon: new pix_icon('i/section')
+                    );
+                    // CHANGED ABOVE: Attach to parentnode with nodeid as defined above, and use a list icon for topic sections.
+                    $sectionnode->nodetype = navigation_node::NODETYPE_BRANCH;
+                    $sectionnode->hidden = (!$section->visible || !$section->available) && ($section->section != 0);
+                    $sectionnode->add_attribute('data-section-name-for', $section->id);
+                } else {
+                    $sectionnode = $unwrappednode;
+                }
+                $parentnode->add_node($sectionnode);
+                $nodeatlevel[$level] = $sectionnode;                             // ADDED.
+            }
+        }
     }
 
     // INCLUDED instead /course/format/weeks/lib.php function ajax_section_move .
