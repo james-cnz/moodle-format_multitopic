@@ -25,6 +25,7 @@
 
 namespace format_multitopic\output\courseformat\content\section;
 
+use core\output\renderer_base;
 use core_courseformat\output\local\content\section\header as header_base;
 
 /**
@@ -53,10 +54,10 @@ class header extends header_base {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
-    public function export_for_template(\renderer_base $output): \stdClass {
+    public function export_for_template(renderer_base $output): \stdClass {
         $format = $this->format;
         $section = $this->section;
         $sectionextra = $this->fmtsectionextra;

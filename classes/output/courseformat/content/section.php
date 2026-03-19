@@ -25,6 +25,7 @@
 
 namespace format_multitopic\output\courseformat\content;
 
+use core\output\renderer_base;
 use core_courseformat\output\local\content\section as section_base;
 use core_courseformat\base as course_format;
 
@@ -57,10 +58,10 @@ class section extends section_base {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
-    public function export_for_template(\renderer_base $output): \stdClass {
+    public function export_for_template(renderer_base $output): \stdClass {
         $format = $this->format;
 
         $data = parent::export_for_template($output);
@@ -84,10 +85,10 @@ class section extends section_base {
      * Add the section header to the data structure.
      *
      * @param \stdClass $data the current cm data reference
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
-    protected function add_header_data(\stdClass &$data, \renderer_base $output): bool {
+    protected function add_header_data(\stdClass &$data, renderer_base $output): bool {
         $result = parent::add_header_data($data, $output);
         if (!$result || !empty($this->section->component)) {
             return $result;
@@ -104,10 +105,10 @@ class section extends section_base {
      * Add the section cm list to the data structure.
      *
      * @param \stdClass $data the current cm data reference
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
-    protected function add_cm_data(\stdClass &$data, \renderer_base $output): bool {
+    protected function add_cm_data(\stdClass &$data, renderer_base $output): bool {
         $result = false;
 
         $section = $this->section;
@@ -135,10 +136,10 @@ class section extends section_base {
      * Add the section editor attributes to the data structure.
      *
      * @param \stdClass $data the current cm data reference
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
-    protected function add_editor_data(\stdClass &$data, \renderer_base $output): bool {
+    protected function add_editor_data(\stdClass &$data, renderer_base $output): bool {
         $result = parent::add_editor_data($data, $output);
 
         if (!empty($this->section->component) || !$result) {
@@ -157,10 +158,10 @@ class section extends section_base {
      *
      * @param \stdClass $data the current cm data reference
      * @param bool[] $haspartials the result of loading partial data elements
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
-    protected function add_format_data(\stdClass &$data, array $haspartials, \renderer_base $output): bool {
+    protected function add_format_data(\stdClass &$data, array $haspartials, renderer_base $output): bool {
         $section = $this->section;
 
         $result = parent::add_format_data($data, $haspartials, $output);

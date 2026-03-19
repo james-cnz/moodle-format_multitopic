@@ -16,10 +16,13 @@
 
 namespace format_multitopic\output\courseformat\contenttabs;
 
+use core\output\html_writer;
 use core\output\named_templatable;
+use core\output\renderable;
+use core\output\renderer_base;
+use core\url;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\courseformat_named_templatable;
-use renderable;
 use stdClass;
 
 /**
@@ -48,10 +51,10 @@ class tabtreecontainer implements named_templatable, renderable {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
-    public function export_for_template(\renderer_base $output): stdClass {
+    public function export_for_template(renderer_base $output): stdClass {
         $format = $this->format;
         $course = $format->get_course();
         $sectionsextra = $format->fmt_get_sections_extra();
@@ -152,14 +155,14 @@ class tabtreecontainer implements named_templatable, renderable {
      * @param \format_multitopic\section_info_extra|string $sectionextra
      * @param int $level
      * @param bool $canaddmore
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
     public function export_tab_for_template(
         \format_multitopic\section_info_extra|string $sectionextra,
         int $level,
         bool $canaddmore,
-        \renderer_base $output
+        renderer_base $output
     ): stdClass {
         $format = $this->format;
         $course = $format->get_course();
@@ -177,7 +180,7 @@ class tabtreecontainer implements named_templatable, renderable {
             $eft = (object)[
                 'id' => "tab_id_{$thissection->id}_l{$level}",
                 'link' => $url?->out(false),
-                'text' => \html_writer::tag('div', $sectionname, ['class' =>
+                'text' => html_writer::tag('div', $sectionname, ['class' =>
                     'tab_content'
                     . (($sectionextra->currentnestedlevel >= $level) ? ' marker' : '')
                     . ((!$thissection->visible || !$thissection->available) && ($thissection->section != 0)
@@ -202,11 +205,11 @@ class tabtreecontainer implements named_templatable, renderable {
                 'sesskey' => sesskey(),
                 'insertparentid' => $parentid,
                 'insertlevel' => $level,
-                'returnurl' => new \moodle_url("/course/view.php?id={$course->id}"
+                'returnurl' => new url("/course/view.php?id={$course->id}"
                     . (($format->get_sectionid() != $format->fmtrootsectionid) ?
                     "&sectionid={$format->get_sectionid()}" : "")),
             ];
-            $url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
+            $url = new url('/course/format/multitopic/_course_changenumsections.php', $params);
             $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle');
             $inactive = !$canaddmore;
             if ($inactive) {

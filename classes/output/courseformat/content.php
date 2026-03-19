@@ -25,8 +25,9 @@
 
 namespace format_multitopic\output\courseformat;
 
+use core\exception\moodle_exception;
+use core\output\renderer_base;
 use core_courseformat\output\local\content as content_base;
-use renderer_base;
 
 /**
  * Base class to render a course format.
@@ -43,7 +44,7 @@ class content extends content_base {
      * @param renderer_base $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
-    public function export_for_template(\renderer_base $output) {
+    public function export_for_template(renderer_base $output) {
         global $CFG;
         global $PAGE;
 
@@ -101,7 +102,7 @@ class content extends content_base {
         ) {
             // This section doesn't exist or is not available for the user.
             // We actually already check this in course/view.php but just in case exit from this function as well.
-            throw new \moodle_exception(
+            throw new moodle_exception(
                 'unknowncoursesection',
                 'error',
                 course_get_url($course),

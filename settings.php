@@ -25,6 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use core\lang_string;
+use core\output\html_writer;
+use core\url;
+
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configselect(
         'format_multitopic/startwday',
@@ -56,7 +60,7 @@ if ($ADMIN->fulltree) {
         0
     ));
 
-    $url = new moodle_url('/admin/course/resetindentation.php', ['format' => 'multitopic']);
+    $url = new url('/admin/course/resetindentation.php', ['format' => 'multitopic']);
     $link = html_writer::link($url, get_string('resetindentation', 'admin'));
     $settings->add(new admin_setting_configcheckbox(
         'format_multitopic/indentation',

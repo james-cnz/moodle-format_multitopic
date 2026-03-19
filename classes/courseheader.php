@@ -23,16 +23,20 @@
  */
 namespace format_multitopic;
 
+use core\output\html_writer;
+use core\output\renderable;
+use core\url;
+
 /**
  * Course header: A banner with the course title and a slice of the course image.
  *
  * @copyright 2019 James Calder and Otago Polytechnic
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class courseheader implements \renderable {
+class courseheader implements renderable {
     // See https://docs.moodle.org/dev/Course_formats#Additional_footer_or_header_on_any_page_inside_the_course .
 
-    /** @var \moodle_url|null course image URL */
+    /** @var url|null course image URL */
     private $imageurl;
     /** @var string|null course image name */
     private $imagename;
@@ -72,7 +76,7 @@ class courseheader implements \renderable {
             $filename = $file->get_filename();
             $filenameextpos = strrpos($filename, '.');
             if ($filenameextpos) {
-                $url = \moodle_url::make_file_url(
+                $url = url::make_file_url(
                     '/pluginfile.php',
                     '/' . $file->get_contextid() . '/course/overviewfiles' . $file->get_filepath() . $filename
                 );
@@ -94,22 +98,22 @@ class courseheader implements \renderable {
 
         // Output the banner.
         // NOTE: Changes here need to be reflected in _course_edit.js .
-        $o = \html_writer::start_tag('div', [
+        $o = html_writer::start_tag('div', [
             'id' => 'course-header-banner',
             'style' => "background-image: url('{$this->imageurl}'); "
                      . "background-position: center {$this->bannerslice}%;",
         ]);
-            $o .= \html_writer::tag('div', $this->coursename, [
+            $o .= html_writer::tag('div', $this->coursename, [
                 'id' => 'course-header-banner-text',
                 'class' => 'h2',
             ]);
-        $o .= \html_writer::end_tag('div');
+        $o .= html_writer::end_tag('div');
 
         // Output the attribution.
-        $o .= \html_writer::start_tag('p', ['id' => 'course-header-banner_attribution',
+        $o .= html_writer::start_tag('p', ['id' => 'course-header-banner_attribution',
                                             'style' => 'visibility: ' . ($this->imageurl ? 'visible' : 'hidden') . ';', ]);
         $o .= format_multitopic_image_attribution($this->imagename, $this->authorwithurl, $this->licencecode);
-        $o .= \html_writer::end_tag('p');
+        $o .= html_writer::end_tag('p');
 
         return $o;
     }

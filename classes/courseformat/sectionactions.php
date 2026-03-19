@@ -17,6 +17,7 @@
 namespace format_multitopic\courseformat;
 
 use stdClass;
+use core\exception\moodle_exception;
 use core_courseformat\local\sectionactions as base_sectionactions;
 
 /**
@@ -95,7 +96,7 @@ class sectionactions extends base_sectionactions {
                     !empty($fields->component) ? 2 : 1
                 );
                 $sectionrecord->section = $movednews[$sectionrecord->id]->section;
-            } catch (\moodle_exception $e) {
+            } catch (moodle_exception $e) {
                 $DB->delete_records('course_sections', ['id' => $sectionrecord->id]);
                 throw $e;
             }

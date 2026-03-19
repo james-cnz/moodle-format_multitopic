@@ -20,6 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../locallib.php');
 
+use core\exception\moodle_exception;
 use format_multitopic;
 
 /**
@@ -57,7 +58,7 @@ class stateactions extends \core_courseformat\stateactions {
     ): void {
         // Validate target elements.
         if (!$targetsectionid) {
-            throw new \moodle_exception("Action fmt_section_move_before requires targetsectionid");
+            throw new moodle_exception("Action fmt_section_move_before requires targetsectionid");
         }
 
         $this->validate_sections($course, $ids, __FUNCTION__);
@@ -135,7 +136,7 @@ class stateactions extends \core_courseformat\stateactions {
     ): void {
         // Validate target elements.
         if (!$targetsectionid) {
-            throw new \moodle_exception("Action section_move_after requires targetsectionid");
+            throw new moodle_exception("Action section_move_after requires targetsectionid");
         }
 
         $this->validate_sections($course, $ids, __FUNCTION__);
@@ -213,7 +214,7 @@ class stateactions extends \core_courseformat\stateactions {
     ): void {
         // Validate target elements.
         if (!$targetsectionid) {
-            throw new \moodle_exception("Action section_move_into requires targetsectionid");
+            throw new moodle_exception("Action section_move_into requires targetsectionid");
         }
 
         $this->validate_sections($course, $ids, __FUNCTION__);

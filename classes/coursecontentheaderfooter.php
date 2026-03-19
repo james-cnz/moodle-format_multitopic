@@ -24,6 +24,10 @@
  */
 namespace format_multitopic;
 
+use core\output\html_writer;
+use core\output\renderable;
+use core\url;
+
 /**
  * Course content header/footer: Back to course button.
  *
@@ -31,12 +35,12 @@ namespace format_multitopic;
  * @copyright based on work by 2009 Tim Hunt
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class coursecontentheaderfooter implements \renderable {
+class coursecontentheaderfooter implements renderable {
     // See https://docs.moodle.org/dev/Course_formats#Additional_footer_or_header_on_any_page_inside_the_course .
 
     /** @var int -1 for header, 1 for footer */
     private $pos;
-    /** @var \moodle_url URL for relevant course section */
+    /** @var url URL for relevant course section */
     private $sectionurl;
 
     /**
@@ -78,7 +82,7 @@ class coursecontentheaderfooter implements \renderable {
         if ($this->sectionurl) {
             $strback = get_string_manager()->string_exists('back_to_course', 'format_multitopic') ?
                         get_string('back_to_course', 'format_multitopic') : get_string('back');
-            $o .= \html_writer::tag(
+            $o .= html_writer::tag(
                 'a',
                 $OUTPUT->pix_icon('t/left', '') . ' ' . $strback,
                 ['href' => $this->sectionurl]
@@ -89,9 +93,9 @@ class coursecontentheaderfooter implements \renderable {
         // Horizontal rule to separate header/footer from page content.
         if ($o) {
             if ($this->pos < 0) {
-                $o = $o . \html_writer::empty_tag('hr');
+                $o = $o . html_writer::empty_tag('hr');
             } else if ($this->pos > 0) {
-                $o = \html_writer::empty_tag('hr') . $o;
+                $o = html_writer::empty_tag('hr') . $o;
             }
         }
 

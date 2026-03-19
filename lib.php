@@ -36,7 +36,12 @@ require_once(__DIR__ . '/classes/courseheader.php');
 require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 // END ADDED.
 
+use core\exception\moodle_exception;
+use core\lang_string;
+use core\output\html_writer;
 use core\output\inplace_editable;
+use core\output\renderable;
+use core\url;
 
 // ADDED.
 /** @var int The level of the General section, which represents the course as a whole.
@@ -105,7 +110,7 @@ class format_multitopic extends core_courseformat\base {
             // If we're on the view page, patch the URL to use the section ID instead of section number.
             if (
                 $PAGE->has_set_url()
-                && ($url = $PAGE->url)->compare(new \moodle_url('/course/view.php'), URL_MATCH_BASE)
+                && ($url = $PAGE->url)->compare(new url('/course/view.php'), URL_MATCH_BASE)
                 && $url->get_param('section')
                 && ($sectionid = optional_param('sectionid', null, PARAM_INT))
             ) {
@@ -780,11 +785,11 @@ class format_multitopic extends core_courseformat\base {
      *                      specifically levelsan, and parentid where levelsan is topic level.
      * @param array $options options for view URL. At the moment we use:
      *     'navigation' (bool) if true and section has no separate page, the function returns null
-     * @return null|moodle_url
+     * @return null|url
      */
     public function get_view_url($section, $options = []) {
         $course = $this->get_course();
-        $url = new moodle_url('/course/view.php', ['id' => $course->id]);       // CHANGED.
+        $url = new url('/course/view.php', ['id' => $course->id]);              // CHANGED.
         // REMOVED section return.
         // REMOVED convert sectioninfo to number.
         $sectionextra = ($section === null) ? null : $this->fmt_get_section_extra($section); // ADDED.
@@ -804,7 +809,7 @@ class format_multitopic extends core_courseformat\base {
                 $pageextra->id : $pageextra->parentid;
             if ($pageid && ($pageid != $this->fmtrootsectionid)) {
                 if (!empty($pageextra->sectionbase->component)) {
-                    $url = new moodle_url('/course/section.php', ['id' => $pageid]);
+                    $url = new url('/course/section.php', ['id' => $pageid]);
                 } else {
                     $url->param('sectionid', $pageid);
                 }

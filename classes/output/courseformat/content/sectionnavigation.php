@@ -24,6 +24,7 @@
 
 namespace format_multitopic\output\courseformat\content;
 
+use core\output\renderer_base;
 use core_courseformat\output\local\content\sectionnavigation as sectionnavigation_base;
 use core_courseformat\base as course_format;
 use stdClass;
@@ -60,10 +61,10 @@ class sectionnavigation extends sectionnavigation_base {
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return stdClass data context for a mustache template
      */
-    public function export_for_template(\renderer_base $output): stdClass {
+    public function export_for_template(renderer_base $output): stdClass {
 
         if ($this->data !== null) {
             return $this->data;
