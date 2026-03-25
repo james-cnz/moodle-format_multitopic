@@ -41,6 +41,7 @@ class provider implements null_provider {
      *
      * @return  string
      */
+    #[\Override]
     public static function get_reason(): string {
         return 'privacy:metadata';
     }
