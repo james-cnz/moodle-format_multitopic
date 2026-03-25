@@ -43,6 +43,7 @@ class content extends content_base {
      * @param renderer_base $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
+    #[\Override]
     public function export_for_template(\renderer_base $output) {
         global $CFG;
         global $PAGE;
@@ -157,6 +158,7 @@ class content extends content_base {
      * @param \course_modinfo $modinfo the current course modinfo object
      * @return \section_info[] an array of section_info to display
      */
+    #[\Override]
     protected function get_sections_to_display(\course_modinfo $modinfo): array {
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();

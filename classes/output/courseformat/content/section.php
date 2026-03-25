@@ -60,6 +60,7 @@ class section extends section_base {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return \stdClass data context for a mustache template
      */
+    #[\Override]
     public function export_for_template(\renderer_base $output): \stdClass {
         $format = $this->format;
 
@@ -87,6 +88,7 @@ class section extends section_base {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
+    #[\Override]
     protected function add_header_data(\stdClass &$data, \renderer_base $output): bool {
         $result = parent::add_header_data($data, $output);
         if (!$result || !empty($this->section->component)) {
@@ -107,6 +109,7 @@ class section extends section_base {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
+    #[\Override]
     protected function add_cm_data(\stdClass &$data, \renderer_base $output): bool {
         $result = false;
 
@@ -138,6 +141,7 @@ class section extends section_base {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
+    #[\Override]
     protected function add_editor_data(\stdClass &$data, \renderer_base $output): bool {
         $result = parent::add_editor_data($data, $output);
 
@@ -160,6 +164,7 @@ class section extends section_base {
      * @param \renderer_base $output typically, the renderer that's calling this function
      * @return bool if the cm has name data
      */
+    #[\Override]
     protected function add_format_data(\stdClass &$data, array $haspartials, \renderer_base $output): bool {
         $section = $this->section;
 
@@ -210,6 +215,7 @@ class section extends section_base {
      *
      * @return bool
      */
+    #[\Override]
     protected function is_section_collapsed(): bool {
         $course = $this->format->get_course();
         $section = $this->section;

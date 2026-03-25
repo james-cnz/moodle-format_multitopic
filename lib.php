@@ -127,6 +127,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return int The current value (COURSE_DISPLAY_MULTIPAGE or COURSE_DISPLAY_SINGLEPAGE)
      */
+    #[\Override]
     public function get_course_display(): int {
         return COURSE_DISPLAY_SINGLEPAGE;
     }
@@ -149,6 +150,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return string the page title
      */
+    #[\Override]
     public function page_title(): string {
         return get_string('sectionoutline');
     }
@@ -158,6 +160,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return bool
      */
+    #[\Override]
     public function uses_sections(): bool {
         return true;
     }
@@ -170,6 +173,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return bool
      */
+    #[\Override]
     public function uses_course_index(): bool {
         return true;
     }
@@ -179,6 +183,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return bool if the course format uses indentation.
      */
+    #[\Override]
     public function uses_indentation(): bool {
         return get_config('format_multitopic', 'indentation') ? true : false;
     }
@@ -407,6 +412,7 @@ class format_multitopic extends core_courseformat\base {
      * @param int|stdClass|\section_info $section Section object from database.
      * @return string Display name that the course format prefers, e.g. "Section 2"
      */
+    #[\Override]
     public function get_section_name($section): string {
 
         // ADDED.
@@ -532,6 +538,7 @@ class format_multitopic extends core_courseformat\base {
      * @param stdClass $section Section object from database or just field course_sections section
      * @return string The default value for the section name.
      */
+    #[\Override]
     public function get_default_section_name($section): string {
         if ($section->section == 0) {
             // Return the general section.
@@ -575,6 +582,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return string The name for the highlighted section based on the given course format.
      */
+    #[\Override]
     public function get_section_highlighted_name(): string {
         return get_string('currentsection', 'format_multitopic');
     }
@@ -584,6 +592,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @param int|null $sectionid null for all pages, or a page's sectionid.
      */
+    #[\Override]
     public function set_sectionid(?int $sectionid): void {
         $this->set_sectionnum(isset($sectionid) ? (object)['id' => $sectionid] : null);
     }
@@ -593,6 +602,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return int|null null for all pages or the page's sectionid.
      */
+    #[\Override]
     public function get_sectionid(): ?int {
         return $this->singlesectionid;
     }
@@ -602,6 +612,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @param \section_info|stdClass|int|null $section null for all pages or a page's section info or number.
      */
+    #[\Override]
     public function set_sectionnum($section): void {
         if ($section === null) {
             $this->singlesection = null;
@@ -629,6 +640,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return int|null the current page's section number or null when there is no single page.
      */
+    #[\Override]
     public function get_sectionnum(): ?int {
         return $this->singlesection;
     }
@@ -638,6 +650,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return array of preferences indexed by section ID
      */
+    #[\Override]
     public function get_sections_preferences(): array {
 
         $result = [];
@@ -676,6 +689,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return array of preferences indexed by preference name
      */
+    #[\Override]
     public function get_sections_preferences_by_preference(): array {
 
         $course = $this->get_course();
@@ -782,6 +796,7 @@ class format_multitopic extends core_courseformat\base {
      *     'navigation' (bool) if true and section has no separate page, the function returns null
      * @return null|moodle_url
      */
+    #[\Override]
     public function get_view_url($section, $options = []) {
         $course = $this->get_course();
         $url = new moodle_url('/course/view.php', ['id' => $course->id]);       // CHANGED.
@@ -825,6 +840,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return stdClass
      */
+    #[\Override]
     public function supports_ajax(): stdClass {
         $ajaxsupport = new stdClass();
         $ajaxsupport->capable = true;
@@ -841,6 +857,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return bool if the format is compatible with components.
      */
+    #[\Override]
     public function supports_components(): bool {
         return true;
     }
@@ -852,6 +869,7 @@ class format_multitopic extends core_courseformat\base {
      * @param navigation_node $node The course node within the navigation
      * @return void
      */
+    #[\Override]
     public function extend_course_navigation($navigation, navigation_node $node) {
         global $PAGE;
 
@@ -895,6 +913,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return array This will be passed in ajax respose
      */
+    #[\Override]
     public function ajax_section_move(): array {
         global $PAGE;
         $titles = [];
@@ -920,6 +939,7 @@ class format_multitopic extends core_courseformat\base {
      * @return array of default blocks, must contain two keys BLOCK_POS_LEFT and BLOCK_POS_RIGHT
      *     each of values is an array of block names (for left and right side columns)
      */
+    #[\Override]
     public function get_default_blocks(): array {
         return [
             BLOCK_POS_LEFT => [],
@@ -938,6 +958,7 @@ class format_multitopic extends core_courseformat\base {
      * @param bool $foreditform
      * @return array of options
      */
+    #[\Override]
     public function course_format_options($foreditform = false): array {
         global $CFG;                                                            // ADDED.
         static $courseformatoptions = false;
@@ -1092,6 +1113,7 @@ class format_multitopic extends core_courseformat\base {
      * @param bool $foreditform
      * @return array
      */
+    #[\Override]
     public function section_format_options($foreditform = false): array {
         // INCLUDED instead /course/format/topics/lib.php function course_format_options body (excluding array items).
         static $sectionformatoptions = false;
@@ -1192,6 +1214,7 @@ class format_multitopic extends core_courseformat\base {
      * @param bool $forsection 'true' if this is a section edit form, 'false' if this is course edit form.
      * @return array array of references to the added form elements.
      */
+    #[\Override]
     public function create_edit_form_elements(&$mform, $forsection = false): array {
         $elements = parent::create_edit_form_elements($mform, $forsection);
 
@@ -1219,6 +1242,7 @@ class format_multitopic extends core_courseformat\base {
      *     this object contains information about the course before update
      * @return bool whether there were any changes to the options values
      */
+    #[\Override]
     public function update_course_format_options($data, $oldcourse = null): bool {
         $data = (array)$data;
         if ($oldcourse !== null) {
@@ -1252,6 +1276,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return null|renderable
      */
+    #[\Override]
     public function course_header() {
         // REMOVED: Removed empty function body.
         // ADDED.
@@ -1266,6 +1291,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return renderable|null
      */
+    #[\Override]
     public function course_content_header() {
         global $PAGE;
         // Don't show in manage files popup.  TODO: Better way?
@@ -1283,6 +1309,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return renderable|null
      */
+    #[\Override]
     public function course_content_footer() {
         global $PAGE;
         // Don't show in manage files popup.  TODO: Better way?
@@ -1301,6 +1328,7 @@ class format_multitopic extends core_courseformat\base {
      * @param int|stdClass|section_info $section The section to check.  Should specify fmt calculated properties.
      * @return bool
      */
+    #[\Override]
     public function is_section_current($section): bool {
         // ADDED.
         if (!is_object($section)) {
@@ -1324,6 +1352,7 @@ class format_multitopic extends core_courseformat\base {
      * @param section_info $section the section modinfo
      * @return bool;
      */
+    #[\Override]
     public function is_section_visible(section_info $section): bool {
         // Previous to Moodle 4.0 thas logic was hardcoded. To prevent errors in the contrib plugins
         // the default logic is the same required for topics and weeks format and still uses
@@ -1361,6 +1390,7 @@ class format_multitopic extends core_courseformat\base {
      * @param bool $available the 'available' propery of the section_info as it was evaluated by conditional availability.
      * @param string $availableinfo the 'availableinfo' propery of the section_info as it was evaluated by conditional availability.
      */
+    #[\Override]
     public function section_get_available_hook(section_info $section, &$available, &$availableinfo): void {
         if ($section->component) {
             parent::section_get_available_hook($section, $available, $availableinfo);
@@ -1394,6 +1424,7 @@ class format_multitopic extends core_courseformat\base {
      * @param int|stdClass|section_info $section The section to check.
      * @return bool
      */
+    #[\Override]
     public function can_delete_section($section): bool {
         $sectionextra = $this->fmt_get_section_extra($section);                 // ADDED.
         return !$sectionextra->hassubsections;                                  // CHANGED.
@@ -1411,6 +1442,7 @@ class format_multitopic extends core_courseformat\base {
      * @param null|lang_string|string $editlabel
      * @return \core\output\inplace_editable
      */
+    #[\Override]
     public function inplace_editable_render_section_name(
         $section,
         $linkifneeded = true,
@@ -1468,6 +1500,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return bool
      */
+    #[\Override]
     public function supports_news(): bool {
         return true;
     }
@@ -1480,6 +1513,7 @@ class format_multitopic extends core_courseformat\base {
      * @param stdClass|section_info $section section where this module is located or will be added to
      * @return bool
      */
+    #[\Override]
     public function allow_stealth_module_visibility($cm, $section): bool {
         // Allow the third visibility state inside visible sections or in section 0.
         return !$section->section || $section->visible;
@@ -1498,6 +1532,7 @@ class format_multitopic extends core_courseformat\base {
      * @param int $sr unused
      * @return null|array any data for the Javascript post-processor (must be json-encodeable)
      */
+    #[\Override]
     public function section_action($section, $action, $sr) {
         global $PAGE;
 
@@ -1524,6 +1559,7 @@ class format_multitopic extends core_courseformat\base {
      * @return array the list of configuration settings
      * @since Moodle 3.5
      */
+    #[\Override]
     public function get_config_for_external(): array {
         // Return everything (nothing to hide).
         return $this->get_format_options();
@@ -1535,6 +1571,7 @@ class format_multitopic extends core_courseformat\base {
      *
      * @return bool True if sections can be removed, false otherwise.
      */
+    #[\Override]
     public function can_sections_be_removed_from_navigation(): bool {
         global $PAGE;
         return ($PAGE->context->contextlevel == CONTEXT_COURSE);

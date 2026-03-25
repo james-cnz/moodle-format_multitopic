@@ -47,6 +47,7 @@ class visibility extends visibility_base {
      *
      * @return bool
      */
+    #[\Override]
     protected function is_section_visibility_editable(): bool {
         $result = parent::is_section_visibility_editable();
         if ($this->section->component) {
