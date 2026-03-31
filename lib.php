@@ -31,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/format/lib.php');
 // ADDED.
 require_once(__DIR__ . '/locallib.php');
-require_once(__DIR__ . '/classes/global_navigation_wrapper.php');
 require_once(__DIR__ . '/classes/courseheader.php');
 require_once(__DIR__ . '/classes/coursecontentheaderfooter.php');
 // END ADDED.
@@ -854,8 +853,6 @@ class format_multitopic extends core_courseformat\base {
      */
     public function extend_course_navigation($navigation, navigation_node $node) {
         global $PAGE;
-
-        // $navigationwrapper = new \format_multitopic\global_navigation_wrapper($navigation, $PAGE); // ADDED.
 
         // If section is specified in course/view.php, make sure it is expanded in navigation.
         if ($navigation->includesectionnum === false) {
