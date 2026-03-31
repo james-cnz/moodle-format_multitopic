@@ -866,7 +866,7 @@ class format_multitopic extends core_courseformat\base {
                 (($selectedsectionid !== null) || ($selectedsection !== null)) && (!defined('AJAX_SCRIPT') || (AJAX_SCRIPT == '0'))
                 && ($PAGE->context->contextlevel == CONTEXT_COURSE)
             ) {
-                $navigation->includesectionnum = $selectedsection ?? $this->get_modinfo()->get_section_info_by_id($selectedsectionid)?->section
+                $navigation->includesectionnum = $selectedsection ?? $this->get_modinfo()->get_section_info_by_id($selectedsectionid)?->section;
             }
             // END CHANGED.
         }
@@ -879,37 +879,38 @@ class format_multitopic extends core_courseformat\base {
 
         // Wrap navigation nodes.
         $modinfo = $this->get_modinfo();
-        $sections = $modinfo->get_listed_section_info();
+        $sections = $modinfo->get_listed_section_info_all();
         $wrappedkey = -1;
-        $nodeatlevel = [-1: $node, 0: $node, 1: $node];
+        $nodeatlevel = [-1 => $node];
+        $nodemaxlevel = -1;
         foreach ($sections as $section) {
             $sectionextra = $this->fmt_get_section_extra($section);
             $unwrappednode = $node->get($section->id, $node::TYPE_SECTION);
             if ($unwrappednode) {
                 $unwrappednode->remove();
             }
-            $firstlevel = max($sectionextra->levelsan, FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1);
-            $lastlevel = max($sectionextra->pagedepthdirect, $firstlevel);
-            // END ADDED.
-            for ($level = $firstlevel; $level <= $lastlevel; $level++) {
-                $parentnode = $nodeatlevel[$level - 1];                          // ADDED.
-                if ($level < $lastlevel) {
+            if ($sectionextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+                $firstlevel = max($sectionextra->levelsan, FORMAT_MULTITOPIC_SECTION_LEVEL_ROOT + 1);
+                $lastlevel = max($sectionextra->pagedepthdirect, $firstlevel);
+                for ($level = $firstlevel; $level <= $lastlevel; $level++) {
+                    $parentnode = $nodeatlevel[$level - 1];
                     $sectionnode = $parentnode->create(
-                        text: $sectionname,
-                        action: $url,
+                        text: $section->name,
+                        action: $this->get_view_url($section),
                         type: navigation_node::TYPE_SECTION,
                         key: $wrappedkey--,
-                        icon: new pix_icon('i/section')
+                        icon: new pix_icon('i/section', '')
                     );
-                    // CHANGED ABOVE: Attach to parentnode with nodeid as defined above, and use a list icon for topic sections.
                     $sectionnode->nodetype = navigation_node::NODETYPE_BRANCH;
                     $sectionnode->hidden = (!$section->visible || !$section->available) && ($section->section != 0);
                     $sectionnode->add_attribute('data-section-name-for', $section->id);
-                } else {
-                    $sectionnode = $unwrappednode;
+                    $parentnode->add_node($sectionnode);
+                    $nodeatlevel[$level] = $sectionnode;
                 }
-                $parentnode->add_node($sectionnode);
-                $nodeatlevel[$level] = $sectionnode;                             // ADDED.
+                $nodemaxlevel = $lastlevel;
+            }
+            if ($unwrappednode) {
+                $nodeatlevel[$nodemaxlevel]->add_node($unwrappednode);
             }
         }
     }
