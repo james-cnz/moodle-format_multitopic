@@ -25,6 +25,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use core\exception\moodle_exception;
+use core\lang_string;
+use core\output\html_writer;
 
 /**
  * Moves sections within a course, from a position to another.
@@ -42,7 +45,7 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     global $DB;                                                                 // CHANGED: Removed $USER.
 
     if (!isset($destination)) {                                                 // CHANGED.
-        throw new \moodle_exception('sectionnotexist');                         // CHANGED.
+        throw new moodle_exception('sectionnotexist');                          // CHANGED.
     }
 
     // Compatibility with course formats using field 'numsections'.
@@ -51,7 +54,7 @@ function format_multitopic_move_section_to(\stdClass $course, $origins, \stdClas
     // Get all sections for this course and re-order them.
     rebuild_course_cache($course->id, true);
     if (!$sectionsextra = course_get_format($course)->fmt_get_sections_extra()) { // CHANGED.
-        throw new \moodle_exception('cannotcreateorfindstructs');               // CHANGED.
+        throw new moodle_exception('cannotcreateorfindstructs');                // CHANGED.
     }
 
     $movedsections = format_multitopic_reorder_sections($sectionsextra, $origins, $destination, $include); // CHANGED.
@@ -182,7 +185,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
     // Reads Calculated section values (levelsan, visiblesan).
     // Writes raw section values (level, visible).
     if (!is_array($sectionsextra)) {
-        throw new \moodle_exception('cannotcreateorfindstructs');
+        throw new moodle_exception('cannotcreateorfindstructs');
     }
 
     // Ignore delegated sections if appropriate.
@@ -203,19 +206,19 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
     foreach ($origins as $origin) {
         // Locate origin section in sections array.
         if (!($originextra = array_key_exists($origin->id, $sectionsextra) ? $sectionsextra[$origin->id] : null)) {
-            throw new \moodle_exception('sectionnotexist');
+            throw new moodle_exception('sectionnotexist');
         }
 
         // We can't move section position 0.
         if (isset($originextra->section) && ($originextra->section < 1)) {
-            throw new \moodle_exception('cannotcreateorfindstructs');
+            throw new moodle_exception('cannotcreateorfindstructs');
         }
 
         if (!isset($originlevel)) {
             $originlevel = $originextra->levelsan;
         } else {
             if ($originextra->levelsan != $originlevel) {
-                throw new \moodle_exception('cannotcreateorfindstructs');
+                throw new moodle_exception('cannotcreateorfindstructs');
             }
         }
 
@@ -248,14 +251,14 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
             $parentextra = $sectionextra;
             if ($target->level <= $parentextra->levelsan) {
                 // The moved section can not be a child of the specified parent.
-                throw new \moodle_exception('cannotcreateorfindstructs');
+                throw new moodle_exception('cannotcreateorfindstructs');
             }
         } else if (isset($target->prevupid) && ($sectionextra->id == $target->prevupid)) {
             // Reached the target previous section, remember it.
             $prevextra = $sectionextra;
             if ($target->level < $prevextra->levelsan) {
                 // The moved section can not have the specified section as its previous.
-                throw new \moodle_exception('cannotcreateorfindstructs');
+                throw new moodle_exception('cannotcreateorfindstructs');
             }
         } else if (
             isset($parentextra)
@@ -269,7 +272,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
             // or the position before a specified next section.
             if ($sectionextra->levelsan > $target->level) {
                 // If inserted here, the moved section would absorb other sections.
-                throw new \moodle_exception('cannotcreateorfindstructs');
+                throw new moodle_exception('cannotcreateorfindstructs');
             }
             $appendextraarray[$id] = $sectionextra;
             unset($sectionsextra[$id]);
@@ -287,7 +290,7 @@ function format_multitopic_reorder_sections(array $sectionsextra, $origins, \std
         $found = true;
     }
     if (!$found) {
-        throw new \moodle_exception('sectionnotexist');
+        throw new moodle_exception('sectionnotexist');
     }
 
     $sections = [];
@@ -367,27 +370,27 @@ function format_multitopic_image_attribution($imagename, $authorwithurl, $licenc
     $authorhtml = $authorwithurlarray[0];
     if (count($authorwithurlarray) > 1) {
         $authorurl = $authorwithurlarray[1];
-        $authorhtml = \html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
+        $authorhtml = html_writer::tag('a', $authorhtml, ['href' => $authorurl, 'target' => '_blank']);
     }
     $licence = license_manager::get_licenses()[$licencecode] ?? null;
     $licencehtml = ($licencecode && ($licencecode != 'unknown') && $licence) ? $licence->fullname : '';
     if ($licencehtml && $licence->source) {
-        $licencehtml = \html_writer::tag('a', $licencehtml, ['href' => $licence->source, 'target' => '_blank']);
+        $licencehtml = html_writer::tag('a', $licencehtml, ['href' => $licence->source, 'target' => '_blank']);
     }
-    $o .= \html_writer::tag(
+    $o .= html_writer::tag(
         'span',
         get_string('image', 'format_multitopic') . ": {$imagename}" . (($authorhtml || $licencehtml) ? ',' : ''),
         ['style' => 'white-space: nowrap;']
     ) . ' ';
     if ($authorhtml) {
-        $o .= \html_writer::tag(
+        $o .= html_writer::tag(
             'span',
             get_string('image_by', 'format_multitopic') . " {$authorhtml}" . ($licencehtml ? ',' : ''),
             ['style' => 'white-space: nowrap;']
         ) . ' ';
     }
     if ($licencehtml) {
-        $o .= \html_writer::tag(
+        $o .= html_writer::tag(
             'span',
             get_string('image_licence', 'format_multitopic') . " {$licencehtml}",
             ['style' => 'white-space: nowrap;']

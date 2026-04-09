@@ -27,6 +27,9 @@
 
 namespace format_multitopic\output;
 
+use core\output\html_writer;
+use core\output\renderable;
+use core\output\templatable;
 use core_courseformat\output\section_renderer;
 use moodle_page;
 
@@ -56,16 +59,16 @@ class renderer extends section_renderer {
      * course format templatables can be rendered using the core_course/local/* templates.
      * Format plugins are free to override the default template location using render_xxx methods as usual.
      *
-     * @param \renderable $widget instance with renderable interface
+     * @param renderable $widget instance with renderable interface
      * @return string the widget HTML
      */
     #[\Override]
-    public function render(\renderable $widget) {
+    public function render(renderable $widget) {
         global $CFG;
         $fullpath = str_replace('\\', '/', get_class($widget));
 
         // Check for special course format templatables.
-        if ($widget instanceof \templatable) {
+        if ($widget instanceof templatable) {
             // Templatables from both core_courseformat\output\local\* and format_xxx\output\courseformat\*
             // use format_multitopic/courseformat templates, if they exist.
             $corepath = 'core_courseformat\/output\/local';
@@ -106,8 +109,8 @@ class renderer extends section_renderer {
 
         return  '<div>'
                 . $this->render(course_get_format($course)->inplace_editable_render_section_name($section, $linkifneeded))
-                . \html_writer::empty_tag('br')
-                . \html_writer::tag('span', $datestring, ['class' => 'section_subtitle'])
+                . html_writer::empty_tag('br')
+                . html_writer::tag('span', $datestring, ['class' => 'section_subtitle'])
                 . '</div>';                                                     // CHANGED.
     }
 

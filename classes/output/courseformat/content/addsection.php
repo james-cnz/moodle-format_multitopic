@@ -25,6 +25,8 @@
 
 namespace format_multitopic\output\courseformat\content;
 
+use core\output\renderer_base;
+use core\url;
 use core_courseformat\output\local\content\addsection as addsection_base;
 use core_courseformat\base as course_format;
 use section_info;
@@ -66,13 +68,13 @@ class addsection extends addsection_base {
      * Note to course format developers: inserting sections in the other positions should check both
      * capabilities 'moodle/course:update' and 'moodle/course:movesections'.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @param int $lastsection the last section number
      * @param int $maxsections the maximum number of sections (deprecated since Moodle 5.1)
      * @return stdClass data context for a mustache template
      */
     #[\Override]
-    protected function get_add_section_data(\renderer_base $output, int $lastsection, int $maxsections = 0): stdClass {
+    protected function get_add_section_data(renderer_base $output, int $lastsection, int $maxsections = 0): stdClass {
         $format = $this->format;
         $course = $format->get_course();
         $data = parent::get_add_section_data($output, $lastsection, $maxsections);
@@ -85,7 +87,7 @@ class addsection extends addsection_base {
             'courseid' => $course->id, // CHANGED.
             'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,
             'sesskey' => sesskey(),
-            'returnurl' => new \moodle_url(
+            'returnurl' => new url(
                 "/course/view.php?id={$course->id}"
                 . (($format->get_sectionid() != $format->fmtrootsectionid) ?
                     "&sectionid={$format->get_sectionid()}" : "")
@@ -97,7 +99,7 @@ class addsection extends addsection_base {
             $params['insertparentid'] = $format->get_sectionid();
         }
 
-        $data->addsections->url = new \moodle_url('/course/format/multitopic/_course_changenumsections.php', $params);
+        $data->addsections->url = new url('/course/format/multitopic/_course_changenumsections.php', $params);
         $data->addsections->title = $addstring;
 
         return $data;

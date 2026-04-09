@@ -27,6 +27,8 @@
 namespace format_multitopic\output\courseformat\content\section;
 
 use context_course;
+use core\output\html_writer;
+use core\url;
 use core_courseformat\output\local\content\section\summary as summary_base;
 
 /**
@@ -68,7 +70,7 @@ class summary extends summary_base {
             $filename = $file->get_filename();
             $filenameextpos = strrpos($filename, '.');
             if ((substr($filename, 0, 4) == 'goi_') && $filenameextpos) {
-                $imageurl = \moodle_url::make_file_url(
+                $imageurl = url::make_file_url(
                     '/pluginfile.php',
                     "/{$file->get_contextid()}/course/section/{$section->id}{$file->get_filepath()}{$filename}"
                 );
@@ -83,12 +85,12 @@ class summary extends summary_base {
 
         // Output section image, if any.
         if (isset($imageurl)) {
-            $o .= \html_writer::start_tag('div', ['class' => 'section_image_holder']);
-            $o .= \html_writer::empty_tag('img', ['src' => $imageurl]);
-            $o .= \html_writer::start_tag('p');
+            $o .= html_writer::start_tag('div', ['class' => 'section_image_holder']);
+            $o .= html_writer::empty_tag('img', ['src' => $imageurl]);
+            $o .= html_writer::start_tag('p');
             $o .= \format_multitopic_image_attribution($imagename, $authorwithurl, $licencecode);
-            $o .= \html_writer::end_tag('p');
-            $o .= \html_writer::end_tag('div');
+            $o .= html_writer::end_tag('p');
+            $o .= html_writer::end_tag('div');
         }
         // END ADDED.
 

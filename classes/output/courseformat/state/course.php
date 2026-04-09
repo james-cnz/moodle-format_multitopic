@@ -16,6 +16,7 @@
 
 namespace format_multitopic\output\courseformat\state;
 
+use core\output\renderer_base;
 use core_courseformat\output\local\state\course as base_course;
 use core_courseformat\base as course_format;
 use stdClass;
@@ -47,11 +48,11 @@ class course extends base_course {
     /**
      * Export this data so it can be used as state object in the course editor.
      *
-     * @param \renderer_base $output typically, the renderer that's calling this function
+     * @param renderer_base $output typically, the renderer that's calling this function
      * @return stdClass data context for a mustache template
      */
     #[\Override]
-    public function export_for_template(\renderer_base $output): stdClass {
+    public function export_for_template(renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
         $format = $this->format;
         $sectionsextra = $format->fmt_get_sections_extra();
