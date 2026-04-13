@@ -55,9 +55,7 @@ class section extends base_section {
     public function export_for_template(renderer_base $output): stdClass {
         $data = parent::export_for_template($output);
         $format = $this->format;
-        $course = $format->get_course();
         $section = $this->section;
-        $data->sectionurl = course_get_url($course, $section)->out(false);
         $data->component = $section->component ?? null;
         if ($section->component) {
             return $data;
