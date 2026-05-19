@@ -164,8 +164,10 @@
         {{/ core_courseformat/local/content/bulkedittools}}
     {{/bulkedittools}}
 </div>
+{{$ core_courseformat/local/content-js}}
 {{#js}}
 require(['format_multitopic/courseformat/content'], function(component) {
     component.init('#page', {}, null, {{pagesectionid}});
 });
 {{/js}}
+{{/ core_courseformat/local/content-js}}

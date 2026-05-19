@@ -42,14 +42,24 @@ export default class extends SectionBase {
             const sectionItem = this.getElement(this.selectors.SECTION_ITEM);
             if (sectionItem) {
                 // Init the inner dragable element.
-                const headerComponent = new Header({ // CHANGED.
-                    ...this,
-                    element: sectionItem,
-                    fullregion: this.element,
-                });
+                const headerComponent = this._newHeader(sectionItem);
                 this.configDragDrop(headerComponent);
             }
         }
+    }
+
+    /**
+     * Create a new Header object.
+     *
+     * @param {Element} sectionItem the Header's element
+     * @return {Header} the new object
+     */
+    _newHeader(sectionItem) {
+        return new Header({
+            ...this,
+            element: sectionItem,
+            fullregion: this.element,
+        });
     }
 
     /**

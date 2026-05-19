@@ -112,8 +112,10 @@
     {{> format_multitopic/courseformat/courseindex/section }}
     {{/sectionsnested}}
 </div>
+{{$ core_courseformat/local/courseindex/courseindex-js}}
 {{#js}}
 require(['format_multitopic/courseformat/courseindex/courseindex'], function(component) {
     component.init('#course-index');
 });
 {{/js}}
+{{/ core_courseformat/local/courseindex/courseindex-js}}

@@ -46,6 +46,8 @@ export default class Component extends BaseComponent {
     /**
      * Static method to create a component instance form the mustahce template.
      *
+     * Redeclaration deprecated since Moodle 5.2, see MDL-82720
+     *
      * @param {string} target the DOM main element or its ID
      * @param {object} selectors optional css selector overrides
      * @param {number} sectionReturn the section number of the displayed page
@@ -301,15 +303,15 @@ export default class Component extends BaseComponent {
      * Regenerate content indexes.
      *
      * This method is used when a legacy action refresh some content element.
+     *
+     * Redeclaration mostly deprecated since Moodle 5.2, see MDL-82720
      */
     _indexContents() {
         // Find unindexed sections.
         this._scanIndex(
             this.selectors.SECTION,
             this.sections,
-            (item) => {
-                return new Section(item); // CHANGED.
-            }
+            this._newSection
         );
 
         // Find unindexed cms.
@@ -322,6 +324,17 @@ export default class Component extends BaseComponent {
         );
 
         this._refreshAllSectionsToggler(this.reactive.stateManager.state); // ADDED.
+    }
+
+
+    /**
+     * Create a new Section object.
+     *
+     * @param {Object} item the constructor data
+     * @return {Section} the new object
+     */
+    _newSection(item) {
+        return new Section(item);
     }
 
     /**

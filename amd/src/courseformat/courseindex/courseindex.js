@@ -133,8 +133,7 @@ export default class Component extends BaseComponent {
         const exporter = this.reactive.getExporter();
         const data = exporter.section(state, element);
         // Create the new content.
-        const newcomponent = await this.renderComponent(fakeelement, 'format_multitopic/courseformat/courseindex/section', data);
-        // CHANGED LINE ABOVE.
+        const newcomponent = await this._renderSection(fakeelement, data);
         // Replace the fake node with the real content.
         const newelement = newcomponent.getElement();
         this.sections[element.id] = newelement;
@@ -142,6 +141,17 @@ export default class Component extends BaseComponent {
         if (fakesubsections.children.length > 0) {
             newelement.querySelector(".courseindex-item-content .subsections").replaceWith(fakesubsections);
         }
+    }
+
+    /**
+     * Render a course index section template.
+     *
+     * @param {Element} fakeelement fake node while the component is loading
+     * @param {Object} data the render data
+     * @return {Promise<BaseComponent>} the new object
+     */
+    _renderSection(fakeelement, data) {
+        return this.renderComponent(fakeelement, 'format_multitopic/courseformat/courseindex/section', data);
     }
 
 }
