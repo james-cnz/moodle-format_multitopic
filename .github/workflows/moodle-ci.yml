@@ -55,8 +55,14 @@ jobs:
             # extensions: xmlrpc-beta
           # Moodle 5.2, PHP 8.4, PostgresSQL
           - php: '8.4' # 8.3-8.4
-            moodle-branch: 'main'
+            moodle-branch: 'MOODLE_502_STABLE'
             database: pgsql
+            plugin-ci: ^4
+            # extensions: xmlrpc-beta
+          # Moodle 5.3, PHP 8.4, MariaDB
+          - php: '8.4' # 8.3-8.4
+            moodle-branch: 'main'
+            database: mariadb
             plugin-ci: ^4
             # extensions: xmlrpc-beta
 
