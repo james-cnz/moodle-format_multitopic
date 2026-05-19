@@ -220,6 +220,11 @@ export default class Component extends BaseComponent {
     /**
      * Update a course section name on the whole page.
      *
+     * Course formats can override the section title rendering so the frontend depends heavily on backend
+     * rendering. Luckily in edit mode we can trigger a title update using the inplace_editable module.
+     *
+     * Redeclaration deprecated since Moodle 5.2, see MDL-85917.
+     *
      * @param {object} param
      * @param {Object} param.element details the update details.
      */
@@ -240,7 +245,7 @@ export default class Component extends BaseComponent {
             // The course content HTML can be modified at any moment, so the function need to do some checkings
             // to make sure the inplace editable still represents the same itemid.
             const currentitemid = inplace.getItemId();
-            if (currentitemid == element.id) { // CHANGED.
+            if (currentitemid == element.id) {
                 inplace.setValue(element.rawtitle);
             }
         }
