@@ -131,8 +131,10 @@
     </div>
 </div>
 {{#testingsection}}</div>{{/testingsection}}
+{{$ core_courseformat/local/courseindex/section-js}}
 {{#js}}
 require(['format_multitopic/courseformat/courseindex/section'], function(component) {
     component.init('#course-index-section-{{id}}');
 });
 {{/js}}
+{{/ core_courseformat/local/courseindex/section-js}}

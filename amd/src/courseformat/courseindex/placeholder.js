@@ -49,19 +49,17 @@ export default class Component extends BaseComponent {
     /**
      * Load the course index template.
      *
+     * Redeclaration deprecated since Moodle 5.2, see MDL-82720
+     *
      * @param {Object} state the initial state
      */
     async loadTemplateContent(state) {
         // Collect section information from the state.
         const exporter = this.reactive.getExporter();
         const data = exporter.course(state);
-        data.sectionsnested = this._nestSections(data.sections);
         try {
             // To render an HTML into our component we just use the regular Templates module.
-            const {html, js} = await Templates.renderForPromise(
-                'format_multitopic/courseformat/courseindex/courseindex', // CHANGED.
-                data,
-            );
+            const {html, js} = await this._renderCourseIndex(data);
             Templates.replaceNode(this.element, html, js);
             this.pendingContent.resolve();
 
@@ -71,6 +69,20 @@ export default class Component extends BaseComponent {
             this.pendingContent.resolve(error);
             throw error;
         }
+    }
+
+    /**
+     * Render the course index template.
+     *
+     * @param {Object} data the render data
+     * @return {Promise<{html: string, js: string}>} the new HTML and JS
+     */
+    _renderCourseIndex(data) {
+        data.sectionsnested = this._nestSections(data.sections);
+        return Templates.renderForPromise(
+            'format_multitopic/courseformat/courseindex/courseindex',
+            data,
+        );
     }
 
     /**

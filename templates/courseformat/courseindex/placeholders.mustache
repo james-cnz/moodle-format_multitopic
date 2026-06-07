@@ -19,6 +19,8 @@
 
     This template renders the loading placeholders for the course index.
 
+    Redeclaration mostly deprecated since Moodle 5.2, see MDL-82720
+
     Example context (json):
     {}
 }}
@@ -50,8 +52,10 @@
         </li>
     </ul>
 </div>
+{{$ core_courseformat/local/courseindex/placeholders-js}}
 {{#js}}
 require(['format_multitopic/courseformat/courseindex/placeholder'], function(component) {
     component.init('#course-index-placeholder');
 });
 {{/js}}
+{{/ core_courseformat/local/courseindex/placeholders-js}}
