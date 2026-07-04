@@ -16,11 +16,8 @@
 
 namespace format_multitopic\courseformat;
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once(__DIR__ . '/../../locallib.php');
-
 use core\exception\moodle_exception;
+use core_courseformat\formatactions;
 use format_multitopic;
 
 /**
@@ -101,7 +98,8 @@ class stateactions extends \core_courseformat\stateactions {
         foreach ($subids as $id) {
             $affectedsections[$id] = true;
         }
-        format_multitopic_move_section_to($course, $origins, $destination);      // CHANGED.
+        $sectionactions = formatactions::section($course);
+        $sectionactions->fmt_move_at($origins, $destination);                   // CHANGED.
 
         // Use section_state to return the section and activities updated state.
         $this->section_state($updates, $course, $subids, $targetsectionid);
@@ -180,7 +178,8 @@ class stateactions extends \core_courseformat\stateactions {
         foreach ($subids as $id) {
             $affectedsections[$id] = true;
         }
-        format_multitopic_move_section_to($course, $origins, $destination);      // CHANGED.
+        $sectionactions = formatactions::section($course);
+        $sectionactions->fmt_move_at($origins, $destination);                   // CHANGED.
 
         // Use section_state to return the section and activities updated state.
         $this->section_state($updates, $course, $subids, $targetsectionid);
@@ -258,7 +257,8 @@ class stateactions extends \core_courseformat\stateactions {
         foreach ($subids as $id) {
             $affectedsections[$id] = true;
         }
-        format_multitopic_move_section_to($course, $origins, $destination);      // CHANGED.
+        $sectionactions = formatactions::section($course);
+        $sectionactions->fmt_move_at($origins, $destination);                   // CHANGED.
 
         // Use section_state to return the section and activities updated state.
         $this->section_state($updates, $course, $subids, $targetsectionid);
