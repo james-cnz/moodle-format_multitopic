@@ -1226,10 +1226,19 @@ class format_multitopic extends core_courseformat\base {
         // REMOVED: numsections .
 
         // ADDED.
-        global $PAGE;
-        // Include code to preview the banner (and attribution, to an extent), if we're on the course edit page.
+        global $CFG, $PAGE;
         if (!$forsection) {
+            // Include code to preview the banner (and attribution, to an extent), if we're on the course edit page.
             $PAGE->requires->js('/course/format/multitopic/_course_edit.js');
+        } else if ($CFG->version >= 2026032000) {
+            $mform->hideIf('level', 'component', 'ne', '');
+            $mform->hideIf('periodduration', 'component', 'ne', '');
+            $mform->hideIf('collapsible', 'component', 'ne', '');
+            $mform->hideIf('level', 'id', 'eq', $this->fmtrootsectionid);
+            $mform->hideIf('periodduration', 'id', 'eq', $this->fmtrootsectionid);
+            $mform->hideIf('collapsible', 'id', 'eq', $this->fmtrootsectionid);
+            $mform->hideIf('periodduration', 'level', 'lt', 2);
+            $mform->hideIf('collapsible', 'level', 'lt', 2);
         }
         // END ADDED.
 
