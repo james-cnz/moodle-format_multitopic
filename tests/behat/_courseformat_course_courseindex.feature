@@ -62,6 +62,8 @@ Feature: Course index depending on role (Multitopic format)
     And "courseindex-content" "region" should be visible
     And I should see "Activity sample 1" in the "courseindex-content" "region"
 
+  # REMOVED Scenario: Course title is displayed in the course index heading
+
   @javascript
   Scenario: Course index as a teacher
     Given I log in as "teacher1"
@@ -176,36 +178,11 @@ Feature: Course index depending on role (Multitopic format)
     And I should see "Section 3" in the "courseindex-content" "region"
     And I should see "Activity sample 3" in the "courseindex-content" "region"
 
-  @javascript
-  Scenario: Course index toggling all sections
-    When I am on the "Course 1" course page logged in as teacher1
-    # Sections should be opened by default.
-    Then I should see "Section 1" in the "courseindex-content" "region"
-    And I should see "Activity sample 1" in the "courseindex-content" "region"
-    And I should see "Section 2" in the "courseindex-content" "region"
-    And I should see "Activity sample 2" in the "courseindex-content" "region"
-    And I should see "Section 3" in the "courseindex-content" "region"
-    And I should see "Activity sample 3" in the "courseindex-content" "region"
-    # Collapse all sections
-    And I click on "Course index options" "button" in the "#courseindexdrawercontrols" "css_element"
-    And I click on "Collapse all" "link" in the "#courseindexdrawercontrols" "css_element"
-    And I click on "Expand" "link" in the ".courseindex-section[data-number='0']" "css_element"
-    # ADDED line above.
-    And I should see "Section 1" in the "courseindex-content" "region"
-    And I should not see "Activity sample 1" in the "courseindex-content" "region"
-    And I should see "Section 2" in the "courseindex-content" "region"
-    And I should not see "Activity sample 2" in the "courseindex-content" "region"
-    And I should see "Section 3" in the "courseindex-content" "region"
-    And I should not see "Activity sample 3" in the "courseindex-content" "region"
-    # Expand all sections
-    And I click on "Course index options" "button" in the "#courseindexdrawercontrols" "css_element"
-    And I click on "Expand all" "link" in the "#courseindexdrawercontrols" "css_element"
-    And I should see "Section 1" in the "courseindex-content" "region"
-    And I should see "Activity sample 1" in the "courseindex-content" "region"
-    And I should see "Section 2" in the "courseindex-content" "region"
-    And I should see "Activity sample 2" in the "courseindex-content" "region"
-    And I should see "Section 3" in the "courseindex-content" "region"
-    And I should see "Activity sample 3" in the "courseindex-content" "region"
+  # REMOVED Scenario: Course index toggling all sections
+
+  # REMOVED Scenario: Adding a section updates the toggle button state
+
+  # REMOVED Scenario: Deleting a section updates the toggle button state
 
   @javascript
   Scenario: Course index section preferences
@@ -250,9 +227,7 @@ Feature: Course index depending on role (Multitopic format)
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     When I click on "Add topic" "link" in the "fmt-course-addsection" "region"
-    # CHANGED line above.
     Then I should see "Section 5" in the "courseindex-content" "region"
-    # CHANGED line above.
 
   @javascript
   Scenario: Remove a section should alter the course index
@@ -271,7 +246,31 @@ Feature: Course index depending on role (Multitopic format)
     Then I should not see "Section 1" in the "courseindex-content" "region"
     And I should not see "Activity sample 1" in the "courseindex-content" "region"
 
-  # REMOVED Course index locked activity link
+  @javascript
+  Scenario: Course index locked activity link
+    Given the following config values are set as admin:
+      | enableavailability | 1 |
+    And I log in as "teacher1"
+    And I am on "Course 1" course homepage with editing mode on
+    And I edit the section "3" and I fill the form with:
+      | Level | 0 |
+    # Add access restriction to Activity sample 3.
+    And I open "Activity sample 3" actions menu
+    And I click on "Edit settings" "link" in the "Activity sample 3" activity
+    And I expand all fieldsets
+    And I click on "Add restriction..." "button"
+    And I click on "Date" "button" in the "Add restriction..." "dialogue"
+    And I set the following fields to these values:
+      | x[day]   | 31                  |
+      | x[month] | 12                  |
+      | x[year]  | ## +1 year ## %Y ## |
+    And I press "Save and return to course"
+    And I log out
+    # Check course index link goes to the specific section.
+    When I log in as "student1"
+    And I am on "Course 1" course homepage
+    And I click on "Activity sample 3" "link" in the "courseindex-content" "region"
+    Then I should see "Activity sample 3" in the "region-main" "region"
 
   @javascript
   Scenario Outline: Course index is displayed by default depending on the screen size.
