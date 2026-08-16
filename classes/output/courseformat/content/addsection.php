@@ -78,7 +78,7 @@ class addsection extends addsection_base {
         global $CFG;
         $format = $this->format;
         $course = $format->get_course();
-        if ($CFG->version < 2025082900) {
+        if ($CFG->version < 2026081600) {
             $data = parent::get_add_section_data($output, $lastsection, $maxsections);
         } else {
             $data = new stdClass();
@@ -88,7 +88,7 @@ class addsection extends addsection_base {
                     get_string('addsectiontopic', 'format_' . $course->format)
                     : get_string('addsection', 'core_courseformat');
 
-        if ($CFG->version < 2025082900) {
+        if ($CFG->version < 2026081600) {
             $params = [
                 'courseid' => $course->id, // CHANGED.
                 'insertlevel' => FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC,

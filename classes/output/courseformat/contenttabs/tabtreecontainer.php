@@ -201,7 +201,7 @@ class tabtreecontainer implements named_templatable, renderable {
             $straddsection = get_string_manager()->string_exists('addsectionpage', 'format_' . $course->format) ?
                                 get_string('addsectionpage', 'format_' . $course->format)
                                 : get_string('addsection', 'core_courseformat');
-            if ($CFG->version < 2025082900) {
+            if ($CFG->version < 2026081600) {
                 $params = [
                     'courseid' => $course->id,
                     'increase' => true,
