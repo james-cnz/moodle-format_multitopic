@@ -46,7 +46,7 @@ class controlmenu extends controlmenu_base {
     /** @var bool Whether we are dealing with a page section */
     protected $fmtispage;
 
-    /** @var url Return URL */
+    /** @var url Return URL. Deprecated since Moodle 5.3. */
     protected $fmtreturnurl;
 
     /**
