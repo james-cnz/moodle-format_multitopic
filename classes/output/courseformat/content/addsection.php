@@ -135,7 +135,8 @@ class addsection extends addsection_base {
                     action: $action,
                     targetsectionid: $targetsectionid,
                     targetcmid: 2, // Level.
-                    returnurl: $format->get_view_url($returnsection),
+                    returnsection: $returnsection,
+                    returnoptions: $format->get_return_options($returnsection),
                 ),
                 'title' => $addstring,
                 'newsection' => $lastsection + 1,
