@@ -35,12 +35,12 @@
 
     {{#addsections}}
         <a href="{{{url}}}"
-            class="{{^canaddsection}}d-none{{/canaddsection}} w-100 btn add-section justify-content-center align-items-center p-3"
+            class="{{^canaddsection}}d-none{{/canaddsection}} w-100 btn btn-add-content add-section justify-content-center align-items-center p-3"
             data-add-sections="{{title}}"
             data-new-sections="{{newsection}}"
 
         >
-            {{#pix}} t/add, core {{/pix}}
+            <span>{{#pix}} t/add, core {{/pix}}</span>
             {{title}}
         </a>
         {{#fmthavemaxsections}}
