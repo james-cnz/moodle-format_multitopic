@@ -43,15 +43,15 @@ class stateactions extends \core_courseformat\stateactions {
      *
      * @deprecated since Moodle 5.0 MDL-83527
      * @todo Final deprecation in Moodle 6.0 MDL-83530
-     * @param stateupdates $updates the affected course elements track
-     * @param stdClass $course the course object
+     * @param \core_courseformat\stateupdates $updates the affected course elements track
+     * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
      * @param int|null $targetsectionid optional target section id
      * @param int|null $targetcmid optional reused as target level
      */
     public function fmt_section_move_before(
-        stateupdates $updates,
-        stdClass $course,
+        \core_courseformat\stateupdates $updates,
+        \stdClass $course,
         array $ids,
         ?int $targetsectionid = null,
         ?int $targetcmid = null
@@ -63,7 +63,7 @@ class stateactions extends \core_courseformat\stateactions {
 
         $this->validate_sections($course, $ids, __FUNCTION__);
 
-        $coursecontext = context_course::instance($course->id);
+        $coursecontext = \context_course::instance($course->id);
         require_capability('moodle/course:movesections', $coursecontext);
 
         // Target section.
@@ -122,16 +122,16 @@ class stateactions extends \core_courseformat\stateactions {
     /**
      * Move course sections after another location in the same course.
      *
-     * @param stateupdates $updates the affected course elements track
-     * @param stdClass $course the course object
+     * @param \core_courseformat\stateupdates $updates the affected course elements track
+     * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
      * @param int|null $targetsectionid optional target section id
      * @param int|null $targetcmid optional reused as target level
      */
     #[\Override]
     public function section_move_after(
-        stateupdates $updates,
-        stdClass $course,
+        \core_courseformat\stateupdates $updates,
+        \stdClass $course,
         array $ids,
         ?int $targetsectionid = null,
         ?int $targetcmid = null
@@ -143,7 +143,7 @@ class stateactions extends \core_courseformat\stateactions {
 
         $this->validate_sections($course, $ids, __FUNCTION__);
 
-        $coursecontext = context_course::instance($course->id);
+        $coursecontext = \context_course::instance($course->id);
         require_capability('moodle/course:movesections', $coursecontext);
 
         // Target section.
@@ -202,15 +202,15 @@ class stateactions extends \core_courseformat\stateactions {
     /**
      * Move course sections into another location in the same course.
      *
-     * @param stateupdates $updates the affected course elements track
-     * @param stdClass $course the course object
+     * @param \core_courseformat\stateupdates $updates the affected course elements track
+     * @param \stdClass $course the course object
      * @param int[] $ids the list of affected course section ids
      * @param int|null $targetsectionid optional target section id
      * @param int|null $targetcmid optional reused as target level
      */
     public function fmt_section_move_into(
-        stateupdates $updates,
-        stdClass $course,
+        \core_courseformat\stateupdates $updates,
+        \stdClass $course,
         array $ids,
         ?int $targetsectionid = null,
         ?int $targetcmid = null
@@ -222,7 +222,7 @@ class stateactions extends \core_courseformat\stateactions {
 
         $this->validate_sections($course, $ids, __FUNCTION__);
 
-        $coursecontext = context_course::instance($course->id);
+        $coursecontext = \context_course::instance($course->id);
         require_capability('moodle/course:movesections', $coursecontext);
 
         // Target section.
@@ -318,20 +318,20 @@ class stateactions extends \core_courseformat\stateactions {
     /**
      * Show/hide course sections.
      *
-     * @param stateupdates $updates the affected course elements track
-     * @param stdClass $course the course object
+     * @param \core_courseformat\stateupdates $updates the affected course elements track
+     * @param \stdClass $course the course object
      * @param int[] $ids section ids
      * @param int $visible the new visible value
      */
     #[\Override]
     protected function set_section_visibility(
-        stateupdates $updates,
-        stdClass $course,
+        \core_courseformat\stateupdates $updates,
+        \stdClass $course,
         array $ids,
         int $visible
     ): void {
         $this->validate_sections($course, $ids, __FUNCTION__);
-        $coursecontext = context_course::instance($course->id);
+        $coursecontext = \context_course::instance($course->id);
         require_all_capabilities(['moodle/course:update', 'moodle/course:sectionvisibility'], $coursecontext);
 
         $format = course_get_format($course->id);
