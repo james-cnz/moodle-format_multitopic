@@ -135,6 +135,10 @@ class content extends content_base {
 
         // REMOVED navigation.
 
+        if ($CFG->version >= 2026080300) {
+            $data->collapsemenu = true;
+        }
+
         $addsection = new $this->addsectionclass($format);
         $data->numsections = $addsection->export_for_template($output);
 

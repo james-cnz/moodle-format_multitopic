@@ -167,6 +167,8 @@ class section extends section_base {
      */
     #[\Override]
     protected function add_format_data(\stdClass &$data, array $haspartials, renderer_base $output): bool {
+        global $CFG;
+
         $section = $this->section;
 
         $result = parent::add_format_data($data, $haspartials, $output);
@@ -177,10 +179,10 @@ class section extends section_base {
         $sectionextra = $this->fmtsectionextra;
         $format = $this->format;
 
-        if (empty($section->component) && ($sectionextra->levelsan < 2)) {
+        if (($CFG->version < 2026080300) && empty($section->component) && ($sectionextra->levelsan < 2)) {
             $data->collapsemenu = true;
         } else {
-            unset($data->collapsemenu);
+            $data->collapsemenu = false;
         }
 
         // ADDED.
