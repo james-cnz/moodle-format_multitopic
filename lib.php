@@ -814,53 +814,56 @@ class format_multitopic extends core_courseformat\base {
      * The URL to use for the specified course (with section).
      *
      * @param int|stdClass $section Section object from database or just field course_sections.section
-     *                      Should specify fmt calculated properties,
-     *                      specifically levelsan, and parentid where levelsan is topic level.
+     *     if omitted the course view page is returned
      * @param array $options options for view URL. At the moment we use:
      *     'pagesectionid' (int) the section ID of the page to display (null or 0 for course main page)
      *     'parentpagesectionid' (int) the section ID of the page's parent
-     *     'navigation' (bool) if true and section has no separate page, the function returns null
-     * @return null|url
+     * @return url
      */
     #[\Override]
     public function get_view_url($section, $options = []) {
         $course = $this->get_course();
-        $sectionextra = ($section === null) ? null : $this->fmt_get_section_extra($section); // ADDED.
+        $modinfo = $this->get_modinfo();
+        $section = (is_null($section) || $section instanceof section_info) ?
+                    $section
+                    : (
+                        is_object($section) ?
+                        $modinfo->get_section_info_by_id($section->id, IGNORE_MISSING)
+                        : $modinfo->get_section_info($section, IGNORE_MISSING)
+                    );
 
-        if ($sectionextra !== null) {
-            $pageid = $sectionextra->id;
-            if (
-                !empty($sectionextra->sectionbase->component)
-                && ($sectionextra->sectionbase->component == 'mod_subsection')
-            ) {
-                $modinfo = get_fast_modinfo($course);
-                $pageid = $modinfo->get_instances_of('subsection')[$sectionextra->sectionbase->itemid]->section;
+        // Determine page.
+        if ($section != null) {
+            $pagesection = ($section && $section->get_component_instance()) ?
+                            $section->get_component_instance()->get_parent_section()
+                            : $section;
+            $pagesectionextra = $this->fmt_get_section_extra($pagesection);
+            if ($pagesectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+                $pagesection = $modinfo->get_section_info_by_id($pagesectionextra->parentid, IGNORE_MISSING);
             }
-            $pageextra = ($pageid == $sectionextra->id) ?
-                $sectionextra : $this->fmt_get_section_extra((object)['id' => $pageid]);
-            $pageid = ($pageextra->levelsan < FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) ?
-                $pageextra->id : $pageextra->parentid;
         } else if (array_key_exists('pagesectionid', $options)) {
-            $page = $this->get_modinfo()->get_section_info_by_id($options['pagesectionid'], IGNORE_MISSING);
-            $pageid = $page?->id;
-            if (!$pageid && array_key_exists('parentpagesectionid', $options)) {
-                $page = $this->get_modinfo()->get_section_info_by_id($options['parentpagesectionid'], IGNORE_MISSING);
-                $pageid = $page?->id;
+            $pagesectionid = $options['pagesectionid'] ?? null;
+            $pagesection = $pagesectionid ? $modinfo->get_section_info_by_id($pagesectionid, IGNORE_MISSING) : null;
+            if (!$pagesection && array_key_exists('parentpagesectionid', $options)) {
+                $pagesection = $modinfo->get_section_info_by_id($options['parentpagesectionid'], IGNORE_MISSING);
             }
         } else {
-            $pageid = null;
+            $pagesection = null;
         }
 
-        $url = new url('/course/view.php', ['id' => $course->id]);
-        if ($pageid && ($pageid != $this->fmtrootsectionid)) {
-            if (!empty($pageextra->sectionbase->component)) {
-                $url = new url('/course/section.php', ['id' => $pageid]);
-            } else {
-                $url->param('sectionid', $pageid);
+        // Base URL.
+        if (empty($pagesection?->component)) {
+            $url = new url('/course/view.php', ['id' => $course->id]);
+            if ($pagesection && ($pagesection->id != $this->fmtrootsectionid)) {
+                $url->param('sectionid', $pagesection->id);
             }
+        } else {
+            $url = new url('/course/section.php', ['id' => $pagesection->id]);
         }
-        if ($sectionextra && ($sectionextra->id != $pageid)) {
-            $url->set_anchor('sectionid-' . $sectionextra->id . '-title');
+
+        // Add details.
+        if ($section && ($section->id != $pagesection?->id)) {
+            $url->set_anchor("sectionid-{$section->id}-title");
         }
 
         return $url;
