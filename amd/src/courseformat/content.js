@@ -295,7 +295,13 @@ export default class Component extends BaseComponent {
 
         // Update Add section button.
         const addSectionDom = document.querySelector("div#fmt-course-addsection > a");
-        addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + pageSectionId);
+        if (addSectionDom.href.match(/\/_course_changenumsections.php\?/)) {
+            // Deprecated since Moodle 5.3.
+            addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + pageSectionId);
+        } else {
+            addSectionDom.href = addSectionDom.href.replace(/\btargetsectionid=\d+\b/, "targetsectionid=" + pageSectionId)
+                                .replace(/\breturnsectionid=\d+\b/, "returnsectionid=" + sectionlist.at(-1));
+        }
 
     }
 
