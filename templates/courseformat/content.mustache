@@ -21,6 +21,7 @@
 
     Example context (json):
     {
+
         "initialsection": {
                 "num": 0,
                 "id": 34,
@@ -128,7 +129,27 @@
         {{> format_multitopic/courseformat/contenttabs/tabtreecontainer}}
     {{/tabs}}
     {{{completionhelp}}}
-    <ul class="{{format}} section-list sections topics" data-for="course_sectionlist" data-originalsinglesectionid="{{originalsinglesectionid}}">
+    {{#collapsemenu}}
+        <div class="d-flex justify-content-end mb-1">
+            <button type="button"
+                    id="collapsesections"
+                    class="section-collapsemenu aabtn"
+                    aria-expanded="true"
+                    data-toggle="toggleall"
+            >
+                <span class="collapseall text-nowrap">
+                    {{#pix}} t/collapseall, core {{/pix}}
+                    <span class="collapsemenu-text">{{#str}}collapseall{{/str}}</span>
+                </span>
+                <span class="expandall text-nowrap">
+                    {{#pix}} t/expandall, core {{/pix}}
+                    <span class="collapsemenu-text">{{#str}}expandall{{/str}}</span>
+                </span>
+            </button>
+        </div>
+    {{/collapsemenu}}
+    <ul class="{{format}} section-list sections topics{{#collapsemenu}} has-collapsemenu{{/collapsemenu}}"
+            data-for="course_sectionlist" data-originalsinglesectionid="{{originalsinglesectionid}}">
         {{#initialsection}}
             {{$ core_courseformat/local/content/section }}
                 {{> format_multitopic/courseformat/content/section }}
