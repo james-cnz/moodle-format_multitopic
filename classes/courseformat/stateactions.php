@@ -294,6 +294,10 @@ class stateactions extends \core_courseformat\stateactions {
         ?int $targetsectionid = null,
         ?int $targetcmid = 2
     ): void {
+        // Validate target elements.
+        if (!$targetsectionid) {
+            throw new moodle_exception("Action fmt_section_add_into requires targetsectionid");
+        }
 
         $coursecontext = context_course::instance($course->id);
         require_capability('moodle/course:update', $coursecontext);

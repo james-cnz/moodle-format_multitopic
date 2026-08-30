@@ -76,6 +76,7 @@ class addsection extends addsection_base {
     #[\Override]
     protected function get_add_section_data(renderer_base $output, int $lastsection, int $maxsections = 0): stdClass {
         global $CFG;
+
         $format = $this->format;
         $course = $format->get_course();
         if ($CFG->version < 2026081600) {
