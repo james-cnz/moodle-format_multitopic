@@ -35,6 +35,7 @@ use core\output\html_writer;
  *
  * CHANGED: Pass section info through to corresponding course format function.
  *
+ * @deprecated since Moodle 5.3 MDL-86884
  * @param stdClass $course
  * @param section_info $section The section to check.  Must specify section (number).  Should specify calculated properties.
  * @return bool
