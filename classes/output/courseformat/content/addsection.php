@@ -113,23 +113,13 @@ class addsection extends addsection_base {
                 $action = 'section_add';
                 $targetsectionid = $this->targetsection->id;
                 $returnsection = $this->targetsection;
+                $returnoptions = $format->get_return_options($returnsection);
             } else {
                 $action = 'fmt_section_add_into';
                 $targetsectionid = $format->get_sectionid();
-                $sectionsextra = $format->fmt_get_sections_extra();
-                $foundparent = false;
-                $lastchildid = null;
-                foreach ($sectionsextra as $sectionextra) {
-                    if ($sectionextra->id == $targetsectionid) {
-                        $foundparent = true;
-                    } else if ($foundparent && $sectionextra->levelsan < 2) {
-                        break;
-                    }
-                    if ($foundparent) {
-                        $lastchildid = $sectionextra->id;
-                    }
-                }
-                $returnsection = $format->get_modinfo()->get_section_info_by_id($lastchildid);
+                $returnsection = null;
+                $returnoptions = $format->get_return_options($returnsection);
+                $returnoptions['pagelasttopic'] = 1;
             }
             $data->addsections = (object) [
                 'url' => $this->format->get_update_url(
@@ -137,7 +127,7 @@ class addsection extends addsection_base {
                     targetsectionid: $targetsectionid,
                     targetcmid: 2, // Level.
                     returnsection: $returnsection,
-                    returnoptions: $format->get_return_options($returnsection),
+                    returnoptions: $returnoptions,
                 ),
                 'title' => $addstring,
                 'newsection' => $lastsection + 1,

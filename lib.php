@@ -844,7 +844,20 @@ class format_multitopic extends core_courseformat\base {
         } else if (array_key_exists('pagesectionid', $options)) {
             $pagesectionid = $options['pagesectionid'] ?? null;
             $pagesection = $pagesectionid ? $modinfo->get_section_info_by_id($pagesectionid, IGNORE_MISSING) : null;
-            if (!$pagesection && array_key_exists('parentpagesectionid', $options)) {
+            if ($pagesection && array_key_exists('pagelasttopic', $options)) {
+                $sectionsextra = $this->fmt_get_sections_extra();
+                $foundpage = false;
+                foreach ($sectionsextra as $sectionextra) {
+                    if ($sectionextra->id == $pagesectionid) {
+                        $foundpage = true;
+                    } else if ($foundpage && $sectionextra->levelsan < 2) {
+                        break;
+                    }
+                    if ($foundpage) {
+                        $section = $sectionextra->sectionbase;
+                    }
+                }
+            } else if (!$pagesection && array_key_exists('parentpagesectionid', $options)) {
                 $pagesection = $modinfo->get_section_info_by_id($options['parentpagesectionid'], IGNORE_MISSING);
             }
         } else {
