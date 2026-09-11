@@ -46,7 +46,7 @@ class controlmenu extends controlmenu_base {
     /** @var bool Whether we are dealing with a page section */
     protected $fmtispage;
 
-    /** @var url Return URL */
+    /** @var url Return URL. Deprecated since Moodle 5.3. */
     protected $fmtreturnurl;
 
     /**
@@ -117,7 +117,7 @@ class controlmenu extends controlmenu_base {
         $link = parent::get_section_edit_item();
 
         if ($link) {
-            $link->url->remove_params('sr');
+            $link->url->remove_params('sr'); // Deprecated since Moodle 5.3.
             $link->url->remove_params('returnurl');
         }
 
