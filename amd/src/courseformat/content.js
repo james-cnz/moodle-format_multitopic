@@ -299,8 +299,7 @@ export default class Component extends BaseComponent {
             // Deprecated since Moodle 5.3.
             addSectionDom.href = addSectionDom.href.replace(/\binsertparentid=\d+\b/, "insertparentid=" + pageSectionId);
         } else {
-            addSectionDom.href = addSectionDom.href.replace(/\btargetsectionid=\d+\b/, "targetsectionid=" + pageSectionId)
-                                .replace(/\breturnsectionid=\d+\b/, "returnsectionid=" + sectionlist.at(-1));
+            addSectionDom.href = addSectionDom.href.replace(/\btargetsectionid=\d+\b/, "targetsectionid=" + pageSectionId);
         }
 
     }

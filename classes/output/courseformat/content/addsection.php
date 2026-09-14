@@ -118,7 +118,7 @@ class addsection extends addsection_base {
                 $action = 'fmt_section_add_into';
                 $targetsectionid = $format->get_sectionid();
                 $returnsection = null;
-                $returnoptions = $format->get_return_options($returnsection);
+                $returnoptions = $format->get_return_options($format->get_page_section());
                 $returnoptions['pagelasttopic'] = 1;
             }
             $data->addsections = (object) [
