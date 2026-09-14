@@ -218,7 +218,7 @@ class tabtreecontainer implements named_templatable, renderable {
                     action: 'fmt_section_add_into',
                     targetsectionid: $parentid,
                     targetcmid: $level,
-                    returnoptions: $format->get_return_options(null),
+                    returnoptions: $format->get_return_options($format->get_page_section()),
                 );
             }
             $icon = $output->pix_icon('t/switch_plus', $straddsection, 'moodle');
