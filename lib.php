@@ -658,14 +658,33 @@ class format_multitopic extends core_courseformat\base {
      *               and option values must be integers.
      */
     public function get_return_options(section_info|stdClass|null $section): array {
-        $pagesectionid = $this->get_sectionid();
+        $modinfo = $this->get_modinfo();
+        $section = (is_null($section) || $section instanceof section_info) ?
+                    $section
+                    : $modinfo->get_section_info_by_id($section->id, IGNORE_MISSING);
+
+        // Determine page.
+        if ($section != null) {
+            $pagesection = ($section && $section->get_component_instance()) ?
+                            $section->get_component_instance()->get_parent_section()
+                            : $section;
+            $pagesectionid = $pagesection->id;
+            $pagesectionextra = $this->fmt_get_section_extra($pagesection);
+            if ($pagesectionextra->levelsan >= FORMAT_MULTITOPIC_SECTION_LEVEL_TOPIC) {
+                $pagesectionid = $pagesectionextra->parentid;
+            }
+        } else {
+            $pagesectionid = null;
+        }
         $returnoptions = ['pagesectionid' => $pagesectionid ?? 0];
+
         $parentpagesectionid = $pagesectionid ?
                                 $this->fmt_get_section_extra((object)['id' => $pagesectionid])->parentid
                                 : null;
         if ($parentpagesectionid) {
             $returnoptions['parentpagesectionid'] = $parentpagesectionid;
         }
+
         return $returnoptions;
     }
 
