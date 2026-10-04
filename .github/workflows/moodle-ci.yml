@@ -37,43 +37,51 @@ jobs:
       matrix:
         include:
           # Moodle 5.0.0, PHP 8.2, PostgreSQL
-          - php: '8.2' # 8.2-8.4
+          - php: '8.2.0' # 8.2-8.4
             moodle-branch: 'v5.0.0'
             database: pgsql
             postgres-version: '14'
             mariadb-version: '10.11'
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 5.0, PHP 8.2, PostgreSQL
-          - php: '8.2' # 8.2-8.4
+          # Moodle 5.0, PHP 8.2, MariaDB
+          - php: '8.2.0' # 8.2-8.4
             moodle-branch: 'MOODLE_500_STABLE'
-            database: pgsql
-            postgres-version: '15'
+            database: mariadb
+            postgres-version: '14'
             mariadb-version: '10.11'
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 5.1, PHP 8.3, MariaDB
+          # Moodle 5.1, PHP 8.3, PostgreSQL
           - php: '8.3' # 8.2-8.4
             moodle-branch: 'MOODLE_501_STABLE'
+            database: pgsql
+            postgres-version: '16'
+            mariadb-version: '11.4'
+            plugin-ci: ^4
+            # extensions: xmlrpc-beta
+          # Moodle 5.2, PHP 8.3, MariaDB
+          - php: '8.3' # 8.3-8.4
+            moodle-branch: 'MOODLE_502_STABLE'
             database: mariadb
             postgres-version: '16'
-            mariadb-version: '10.11'
+            mariadb-version: '11.4'
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 5.2, PHP 8.4, PostgresSQL
+          # Moodle 5.3, PHP 8.4, PostgreSQL
           - php: '8.4' # 8.3-8.4
-            moodle-branch: 'MOODLE_502_STABLE'
+            moodle-branch: 'MOODLE_503_STABLE'
             database: pgsql
-            postgres-version: '17'
-            mariadb-version: '11'
+            postgres-version: '18'
+            mariadb-version: '13'
             plugin-ci: ^4
             # extensions: xmlrpc-beta
-          # Moodle 5.3, PHP 8.4, MariaDB
-          - php: '8.4' # 8.3-8.4
+          # Moodle 6.0, PHP 8.4, MariaDB
+          - php: '8.4'
             moodle-branch: 'main'
             database: mariadb
-            postgres-version: '17'
-            mariadb-version: '12.3'
+            postgres-version: '18'
+            mariadb-version: '13'
             plugin-ci: ^4
             # extensions: xmlrpc-beta
 
