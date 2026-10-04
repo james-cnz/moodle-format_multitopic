@@ -38,9 +38,7 @@ Feature: Course index depending on role (Multitopic format)
 #    Course index is visible on Course main page
     When I am on the "C1" "Course" page logged in as "teacher1"
     And "courseindex-content" "region" should be visible
-#    Course index is visible on Settings page
-    And I am on the "C1" "course editing" page
-    And "courseindex-content" "region" should be visible
+#    REMOVED Course index is visible on Settings page
 #    Course index is visible on Participants page
     And I am on the "C1" "enrolled users" page
     And "courseindex-content" "region" should be visible
@@ -184,6 +182,16 @@ Feature: Course index depending on role (Multitopic format)
 
   # REMOVED Scenario: Deleting a section updates the toggle button state
 
+  # REMOVED Scenario: Expanding a newly added section does not expand a different section
+
+  @javascript @accessibility
+  Scenario: The course index meets accessibility standards after a section is deleted
+    Given I am on the "Course 1" course page logged in as teacher1
+    And I turn editing mode on
+    When I delete section "2"
+    And I click on "Delete" "button" in the ".modal" "css_element"
+    Then the "#course-index" "css_element" should meet accessibility standards with "best-practice" extra tests
+
   @javascript
   Scenario: Course index section preferences
     When I am on the "C1" "Course" page logged in as "teacher1"
@@ -269,6 +277,8 @@ Feature: Course index depending on role (Multitopic format)
     # Check course index link goes to the specific section.
     When I log in as "student1"
     And I am on "Course 1" course homepage
+    And I click on "General" "link" in the "region-main" "region"
+    And I should not see "Activity sample 3" in the "region-main" "region"
     And I click on "Activity sample 3" "link" in the "courseindex-content" "region"
     Then I should see "Activity sample 3" in the "region-main" "region"
 
