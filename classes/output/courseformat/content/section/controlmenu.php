@@ -185,13 +185,7 @@ class controlmenu extends controlmenu_base {
             && has_capability('moodle/course:movesections', $this->coursecontext)
             && has_capability('moodle/course:sectionvisibility', $this->coursecontext)
         ) {
-            $url = new url(
-                $this->baseurl,
-                [
-                    'movesection' => $this->section->section,
-                    'section' => $this->section->section,
-                ]
-            );
+            $url = new url($this->baseurl);
             $link = new link_secondary(
                 url: $url,
                 icon: new pix_icon('i/dragdrop', ''),
